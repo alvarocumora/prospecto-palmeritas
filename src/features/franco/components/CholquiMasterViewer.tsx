@@ -4,6 +4,7 @@ import { ProjectMasterViewer, type AssayPoint } from "@/components/geo/ProjectMa
 import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
 import drillRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
+import pedimentosRaw from "@/data/geo/cholqui_pedimentos.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
 
 /** Visor maestro unificado de Cholqui: reemplaza los 3 mapas apilados por uno solo. */
@@ -18,6 +19,7 @@ function parse(raw: string): (FeatureCollection & { metadata?: Record<string, un
 const concessions = parse(concessionsRaw);
 const anomalies = parse(anomaliesRaw);
 const drillGrid = parse(drillRaw);
+const pedimentos = parse(pedimentosRaw);
 
 const norm = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
 const assayBy = new Map(CHOLQUI_ASSAYS.map((a) => [norm(a.sample), a]));
@@ -52,6 +54,7 @@ export function CholquiMasterViewer() {
       concessions={concessions}
       anomalies={anomalies}
       drillGrid={drillGrid}
+      pedimentos={pedimentos}
       assays={assays}
       coverage={coverage}
     />

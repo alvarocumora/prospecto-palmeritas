@@ -1,0 +1,82 @@
+{
+  "type": "FeatureCollection",
+  "name": "pedimentos_propuestos",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "tipo": "PROPUESTA / BORRADOR — no es solicitud oficial",
+    "datum": "WGS84 / UTM huso 19S (SIRGAS)",
+    "fuente_catastro": "SERNAGEOMIN",
+    "n": 1,
+    "disclaimer": "Vacancia indicativa. Requiere verificación legal / estudio de títulos (pedimentos en trámite, servidumbres, áreas protegidas) antes de constituir."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09071789912915,
+              -33.90688903308866
+            ],
+            [
+              -71.09036580673548,
+              -33.89246816026633
+            ],
+            [
+              -71.10765815473987,
+              -33.892173428222605
+            ],
+            [
+              -71.10801315454702,
+              -33.90659414168132
+            ],
+            [
+              -71.09071789912915,
+              -33.90688903308866
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-CQ-01",
+        "target_z": 7.15,
+        "area_ha": 256.0,
+        "lados_m": {
+          "E-W": 1600,
+          "N-S": 1600
+        },
+        "corners_utm": {
+          "NW": [
+            305100,
+            6247800
+          ],
+          "NE": [
+            306700,
+            6247800
+          ],
+          "SE": [
+            306700,
+            6246200
+          ],
+          "SW": [
+            305100,
+            6246200
+          ]
+        },
+        "cara_norte_utm": {
+          "E_centro": 305900.0,
+          "N": 6247800
+        },
+        "datum": "EPSG:32719",
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    }
+  ]
+}
