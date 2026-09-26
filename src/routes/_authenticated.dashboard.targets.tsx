@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
+import { lazy, useMemo, useRef, useState } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useProjectRole, canWrite } from "@/hooks/useProjectRole";
 import {
@@ -29,7 +29,10 @@ import {
   Satellite,
 } from "lucide-react";
 import { toast } from "sonner";
-import { TargetsMap } from "@/components/targets/TargetsMap";
+// react-leaflet toca `window` al importarse: cargar solo en cliente (evita crash SSR).
+const TargetsMap = lazy(() =>
+  import("@/components/targets/TargetsMap").then((m) => ({ default: m.TargetsMap })),
+);
 import { TargetsExecutivePanel } from "@/components/targets/TargetsExecutivePanel";
 import { snapshotElement, buildTargetsPDF } from "@/lib/exportTargetsPDF";
 import { InstallPWAButton } from "@/components/pwa/InstallPWAButton";
@@ -316,11 +319,13 @@ function TargetsPage() {
         </div>
       ) : view === "map" ? (
         <div ref={mapWrapRef}>
-          <TargetsMap
-            targets={targets}
-            concessions={concessions}
-            anomaliesByIndex={anomaliesByIndex}
-          />
+          <ClientOnly fallback={<div className="h-[600px] w-full animate-pulse bg-muted/20" />}>
+            <TargetsMap
+              targets={targets}
+              concessions={concessions}
+              anomaliesByIndex={anomaliesByIndex}
+            />
+          </ClientOnly>
         </div>
       ) : view === "ranking" ? (
         <div ref={rankingWrapRef}>
