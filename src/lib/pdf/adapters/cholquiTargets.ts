@@ -69,24 +69,14 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         note: `${summary.indexes.length} índices espectrales`,
       },
       {
-        label: "Puntaje máximo",
-        value: summary.maxScore != null ? summary.maxScore.toFixed(2).replace(".", ",") : "s/d",
-        note: "Realce relativo al fondo del AOI",
+        label: "Dentro de la tenencia",
+        value: `${summary.withinTenure} de ${summary.anomalies}`,
+        note: "Sólo estas generan plataforma propuesta",
       },
       {
         label: "Plataformas propuestas",
         value: String(summary.collars),
-        note: "Fase 1 conceptual, no comprometida",
-      },
-      {
-        label: "Metraje propuesto",
-        value: `${num(summary.totalMeters)} m`,
-        note: "Sondaje diamantino, inclinación -60°",
-      },
-      {
-        label: "Dentro de la tenencia",
-        value: `${summary.withinTenure} de ${summary.anomalies}`,
-        note: "Sólo estas generan plataforma propuesta",
+        note: `Fase 1 conceptual, ${num(summary.totalMeters)} m`,
       },
       {
         label: "Superficie interpretable",
@@ -98,6 +88,16 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
           data.coverage.bestCasePct != null
             ? `Mejor caso ${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} % del AOI`
             : "Cobertura sin vegetación del AOI",
+      },
+      {
+        label: "Puntaje máximo",
+        value: summary.maxScore != null ? summary.maxScore.toFixed(2).replace(".", ",") : "s/d",
+        note: "Realce relativo al fondo del AOI",
+      },
+      {
+        label: "Metraje propuesto",
+        value: `${num(summary.totalMeters)} m`,
+        note: "Sondaje diamantino, inclinación -60°",
       },
     ],
     thesis: [
