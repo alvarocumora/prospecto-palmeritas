@@ -1,0 +1,335 @@
+{
+  "type": "FeatureCollection",
+  "name": "distrito_pedimentos",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "tipo": "PROPUESTA / BORRADOR",
+    "datum": "WGS84/UTM19S (SIRGAS)",
+    "fuente": "SERNAGEOMIN (310 concesiones, distrito ampliado)",
+    "criterio": "terreno vacante <8 km de la mineralización de Cholqui, rectángulo N-S/E-W 100-5000 ha",
+    "n": 5,
+    "disclaimer": "Vacancia indicativa. Requiere verificación legal / estudio de títulos."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.06033012123065,
+              -33.99215903125827
+            ],
+            [
+              -71.05833196904152,
+              -33.90923805857077
+            ],
+            [
+              -71.08859995825728,
+              -33.90872833290567
+            ],
+            [
+              -71.09062744171133,
+              -33.991647719936886
+            ],
+            [
+              -71.06033012123065,
+              -33.99215903125827
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-D-01",
+        "area_ha": 2576.0,
+        "lados_m": {
+          "E-W": 2800,
+          "N-S": 9200
+        },
+        "dist_cholqui_km": 8.1,
+        "cara_norte_utm": {
+          "E_centro": 308300.0,
+          "N": 6246000
+        },
+        "datum": "EPSG:32719",
+        "corners_utm": {
+          "NW": [
+            306900,
+            6246000
+          ],
+          "NE": [
+            309700,
+            6246000
+          ],
+          "SE": [
+            309700,
+            6236800
+          ],
+          "SW": [
+            306900,
+            6236800
+          ]
+        },
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02745200594379,
+              -33.929587580697216
+            ],
+            [
+              -71.0265554716971,
+              -33.89173134318519
+            ],
+            [
+              -71.04384836924613,
+              -33.89144557262168
+            ],
+            [
+              -71.04475254081464,
+              -33.9293014043941
+            ],
+            [
+              -71.02745200594379,
+              -33.929587580697216
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-D-02",
+        "area_ha": 672.0,
+        "lados_m": {
+          "E-W": 1600,
+          "N-S": 4200
+        },
+        "dist_cholqui_km": 3.6,
+        "cara_norte_utm": {
+          "E_centro": 311800.0,
+          "N": 6248000
+        },
+        "datum": "EPSG:32719",
+        "corners_utm": {
+          "NW": [
+            311000,
+            6248000
+          ],
+          "NE": [
+            312600,
+            6248000
+          ],
+          "SE": [
+            312600,
+            6243800
+          ],
+          "SW": [
+            311000,
+            6243800
+          ]
+        },
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.97405162889021,
+              -33.91242155818053
+            ],
+            [
+              -70.9724535340173,
+              -33.84301580343267
+            ],
+            [
+              -70.97785470096427,
+              -33.842929242760384
+            ],
+            [
+              -70.97945716494438,
+              -33.912334771942554
+            ],
+            [
+              -70.97405162889021,
+              -33.91242155818053
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-D-03",
+        "area_ha": 385.0,
+        "lados_m": {
+          "E-W": 500,
+          "N-S": 7700
+        },
+        "dist_cholqui_km": 6.9,
+        "cara_norte_utm": {
+          "E_centro": 317250.0,
+          "N": 6253500
+        },
+        "datum": "EPSG:32719",
+        "corners_utm": {
+          "NW": [
+            317000,
+            6253500
+          ],
+          "NE": [
+            317500,
+            6253500
+          ],
+          "SE": [
+            317500,
+            6245800
+          ],
+          "SW": [
+            317000,
+            6245800
+          ]
+        },
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12931804983789,
+              -33.893604169500506
+            ],
+            [
+              -71.12873576185476,
+              -33.87017076513815
+            ],
+            [
+              -71.13954042966117,
+              -33.869983583945704
+            ],
+            [
+              -71.14012566763546,
+              -33.89341682377495
+            ],
+            [
+              -71.12931804983789,
+              -33.893604169500506
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-D-04",
+        "area_ha": 260.0,
+        "lados_m": {
+          "E-W": 1000,
+          "N-S": 2600
+        },
+        "dist_cholqui_km": 7.8,
+        "cara_norte_utm": {
+          "E_centro": 302600.0,
+          "N": 6250200
+        },
+        "datum": "EPSG:32719",
+        "corners_utm": {
+          "NW": [
+            302100,
+            6250200
+          ],
+          "NE": [
+            303100,
+            6250200
+          ],
+          "SE": [
+            303100,
+            6247600
+          ],
+          "SW": [
+            302100,
+            6247600
+          ]
+        },
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09325816686426,
+              -33.833809689221134
+            ],
+            [
+              -71.09200690695349,
+              -33.78243463461464
+            ],
+            [
+              -71.09632447647535,
+              -33.7823613304209
+            ],
+            [
+              -71.09757831417731,
+              -33.83373624353611
+            ],
+            [
+              -71.09325816686426,
+              -33.833809689221134
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-D-05",
+        "area_ha": 228.0,
+        "lados_m": {
+          "E-W": 400,
+          "N-S": 5700
+        },
+        "dist_cholqui_km": 9.0,
+        "cara_norte_utm": {
+          "E_centro": 306100.0,
+          "N": 6260000
+        },
+        "datum": "EPSG:32719",
+        "corners_utm": {
+          "NW": [
+            305900,
+            6260000
+          ],
+          "NE": [
+            306300,
+            6260000
+          ],
+          "SE": [
+            306300,
+            6254300
+          ],
+          "SW": [
+            305900,
+            6254300
+          ]
+        },
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    }
+  ]
+}
