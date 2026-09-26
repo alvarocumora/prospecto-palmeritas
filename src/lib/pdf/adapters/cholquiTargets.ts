@@ -176,8 +176,8 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         blocks: [
           {
             kind: "table",
-            head: ["ID", "Índice", "Severidad", "Puntaje", "Área ha", "Muestra más cercana"],
-            widths: [0.09, 0.32, 0.13, 0.12, 0.12, 0.22],
+            head: ["ID", "Índice", "Severidad", "Puntaje", "Tenencia", "Muestra más cercana"],
+            widths: [0.09, 0.32, 0.13, 0.12, 0.16, 0.18],
             rows: top.map((a, i) => {
               const near = nearestSample(a.lat, a.lng);
               return [
@@ -185,7 +185,7 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
                 indexLabel(a.indexCode),
                 a.severity,
                 a.score != null ? a.score.toFixed(2).replace(".", ",") : "s/d",
-                a.areaHa != null ? num(a.areaHa, 1) : "s/d",
+                a.withinTenure ? "Dentro" : "Verificar",
                 near ? `${near.code} a ${num(near.km, 1)} km` : "s/d",
               ];
             }),
@@ -193,6 +193,10 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
           {
             kind: "text",
             body: "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
+          },
+          {
+            kind: "text",
+            body: "Tenencia: la bandera dentro/fuera se calculó contra las pertenencias conocidas (TOKI, PALLOCABE, DOS MARIAS). Las anomalías marcadas como \u0022Verificar\u0022 quedan como contexto regional y no generan plataforma propuesta hasta confirmar la tenencia (ESPERANZA / EUROPA u otras).",
           },
         ],
       },
