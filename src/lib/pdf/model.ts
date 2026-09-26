@@ -39,6 +39,8 @@ export type DocSection = {
   blocks: DocBlock[];
   /** Si es true, la plantilla de deck le dedica una lámina propia. */
   deck?: boolean;
+  /** Restricts a section to compatible report narratives. Undefined means reusable. */
+  profiles?: ReportProfile[];
 };
 
 export type ProjectDoc = {
