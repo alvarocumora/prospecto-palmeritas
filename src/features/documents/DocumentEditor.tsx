@@ -35,6 +35,7 @@ import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "geocapitals:doc:";
+const FLOW_POSITION_KEYS = ["A", "B", "C", "D"] as const;
 
 type SyncStatus = "idle" | "loading" | "saving" | "saved" | "offline" | "error";
 
@@ -318,7 +319,6 @@ export function DocumentEditor({
 
   type FlowSignerInput = { role: string; name: string; email: string };
   const [flowSigners, setFlowSigners] = useState<FlowSignerInput[]>([]);
-  const posKeys = ["A", "B", "C", "D"] as const;
   useEffect(() => {
     // Precarga inputs con las partes del bloque de firma.
     // Para NCNDA (posiciones A/B/C) y plantillas con convención pX_name/pX_email,
@@ -328,7 +328,7 @@ export function DocumentEditor({
     setFlowSigners((prev) =>
       parties.map((role, i) => {
         if (prev[i] && (prev[i].name || prev[i].email)) return prev[i];
-        const p = posKeys[i];
+        const p = FLOW_POSITION_KEYS[i];
         const name = p ? (values[`p${p}_name`] ?? "").trim() : "";
         const email = p ? (values[`p${p}_email`] ?? "").trim() : "";
         return { role, name, email };
