@@ -8,11 +8,12 @@
     }
   },
   "metadata": {
-    "tipo": "PROPUESTA / BORRADOR — no es solicitud oficial",
-    "datum": "PSAD56 / UTM huso 19S (EPSG:24879)",
-    "objetivo": "Pedimento al sur de ELARA 1 para capturar el clúster de anomalías Al-OH que hoy cae sobre el borde sur (mitad fuera de tenencia).",
-    "VACANCIA_NO_VERIFICADA": "El catastro del sector es DENSO (visor SERNAGEOMIN). La vacancia de este rectángulo NO está verificada contra los polígonos oficiales. Requiere cruzar con el catastro completo + prioridad (fechas) antes de pedir.",
-    "guarda_geologica": "La anomalía Al-OH (Sentinel-2) NO identifica mineral ni mide ley; requiere geoquímica/hiperespectral. La grilla de sondaje es conceptual."
+    "veredicto": "PED-EL-S1 NO VIABLE tal como se propuso: el campo BHP 03201Q4xx (EN TRAMITE) baja al sur y cubre la mitad oriental, llevándose las 6 anomalias Al-OH fuertes. La franja vacante al oeste (600 ha) no tiene anomalias fuertes.",
+    "inteligencia": "BHP estacó independientemente el suelo con la anomalia Al-OH mas fuerte: corrobora el target y confirma que un major valora ese terreno. Vigilar si algun rol 03201Q4xx EN TRAMITE caduca -> ahi se abre el suelo.",
+    "recomendacion": "Perforar las anomalias INTERIORES de ELARA 1 (suelo propio) en vez de pedir al sur. El sur esta tomado por BHP.",
+    "fuente_vacancia": "Visor Catastro Minero Online SERNAGEOMIN, captura del operador 2026-09-27 (cursor E439006/N6995443).",
+    "datum": "PSAD56 / UTM 19S (EPSG:24879)",
+    "guardas": "Borde BHP digitalizado del cursor (±200 m); poligonos oficiales por confirmar. Al-OH no mide ley."
   },
   "features": [
     {
@@ -46,377 +47,86 @@
       },
       "properties": {
         "code": "PED-EL-S1",
-        "nombre": "ELARA Sur (propuesta)",
+        "estado": "NO VIABLE",
+        "motivo": "Colisiona con el campo de exploración BHP 03201Q4xx (EN TRAMITE), que cubre la mitad oriental (E>=439000).",
         "area_ha": 1200,
-        "lados_m": {
-          "E-W": 4000,
-          "N-S": 3000
-        },
-        "corners_psad56_utm19s": {
-          "NW": [
-            437000,
-            6997000
-          ],
-          "NE": [
-            441000,
-            6997000
-          ],
-          "SE": [
-            441000,
-            6994000
-          ],
-          "SW": [
-            437000,
-            6994000
+        "datum": "PSAD56/UTM19S (EPSG:24879)",
+        "anomalias_z5_sobre_BHP": 6,
+        "verificado_con": "captura visor SERNAGEOMIN 'elara sur' E439006/N6995443"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ],
+            [
+              -69.59732212554178,
+              -27.151671717668084
+            ],
+            [
+              -69.59746625447147,
+              -27.178755409323983
+            ],
+            [
+              -69.61765534821825,
+              -27.178667963664108
+            ],
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ]
           ]
-        },
-        "datum": "PSAD56 / UTM 19S (EPSG:24879)",
-        "objetivo": "captura clúster Al-OH sur (borde de ELARA -> interior)",
-        "anomalias_capturadas": 5,
-        "anomalias_z5_capturadas": 5,
-        "procedencia": "PROPUESTA / BORRADOR"
+        ]
+      },
+      "properties": {
+        "code": "PED-EL-S1_zona_BHP",
+        "estado": "OCUPADO (BHP 03201Q4xx, EN TRAMITE)",
+        "nota": "Alberga las 6 anomalias Al-OH fuertes del sur. No pedible mientras BHP mantenga prioridad.",
+        "borde_oeste_psad56_E": 439000,
+        "borde_digitalizado": true,
+        "precision": "±200 m (lectura de cursor)"
       }
     },
     {
       "type": "Feature",
       "geometry": {
-        "type": "Point",
+        "type": "Polygon",
         "coordinates": [
-          -69.620579,
-          -27.159696
+          [
+            [
+              -69.63769048103266,
+              -27.15149412682648
+            ],
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ],
+            [
+              -69.61765534821825,
+              -27.178667963664108
+            ],
+            [
+              -69.63784434895707,
+              -27.17857761259947
+            ],
+            [
+              -69.63769048103266,
+              -27.15149412682648
+            ]
+          ]
         ]
       },
       "properties": {
-        "code": "PED-EL-S1-DDH-01",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          438700,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.620559,
-          -27.156085
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-02",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          438700,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.620539,
-          -27.152474
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-03",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          438700,
-          6996900
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.616542,
-          -27.159714
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-04",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439100,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.616522,
-          -27.156103
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-05",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439100,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.616502,
-          -27.152492
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-06",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439100,
-          6996900
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.612505,
-          -27.159732
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-07",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439500,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.612485,
-          -27.15612
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-08",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439500,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.612465,
-          -27.152509
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-09",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439500,
-          6996900
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.608467,
-          -27.159749
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-10",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439900,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.608448,
-          -27.156138
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-11",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439900,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.608428,
-          -27.152527
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-12",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          439900,
-          6996900
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.60443,
-          -27.159767
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-13",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440300,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.604411,
-          -27.156155
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-14",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440300,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.604391,
-          -27.152544
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-15",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440300,
-          6996900
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.600393,
-          -27.159784
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-16",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440700,
-          6996100
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.600374,
-          -27.156173
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-17",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440700,
-          6996500
-        ],
-        "espaciamiento_m": 400
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -69.600355,
-          -27.152562
-        ]
-      },
-      "properties": {
-        "code": "PED-EL-S1-DDH-18",
-        "tipo": "collar propuesto (conceptual)",
-        "psad56_utm19s": [
-          440700,
-          6996900
-        ],
-        "espaciamiento_m": 400
+        "code": "PED-EL-S1_franja_vacante_O",
+        "estado": "aparentemente vacante",
+        "area_ha": 600,
+        "nota": "Terreno de cañón empinado; SIN anomalias Al-OH fuertes. Valor exploratorio bajo. Vacancia por confirmar contra poligonos oficiales."
       }
     }
   ]
