@@ -194,23 +194,23 @@ export function ProjectMasterViewer({
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     tenencia: true,
     halos: true,
-    magneticaRegional: true,
+    magneticaRegional: false,
     gravedadRegional: false,
-    geofisicaProyecto: true,
-    magSurfaceProject: true,
+    geofisicaProyecto: false,
+    magSurfaceProject: false,
     ipChargeSurfaceProject: false,
     ipResSurfaceProject: false,
     relieve: false,
     franjas: false,
-    yacimientos: true,
-    geoquimica: true,
-    sondajes: true,
+    yacimientos: false,
+    geoquimica: false,
+    sondajes: false,
     ensayes: true,
-    pedimentos: true,
+    pedimentos: false,
   });
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true);
 
   // Construcción imperativa del mapa (client-only; leaflet toca window).
   useEffect(() => {
@@ -602,7 +602,7 @@ export function ProjectMasterViewer({
             onClick={() => setCollapsed((c) => !c)}
             className="flex w-full items-center justify-between px-2 py-1.5 font-semibold text-content"
           >
-            <span>Capas de evidencia</span>
+            <span>Capas · {Object.values(visible).filter(Boolean).length} activas</span>
             <span className="text-content-subtle">{collapsed ? "▸" : "▾"}</span>
           </button>
           {!collapsed && (
