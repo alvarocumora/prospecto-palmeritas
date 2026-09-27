@@ -10,6 +10,7 @@ import { requireTradeRole } from "@/lib/access/roleMiddleware";
 import { sha256Hex } from "@/lib/documents/signing";
 import { tokenPrefix } from "@/lib/sourcing";
 import { publicUrl } from "@/lib/publicUrl";
+import type { ComplianceFetchResult } from "@/features/trades/TradeComplianceChecklist";
 
 const asSb = (c: unknown): SupabaseClient => c as SupabaseClient;
 
@@ -510,7 +511,7 @@ export const getOperacionChecklist = createServerFn({ method: "POST" })
     if (r.error) throw new Error(r.error.message);
     const readinessRow = Array.isArray(r.data) ? r.data[0] : r.data;
     return {
-      rows: (c.data ?? []) as unknown as any[],
-      readiness: (readinessRow ?? null) as any,
+      rows: (c.data ?? []) as unknown as ComplianceFetchResult["rows"],
+      readiness: (readinessRow ?? null) as ComplianceFetchResult["readiness"],
     };
   });

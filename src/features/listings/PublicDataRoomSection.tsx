@@ -197,7 +197,6 @@ export function PublicDataRoomSection({
         <NdaModal
           listingId={listingId}
           listingTitle={listingTitle}
-          userId={user.id}
           userEmail={user.email ?? "signed"}
           onClose={() => setModalOpen(false)}
           onSigned={() => {
@@ -213,14 +212,12 @@ export function PublicDataRoomSection({
 function NdaModal({
   listingId,
   listingTitle,
-  userId,
   userEmail,
   onClose,
   onSigned,
 }: {
   listingId: string;
   listingTitle: string;
-  userId: string;
   userEmail: string;
   onClose: () => void;
   onSigned: () => void;

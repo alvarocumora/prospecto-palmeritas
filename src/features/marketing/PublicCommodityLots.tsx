@@ -36,7 +36,6 @@ function LotCard({ lot }: { lot: PublicCommodityLot }) {
     >
       <div className="aspect-[16/9] bg-neutral-100 relative overflow-hidden">
         {lot.cover_image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={lot.cover_image_url}
             alt={lot.title}

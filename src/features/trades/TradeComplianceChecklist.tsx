@@ -14,7 +14,7 @@ import { CheckCircle2, Circle, Clock, AlertTriangle, Lock, Upload, Loader2 } fro
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-type ChecklistRow = {
+export type ChecklistRow = {
   section_no: number;
   section: string;
   doc_kind: string;
@@ -29,7 +29,7 @@ type ChecklistRow = {
   uploaded_at: string | null;
 };
 
-type Readiness = {
+export type Readiness = {
   mandatory_total: number;
   mandatory_ok: number;
   mandatory_missing: number;

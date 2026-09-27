@@ -172,7 +172,9 @@ function VerifyPage() {
       await navigator.clipboard.writeText(canonicalUrl);
       setCopied(true);
       setTimeout(() => setCopied(false), 1600);
-    } catch {}
+    } catch {
+      // Clipboard access is optional; the verification view remains usable.
+    }
   };
 
   return (

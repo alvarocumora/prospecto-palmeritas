@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Download, ShieldCheck } from "lucide-react";
@@ -52,13 +52,16 @@ function PrivacyPanel() {
   const [details, setDetails] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const reload = () =>
-    list({})
-      .then((r) => setRows(r as Dsr[]))
-      .catch(() => setRows([]));
+  const reload = useCallback(
+    () =>
+      list({})
+        .then((r) => setRows(r as Dsr[]))
+        .catch(() => setRows([])),
+    [list],
+  );
   useEffect(() => {
     reload();
-  }, []);
+  }, [reload]);
 
   const submit = async () => {
     setBusy(true);
