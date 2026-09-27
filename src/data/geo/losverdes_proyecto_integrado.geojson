@@ -1,0 +1,1250 @@
+{
+  "type": "FeatureCollection",
+  "name": "losverdes_proyecto_integrado",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "proyecto": "Proyecto Minero Integrado Los Verdes",
+    "objetivo_ha": 2600,
+    "ha_verificadas_mapeadas": 1963,
+    "n_concesiones_proyecto": 17,
+    "arranque": [
+      "Los Verdes 4",
+      "Los Verdes 5",
+      "Peumo 1",
+      "Las Trancas 1"
+    ],
+    "nota": "Concesiones proyecto vs vecinos major (Pelambres/AGV). ~2600 ha objetivo; saldo ~637 ha por confirmar. Multi-titular.",
+    "fuente": "SERNAGEOMIN catastro_SNGM"
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.119912438,
+              -32.0263842639999
+            ],
+            [
+              -71.1125047039999,
+              -32.026507916
+            ],
+            [
+              -71.112546104,
+              -32.028310984
+            ],
+            [
+              -71.109371284,
+              -32.0283638499999
+            ],
+            [
+              -71.109536674,
+              -32.035576131
+            ],
+            [
+              -71.1201202,
+              -32.035399555
+            ],
+            [
+              -71.119912438,
+              -32.0263842639999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031297-9",
+        "nombre": "LOS VERDES 3 1/20",
+        "titular": "FERNANDEZ VASQUEZ CARLOS RBTO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 94,
+        "comuna": "LOS VILOS",
+        "ano": "2025",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1305992229999,
+              -32.0307144839999
+            ],
+            [
+              -71.120016307,
+              -32.030891911
+            ],
+            [
+              -71.120432018,
+              -32.048922466
+            ],
+            [
+              -71.1310170049999,
+              -32.0487449149999
+            ],
+            [
+              -71.1305992229999,
+              -32.0307144839999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031906-K",
+        "nombre": "EL CANELO",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "LOS VILOS",
+        "ano": "2023",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1317030559999,
+              -32.0554974089999
+            ],
+            [
+              -71.126410188,
+              -32.0555863399999
+            ],
+            [
+              -71.1266188229999,
+              -32.064601551
+            ],
+            [
+              -71.1319122089999,
+              -32.0645125889999
+            ],
+            [
+              -71.1317030559999,
+              -32.0554974089999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030672-3",
+        "nombre": "SANTA CAROLINA 2 1/10",
+        "titular": "SOCIEDAD MINERA M.V. SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "LOS VILOS",
+        "ano": "2006",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.098747363,
+              -32.02673641
+            ],
+            [
+              -71.093456036,
+              -32.0268238959999
+            ],
+            [
+              -71.0935996489999,
+              -32.033134708
+            ],
+            [
+              -71.088307937,
+              -32.033221994
+            ],
+            [
+              -71.0883693439999,
+              -32.035926635
+            ],
+            [
+              -71.098953055,
+              -32.0357518239999
+            ],
+            [
+              -71.098747363,
+              -32.02673641
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031060-7",
+        "nombre": "LOS VERDES 4 1/10",
+        "titular": "FERNANDEZ VASQUEZ CARLOS RBTO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 65,
+        "comuna": "LOS VILOS",
+        "ano": "2015",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "arranque"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0874248229999,
+              -32.0110952389999
+            ],
+            [
+              -71.082134358,
+              -32.011182214
+            ],
+            [
+              -71.082256711,
+              -32.016591535
+            ],
+            [
+              -71.087547488,
+              -32.016504542
+            ],
+            [
+              -71.0874248229999,
+              -32.0110952389999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030793-2",
+        "nombre": "LA FLORIDA 1/6",
+        "titular": "LIZAMA TAPIA JOSE ELIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 30,
+        "comuna": "LOS VILOS",
+        "ano": "2012",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1192897079999,
+              -31.999338305
+            ],
+            [
+              -71.087551267,
+              -31.9998646519999
+            ],
+            [
+              -71.087960122,
+              -32.017895672
+            ],
+            [
+              -71.10065808,
+              -32.0176859389999
+            ],
+            [
+              -71.1004729329999,
+              -32.009572052
+            ],
+            [
+              -71.111053532,
+              -32.00939636
+            ],
+            [
+              -71.1111569,
+              -32.0139040449999
+            ],
+            [
+              -71.112215006,
+              -32.013886425
+            ],
+            [
+              -71.11225638,
+              -32.0156894959999
+            ],
+            [
+              -71.113314507,
+              -32.0156718659999
+            ],
+            [
+              -71.1133559049999,
+              -32.0174749359999
+            ],
+            [
+              -71.119704768,
+              -32.017368958
+            ],
+            [
+              -71.1192897079999,
+              -31.999338305
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030861-0",
+        "nombre": "POLACO 6 1/129",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 504,
+        "comuna": "LOS VILOS",
+        "ano": "2012",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "vecino_major",
+        "fase": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1077115969999,
+              -32.022789055
+            ],
+            [
+              -71.11466215,
+              -32.0195225109999
+            ],
+            [
+              -71.111467084,
+              -32.014587891
+            ],
+            [
+              -71.10451677,
+              -32.01785425
+            ],
+            [
+              -71.1077115969999,
+              -32.022789055
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030347-3",
+        "nombre": "CAMPANARIO 2 1/10",
+        "titular": "SLM CAMPANARIO 2 UNO LOS VILOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "LOS VILOS",
+        "ano": "1999",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.120224116,
+              -32.039907195
+            ],
+            [
+              -71.1096400719999,
+              -32.040083802
+            ],
+            [
+              -71.109846938,
+              -32.049099134
+            ],
+            [
+              -71.120432018,
+              -32.048922466
+            ],
+            [
+              -71.120224116,
+              -32.039907195
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031291-K",
+        "nombre": "PEUMO 1/20",
+        "titular": "SOCIEDAD DE EXPLOTACIONES MINA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS",
+        "ano": "2023",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "arranque"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.120536004,
+              -32.053430095
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.1101574099999,
+              -32.0626221049999
+            ],
+            [
+              -71.120744045,
+              -32.062445344
+            ],
+            [
+              -71.120536004,
+              -32.053430095
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031907-8",
+        "nombre": "PLAZETAS",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS",
+        "ano": "2023",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "MultiPolygon",
+        "coordinates": [
+          [
+            [
+              [
+                -71.130734963,
+                -32.0403751429999
+              ],
+              [
+                -71.13073493,
+                -32.0403751429999
+              ],
+              [
+                -71.130734923,
+                -32.0403747189999
+              ],
+              [
+                -71.129485495,
+                -32.026955877
+              ],
+              [
+                -71.126214483,
+                -32.027176814
+              ],
+              [
+                -71.127563897,
+                -32.0416748009999
+              ],
+              [
+                -71.1308354179999,
+                -32.041453807
+              ],
+              [
+                -71.130734963,
+                -32.0403751429999
+              ]
+            ]
+          ],
+          [
+            [
+              [
+                -71.133910498,
+                -32.040338043
+              ],
+              [
+                -71.133668109,
+                -32.02531124
+              ],
+              [
+                -71.130493165,
+                -32.025348311
+              ],
+              [
+                -71.130734923,
+                -32.0403747189999
+              ],
+              [
+                -71.130734963,
+                -32.0403751429999
+              ],
+              [
+                -71.133910498,
+                -32.040338043
+              ]
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030020-2",
+        "nombre": "BLANQUILLA 1/2",
+        "titular": "DEL CAMPO CARMONA BARBARA CONS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS",
+        "ano": "1996",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1267204549999,
+              -32.0461114729999
+            ],
+            [
+              -71.12142811,
+              -32.0462001729999
+            ],
+            [
+              -71.1215529409999,
+              -32.0516093269999
+            ],
+            [
+              -71.1268455969999,
+              -32.051520608
+            ],
+            [
+              -71.1267204549999,
+              -32.0461114729999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030561-1",
+        "nombre": "SANTA CAROLINA 1/6",
+        "titular": "SOCIEDAD MINERA M.V. SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 30,
+        "comuna": "LOS VILOS",
+        "ano": "2000",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.119440233,
+              -32.01737338
+            ],
+            [
+              -71.114149515,
+              -32.0174617059999
+            ],
+            [
+              -71.114170224,
+              -32.0183632399999
+            ],
+            [
+              -71.115228379,
+              -32.0183455919999
+            ],
+            [
+              -71.11526982,
+              -32.020148659
+            ],
+            [
+              -71.114211643,
+              -32.0201663089999
+            ],
+            [
+              -71.1142157849999,
+              -32.020346616
+            ],
+            [
+              -71.113157606,
+              -32.0203642559999
+            ],
+            [
+              -71.113173546,
+              -32.021058438
+            ],
+            [
+              -71.1121153569999,
+              -32.0210760699999
+            ],
+            [
+              -71.1122395199999,
+              -32.0264852789999
+            ],
+            [
+              -71.11329777,
+              -32.0264676429999
+            ],
+            [
+              -71.1132818259999,
+              -32.025773462
+            ],
+            [
+              -71.1143400679999,
+              -32.0257558169999
+            ],
+            [
+              -71.114356641,
+              -32.0264770439999
+            ],
+            [
+              -71.119647876,
+              -32.026388687
+            ],
+            [
+              -71.119440233,
+              -32.01737338
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031137-9",
+        "nombre": "ALTO LOS VERDES 2 1/15",
+        "titular": "FERNANDEZ VASQUEZ CARLOS RBTO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 60,
+        "comuna": "LOS VILOS",
+        "ano": "2016",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1201202,
+              -32.035399555
+            ],
+            [
+              -71.109536674,
+              -32.035576131
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.120536004,
+              -32.053430095
+            ],
+            [
+              -71.1201202,
+              -32.035399555
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031911-6",
+        "nombre": "PLAZETAS 2",
+        "titular": "PRIETO ROJAS HUGO SEBASTIAN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "LOS VILOS",
+        "ano": "2024",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.109580068,
+              -32.014381229
+            ],
+            [
+              -71.10111513,
+              -32.0145217739999
+            ],
+            [
+              -71.101135708,
+              -32.0154233169999
+            ],
+            [
+              -71.1006066429999,
+              -32.015432083
+            ],
+            [
+              -71.100791844,
+              -32.023545961
+            ],
+            [
+              -71.107141177,
+              -32.023440594
+            ],
+            [
+              -71.1071205329999,
+              -32.022539056
+            ],
+            [
+              -71.1060623239999,
+              -32.022556639
+            ],
+            [
+              -71.10602106,
+              -32.020753562
+            ],
+            [
+              -71.10496287,
+              -32.020771134
+            ],
+            [
+              -71.10492163,
+              -32.018968055
+            ],
+            [
+              -71.1038634609999,
+              -32.0189856179999
+            ],
+            [
+              -71.1038222449999,
+              -32.0171825369999
+            ],
+            [
+              -71.105938543,
+              -32.0171474059999
+            ],
+            [
+              -71.105917916,
+              -32.016245866
+            ],
+            [
+              -71.106976053,
+              -32.016228288
+            ],
+            [
+              -71.1069554169999,
+              -32.0153267489999
+            ],
+            [
+              -71.10960073,
+              -32.015282766
+            ],
+            [
+              -71.109580068,
+              -32.014381229
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030794-0",
+        "nombre": "MIRAFLORES 1/14",
+        "titular": "MINERA AGV GOLD COPPER LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 49,
+        "comuna": "LOS VILOS",
+        "ano": "2012",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "vecino_major",
+        "fase": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.151027313,
+              -31.9988040279999
+            ],
+            [
+              -71.1192897079999,
+              -31.999338305
+            ],
+            [
+              -71.119704768,
+              -32.017368958
+            ],
+            [
+              -71.151448578,
+              -32.0168343089999
+            ],
+            [
+              -71.151027313,
+              -31.9988040279999
+            ]
+          ],
+          [
+            [
+              -71.146115962,
+              -32.015120936
+            ],
+            [
+              -71.139767363,
+              -32.0152282289999
+            ],
+            [
+              -71.1396835429999,
+              -32.0116221489999
+            ],
+            [
+              -71.146031893,
+              -32.011514871
+            ],
+            [
+              -71.146115962,
+              -32.015120936
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030691-K",
+        "nombre": "PATAGUA 11 1/60",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 576,
+        "comuna": "LOS VILOS",
+        "ano": "2004",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "vecino_major",
+        "fase": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.112132531,
+              -32.021824344
+            ],
+            [
+              -71.110016135,
+              -32.021859583
+            ],
+            [
+              -71.110036806,
+              -32.02276112
+            ],
+            [
+              -71.1079203849999,
+              -32.0227963249999
+            ],
+            [
+              -71.107941037,
+              -32.0236978619999
+            ],
+            [
+              -71.101591689,
+              -32.023803269
+            ],
+            [
+              -71.1016946509999,
+              -32.0283109719999
+            ],
+            [
+              -71.112277396,
+              -32.028135086
+            ],
+            [
+              -71.112132531,
+              -32.021824344
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030827-0",
+        "nombre": "EXPANCION 1/12",
+        "titular": "MINERA AGV GOLD COPPER LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 56,
+        "comuna": "LOS VILOS",
+        "ano": "2012",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "vecino_major",
+        "fase": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1008638869999,
+              -32.0267013549999
+            ],
+            [
+              -71.098747363,
+              -32.02673641
+            ],
+            [
+              -71.098953055,
+              -32.0357518239999
+            ],
+            [
+              -71.101069786,
+              -32.0357167559999
+            ],
+            [
+              -71.1010656669999,
+              -32.035536448
+            ],
+            [
+              -71.1095325379999,
+              -32.035395824
+            ],
+            [
+              -71.10936715,
+              -32.028183543
+            ],
+            [
+              -71.100900942,
+              -32.028324128
+            ],
+            [
+              -71.1008638869999,
+              -32.0267013549999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031059-3",
+        "nombre": "LOS VERDES 5 1/12",
+        "titular": "FERNANDEZ VASQUEZ CARLOS RBTO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 84,
+        "comuna": "LOS VILOS",
+        "ano": "2015",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "arranque"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.109536674,
+              -32.035576131
+            ],
+            [
+              -71.098953055,
+              -32.0357518239999
+            ],
+            [
+              -71.099364715,
+              -32.0537826099999
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.109536674,
+              -32.035576131
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031905-1",
+        "nombre": "EL ALTO",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "LOS VILOS",
+        "ano": "2023",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.099364715,
+              -32.0537826099999
+            ],
+            [
+              -71.099570683,
+              -32.0627979819999
+            ],
+            [
+              -71.1101574099999,
+              -32.0626221049999
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031292-8",
+        "nombre": "LAS TRANCAS1/20",
+        "titular": "SOCIEDAD DE EXPLOTACIONES MINA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS",
+        "ano": "2023",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "arranque"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.130286132,
+              -32.017191623
+            ],
+            [
+              -71.119704768,
+              -32.017368958
+            ],
+            [
+              -71.1201202,
+              -32.035399555
+            ],
+            [
+              -71.1307036329999,
+              -32.035222097
+            ],
+            [
+              -71.130286132,
+              -32.017191623
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031909-4",
+        "nombre": "EL CANELO 2",
+        "titular": "PRIETO ROJAS HUGO SEBASTIAN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "LOS VILOS",
+        "ano": "2024",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.10065808,
+              -32.0176859389999
+            ],
+            [
+              -71.087960122,
+              -32.017895672
+            ],
+            [
+              -71.088307937,
+              -32.033221994
+            ],
+            [
+              -71.0935996489999,
+              -32.033134708
+            ],
+            [
+              -71.093456036,
+              -32.0268238959999
+            ],
+            [
+              -71.1008638869999,
+              -32.0267013549999
+            ],
+            [
+              -71.10065808,
+              -32.0176859389999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030862-9",
+        "nombre": "POLACO 7 1/155",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 155,
+        "comuna": "LOS VILOS",
+        "ano": "2012",
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "vecino_major",
+        "fase": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.087694324,
+              -32.0061755149999
+            ],
+            [
+              -71.077113937,
+              -32.006349244
+            ],
+            [
+              -71.0777244449999,
+              -32.033395905
+            ],
+            [
+              -71.088307937,
+              -32.033221994
+            ],
+            [
+              -71.087694324,
+              -32.0061755149999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031894-2",
+        "nombre": "LA FLORIDA 1",
+        "titular": "LIZAMA TAPIA JOSE ELIAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "LOS VILOS",
+        "ano": null,
+        "es_tenencia_proyecto": null,
+        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)",
+        "grupo": "proyecto",
+        "fase": "anexo"
+      }
+    }
+  ]
+}
