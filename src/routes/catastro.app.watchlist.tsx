@@ -1,7 +1,16 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Trash2, MapPin, Crown, ExternalLink, AlertTriangle, Loader2, RefreshCw } from "lucide-react";
+import {
+  Bell,
+  Trash2,
+  MapPin,
+  Crown,
+  ExternalLink,
+  AlertTriangle,
+  Loader2,
+  RefreshCw,
+} from "lucide-react";
 import { toast } from "sonner";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { supabase } from "@/integrations/supabase/client";
