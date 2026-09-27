@@ -34,7 +34,12 @@ export function KpiTile({
       <div className="mt-1 flex items-baseline gap-2">
         <span className="text-2xl font-bold tabular-nums">{value}</span>
         {trend && (
-          <span className={cn("text-xs font-semibold", trend.positive ? "text-signal-green" : "text-signal-red")}>
+          <span
+            className={cn(
+              "text-xs font-semibold",
+              trend.positive ? "text-signal-green" : "text-signal-red",
+            )}
+          >
             {trend.value}
           </span>
         )}

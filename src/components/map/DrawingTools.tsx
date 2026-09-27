@@ -1,5 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { Pencil, Trash2, Download, X, Square, Minus, MapPin, Landmark, Loader2, FileText } from "lucide-react";
+import {
+  Pencil,
+  Trash2,
+  Download,
+  X,
+  Square,
+  Minus,
+  MapPin,
+  Landmark,
+  Loader2,
+  FileText,
+} from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import type { FeatureGroup, Map as LeafletMap } from "leaflet";
 import type { Feature, FeatureCollection, Geometry, Polygon } from "geojson";
@@ -255,21 +266,28 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
       </div>
 
       <div className="border-t border-border pt-2 space-y-1.5">
-        <div className="text-[10px] text-muted-foreground uppercase tracking-wide">Pedimento (catastro en vivo)</div>
+        <div className="text-[10px] text-muted-foreground uppercase tracking-wide">
+          Pedimento (catastro en vivo)
+        </div>
         <button
           type="button"
           onClick={generatePedimento}
           disabled={count === 0 || busy}
           className="w-full inline-flex items-center gap-2 px-2 py-1.5 rounded border border-gold bg-gold/10 text-gold hover:bg-gold/20 disabled:opacity-50 transition-colors"
         >
-          {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Landmark className="w-3.5 h-3.5" />}
+          {busy ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+          ) : (
+            <Landmark className="w-3.5 h-3.5" />
+          )}
           {busy ? "Consultando SERNAGEOMIN…" : "Generar pedimento en AOI"}
         </button>
         {pedErr && <div className="text-[10px] text-destructive leading-tight">{pedErr}</div>}
         {ped && (
           <div className="text-[10px] text-foreground space-y-0.5 leading-tight">
             <div>
-              <strong>{ped.areaHa} ha</strong> · {ped.ladosM["E-W"]}×{ped.ladosM["N-S"]} m · {ped.datum}
+              <strong>{ped.areaHa} ha</strong> · {ped.ladosM["E-W"]}×{ped.ladosM["N-S"]} m ·{" "}
+              {ped.datum}
             </div>
             <div className="text-muted-foreground">
               NW {ped.cornersUtm.NW[0].toLocaleString()}/{ped.cornersUtm.NW[1].toLocaleString()} ·

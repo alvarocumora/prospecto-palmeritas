@@ -28,7 +28,12 @@ export function downloadPedimentoEscrito(ped: PedimentoResult, tipo: EscritoTipo
   let y = 56;
 
   doc.setFont("helvetica", "normal").setFontSize(7).setTextColor(120);
-  doc.text(`GeoCapitals · Catastro Intelligence — BORRADOR ${new Date().toLocaleDateString("es-CL")}`, W - M, y, { align: "right" });
+  doc.text(
+    `GeoCapitals · Catastro Intelligence — BORRADOR ${new Date().toLocaleDateString("es-CL")}`,
+    W - M,
+    y,
+    { align: "right" },
+  );
   doc.setDrawColor(180).line(M, y + 6, W - M, y + 6);
   y += 30;
 

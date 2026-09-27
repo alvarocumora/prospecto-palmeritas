@@ -34,13 +34,22 @@ function obstaclesUtm(concessions: FeatureCollection, fwd: (c: Position) => Posi
     if (!g) continue;
     if (g.type === "Polygon") polys.push(projectPolygon(g, fwd));
     else if (g.type === "MultiPolygon")
-      for (const coords of g.coordinates) polys.push(projectPolygon({ type: "Polygon", coordinates: coords }, fwd));
+      for (const coords of g.coordinates)
+        polys.push(projectPolygon({ type: "Polygon", coordinates: coords }, fwd));
   }
   return polys;
 }
 
 function rectPolygon(w: number, s: number, e: number, n: number): Feature<Polygon> {
-  return turf.polygon([[[w, s], [e, s], [e, n], [w, n], [w, s]]]);
+  return turf.polygon([
+    [
+      [w, s],
+      [e, s],
+      [e, n],
+      [w, n],
+      [w, s],
+    ],
+  ]);
 }
 
 export type PedimentoResult = {
@@ -73,7 +82,8 @@ export function proposePedimento(
   const c = turf.centroid(aoiPoly).geometry.coordinates;
   const { proj, zone } = utmProj(c[0]);
   const fwd = (coord: Position): Position => proj4(WGS84, proj, [coord[0], coord[1]]) as Position;
-  const inv = (x: number, y: number): [number, number] => proj4(proj, WGS84, [x, y]) as [number, number];
+  const inv = (x: number, y: number): [number, number] =>
+    proj4(proj, WGS84, [x, y]) as [number, number];
 
   const aoiUtm = turf.polygon(projectPolygon(aoiPoly, fwd).coordinates);
   const obstacles = obstaclesUtm(concessions, fwd);
@@ -84,7 +94,7 @@ export function proposePedimento(
   const [minX, minY, maxX, maxY] = turf.bbox(aoiUtm);
 
   const ok = (w: number, e: number, s: number, n: number): boolean => {
-    if ((e - w) * (n - s) / 10000 > maxHa) return false;
+    if (((e - w) * (n - s)) / 10000 > maxHa) return false;
     const rect = rectPolygon(w, s, e, n);
     if (!turf.booleanContains(aoiUtm, rect)) return false;
     if (obstacleMulti) {
@@ -117,32 +127,57 @@ export function proposePedimento(
       const ns = side === "s" ? s - step : s;
       const nn = side === "n" ? n + step : n;
       if (ok(nw, ne, ns, nn)) {
-        w = nw; e = ne; s = ns; n = nn; grew = true;
+        w = nw;
+        e = ne;
+        s = ns;
+        n = nn;
+        grew = true;
       }
     }
   }
 
   // redondear a 100 m (convención de vértices)
-  w = Math.floor(w / 100) * 100; s = Math.floor(s / 100) * 100;
-  e = Math.ceil(e / 100) * 100; n = Math.ceil(n / 100) * 100;
-  while (obstacleMulti && turf.booleanIntersects(rectPolygon(w, s, e, n), obstacleMulti) && e - w > 200 && n - s > 200) {
-    w += 100; s += 100; e -= 100; n -= 100;
+  w = Math.floor(w / 100) * 100;
+  s = Math.floor(s / 100) * 100;
+  e = Math.ceil(e / 100) * 100;
+  n = Math.ceil(n / 100) * 100;
+  while (
+    obstacleMulti &&
+    turf.booleanIntersects(rectPolygon(w, s, e, n), obstacleMulti) &&
+    e - w > 200 &&
+    n - s > 200
+  ) {
+    w += 100;
+    s += 100;
+    e -= 100;
+    n -= 100;
   }
 
   const cornersUtm = {
-    NW: [w, n] as [number, number], NE: [e, n] as [number, number],
-    SE: [e, s] as [number, number], SW: [w, s] as [number, number],
+    NW: [w, n] as [number, number],
+    NE: [e, n] as [number, number],
+    SE: [e, s] as [number, number],
+    SW: [w, s] as [number, number],
   };
   const cornersWgs84 = {
-    NW: inv(w, n), NE: inv(e, n), SE: inv(e, s), SW: inv(w, s),
+    NW: inv(w, n),
+    NE: inv(e, n),
+    SE: inv(e, s),
+    SW: inv(w, s),
   };
-  const ring: Position[] = [cornersWgs84.NW, cornersWgs84.NE, cornersWgs84.SE, cornersWgs84.SW, cornersWgs84.NW];
+  const ring: Position[] = [
+    cornersWgs84.NW,
+    cornersWgs84.NE,
+    cornersWgs84.SE,
+    cornersWgs84.SW,
+    cornersWgs84.NW,
+  ];
   return {
     rectangleWgs84: turf.polygon([ring]),
     cornersUtm,
     cornersWgs84,
     ladosM: { "E-W": e - w, "N-S": n - s },
-    areaHa: Math.round((e - w) * (n - s) / 10000 * 10) / 10,
+    areaHa: Math.round((((e - w) * (n - s)) / 10000) * 10) / 10,
     caraNorteUtm: { E_centro: Math.round((w + e) / 2), N: n },
     huso: zone,
     datum: `WGS84 / UTM ${zone}S`,
