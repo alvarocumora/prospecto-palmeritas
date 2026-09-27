@@ -1,6 +1,6 @@
 // Vista principal del tablero de trades. Reutilizable en modo normal y
 // fullscreen. Encapsula: query + realtime, filtros, drag & drop y swimlanes.
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { DndContext, PointerSensor, useSensor, useSensors, type DragEndEvent } from "@dnd-kit/core";
@@ -63,7 +63,7 @@ export function TradeBoardView({ search, onSearchChange }: TradeBoardViewProps) 
     queryFn: () => listFn(),
     staleTime: 15_000,
   });
-  const trades = (data ?? []) as unknown as BoardTrade[];
+  const trades = useMemo(() => (data ?? []) as unknown as BoardTrade[], [data]);
 
   const stageMut = useMutation({
     mutationFn: (v: { id: string; stage: TradeStage }) =>

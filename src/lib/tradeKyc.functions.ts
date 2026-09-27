@@ -98,7 +98,7 @@ export const uploadTradeKycDocument = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const bin = Uint8Array.from(atob(data.base64), (c) => c.charCodeAt(0));
-    const safeName = data.fileName.replace(/[^\w.\-]+/g, "_").slice(-120);
+    const safeName = data.fileName.replace(/[^\w.-]+/g, "_").slice(-120);
     const path = `${data.tradeId}/kyc/${data.party}/${data.docKey}-${Date.now()}-${safeName}`;
 
     const { error: upErr } = await supabaseAdmin.storage

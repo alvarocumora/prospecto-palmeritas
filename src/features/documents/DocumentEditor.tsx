@@ -35,6 +35,7 @@ import { signUrl as buildSignUrl } from "@/lib/publicUrl";
 import { useAuth } from "@/hooks/useAuth";
 
 const STORAGE_PREFIX = "geocapitals:doc:";
+const FLOW_POSITION_KEYS = ["A", "B", "C", "D"] as const;
 
 type SyncStatus = "idle" | "loading" | "saving" | "saved" | "offline" | "error";
 
@@ -324,11 +325,10 @@ export function DocumentEditor({
     // rellena automáticamente nombre y email desde los datos del documento para
     // que el orden de la firma coincida SIEMPRE con las partes del contrato
     // (Parte A → firmante #1, Parte B → #2, …).
-    const posKeys = ["A", "B", "C", "D"] as const;
     setFlowSigners((prev) =>
       parties.map((role, i) => {
         if (prev[i] && (prev[i].name || prev[i].email)) return prev[i];
-        const p = posKeys[i];
+        const p = FLOW_POSITION_KEYS[i];
         const name = p ? (values[`p${p}_name`] ?? "").trim() : "";
         const email = p ? (values[`p${p}_email`] ?? "").trim() : "";
         return { role, name, email };
@@ -357,7 +357,9 @@ export function DocumentEditor({
         if (parsed.flowId) setFlowId(parsed.flowId);
         if (parsed.tokens) setFlowTokens(parsed.tokens);
       }
-    } catch {}
+    } catch {
+      // Best-effort UI persistence; failure is intentionally non-fatal.
+    }
   }, [flowStorageKey, user]);
 
   const refreshFlow = useCallback(async () => {
@@ -415,7 +417,9 @@ export function DocumentEditor({
           flowStorageKey,
           JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
         );
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       toast.success(
         `Flujo creado con ${res.tokens.length} firmantes en orden. Link del primero copiado.`,
       );
@@ -448,7 +452,9 @@ export function DocumentEditor({
         setFlowTokens(next);
         try {
           window.localStorage.setItem(flowStorageKey, JSON.stringify({ flowId, tokens: next }));
-        } catch {}
+        } catch {
+          // Best-effort UI persistence; failure is intentionally non-fatal.
+        }
         await navigator.clipboard.writeText(buildSignUrl(res.token)).catch(() => {});
         toast.success("Link regenerado y copiado.");
       } else {
@@ -490,7 +496,9 @@ export function DocumentEditor({
       setFlowSummary(null);
       try {
         window.localStorage.removeItem(flowStorageKey);
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       // Reconstruye los inputs desde las partes actuales del documento.
       const posKeys = ["A", "B", "C", "D"] as const;
       const fresh = parties.map((role, i) => {
@@ -523,7 +531,9 @@ export function DocumentEditor({
           flowStorageKey,
           JSON.stringify({ flowId: res.flowId, tokens: tokMap }),
         );
-      } catch {}
+      } catch {
+        // Best-effort UI persistence; failure is intentionally non-fatal.
+      }
       await navigator.clipboard.writeText(buildSignUrl(res.tokens[0].token)).catch(() => {});
       toast.success(
         `Flujo re-sincronizado. #1 = ${fresh[0]?.name || fresh[0]?.role || "Parte A"}. Link del primero copiado.`,
@@ -1211,7 +1221,6 @@ function SignFlowPanel({
   // Detecta desalineación: si algún firmante pendiente no coincide (por nombre
   // o email) con los datos actuales de la parte del contrato, ofrecemos
   // re-sincronizar el flujo.
-  const posKeys = ["A", "B", "C", "D"] as const;
   const misaligned =
     started &&
     (summary?.signers ?? []).some((s) => {

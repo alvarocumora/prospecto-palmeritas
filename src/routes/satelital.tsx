@@ -117,7 +117,7 @@ function SatelitalPage() {
     queryFn: () => fetchSat(),
     staleTime: 60_000,
   });
-  const projects: PublicSatProject[] = data ?? [];
+  const projects = useMemo<PublicSatProject[]>(() => data ?? [], [data]);
 
   const [filters, setFilters] = useState<Filters>(() => ({
     ...emptyFilters,

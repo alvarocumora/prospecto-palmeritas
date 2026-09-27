@@ -23,7 +23,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { getLosVerdesMapData, type LosVerdesMapData } from "@/lib/losverdes-map.functions";
+import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 
 type LayerKey = "concessions" | "targets" | "sat" | "mag" | "samples";
 

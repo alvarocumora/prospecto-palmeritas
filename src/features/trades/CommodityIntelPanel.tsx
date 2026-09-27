@@ -60,7 +60,7 @@ export function CommodityIntelPanel({ commodity, quantityT }: CommodityIntelPane
     staleTime: 5 * 60_000,
   });
 
-  const routes = rates ?? [];
+  const routes = useMemo(() => rates ?? [], [rates]);
   const origins = useMemo(() => [...new Set(routes.map((r) => r.port_origin))].sort(), [routes]);
   const [origin, setOrigin] = useState<string>("");
   const [dest, setDest] = useState<string>("");

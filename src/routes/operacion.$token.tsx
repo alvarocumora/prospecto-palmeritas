@@ -279,7 +279,7 @@ function ComplianceChecklistPublic({ token, session }: { token: string; session:
       <TradeComplianceChecklist
         fetcher={async () => {
           const r = await fetchFn({ data: { token, session } });
-          return { rows: (r.rows ?? []) as any, readiness: (r.readiness ?? null) as any };
+          return { rows: r.rows ?? [], readiness: r.readiness ?? null };
         }}
         queryKey={["operacion-checklist", token]}
         onUpload={onUpload}

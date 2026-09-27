@@ -26,7 +26,6 @@ import {
   COUNTRIES,
   COMMODITIES,
   INCOTERMS,
-  commodityLabel,
   countryFlag,
   countryName,
   formLabel,

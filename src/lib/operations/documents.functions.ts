@@ -41,7 +41,7 @@ async function validatePortalToken(token: string, role: "buyer" | "seller") {
 }
 
 function sanitizeFilename(name: string) {
-  return name.replace(/[^\w.\-]+/g, "_").slice(-120);
+  return name.replace(/[^\w.-]+/g, "_").slice(-120);
 }
 
 const uploadSchema = z.object({
