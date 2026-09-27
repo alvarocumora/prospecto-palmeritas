@@ -189,10 +189,7 @@ export function ProjectMasterViewer({
       // Las superficies sólo aceptan estaciones CAMPO (is_synthetic=false) y
       // se etiquetan como DERIVADO/IDW, nunca como inversión ni observación directa.
       if (geophysics && (geophysics.lines.length || geophysics.stations.length)) {
-        const magneticSurface = buildFieldGeophysicsSurface(
-          geophysics.stations,
-          "mag_residual_nt",
-        );
+        const magneticSurface = buildFieldGeophysicsSurface(geophysics.stations, "mag_residual_nt");
         const ipChargeSurface = buildFieldGeophysicsSurface(
           geophysics.stations,
           "ip_chargeability_mvv",
@@ -208,10 +205,7 @@ export function ProjectMasterViewer({
           );
         }
         if (ipChargeSurface) {
-          groups.current.ipChargeSurfaceProject = buildGeophysicsSurfaceLayer(
-            L,
-            ipChargeSurface,
-          );
+          groups.current.ipChargeSurfaceProject = buildGeophysicsSurfaceLayer(L, ipChargeSurface);
         }
         if (ipResSurface) {
           groups.current.ipResSurfaceProject = buildGeophysicsSurfaceLayer(L, ipResSurface);
