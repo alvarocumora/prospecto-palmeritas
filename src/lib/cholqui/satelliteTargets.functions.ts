@@ -100,7 +100,9 @@ function readAnomalies(): CholquiAnomaly[] {
     const centroid = polygonCentroid(f.geometry);
     if (!centroid) return;
     const p = (f.properties ?? {}) as Record<string, unknown>;
-    const ring = (Array.isArray(f.geometry?.coordinates) ? f.geometry?.coordinates[0] : []) as AnomalyRing;
+    const ring = (
+      Array.isArray(f.geometry?.coordinates) ? f.geometry?.coordinates[0] : []
+    ) as AnomalyRing;
     out.push({
       id: `CHQ-SAT-${String(i + 1).padStart(2, "0")}`,
       indexCode: str(p["index_code"], "SIN_INDICE"),
