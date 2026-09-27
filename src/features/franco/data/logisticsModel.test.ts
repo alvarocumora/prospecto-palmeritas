@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  CHOLQUI_LOGISTICS_BENCHMARK,
-  calculateLogistics,
-  logisticsScale,
-} from "./logisticsModel";
+import { CHOLQUI_LOGISTICS_BENCHMARK, calculateLogistics, logisticsScale } from "./logisticsModel";
 
 describe("Cholqui logistics engineering model", () => {
   it("models the full round trip, not only the loaded leg", () => {
