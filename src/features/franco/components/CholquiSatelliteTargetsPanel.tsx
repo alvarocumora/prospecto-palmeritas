@@ -227,10 +227,7 @@ export function CholquiSatelliteTargetsPanel() {
         <>
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-b border-hairline bg-surface-2">
             {[
-              [
-                "Anomalías",
-                `${data.summary.anomalies} · ${data.summary.withinTenure} en tenencia`,
-              ],
+              ["Anomalías", `${data.summary.anomalies} · ${data.summary.withinTenure} en tenencia`],
               [
                 "Superficie interpretable",
                 data.coverage.typicalPct != null
