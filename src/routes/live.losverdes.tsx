@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import {
   ProjectReadinessStrip,
+  ProjectWorkspaceSection,
   ProjectWorkspaceShell,
 } from "@/components/project-workspace/ProjectWorkspaceShell";
 // Visor estratégico 2D (focus exploración + certificación). El 3D queda
@@ -293,6 +294,8 @@ function LiveLosVerdesPage() {
 
   const stats = reportQ.data?.stats;
   const totals = miningQ.data?.totals;
+  const concessionGeomCount =
+    reportQ.data?.concessions.filter((concession) => concession.geometry_geojson != null).length ?? 0;
 
   return (
     <ProjectWorkspaceShell
@@ -309,7 +312,7 @@ function LiveLosVerdesPage() {
         { id: "mine-plan", label: "Explotación" },
         { id: "economics", label: "Economía" },
         { id: "validation", label: "Validación" },
-        { id: "investment", label: "Inversión" },
+        { id: "investment", label: "Inversión", href: "#economics" },
       ]}
       metrics={[
         {
@@ -368,7 +371,11 @@ function LiveLosVerdesPage() {
     >
       <div id="overview" className="space-y-3">
         <ProjectReadinessStrip
-          catastro={stats ? `${stats.concessionsTotal} registros · geometría en visor` : "Cargando"}
+          catastro={
+            stats
+              ? `${stats.concessionsTotal} registros · ${concessionGeomCount}/${stats.concessionsTotal} con geometría`
+              : "Cargando"
+          }
           exploration={stats ? `${stats.samplesTotal} muestras · ${stats.satTotal} anomalías SAT` : "Cargando"}
           economics={totals ? "Modelo conceptual disponible" : "Pendiente"}
           validation="Sin recurso/reserva certificado"
@@ -503,6 +510,38 @@ function LiveLosVerdesPage() {
             </div>
           </Card>
         </div>
+
+        <ProjectWorkspaceSection
+          id="economics"
+          eyebrow="Economía e inversión"
+          title="Escenario económico y madurez de inversión"
+          description="Las cifras del plan se mantienen como escenario conceptual hasta reconciliar inventario, continuidad, metalurgia, diseño minero y costos de ejecución."
+        >
+          <div className="grid gap-px bg-hairline sm:grid-cols-2 lg:grid-cols-4">
+            <div className="bg-surface-3 p-4">
+              <div className="text-[10px] font-mono uppercase text-content-subtle">NPV escenario @8%</div>
+              <div className="mt-1 text-xl font-semibold text-content">
+                {totals ? fmtUsd(totals.npvUsdTotal) : "—"}
+              </div>
+            </div>
+            <div className="bg-surface-3 p-4">
+              <div className="text-[10px] font-mono uppercase text-content-subtle">CAPEX escenario</div>
+              <div className="mt-1 text-xl font-semibold text-content">
+                {totals ? fmtUsd(totals.capexUsdTotal) : "—"}
+              </div>
+            </div>
+            <div className="bg-surface-3 p-4">
+              <div className="text-[10px] font-mono uppercase text-content-subtle">Base geológica</div>
+              <div className="mt-1 text-sm font-semibold text-content">Conceptual</div>
+              <div className="mt-1 text-[11px] text-content-subtle">No recurso/reserva certificado</div>
+            </div>
+            <div className="bg-surface-3 p-4">
+              <div className="text-[10px] font-mono uppercase text-content-subtle">Investment readiness</div>
+              <div className="mt-1 text-sm font-semibold text-content">Due diligence abierta</div>
+              <div className="mt-1 text-[11px] text-content-subtle">Separada de la evidencia técnica</div>
+            </div>
+          </div>
+        </ProjectWorkspaceSection>
 
         {/* Catastro / anomalías / targets */}
         {reportQ.data && (
