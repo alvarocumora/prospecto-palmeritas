@@ -3,6 +3,8 @@ import type { Map as LeafletMap, Layer, GeoJSON as LeafletGeoJSON, TileLayer } f
 import "leaflet/dist/leaflet.css";
 import type { Feature, FeatureCollection } from "geojson";
 import { buildGeophysicsOverlays } from "@/components/map/geophysicsOverlays";
+import { buildGeophysicsLayer } from "@/components/map/geophysicsLayers";
+import type { GeophysicsData } from "@/types/geophysics";
 
 /**
  * Visor geoespacial maestro, genérico por proyecto. Reemplaza los mapas apilados
@@ -38,6 +40,7 @@ export type MasterViewerProps = {
   pedimentos?: FeatureCollection | null;
   assays?: AssayPoint[];
   coverage?: { typicalPct?: number; bestcasePct?: number; conclusive?: boolean } | null;
+  geophysics?: GeophysicsData | null;
   height?: number;
 };
 
@@ -59,6 +62,7 @@ type LayerKey =
   | "halos"
   | "magneticaRegional"
   | "gravedadRegional"
+  | "geofisicaProyecto"
   | "relieve"
   | "sondajes"
   | "ensayes"
@@ -88,6 +92,7 @@ const LAYER_SECTIONS: ReadonlyArray<{
     layers: [
       ["magneticaRegional", "Anomalía magnética · EMAG2 v3"],
       ["gravedadRegional", "Anomalía Bouguer · WGM2012"],
+      ["geofisicaProyecto", "Geofísica de proyecto · estaciones/líneas"],
     ],
   },
   {
@@ -117,6 +122,7 @@ export function ProjectMasterViewer({
   pedimentos,
   assays = [],
   coverage,
+  geophysics = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
@@ -129,6 +135,7 @@ export function ProjectMasterViewer({
     halos: true,
     magneticaRegional: false,
     gravedadRegional: false,
+    geofisicaProyecto: true,
     relieve: false,
     sondajes: true,
     ensayes: true,
@@ -159,11 +166,22 @@ export function ProjectMasterViewer({
       // --- Geofísica pública regional. Se mantiene apagada por defecto para no
       // confundir contexto regional con evidencia de detalle del prospecto.
       const geophysics = buildGeophysicsOverlays(L);
-      groups.current.magneticaRegional = geophysics["Anomalía magnética EMAG2 v3 · regional"];
-      groups.current.gravedadRegional = geophysics["Anomalía Bouguer WGM2012 · regional"];
-      groups.current.relieve = geophysics["Relieve / hillshade"];
+      groups.current.magneticaRegional = geophysics["Magnetometría EMAG2 (regional)"];
+      groups.current.gravedadRegional = geophysics["Gravimetría Bouguer WGM2012 (regional)"];
+      groups.current.relieve = geophysics["Hillshade SRTM (Esri)"];
 
       const sel = (kind: LayerKey, props: Record<string, unknown>) => setSelected({ kind, props });
+
+      // --- Geofísica del proyecto: líneas y estaciones cargadas en la base.
+      // buildGeophysicsLayer mantiene la distinción REAL/CAMPO vs SIMULADO.
+      if (geophysics && (geophysics.lines.length || geophysics.stations.length)) {
+        groups.current.geofisicaProyecto = buildGeophysicsLayer(
+          L,
+          geophysics.surveys,
+          geophysics.lines,
+          geophysics.stations,
+        ).addTo(map);
+      }
 
       // --- Tenencia (catastro SERNAGEOMIN: tenencia del proyecto vs contexto oficial)
       if (concessions?.features?.length) {
@@ -301,7 +319,7 @@ export function ProjectMasterViewer({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [geophysics]);
 
   // Toggle de capas
   useEffect(() => {
