@@ -395,6 +395,19 @@ export function ProjectMasterViewer({
     [],
   );
 
+  const geophysicsStatus = useMemo(() => {
+    const stations = geophysics?.stations ?? [];
+    const field = stations.filter((station) => !station.is_synthetic);
+    const synthetic = stations.length - field.length;
+    return {
+      field: field.length,
+      synthetic,
+      magnetic: field.filter((station) => station.mag_nt != null).length,
+      ipCharge: field.filter((station) => station.ip_chargeability_mvv != null).length,
+      ipRes: field.filter((station) => station.ip_resistivity_ohmm != null).length,
+    };
+  }, [geophysics]);
+
   return (
     <div className="w-full overflow-hidden rounded-xl border border-hairline bg-surface">
       {/* Cabecera: métrica de cobertura + descargo del halo */}
@@ -444,6 +457,13 @@ export function ProjectMasterViewer({
               {section.note && (
                 <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
                   {section.note}
+                </div>
+              )}
+              {section.title === "Geofísica" && (
+                <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                  CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic} · Mag:{" "}
+                  {geophysicsStatus.magnetic} · IP carg: {geophysicsStatus.ipCharge} · IP resist:{" "}
+                  {geophysicsStatus.ipRes}. Halo requiere ≥4 puntos CAMPO por variable.
                 </div>
               )}
               {section.layers.map(([k, label]) => (
