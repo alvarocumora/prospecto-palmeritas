@@ -111,11 +111,12 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     concessions: true,
     targets: true,
-    sat: true,
-    mag: true,
+    sat: false,
+    mag: false,
     samples: true,
   });
   const [certificationMode, setCertificationMode] = useState(false);
+  const [layersOpen, setLayersOpen] = useState(false);
   const [selected, setSelected] = useState<SelectedFeature | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
@@ -457,11 +458,20 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
         ))}
       </div>
 
-      {/* Layers panel */}
-      <div className="absolute top-3 right-14 bg-bg-secondary/95 border border-border rounded p-2 min-w-[180px]">
-        <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-gold mb-1.5">
-          <LayersIcon className="w-3 h-3" /> Capas
-        </div>
+      {/* Layers panel — cerrado por defecto para priorizar el mapa. */}
+      <div className="absolute top-3 right-14 bg-bg-secondary/95 border border-border rounded p-1.5 min-w-[150px]">
+        <button
+          type="button"
+          onClick={() => setLayersOpen((open) => !open)}
+          className="flex w-full items-center justify-between gap-2 px-1 text-[10px] font-mono uppercase tracking-wider text-gold"
+        >
+          <span className="flex items-center gap-1.5">
+            <LayersIcon className="w-3 h-3" /> Capas · {Object.values(visible).filter(Boolean).length}
+          </span>
+          <span>{layersOpen ? "▾" : "▸"}</span>
+        </button>
+        {layersOpen && (
+          <div className="mt-1.5 min-w-[180px]">
         <LayerToggle
           icon={<TestTube2 className="w-3 h-3" />}
           label="Muestras"
@@ -520,6 +530,8 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
           checked={visible.mag}
           onChange={(v) => setVisible((s) => ({ ...s, mag: v }))}
         />
+          </div>
+        )}
       </div>
 
       {/* Certification toggle */}
@@ -527,12 +539,12 @@ export function LosVerdesStrategicMap({ height = 640 }: { height?: number }) {
         <label className="flex items-center justify-between gap-3 text-xs cursor-pointer">
           <span className="flex items-center gap-1.5 text-foreground">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span className="font-medium">Modo certificación</span>
+            <span className="font-medium">Modo validación</span>
           </span>
           <Switch checked={certificationMode} onCheckedChange={setCertificationMode} />
         </label>
         <div className="mt-1.5 text-[10px] font-mono text-muted-foreground">
-          NI 43-101 · targets con confianza ≥ 60%
+          Filtro interno · targets con confianza ≥ 60%
         </div>
         {certificationMode && (
           <div className="mt-1.5 text-[10px] font-mono">
