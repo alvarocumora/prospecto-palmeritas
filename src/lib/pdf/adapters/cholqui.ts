@@ -158,7 +158,8 @@ export function buildCholquiDoc(): ProjectDoc {
         status: "PENDING_DD",
         provenance: "PENDING_DD",
         label: "Metalurgia y recursos",
-        detail: "Sin ensayos metalúrgicos de recuperación/consumo de ácido y sin estimación de recursos bajo estándar reconocido.",
+        detail:
+          "Sin ensayos metalúrgicos de recuperación/consumo de ácido y sin estimación de recursos bajo estándar reconocido.",
         confidence: "low",
       },
     ],
