@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { supabase } from "@/integrations/supabase/client";
 import { checkMyWatchlist } from "@/lib/catastroMonitor.functions";
+import { SectionHeader } from "@/components/ui-system";
 import {
   listMyAlerts,
   listMyWatchlist,
@@ -72,38 +73,37 @@ function WatchlistPage() {
   return (
     <PublicCatastroShell>
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex items-start justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl font-bold mb-1">Monitoreo</h1>
-            <p className="text-xs font-mono text-muted-foreground">
-              Concesiones que sigues y alertas de cambios en SERNAGEOMIN.
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={() => checkMut.mutate()}
-              disabled={checkMut.isPending || !wl.data?.items.length}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-gold bg-gold/10 text-gold text-xs font-mono hover:bg-gold/20 disabled:opacity-50 transition-colors"
-            >
-              {checkMut.isPending ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="w-3.5 h-3.5" />
-              )}
-              Revisar ahora
-            </button>
-            {wl.data && (
-              <div className="text-right">
-                <div className="text-[10px] font-mono uppercase text-muted-foreground">Plan</div>
-                <div className="text-sm font-semibold capitalize">{wl.data.plan}</div>
-                <div className="text-[10px] font-mono text-muted-foreground">
-                  {wl.data.used} / {wl.data.maxWatches === 99999 ? "∞" : wl.data.maxWatches}
+        <SectionHeader
+          eyebrow="Catastro · Vigilancia"
+          title="Monitoreo"
+          description="Concesiones que sigues y alertas de cambios en SERNAGEOMIN."
+          actions={
+            <>
+              <button
+                type="button"
+                onClick={() => checkMut.mutate()}
+                disabled={checkMut.isPending || !wl.data?.items.length}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-gold bg-gold/10 text-gold text-xs font-mono hover:bg-gold/20 disabled:opacity-50 transition-colors"
+              >
+                {checkMut.isPending ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3.5 h-3.5" />
+                )}
+                Revisar ahora
+              </button>
+              {wl.data && (
+                <div className="text-right">
+                  <div className="text-[10px] font-mono uppercase text-muted-foreground">Plan</div>
+                  <div className="text-sm font-semibold capitalize">{wl.data.plan}</div>
+                  <div className="text-[10px] font-mono text-muted-foreground">
+                    {wl.data.used} / {wl.data.maxWatches === 99999 ? "∞" : wl.data.maxWatches}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        </div>
+              )}
+            </>
+          }
+        />
 
         <section className="mb-10">
           <h2 className="text-sm font-mono uppercase tracking-wider text-muted-foreground mb-3">
