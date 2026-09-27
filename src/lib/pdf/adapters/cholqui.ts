@@ -34,6 +34,7 @@ export function buildCholquiDoc(): ProjectDoc {
   const ratioMax = Math.max(...ratios);
 
   return {
+    reportProfile: "technical",
     code: CHOLQUI.code,
     name: CHOLQUI.name,
     subtitle: `${CHOLQUI.commodity} · ${CHOLQUI.stage}`,
@@ -124,6 +125,44 @@ export function buildCholquiDoc(): ProjectDoc {
         { label: LAS_MINITAS.name, lat: LAS_MINITAS.lat, lng: LAS_MINITAS.lng, highlight: true },
       ],
     },
+    dataQuality: [
+      {
+        status: "PENDING_DD",
+        provenance: "DOCUMENTARY",
+        label: "Propiedad minera",
+        detail: `${CHOLQUI.pedimentos} pedimentos y ${CHOLQUI.pertenencias} pertenencias declaradas; dominio y vigencia requieren matriz documental única.`,
+        confidence: "medium",
+      },
+      {
+        status: "VERIFIED",
+        provenance: "CERTIFIED",
+        label: "Ensayes de superficie",
+        detail: `${CHOLQUI_ASSAYS.length} muestras puntuales respaldadas por ${CHOLQUI_ASSAY_REPORTS.length} informes de laboratorio.`,
+        confidence: "high",
+      },
+      {
+        status: "OBSERVED",
+        provenance: "OBSERVED",
+        label: "Geología de terreno",
+        detail: `${CHOLQUI_GEOLOGY.observaciones} observaciones de terreno; no equivalen a continuidad ni ley media.`,
+        confidence: "medium",
+      },
+      {
+        status: "CONCEPTUAL",
+        provenance: "INTERPRETED",
+        label: "Potencial conceptual",
+        detail: `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_CONCEPTUAL.sector}; no es recurso ni reserva.`,
+        confidence: "low",
+      },
+      {
+        status: "PENDING_DD",
+        provenance: "PENDING_DD",
+        label: "Metalurgia y recursos",
+        detail:
+          "Sin ensayos metalúrgicos de recuperación/consumo de ácido y sin estimación de recursos bajo estándar reconocido.",
+        confidence: "low",
+      },
+    ],
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
     sections: [
       {
@@ -176,6 +215,7 @@ export function buildCholquiDoc(): ProjectDoc {
         eyebrow: "Escenario operacional",
         title: "Ruta de monetización a ENAMI",
         deck: true,
+        profiles: ["investment"],
         lead: `Escenario base entregado por el titular: ${CHOLQUI_BASE_CASE.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses con rampa ${CHOLQUI_BASE_CASE.ramp}, a ${CHOLQUI_BASE_CASE.gradePct} % de Cu soluble. Cifras ilustrativas, sin VAN ni TIR auditados.`,
         blocks: [{ kind: "kv", items: CHOLQUI_ASSUMPTIONS }],
       },

@@ -7,7 +7,12 @@
  * cada capa conserva su etiqueta de procedencia.
  */
 import { publicUrl } from "@/lib/publicUrl";
-import { CHOLQUI, CHOLQUI_ASSAYS, CHOLQUI_POINTS, LAS_MINITAS } from "@/features/franco/data/cholqui";
+import {
+  CHOLQUI,
+  CHOLQUI_ASSAYS,
+  CHOLQUI_POINTS,
+  LAS_MINITAS,
+} from "@/features/franco/data/cholqui";
 import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import type { ProjectDoc } from "../model";
@@ -48,6 +53,7 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
   const top = anomalies.slice(0, 12);
 
   return {
+    reportProfile: "targeting",
     code: `${CHOLQUI.code}-SAT`,
     name: `${CHOLQUI.name} — Targets satelitales`,
     subtitle: "Anomalías espectrales y malla de sondajes propuesta",
@@ -145,33 +151,107 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
     dataQuality: [
       {
         status: "DERIVED",
+        provenance: "DERIVED",
         label: "Anomalías espectrales",
         detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
       },
       {
         status: "PENDING_DD",
+        provenance: "PENDING_DD",
         label: "Tenencia de las anomalías fuera del set conocido",
         detail: `${summary.outsideTenure} anomalías caen fuera de las pertenencias conocidas: contexto regional, sin plataforma propuesta hasta verificar tenencia.`,
       },
       {
         status: "CONCEPTUAL",
+        provenance: "PROPOSED",
         label: "Malla de sondajes",
         detail:
           "Propuesta de exploración calculada sobre las anomalías. No es un programa comprometido ni una estimación de recursos.",
       },
       {
         status: "VERIFIED",
+        provenance: "CERTIFIED",
         label: "Ensayes de superficie",
         detail: `${CHOLQUI_ASSAYS.length} muestras puntuales con informe de laboratorio firmado.`,
       },
       {
         status: "PENDING_DD",
+        provenance: "PENDING_DD",
         label: "Topografía y permisos",
         detail:
           "Las coordenadas de collar son preliminares: requieren topografía, acceso, servidumbres y permisos sectoriales.",
       },
     ],
     sections: [
+      {
+        eyebrow: "Datos de entrada",
+        title: "Datasets, procedencia y cobertura",
+        blocks: [
+          {
+            kind: "kv",
+            items: [
+              ["Sensor", data.coverage.sensor],
+              ["Fecha de corrida", data.runDate || "s/d"],
+              [
+                "Escenas utilizadas",
+                data.coverage.scenesUsed != null ? String(data.coverage.scenesUsed) : "s/d",
+              ],
+              ["CRS de salida", "WGS84 / EPSG:4326"],
+              ["Fuente", "Corrida satelital almacenada en GeoCapitals"],
+              ["Procedencia", "DERIVED / INTERPRETED — no verificado en terreno"],
+            ],
+          },
+        ],
+      },
+      {
+        eyebrow: "Calidad de datos",
+        title: "Cobertura y límites de interpretación",
+        blocks: [
+          {
+            kind: "kv",
+            items: [
+              [
+                "Superficie interpretable típica",
+                data.coverage.typicalPct != null
+                  ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+                  : "s/d",
+              ],
+              [
+                "Mejor caso",
+                data.coverage.bestCasePct != null
+                  ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %`
+                  : "s/d",
+              ],
+              ["Conclusivo", data.coverage.conclusive ? "Sí" : "No"],
+              [
+                "Tenencia",
+                data.coverage.tenureNote || "Requiere verificación contra catastro vigente",
+              ],
+            ],
+          },
+          {
+            kind: "text",
+            body:
+              data.coverage.headline ||
+              "La cobertura espectral debe interpretarse como screening regional y no como identificación mineral.",
+          },
+        ],
+      },
+      {
+        eyebrow: "Metodología",
+        title: "Cómo se generan y priorizan las anomalías",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "Screening Sentinel-2 L2A mediante razones de banda y realces relativos al fondo del área de interés.",
+              "Ranking determinista por puntaje de anomalía; el puntaje no representa ley ni concentración.",
+              "Cruce espacial con la tenencia conocida: sólo anomalías dentro de la tenencia pueden originar una plataforma conceptual.",
+              "La propuesta de collar es una salida de planificación y permanece PROPOSED hasta completar ground truth y revisión técnica.",
+            ],
+          },
+        ],
+      },
       {
         eyebrow: "Detección",
         title: "Anomalías espectrales sobre el AOI",
@@ -205,6 +285,23 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         ],
       },
       {
+        eyebrow: "Antes de perforar",
+        title: "Trabajos previos obligatorios",
+        blocks: [
+          {
+            kind: "bullets",
+            items: [
+              "Topografía de detalle y replanteo en terreno de cada collar propuesto.",
+              "Mapeo geológico-estructural y canaletas sobre las anomalías de mayor puntaje.",
+              "Verificación de servidumbres, accesos y permisos sectoriales de cada plataforma.",
+              "Protocolo QA/QC definido y laboratorio acreditado contratado antes del primer metro.",
+              "Revisión de la malla por persona competente una vez incorporado el mapeo de terreno.",
+            ],
+          },
+        ],
+      },
+
+      {
         eyebrow: "Propuesta",
         title: "Malla de sondajes de fase 1",
         deck: true,
@@ -212,7 +309,14 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         blocks: [
           {
             kind: "table",
-            head: ["Sondaje", "Collar (lat, lon)", "Azimut", "Inclinación", "Profundidad", "Prioridad"],
+            head: [
+              "Sondaje",
+              "Collar (lat, lon)",
+              "Azimut",
+              "Inclinación",
+              "Profundidad",
+              "Prioridad",
+            ],
             widths: [0.15, 0.28, 0.12, 0.15, 0.16, 0.14],
             rows: collarRows(collars),
           },
@@ -238,22 +342,6 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
             head: ["Sondaje", "Índice que la origina", "Objetivo geológico"],
             widths: [0.15, 0.33, 0.52],
             rows: collars.map((c) => [c.code, indexLabel(c.indexCode), c.objective]),
-          },
-        ],
-      },
-      {
-        eyebrow: "Antes de perforar",
-        title: "Trabajos previos obligatorios",
-        blocks: [
-          {
-            kind: "bullets",
-            items: [
-              "Topografía de detalle y replanteo en terreno de cada collar propuesto.",
-              "Mapeo geológico-estructural y canaletas sobre las anomalías de mayor puntaje.",
-              "Verificación de servidumbres, accesos y permisos sectoriales de cada plataforma.",
-              "Protocolo QA/QC definido y laboratorio acreditado contratado antes del primer metro.",
-              "Revisión de la malla por persona competente una vez incorporado el mapeo de terreno.",
-            ],
           },
         ],
       },

@@ -51,7 +51,7 @@ const COPPER: [number, number, number] = [192, 112, 58];
 export const CHOLQUI_LIVE_URL = publicUrl(CHOLQUI.liveUrl);
 
 /** Versión del documento: cambia con el contenido, se imprime en el pie. */
-export const CHOLQUI_DOC_VERSION = "v2.0";
+export const CHOLQUI_DOC_VERSION = "v3.0";
 export const CHOLQUI_TEASER_VERSION = "v2.0";
 
 type CholquiPdfKind = "brief" | "teaser";
@@ -215,7 +215,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(8);
   pdf.setTextColor(...PAPER);
-  pdf.text("GEOCAPITALS · STANDARDIZED INVESTMENT REPORT", M, 62);
+  pdf.text("GEOCAPITALS · INVESTMENT MEMORANDUM", M, 62);
   pdf.setFont("helvetica", "normal");
   pdf.setFontSize(7.2);
   pdf.setTextColor(150, 158, 168);
@@ -280,6 +280,18 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       ["Enlace canónico", CHOLQUI_LIVE_URL],
     ],
   );
+  table(
+    ["Ruta de lectura", "Secciones"],
+    [
+      ["Tesis", "01 Resumen ejecutivo"],
+      ["Evidencia", "02 Evidencia y confianza · 03 Contexto geoespacial · 04–05 evidencia técnica"],
+      ["Economía", "06 Economía preliminar · 07 Plan minero y sensibilidades"],
+      ["Decisión", "08 Brechas críticas · 09 Estructura de inversión"],
+      ["Control", "10 Procedencia del dato · 11 Riesgos"],
+    ],
+    true,
+  );
+
   h1("01 · Resumen ejecutivo", "Qué es el Proyecto Cholqui");
   para(
     `${CHOLQUI.name} es un proyecto de exploración avanzada de cobre, oro y plata en ${CHOLQUI.location}. Controla aproximadamente ${CHOLQUI.areaHa.toLocaleString("es-CL")} hectáreas mediante ${CHOLQUI.pedimentos} pedimentos y ${CHOLQUI.pertenencias} pertenencias, que rodean a ${LAS_MINITAS.name}, una faena de un tercero en producción sobre la misma estructura geológica. Acceso: ${CHOLQUI.access}.`,
@@ -289,9 +301,50 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
     "El proyecto NO cuenta con estimación de recursos ni reservas bajo un estándar reconocido. Toda cifra económica de este documento corresponde a escenarios ilustrativos de sensibilidad.",
   );
 
+  h1("02 · Evidencia y confianza", "Qué sabemos, qué interpretamos y qué falta validar");
+  table(
+    ["Materia", "Clase", "Confianza", "Estado"],
+    [
+      [
+        "Ensayes de superficie",
+        "CERTIFIED",
+        "Alta",
+        `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes`,
+      ],
+      [
+        "Geología de terreno",
+        "OBSERVED",
+        "Media",
+        `${CHOLQUI_GEOLOGY.observaciones} observaciones; continuidad no demostrada`,
+      ],
+      [
+        "Propiedad minera",
+        "DOCUMENTARY",
+        "Media",
+        "Dominio, vigencia y matriz única pendientes de cierre DD",
+      ],
+      [
+        "Potencial La Maza",
+        "INTERPRETED",
+        "Baja",
+        `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t conceptuales · no es recurso`,
+      ],
+      [
+        "Metalurgia",
+        "PENDING_DD",
+        "Baja",
+        "Sin recuperación, consumo de ácido ni cinética validados",
+      ],
+      ["Economía", "SCENARIO", "Baja", "Sensibilidades ilustrativas; sin VAN/TIR auditados"],
+    ],
+  );
+  disclaimer(
+    "La clase de evidencia no se eleva por inferencia: una interpretación sigue siendo INTERPRETED y un escenario económico sigue siendo SCENARIO aunque utilicen datos certificados.",
+  );
+
   // ── Live Map / evidencia geoespacial ───────────────────────────────────
   newPage();
-  h1("02 · Live Map", "Catastro, evidencia y contexto geoespacial");
+  h1("03 · Live Map", "Catastro, evidencia y contexto geoespacial");
   const evidenceExport = getGeologicalEvidenceExport();
   if (evidenceExport) {
     const img = pdf.getImageProperties(evidenceExport.mapPng);
@@ -312,7 +365,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   }
 
   // ── Ubicación y propiedad ────────────────────────────────────────────────
-  h1("02a · Ubicación y propiedad", "Qué controla actualmente la compañía");
+  h1("03a · Ubicación y propiedad", "Qué controla actualmente la compañía");
   table(
     ["Campo", "Valor"],
     [
@@ -339,7 +392,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   );
 
   // ── Evidencia geológica ──────────────────────────────────────────────────
-  h1("03 · Evidencia", "Evidencia de mineralización");
+  h1("04 · Evidencia", "Evidencia de mineralización");
   table(
     ["Dimensión", "Antecedente"],
     [
@@ -396,7 +449,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Puntos de muestreo ───────────────────────────────────────────────────
   // Continúa en la misma página si el aviso de evidencia abrió una página nueva.
-  h1("04 · Puntos de terreno", "Observación y muestreo georreferenciado");
+  h1("05 · Puntos de terreno", "Observación y muestreo georreferenciado");
   table(
     ["Punto", "Sector", "Este (PSAD'56 19H)", "Norte", "Lat (WGS84)", "Lng (WGS84)"],
     CHOLQUI_POINTS.map((p) => [
@@ -412,7 +465,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Economía preliminar ──────────────────────────────────────────────────
   newPage();
-  h1("05 · Economía preliminar", "Sensibilidad a la ley de cobre soluble");
+  h1("06 · Economía preliminar", "Sensibilidad a la ley de cobre soluble");
   para(
     `El modelo entregado considera la venta de mineral oxidado a ENAMI sobre un plan de ${CHOLQUI_PLAN_TONNES.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses (${CHOLQUI_BASE_CASE.ramp}). Los escenarios comparten plan minero y costos: sólo cambia la tarifa por ley de cobre soluble según la ${CHOLQUI_ENAMI.circular}. El caso efectivamente modelado es 1,5 % Cu soluble.`,
   );
@@ -459,7 +512,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   });
   y += 8;
 
-  h1("06 · Supuestos", "Supuestos comunes a los escenarios");
+  h1("06a · Supuestos", "Supuestos comunes a los escenarios");
   table(
     ["Supuesto", "Valor"],
     CHOLQUI_ASSUMPTIONS.map(([k, v]) => [k, v]),
@@ -474,7 +527,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   const plan15 = projectCashflow({ plateau: 15_000, gradePct: 1.5 });
   const plan20 = projectCashflow({ plateau: 20_000, gradePct: 1.5 });
 
-  h1("06a · Plan minero", "Escalamiento de 1.000 a 15.000 / 20.000 t por mes");
+  h1("07 · Plan minero", "Escalamiento de 1.000 a 15.000 / 20.000 t por mes");
   para(
     `Proyección de ingeniería preliminar partiendo de 1.000 t/mes con rampa lineal de 12 meses y meseta sostenida hasta el mes 24. La meseta de 15.000 t/mes corresponde al plan declarado; la de 20.000 t/mes es una hipótesis de ampliación sujeta al marco regulatorio y a permisos, no autorizada a la fecha. La flota se dimensiona desde el tonelaje y los costos separan componentes variables (CLP ${nfCl(VARIABLE_CLP_T)}/t) de fijos mensuales (CLP ${nfCl(FIXED_CLP_MONTH)}/mes), con ${CONTINGENCY_PCT} % de contingencia.`,
   );
@@ -570,7 +623,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Proyección mensual y sensibilidad del plan escalable ──────────────────
   newPage();
-  h1("06a.1 · Flujo mensual", "Ventas, costos y caja a 24 meses");
+  h1("07a · Flujo mensual", "Ventas, costos y caja a 24 meses");
   para(
     "Proyección mensual de ingeniería preliminar para los dos ritmos de meseta. El precio aplicado es la tarifa ENAMI asociada a 1,5 % Cu soluble; el caso de 20.000 t/mes se presenta como hipótesis de ampliación sujeta a regulación y permisos.",
   );
@@ -623,7 +676,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   );
 
   newPage();
-  h1("06a.2 · Sensibilidad", "Meseta, ley soluble y resultado a 24 meses");
+  h1("07b · Sensibilidad", "Meseta, ley soluble y resultado a 24 meses");
   para(
     "Matriz de sensibilidad combinando las mesetas de 15.000 y 20.000 t/mes con las cuatro leyes tarifarias del antecedente ENAMI. El costo de cada escenario se recalcula con la flota y los costos unitarios derivados del ritmo.",
   );
@@ -662,7 +715,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Brechas materiales del modelo ────────────────────────────────────────
   newPage();
-  h1("06b · Brechas", "Qué falta validar antes de comprometer capital");
+  h1("08 · Brechas críticas", "Qué falta validar antes de comprometer capital");
   CHOLQUI_GAPS.forEach((g) => para(`— ${g}`, SLATE, 8.6));
   table(
     ["Garantía documentada", "Titular", "Avalúo fiscal", "Estado"],
@@ -684,7 +737,7 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Estructura de inversión ──────────────────────────────────────────────
   newPage();
-  h1("07 · Estructura de inversión", "Qué obtiene el inversionista");
+  h1("09 · Estructura de inversión", "Qué obtiene el inversionista");
   table(
     ["Término", "Valor referencial"],
     [
@@ -713,13 +766,13 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
 
   // ── Procedencia y riesgos ────────────────────────────────────────────────
   newPage();
-  h1("08 · Procedencia del dato", "Hecho, declarado y por verificar");
+  h1("10 · Procedencia del dato", "Hecho, declarado y por verificar");
   table(
     ["Sección", "Dato", "Valor", "Procedencia", "Fuente"],
     CHOLQUI_FACTS.map((f) => [f.section, f.label, f.value, f.provenance, f.source]),
   );
 
-  h1("09 · Riesgos", "Riesgos principales y plan de de-risking");
+  h1("11 · Riesgos", "Riesgos principales y plan de de-risking");
   bullets(CHOLQUI_CAVEATS);
   para(
     "Plan de mitigación: gamma-espectrometría 1:10.000 y mapeo de detalle, zanjas en Cuesta Ancha, campaña de sondaje de confirmación, modelo geológico 3D, estimación de recursos por persona calificada y estudios metalúrgicos. Cada etapa reduce incertidumbre y habilita la siguiente valorización.",
