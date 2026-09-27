@@ -5,10 +5,7 @@ import {
   LEGACY_FREIGHT_ASSUMPTION,
   auditDeclaredProductionPlan,
 } from "../data/commercialModel";
-import {
-  LOGISTICS_MARKET_REFERENCES,
-  logisticsScale,
-} from "../data/logisticsModel";
+import { LOGISTICS_MARKET_REFERENCES, logisticsScale } from "../data/logisticsModel";
 import {
   CONTINGENCY_PCT,
   FIXED_COSTS,
@@ -131,9 +128,10 @@ export function CholquiMinePlanPanel() {
         <p className="text-xs text-content-subtle mt-2 max-w-4xl">
           El documento declara {nf.format(productionAudit.declaredTonnes)} t en 24 meses, mientras
           la rampa matemática 1.000→15.000 t/mes genera{" "}
-          {nf.format(productionAudit.mathematicalRampTonnes)} t (+{nf.format(productionAudit.deltaTonnes)} t).
-          El payback de esta simulación queda bloqueado como KPI de decisión hasta reconciliar
-          inventario, metalurgia, aceptación comercial, distancia vial, flete y liquidación.
+          {nf.format(productionAudit.mathematicalRampTonnes)} t (+
+          {nf.format(productionAudit.deltaTonnes)} t). El payback de esta simulación queda bloqueado
+          como KPI de decisión hasta reconciliar inventario, metalurgia, aceptación comercial,
+          distancia vial, flete y liquidación.
         </p>
         <div className="mt-3 grid md:grid-cols-2 gap-2 text-[11px] text-content-subtle">
           {CHOLQUI_COMMERCIAL_DESTINATIONS.map((destination) => (
@@ -141,7 +139,10 @@ export function CholquiMinePlanPanel() {
               <span className="font-mono text-content">{destination.operator}</span> ·{" "}
               {destination.facility}
               <div className="mt-1">
-                Producto: {destination.productFit === "OXIDE_CONFIRMED" ? "óxidos confirmados" : "aceptación por confirmar"}
+                Producto:{" "}
+                {destination.productFit === "OXIDE_CONFIRMED"
+                  ? "óxidos confirmados"
+                  : "aceptación por confirmar"}
                 {" · "}Distancia vial: por verificar{" · "}Cotización: pendiente
               </div>
             </div>
@@ -291,9 +292,7 @@ export function CholquiMinePlanPanel() {
                 title={`Mes ${m.month}: ${fmtClpM(m.cumulativeCashflowClp)}`}
               >
                 <div
-                  className={
-                    m.cumulativeCashflowClp >= 0 ? "bg-content" : "bg-content/25"
-                  }
+                  className={m.cumulativeCashflowClp >= 0 ? "bg-content" : "bg-content/25"}
                   style={{ height: `${Math.max(2, h)}%` }}
                 />
               </div>
@@ -336,10 +335,7 @@ export function CholquiMinePlanPanel() {
           </thead>
           <tbody>
             {plan.months.map((m) => (
-              <tr
-                key={m.month}
-                className="border-b border-hairline"
-              >
+              <tr key={m.month} className="border-b border-hairline">
                 <td className="py-1.5 font-mono text-content">{m.month}</td>
                 <td className="py-1.5 text-right font-mono text-content">{nf.format(m.rate)}</td>
                 <td className="py-1.5 text-right font-mono text-content-muted">
