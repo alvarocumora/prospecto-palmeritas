@@ -1,0 +1,609 @@
+{
+  "type": "FeatureCollection",
+  "name": "losverdes_sur_satellite_anomalies",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "project": "losverdes_sur",
+    "sensor": "Sentinel-2 L2A",
+    "provenance": "DERIVADO / INTERPRETADO",
+    "coverage": {
+      "typical_pct": 95.1,
+      "bestcase_pct": 98.4,
+      "spectral_conclusive": true
+    },
+    "config_sha256": "0acf9cd707413df4cefc7661ebd70fa7890a4e4fbff7fbf3f2d413bd7b3a2ab1",
+    "n": 15
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12452797821727,
+              -32.08444654054054
+            ],
+            [
+              -71.12325202178273,
+              -32.08444654054054
+            ],
+            [
+              -71.12325202178273,
+              -32.08336545945946
+            ],
+            [
+              -71.12452797821727,
+              -32.08336545945946
+            ],
+            [
+              -71.12452797821727,
+              -32.08444654054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "alta",
+        "score": 0.691,
+        "z_score": 6.22,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=6.22 (gossan 2.03). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12776380418266,
+              -32.05949954054054
+            ],
+            [
+              -71.12648819581734,
+              -32.05949954054054
+            ],
+            [
+              -71.12648819581734,
+              -32.05841845945946
+            ],
+            [
+              -71.12776380418266,
+              -32.05841845945946
+            ],
+            [
+              -71.12776380418266,
+              -32.05949954054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.61,
+        "z_score": 5.49,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.49 (gossan 1.91). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.15887892380783,
+              -32.07665054054054
+            ],
+            [
+              -71.15760307619217,
+              -32.07665054054054
+            ],
+            [
+              -71.15760307619217,
+              -32.07556945945946
+            ],
+            [
+              -71.15887892380783,
+              -32.07556945945946
+            ],
+            [
+              -71.15887892380783,
+              -32.07665054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.602,
+        "z_score": 5.42,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.42 (gossan 2.5). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12738181680227,
+              -32.06130954054054
+            ],
+            [
+              -71.12610618319773,
+              -32.06130954054054
+            ],
+            [
+              -71.12610618319773,
+              -32.06022845945946
+            ],
+            [
+              -71.12738181680227,
+              -32.06022845945946
+            ],
+            [
+              -71.12738181680227,
+              -32.06130954054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.588,
+        "z_score": 5.29,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.29 (gossan 2.07). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12225993315839,
+              -32.07799054054054
+            ],
+            [
+              -71.12098406684161,
+              -32.07799054054054
+            ],
+            [
+              -71.12098406684161,
+              -32.07690945945946
+            ],
+            [
+              -71.12225993315839,
+              -32.07690945945946
+            ],
+            [
+              -71.12225993315839,
+              -32.07799054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.587,
+        "z_score": 5.28,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.28 (gossan 1.75). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.15654098451382,
+              -32.085348540540544
+            ],
+            [
+              -71.15526501548617,
+              -32.085348540540544
+            ],
+            [
+              -71.15526501548617,
+              -32.08426745945946
+            ],
+            [
+              -71.15654098451382,
+              -32.08426745945946
+            ],
+            [
+              -71.15654098451382,
+              -32.085348540540544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.583,
+        "z_score": 5.25,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.25 (gossan 2.39). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.15053315153835,
+              -32.10926054054054
+            ],
+            [
+              -71.14925684846165,
+              -32.10926054054054
+            ],
+            [
+              -71.14925684846165,
+              -32.10817945945946
+            ],
+            [
+              -71.15053315153835,
+              -32.10817945945946
+            ],
+            [
+              -71.15053315153835,
+              -32.10926054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.57,
+        "z_score": 5.13,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.13 (gossan 2.06). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.14894018198625,
+              -32.11361654054054
+            ],
+            [
+              -71.14766381801375,
+              -32.11361654054054
+            ],
+            [
+              -71.14766381801375,
+              -32.11253545945946
+            ],
+            [
+              -71.14894018198625,
+              -32.11253545945946
+            ],
+            [
+              -71.14894018198625,
+              -32.11361654054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.547,
+        "z_score": 4.92,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.92 (gossan 1.9). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.15347495466007,
+              -32.08107154054054
+            ],
+            [
+              -71.15219904533994,
+              -32.08107154054054
+            ],
+            [
+              -71.15219904533994,
+              -32.07999045945946
+            ],
+            [
+              -71.15347495466007,
+              -32.07999045945946
+            ],
+            [
+              -71.15347495466007,
+              -32.08107154054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.514,
+        "z_score": 4.63,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.63 (gossan 2.2). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12993394736684,
+              -32.080026540540544
+            ],
+            [
+              -71.12865805263316,
+              -32.080026540540544
+            ],
+            [
+              -71.12865805263316,
+              -32.07894545945946
+            ],
+            [
+              -71.12993394736684,
+              -32.07894545945946
+            ],
+            [
+              -71.12993394736684,
+              -32.080026540540544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.498,
+        "z_score": 4.48,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.48 (gossan 1.9). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.14550791657902,
+              -32.07561454054054
+            ],
+            [
+              -71.14423208342097,
+              -32.07561454054054
+            ],
+            [
+              -71.14423208342097,
+              -32.07453345945946
+            ],
+            [
+              -71.14550791657902,
+              -32.07453345945946
+            ],
+            [
+              -71.14550791657902,
+              -32.07561454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.496,
+        "z_score": 4.46,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.46 (gossan 2.02). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.13354294946055,
+              -32.08032654054054
+            ],
+            [
+              -71.13226705053944,
+              -32.08032654054054
+            ],
+            [
+              -71.13226705053944,
+              -32.07924545945946
+            ],
+            [
+              -71.13354294946055,
+              -32.07924545945946
+            ],
+            [
+              -71.13354294946055,
+              -32.08032654054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.493,
+        "z_score": 4.44,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.44 (gossan 2.08). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.13216691814895,
+              -32.07583954054054
+            ],
+            [
+              -71.13089108185105,
+              -32.07583954054054
+            ],
+            [
+              -71.13089108185105,
+              -32.07475845945946
+            ],
+            [
+              -71.13216691814895,
+              -32.07475845945946
+            ],
+            [
+              -71.13216691814895,
+              -32.07583954054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.487,
+        "z_score": 4.38,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.38 (gossan 2.27). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.15997593500066,
+              -32.07825454054054
+            ],
+            [
+              -71.15870006499935,
+              -32.07825454054054
+            ],
+            [
+              -71.15870006499935,
+              -32.07717345945946
+            ],
+            [
+              -71.15997593500066,
+              -32.07717345945946
+            ],
+            [
+              -71.15997593500066,
+              -32.07825454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.469,
+        "z_score": 4.22,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.22 (gossan 2.13). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12671112535256,
+              -32.10551354054054
+            ],
+            [
+              -71.12543487464745,
+              -32.10551354054054
+            ],
+            [
+              -71.12543487464745,
+              -32.10443245945946
+            ],
+            [
+              -71.12671112535256,
+              -32.10443245945946
+            ],
+            [
+              -71.12671112535256,
+              -32.10551354054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.45,
+        "z_score": 4.05,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.05 (gossan 1.84). DERIVADO Sentinel-2."
+      }
+    }
+  ]
+}
