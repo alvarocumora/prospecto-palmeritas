@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { Map as LeafletMap, LayerGroup, GeoJSON as LeafletGeoJSON, TileLayer } from "leaflet";
+import type { Map as LeafletMap, Layer, GeoJSON as LeafletGeoJSON, TileLayer } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Feature, FeatureCollection } from "geojson";
+import { buildGeophysicsOverlays } from "@/components/map/geophysicsOverlays";
+import {
+  buildGeophysicsLayer,
+  buildGeophysicsSurfaceLayer,
+} from "@/components/map/geophysicsLayers";
+import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
+import type { GeophysicsData } from "@/types/geophysics";
 
 /**
  * Visor geoespacial maestro, genérico por proyecto. Reemplaza los mapas apilados
@@ -37,6 +44,7 @@ export type MasterViewerProps = {
   pedimentos?: FeatureCollection | null;
   assays?: AssayPoint[];
   coverage?: { typicalPct?: number; bestcasePct?: number; conclusive?: boolean } | null;
+  geophysics?: GeophysicsData | null;
   height?: number;
 };
 
@@ -53,8 +61,59 @@ const ALTERATION_LABEL: Record<string, string> = {
   STRUCTURAL_LINEAMENTS: "Lineamiento estructural",
 };
 
-type LayerKey = "tenencia" | "halos" | "sondajes" | "ensayes" | "pedimentos";
+type LayerKey =
+  | "tenencia"
+  | "halos"
+  | "magneticaRegional"
+  | "gravedadRegional"
+  | "geofisicaProyecto"
+  | "magSurfaceProject"
+  | "ipChargeSurfaceProject"
+  | "ipResSurfaceProject"
+  | "relieve"
+  | "sondajes"
+  | "ensayes"
+  | "pedimentos";
 type Selected = { kind: LayerKey; props: Record<string, unknown> } | null;
+
+const LAYER_SECTIONS: ReadonlyArray<{
+  title: string;
+  note?: string;
+  layers: ReadonlyArray<[LayerKey, string]>;
+}> = [
+  {
+    title: "Territorio",
+    layers: [
+      ["tenencia", "Catastro SERNAGEOMIN"],
+      ["relieve", "Relieve / hillshade"],
+    ],
+  },
+  {
+    title: "Teledetección",
+    note: "Derivado de sensores remotos; requiere validación en terreno.",
+    layers: [["halos", "Halos espectrales · Sentinel-2"]],
+  },
+  {
+    title: "Geofísica",
+    note: "Regional = contexto. Superficies de proyecto = IDW derivado de estaciones CAMPO; no son inversión.",
+    layers: [
+      ["magneticaRegional", "Anomalía magnética · EMAG2 v3"],
+      ["gravedadRegional", "Anomalía Bouguer · WGM2012"],
+      ["geofisicaProyecto", "Estaciones y líneas · proyecto"],
+      ["magSurfaceProject", "Halo magnético residual · CAMPO → IDW"],
+      ["ipChargeSurfaceProject", "Halo IP cargabilidad · CAMPO → IDW"],
+      ["ipResSurfaceProject", "Halo IP resistividad · CAMPO → IDW"],
+    ],
+  },
+  {
+    title: "Exploración",
+    layers: [
+      ["ensayes", "Ensayes certificados"],
+      ["sondajes", "Sondajes propuestos"],
+      ["pedimentos", "Pedimentos propuestos"],
+    ],
+  },
+];
 
 type ProvKind = "certificado" | "derivado" | "conceptual" | "contexto";
 const PROV: Record<ProvKind, { label: string; bg: string }> = {
@@ -73,16 +132,24 @@ export function ProjectMasterViewer({
   pedimentos,
   assays = [],
   coverage,
+  geophysics = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
-  const groups = useRef<Partial<Record<LayerKey, LayerGroup>>>({});
+  const groups = useRef<Partial<Record<LayerKey, Layer>>>({});
   const basesRef = useRef<{ sat?: TileLayer; topo?: TileLayer }>({});
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     tenencia: true,
     halos: true,
+    magneticaRegional: false,
+    gravedadRegional: false,
+    geofisicaProyecto: true,
+    magSurfaceProject: true,
+    ipChargeSurfaceProject: false,
+    ipResSurfaceProject: false,
+    relieve: false,
     sondajes: true,
     ensayes: true,
     pedimentos: true,
@@ -109,7 +176,48 @@ export function ProjectMasterViewer({
         maxZoom: 17,
       });
 
+      // --- Geofísica pública regional. Se mantiene apagada por defecto para no
+      // confundir contexto regional con evidencia de detalle del prospecto.
+      const regionalOverlays = buildGeophysicsOverlays(L);
+      groups.current.magneticaRegional = regionalOverlays["Magnetometría EMAG2 (regional)"];
+      groups.current.gravedadRegional = regionalOverlays["Gravimetría Bouguer WGM2012 (regional)"];
+      groups.current.relieve = regionalOverlays["Hillshade SRTM (Esri)"];
+
       const sel = (kind: LayerKey, props: Record<string, unknown>) => setSelected({ kind, props });
+
+      // --- Geofísica del proyecto: superficies primero, estaciones/líneas encima.
+      // Las superficies sólo aceptan estaciones CAMPO (is_synthetic=false) y
+      // se etiquetan como DERIVADO/IDW, nunca como inversión ni observación directa.
+      if (geophysics && (geophysics.lines.length || geophysics.stations.length)) {
+        const magneticSurface = buildFieldGeophysicsSurface(geophysics.stations, "mag_residual_nt");
+        const ipChargeSurface = buildFieldGeophysicsSurface(
+          geophysics.stations,
+          "ip_chargeability_mvv",
+        );
+        const ipResSurface = buildFieldGeophysicsSurface(
+          geophysics.stations,
+          "ip_resistivity_ohmm",
+        );
+
+        if (magneticSurface) {
+          groups.current.magSurfaceProject = buildGeophysicsSurfaceLayer(L, magneticSurface).addTo(
+            map,
+          );
+        }
+        if (ipChargeSurface) {
+          groups.current.ipChargeSurfaceProject = buildGeophysicsSurfaceLayer(L, ipChargeSurface);
+        }
+        if (ipResSurface) {
+          groups.current.ipResSurfaceProject = buildGeophysicsSurfaceLayer(L, ipResSurface);
+        }
+
+        groups.current.geofisicaProyecto = buildGeophysicsLayer(
+          L,
+          geophysics.surveys,
+          geophysics.lines,
+          geophysics.stations,
+        ).addTo(map);
+      }
 
       // --- Tenencia (catastro SERNAGEOMIN: tenencia del proyecto vs contexto oficial)
       if (concessions?.features?.length) {
@@ -247,7 +355,7 @@ export function ProjectMasterViewer({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [geophysics]);
 
   // Toggle de capas
   useEffect(() => {
@@ -281,6 +389,19 @@ export function ProjectMasterViewer({
     [],
   );
 
+  const geophysicsStatus = useMemo(() => {
+    const stations = geophysics?.stations ?? [];
+    const field = stations.filter((station) => !station.is_synthetic);
+    const synthetic = stations.length - field.length;
+    return {
+      field: field.length,
+      synthetic,
+      magnetic: field.filter((station) => station.mag_nt != null).length,
+      ipCharge: field.filter((station) => station.ip_chargeability_mvv != null).length,
+      ipRes: field.filter((station) => station.ip_resistivity_ohmm != null).length,
+    };
+  }, [geophysics]);
+
   return (
     <div className="w-full overflow-hidden rounded-xl border border-hairline bg-surface">
       {/* Cabecera: métrica de cobertura + descargo del halo */}
@@ -290,9 +411,9 @@ export function ProjectMasterViewer({
             {projectName} · visor geoespacial
           </div>
           <div className="text-[11px] text-content-subtle">
-            Una sola vista: tenencia, halos espectrales (DERIVADO), sondajes (PROPUESTO) y ensayes
-            (CERTIFICADO). Los halos son representación interpretativa de la firma espectral, no una
-            extensión medida en terreno.
+            Una sola vista: territorio, teledetección, geofísica regional y exploración. Cada capa
+            conserva su procedencia y escala; una anomalía regional no se presenta como blanco de
+            perforación ni como extensión mineralizada.
           </div>
         </div>
         {coverage && (
@@ -318,24 +439,39 @@ export function ProjectMasterViewer({
 
         {/* Panel de capas (izquierda-flotante) */}
         <div className="pointer-events-auto absolute left-3 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 p-2 text-[12px] shadow">
-          <div className="mb-1 px-1 font-semibold text-content">Capas</div>
-          {(
-            [
-              ["tenencia", "Catastro SERNAGEOMIN (tenencia + oficial)"],
-              ["halos", "Halos espectrales (Sentinel-2)"],
-              ["sondajes", "Malla de sondajes (propuesta)"],
-              ["ensayes", "Ensayes certificados"],
-              ["pedimentos", "Pedimentos propuestos"],
-            ] as [LayerKey, string][]
-          ).map(([k, label]) => (
-            <label key={k} className="flex cursor-pointer items-center gap-2 px-1 py-0.5">
-              <input
-                type="checkbox"
-                checked={visible[k]}
-                onChange={(e) => setVisible((s) => ({ ...s, [k]: e.target.checked }))}
-              />
-              <span className="text-content-muted">{label}</span>
-            </label>
+          <div className="mb-1 px-1 font-semibold text-content">Capas de evidencia</div>
+          {LAYER_SECTIONS.map((section, index) => (
+            <div
+              key={section.title}
+              className={index > 0 ? "mt-2 border-t border-hairline pt-2" : ""}
+            >
+              <div className="px-1 text-[10px] font-semibold uppercase tracking-wider text-content">
+                {section.title}
+              </div>
+              {section.note && (
+                <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                  {section.note}
+                </div>
+              )}
+              {section.title === "Geofísica" && (
+                <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                  CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic} · Mag:{" "}
+                  {geophysicsStatus.magnetic} · IP carg: {geophysicsStatus.ipCharge} · IP resist:{" "}
+                  {geophysicsStatus.ipRes}. Halo requiere ≥4 puntos CAMPO por variable.
+                </div>
+              )}
+              {section.layers.map(([k, label]) => (
+                <label key={k} className="flex cursor-pointer items-start gap-2 px-1 py-0.5">
+                  <input
+                    className="mt-0.5"
+                    type="checkbox"
+                    checked={visible[k]}
+                    onChange={(e) => setVisible((state) => ({ ...state, [k]: e.target.checked }))}
+                  />
+                  <span className="text-content-muted">{label}</span>
+                </label>
+              ))}
+            </div>
           ))}
           <div className="my-2 border-t border-hairline" />
           <div className="mb-1 px-1 font-semibold text-content">Base</div>
@@ -356,7 +492,7 @@ export function ProjectMasterViewer({
             ))}
           </div>
           <div className="my-2 border-t border-hairline" />
-          <div className="mb-1 px-1 font-semibold text-content">Firma espectral</div>
+          <div className="mb-1 px-1 font-semibold text-content">Firma espectral · Sentinel-2</div>
           {legend.map((l) => (
             <div
               key={l.label}
