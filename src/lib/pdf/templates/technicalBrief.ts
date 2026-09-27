@@ -160,7 +160,12 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   if (model.map) {
     need(260);
-    eyebrow(doc, M, y, `${model.dataQuality?.length ? "03" : "02"} · Ubicación y puntos de control`);
+    eyebrow(
+      doc,
+      M,
+      y,
+      `${model.dataQuality?.length ? "03" : "02"} · Ubicación y puntos de control`,
+    );
     y += 16;
     y += title(doc, M, y, model.map.title, 17, CW) + 12;
     if (model.map.imageDataUrl) {
