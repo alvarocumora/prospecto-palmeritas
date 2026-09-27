@@ -40,8 +40,8 @@ export function buildGeophysicsOverlays(L: LeafletNS) {
   );
 
   return {
-    "Anomalía magnética EMAG2 v3 · regional": emag2,
-    "Anomalía Bouguer WGM2012 · regional": wgm2012,
-    "Relieve / hillshade": hillshade,
+    "Magnetometría EMAG2 (regional)": emag2,
+    "Gravimetría Bouguer WGM2012 (regional)": wgm2012,
+    "Hillshade SRTM (Esri)": hillshade,
   };
 }
