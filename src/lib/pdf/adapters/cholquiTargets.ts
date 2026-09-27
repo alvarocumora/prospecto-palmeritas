@@ -7,7 +7,12 @@
  * cada capa conserva su etiqueta de procedencia.
  */
 import { publicUrl } from "@/lib/publicUrl";
-import { CHOLQUI, CHOLQUI_ASSAYS, CHOLQUI_POINTS, LAS_MINITAS } from "@/features/franco/data/cholqui";
+import {
+  CHOLQUI,
+  CHOLQUI_ASSAYS,
+  CHOLQUI_POINTS,
+  LAS_MINITAS,
+} from "@/features/franco/data/cholqui";
 import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import type { ProjectDoc } from "../model";
@@ -187,7 +192,10 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
             items: [
               ["Sensor", data.coverage.sensor],
               ["Fecha de corrida", data.runDate || "s/d"],
-              ["Escenas utilizadas", data.coverage.scenesUsed != null ? String(data.coverage.scenesUsed) : "s/d"],
+              [
+                "Escenas utilizadas",
+                data.coverage.scenesUsed != null ? String(data.coverage.scenesUsed) : "s/d",
+              ],
               ["CRS de salida", "WGS84 / EPSG:4326"],
               ["Fuente", "Corrida satelital almacenada en GeoCapitals"],
               ["Procedencia", "DERIVED / INTERPRETED — no verificado en terreno"],
@@ -202,15 +210,30 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
           {
             kind: "kv",
             items: [
-              ["Superficie interpretable típica", data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"],
-              ["Mejor caso", data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"],
+              [
+                "Superficie interpretable típica",
+                data.coverage.typicalPct != null
+                  ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+                  : "s/d",
+              ],
+              [
+                "Mejor caso",
+                data.coverage.bestCasePct != null
+                  ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %`
+                  : "s/d",
+              ],
               ["Conclusivo", data.coverage.conclusive ? "Sí" : "No"],
-              ["Tenencia", data.coverage.tenureNote || "Requiere verificación contra catastro vigente"],
+              [
+                "Tenencia",
+                data.coverage.tenureNote || "Requiere verificación contra catastro vigente",
+              ],
             ],
           },
           {
             kind: "text",
-            body: data.coverage.headline || "La cobertura espectral debe interpretarse como screening regional y no como identificación mineral.",
+            body:
+              data.coverage.headline ||
+              "La cobertura espectral debe interpretarse como screening regional y no como identificación mineral.",
           },
         ],
       },
@@ -286,7 +309,14 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
         blocks: [
           {
             kind: "table",
-            head: ["Sondaje", "Collar (lat, lon)", "Azimut", "Inclinación", "Profundidad", "Prioridad"],
+            head: [
+              "Sondaje",
+              "Collar (lat, lon)",
+              "Azimut",
+              "Inclinación",
+              "Profundidad",
+              "Prioridad",
+            ],
             widths: [0.15, 0.28, 0.12, 0.15, 0.16, 0.14],
             rows: collarRows(collars),
           },
