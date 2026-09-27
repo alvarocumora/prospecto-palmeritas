@@ -20,7 +20,7 @@ function dataset(
     geometryType: null,
     units: {},
     bboxWgs84: null,
-    provenance: "derived",
+    provenance: "DERIVED",
     qaStatus: "passed",
     qaSummary: {},
     acquisitionStart: null,
