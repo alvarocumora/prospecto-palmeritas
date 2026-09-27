@@ -165,10 +165,10 @@ export function ProjectMasterViewer({
 
       // --- Geofísica pública regional. Se mantiene apagada por defecto para no
       // confundir contexto regional con evidencia de detalle del prospecto.
-      const geophysics = buildGeophysicsOverlays(L);
-      groups.current.magneticaRegional = geophysics["Magnetometría EMAG2 (regional)"];
-      groups.current.gravedadRegional = geophysics["Gravimetría Bouguer WGM2012 (regional)"];
-      groups.current.relieve = geophysics["Hillshade SRTM (Esri)"];
+      const regionalOverlays = buildGeophysicsOverlays(L);
+      groups.current.magneticaRegional = regionalOverlays["Magnetometría EMAG2 (regional)"];
+      groups.current.gravedadRegional = regionalOverlays["Gravimetría Bouguer WGM2012 (regional)"];
+      groups.current.relieve = regionalOverlays["Hillshade SRTM (Esri)"];
 
       const sel = (kind: LayerKey, props: Record<string, unknown>) => setSelected({ kind, props });
 
