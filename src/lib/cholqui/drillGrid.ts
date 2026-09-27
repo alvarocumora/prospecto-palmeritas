@@ -137,11 +137,7 @@ function angularGap(a: number, b: number): number {
  * apunta hacia el eje del distrito, para cortar el cuerpo interpretado y no
  * seguirlo.
  */
-function azimuthFor(
-  lat: number,
-  lng: number,
-  center: { lat: number; lng: number },
-): number {
+function azimuthFor(lat: number, lng: number, center: { lat: number; lng: number }): number {
   const perpendicular = (DOMINANT_STRIKE_DEG + 90) % 360; // 110 grados
   const opposite = (perpendicular + 180) % 360; // 290 grados
   const toCenter = bearingDeg(lat, lng, center.lat, center.lng);
@@ -165,30 +161,32 @@ export function buildDrillGrid(
   const maxCollars = opts.maxCollars ?? MAX_COLLARS;
   const minScore = opts.minScore ?? MIN_SCORE;
 
-  return anomalies
-    .filter((a) => !NON_DRILLABLE.has(a.indexCode))
-    // Guarda legal: nunca se propone perforación fuera de la tenencia conocida.
-    .filter((a) => a.withinTenure !== false)
-    .filter((a) => (a.score ?? 0) >= minScore)
-    .slice()
-    .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.id.localeCompare(b.id))
-    .slice(0, maxCollars)
-    .map((a, i) => {
-      const score = a.score ?? 0;
-      return {
-        code: `CHQ-DDH-${String(i + 1).padStart(2, "0")}`,
-        anomalyId: a.id,
-        indexCode: a.indexCode,
-        lat: a.lat,
-        lng: a.lng,
-        azimuthDeg: azimuthFor(a.lat, a.lng, center),
-        dipDeg: -60,
-        depthM: depthFor(score),
-        priority: priorityOf(score),
-        objective: OBJECTIVE[a.indexCode] ?? "Verificar la anomalía en profundidad",
-        score,
-      };
-    });
+  return (
+    anomalies
+      .filter((a) => !NON_DRILLABLE.has(a.indexCode))
+      // Guarda legal: nunca se propone perforación fuera de la tenencia conocida.
+      .filter((a) => a.withinTenure !== false)
+      .filter((a) => (a.score ?? 0) >= minScore)
+      .slice()
+      .sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || a.id.localeCompare(b.id))
+      .slice(0, maxCollars)
+      .map((a, i) => {
+        const score = a.score ?? 0;
+        return {
+          code: `CHQ-DDH-${String(i + 1).padStart(2, "0")}`,
+          anomalyId: a.id,
+          indexCode: a.indexCode,
+          lat: a.lat,
+          lng: a.lng,
+          azimuthDeg: azimuthFor(a.lat, a.lng, center),
+          dipDeg: -60,
+          depthM: depthFor(score),
+          priority: priorityOf(score),
+          objective: OBJECTIVE[a.indexCode] ?? "Verificar la anomalía en profundidad",
+          score,
+        };
+      })
+  );
 }
 
 export function totalMeters(collars: ProposedCollar[]): number {
