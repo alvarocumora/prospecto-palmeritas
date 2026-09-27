@@ -11,19 +11,13 @@ import {
   type ReactNode,
 } from "react";
 import {
-  MapPin,
   FileDown,
   Loader2,
   Layers,
-  Target,
-  Satellite,
-  Pickaxe,
   Sparkles,
   AlertTriangle,
   Box,
   Copy,
-  CheckCircle2,
-  TestTube2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,7 +50,6 @@ import { syncLosVerdes5Catastro } from "@/lib/losverdes5-catastro.functions";
 import { generateConceptualModelFn } from "@/lib/conceptualModel.functions";
 import { onLosVerdesFocus } from "@/lib/losverdes-focus";
 import { publicUrl } from "@/lib/publicUrl";
-import losVerdesImage from "@/assets/project-losverdes.jpg.asset.json";
 
 export const Route = createFileRoute("/live/losverdes")({
   head: () => ({
@@ -223,20 +216,8 @@ function LiveLosVerdesPage() {
   // Visor 3D gated on-demand: evita que un crash del monolito tumbe toda la página.
   const [engineOn, setEngineOn] = useState(false);
   const [engineKey, setEngineKey] = useState(0);
-  const [qr, setQr] = useState<string | null>(null);
   useEffect(() => setMounted(true), []);
   const liveUrl = publicUrl("/live/losverdes");
-  useEffect(() => {
-    let active = true;
-    void import("qrcode").then((mod) =>
-      mod.toDataURL(liveUrl, { width: 320, margin: 1 }).then((value) => {
-        if (active) setQr(value);
-      }),
-    );
-    return () => {
-      active = false;
-    };
-  }, [liveUrl]);
   const syncCatastro = useServerFn(syncLosVerdes5Catastro);
   const genConceptual = useServerFn(generateConceptualModelFn);
 
@@ -436,7 +417,7 @@ function LiveLosVerdesPage() {
         )}
 
         {/* Visor estratégico 2D — exploración + certificación */}
-        <section>
+        <section id="exploration" className="scroll-mt-24 overflow-hidden rounded-2xl border border-hairline bg-surface-3 p-3">
           <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
             <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
               Visor estratégico · Catastro · Muestreo · Targets · Anomalías
@@ -462,7 +443,7 @@ function LiveLosVerdesPage() {
 
         {/* Visor 3D bajo demanda (beta) */}
         {engineOn && (
-          <section>
+          <section id="resource" className="scroll-mt-24">
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
                 Engine 3D · Marching Cubes · IDW · Sondajes (beta)
@@ -484,7 +465,7 @@ function LiveLosVerdesPage() {
         )}
 
         {/* Plan + contexto */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div id="mine-plan" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <MinePlanPanel phases={miningQ.data?.phases ?? []} />
           </div>
@@ -525,7 +506,7 @@ function LiveLosVerdesPage() {
 
         {/* Catastro / anomalías / targets */}
         {reportQ.data && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div id="validation" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4">
             <Panel title="Catastro" count={reportQ.data.concessions.length}>
               <div className="space-y-1.5 max-h-[360px] overflow-y-auto pr-1">
                 {reportQ.data.concessions.map((c) => (
@@ -613,29 +594,6 @@ function LiveLosVerdesPage() {
         onClose={() => setAiTarget(null)}
       />
     </ProjectWorkspaceShell>
-  );
-}
-
-function KPI({
-  icon,
-  label,
-  value,
-  sub,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value: React.ReactNode;
-  sub?: string;
-}) {
-  return (
-    <Card className="p-3 bg-bg-secondary border-border">
-      <div className="flex items-center justify-between text-muted-foreground">
-        <span className="text-[10px] font-mono uppercase tracking-wider">{label}</span>
-        <span className="text-gold">{icon}</span>
-      </div>
-      <div className="text-xl font-bold mt-1 text-foreground">{value}</div>
-      {sub && <div className="text-[10px] font-mono text-muted-foreground mt-0.5">{sub}</div>}
-    </Card>
   );
 }
 
