@@ -1,0 +1,560 @@
+{
+  "type": "FeatureCollection",
+  "name": "elara1_geoquimica_sedimentos_sngm",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "fuente": "SERNAGEOMIN — Compilación de Geoquímica de Sedimentos de Chile (ArcGIS Online, capa Muestras publicadas)",
+    "tipo": "Geoquímica de sedimento fluvial MEDIDA (multi-elemento). Dato OFICIAL.",
+    "n": 16,
+    "unidades": "ppm salvo Au/Ag (ver fuente); '<' = bajo límite de detección",
+    "guarda": "Dispersión geoquímica regional, NO ley in situ. Orienta, no prueba mineralización."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.700261,
+          -27.073986
+        ]
+      },
+      "properties": {
+        "muestra": 4105,
+        "Cu": 105.2,
+        "Au": 4.0,
+        "Ag": 0.2,
+        "As": 19.8,
+        "Mo": 2.2,
+        "Pb": 27.4,
+        "Zn": 68.0,
+        "Ni": 9.9,
+        "Sb": 0.7,
+        "Bi": 0.5,
+        "Hg": 0.08,
+        "W": 3.0,
+        "La": 35.9,
+        "Ce": 77.4,
+        "Nd": 32.1,
+        "Sm": 7.06,
+        "Y": 39.2,
+        "Th": 12.4,
+        "U": 3.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.660737,
+          -27.142754
+        ]
+      },
+      "properties": {
+        "muestra": 4171,
+        "Cu": 44.3,
+        "Au": 0.5,
+        "Au_bdl": true,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 9.5,
+        "Mo": 1.8,
+        "Pb": 10.2,
+        "Zn": 73.0,
+        "Ni": 25.6,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Hg": 0.07,
+        "W": 1.1,
+        "La": 20.8,
+        "Ce": 44.0,
+        "Nd": 18.8,
+        "Sm": 4.61,
+        "Y": 22.5,
+        "Th": 5.3,
+        "U": 2.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.694049,
+          -27.116656
+        ]
+      },
+      "properties": {
+        "muestra": 4172,
+        "Cu": 58.6,
+        "Au": 1.8,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 8.4,
+        "Mo": 0.7,
+        "Pb": 10.0,
+        "Zn": 68.0,
+        "Ni": 12.9,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.04,
+        "W": 1.5,
+        "La": 18.9,
+        "Ce": 38.5,
+        "Nd": 19.2,
+        "Sm": 4.42,
+        "Y": 20.3,
+        "Th": 5.1,
+        "U": 1.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.608473,
+          -27.213473
+        ]
+      },
+      "properties": {
+        "muestra": 4157,
+        "Cu": 84.4,
+        "Au": 1.4,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 16.7,
+        "Mo": 0.5,
+        "Pb": 10.9,
+        "Zn": 83.0,
+        "Ni": 12.2,
+        "Sb": 0.2,
+        "Bi": 0.2,
+        "Hg": 0.09,
+        "W": 0.8,
+        "La": 21.4,
+        "Ce": 43.5,
+        "Nd": 19.9,
+        "Sm": 4.44,
+        "Y": 20.8,
+        "Th": 4.3,
+        "U": 1.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.564827,
+          -27.146784
+        ]
+      },
+      "properties": {
+        "muestra": 4143,
+        "Cu": 62.9,
+        "Au": 0.9,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 9.3,
+        "Mo": 0.5,
+        "Pb": 7.2,
+        "Zn": 70.0,
+        "Ni": 9.8,
+        "Sb": 0.1,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.09,
+        "W": 0.6,
+        "La": 21.1,
+        "Ce": 40.1,
+        "Nd": 19.7,
+        "Sm": 4.26,
+        "Y": 18.0,
+        "Th": 4.0,
+        "U": 1.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.640167,
+          -27.170494
+        ]
+      },
+      "properties": {
+        "muestra": 4160,
+        "Cu": 97.3,
+        "Au": 2.4,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 6.2,
+        "Mo": 0.6,
+        "Pb": 9.6,
+        "Zn": 69.0,
+        "Ni": 15.4,
+        "Sb": 0.1,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.08,
+        "W": 1.0,
+        "La": 19.4,
+        "Ce": 40.2,
+        "Nd": 20.7,
+        "Sm": 5.07,
+        "Y": 27.3,
+        "Th": 5.6,
+        "U": 1.9
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.573009,
+          -27.122592
+        ]
+      },
+      "properties": {
+        "muestra": 4140,
+        "Cu": 50.1,
+        "Au": 3.1,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 2.8,
+        "Mo": 0.4,
+        "Pb": 5.9,
+        "Zn": 73.0,
+        "Ni": 10.7,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.02,
+        "W": 0.5,
+        "La": 19.0,
+        "Ce": 38.6,
+        "Nd": 18.5,
+        "Sm": 3.82,
+        "Y": 15.6,
+        "Th": 4.6,
+        "U": 1.3
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.524943,
+          -27.125109
+        ]
+      },
+      "properties": {
+        "muestra": 4432,
+        "Cu": 46.2,
+        "Au": 2.3,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 7.7,
+        "Mo": 0.5,
+        "Pb": 9.1,
+        "Zn": 69.0,
+        "Ni": 10.3,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Hg": 0.06,
+        "W": 0.8,
+        "La": 21.5,
+        "Ce": 45.4,
+        "Nd": 21.0,
+        "Sm": 4.45,
+        "Y": 20.1,
+        "Th": 4.0,
+        "U": 1.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.567512,
+          -27.146981
+        ]
+      },
+      "properties": {
+        "muestra": 4433,
+        "Cu": 39.9,
+        "Au": 0.8,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 8.7,
+        "Mo": 0.9,
+        "Pb": 8.0,
+        "Zn": 77.0,
+        "Ni": 10.3,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.04,
+        "W": 0.7,
+        "La": 20.1,
+        "Ce": 37.3,
+        "Nd": 18.5,
+        "Sm": 3.95,
+        "Y": 18.9,
+        "Th": 3.6,
+        "U": 1.1
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.627841,
+          -27.209903
+        ]
+      },
+      "properties": {
+        "muestra": 4155,
+        "Cu": 85.3,
+        "Au": 3.9,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 14.7,
+        "Mo": 1.4,
+        "Pb": 10.2,
+        "Zn": 67.0,
+        "Ni": 25.3,
+        "Sb": 0.1,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.11,
+        "W": 0.8,
+        "La": 21.2,
+        "Ce": 43.1,
+        "Nd": 20.6,
+        "Sm": 4.8,
+        "Y": 24.9,
+        "Th": 5.0,
+        "U": 1.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.685477,
+          -27.113954
+        ]
+      },
+      "properties": {
+        "muestra": 4104,
+        "Cu": 124.6,
+        "Au": 5.4,
+        "Ag": 0.2,
+        "As": 10.4,
+        "Mo": 0.9,
+        "Pb": 12.2,
+        "Zn": 71.0,
+        "Ni": 13.3,
+        "Sb": 0.3,
+        "Bi": 0.2,
+        "Hg": 0.13,
+        "W": 0.8,
+        "La": 19.7,
+        "Ce": 40.7,
+        "Nd": 20.9,
+        "Sm": 4.37,
+        "Y": 21.9,
+        "Th": 6.1,
+        "U": 1.4
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.674014,
+          -27.042759
+        ]
+      },
+      "properties": {
+        "muestra": 4175,
+        "Cu": 63.1,
+        "Au": 2.5,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 10.4,
+        "Mo": 0.9,
+        "Pb": 8.9,
+        "Zn": 68.0,
+        "Ni": 13.0,
+        "Sb": 0.2,
+        "Bi": 0.1,
+        "Hg": 0.05,
+        "W": 1.4,
+        "La": 19.4,
+        "Ce": 41.3,
+        "Nd": 20.9,
+        "Sm": 4.84,
+        "Y": 20.6,
+        "Th": 5.4,
+        "U": 1.5
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.709755,
+          -27.122617
+        ]
+      },
+      "properties": {
+        "muestra": 4161,
+        "Cu": 46.9,
+        "Au": 0.5,
+        "Au_bdl": true,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 6.9,
+        "Mo": 0.5,
+        "Pb": 16.9,
+        "Zn": 61.0,
+        "Ni": 49.9,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.2,
+        "Hg": 0.05,
+        "W": 1.3,
+        "La": 34.0,
+        "Ce": 69.1,
+        "Nd": 34.0,
+        "Sm": 6.75,
+        "Y": 36.9,
+        "Th": 9.5,
+        "U": 2.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.702242,
+          -27.07793
+        ]
+      },
+      "properties": {
+        "muestra": 4176,
+        "Cu": 92.7,
+        "Au": 2.4,
+        "Ag": 0.1,
+        "As": 17.4,
+        "Mo": 1.2,
+        "Pb": 14.2,
+        "Zn": 95.0,
+        "Ni": 13.3,
+        "Sb": 0.3,
+        "Bi": 0.2,
+        "Hg": 0.12,
+        "W": 0.9,
+        "La": 22.3,
+        "Ce": 48.0,
+        "Nd": 25.5,
+        "Sm": 4.52,
+        "Y": 22.8,
+        "Th": 7.1,
+        "U": 1.6
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.623068,
+          -27.170598
+        ]
+      },
+      "properties": {
+        "muestra": 4159,
+        "Cu": 81.3,
+        "Au": 2.1,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 12.7,
+        "Mo": 0.7,
+        "Pb": 11.7,
+        "Zn": 73.0,
+        "Ni": 11.5,
+        "Sb": 0.1,
+        "Bi": 0.2,
+        "Hg": 0.14,
+        "W": 0.6,
+        "La": 22.8,
+        "Ce": 45.8,
+        "Nd": 21.7,
+        "Sm": 4.67,
+        "Y": 20.8,
+        "Th": 5.4,
+        "U": 1.2
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.557427,
+          -27.101411
+        ]
+      },
+      "properties": {
+        "muestra": 4139,
+        "Cu": 54.1,
+        "Au": 0.8,
+        "Ag": 0.1,
+        "Ag_bdl": true,
+        "As": 27.8,
+        "Mo": 1.1,
+        "Pb": 7.7,
+        "Zn": 72.0,
+        "Ni": 17.6,
+        "Sb": 0.1,
+        "Sb_bdl": true,
+        "Bi": 0.1,
+        "Bi_bdl": true,
+        "Hg": 0.06,
+        "W": 0.6,
+        "La": 19.6,
+        "Ce": 36.8,
+        "Nd": 20.6,
+        "Sm": 3.69,
+        "Y": 14.7,
+        "Th": 4.6,
+        "U": 1.7
+      }
+    }
+  ]
+}
