@@ -8,14 +8,166 @@
     }
   },
   "metadata": {
-    "fuente": "SERNAGEOMIN catastro_SNGM",
-    "url": "https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index",
-    "n_total": 22,
-    "situacion": "mayoria CONSTITUIDA",
-    "titulares": "fragmentados (Fernandez, Los Pelambres, otros)",
-    "nota": "Sin titular dominante del proyecto. La tenencia del proyecto se define con el export de mining_concessions (DB) — pendiente."
+    "fuente": "SERNAGEOMIN (copias oficiales SIGEX/ArcGIS Online)",
+    "n": 44
   },
   "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.111063868,
+              -32.009847129
+            ],
+            [
+              -71.100483217,
+              -32.010022824
+            ],
+            [
+              -71.100586069,
+              -32.01453054
+            ],
+            [
+              -71.111167238,
+              -32.0143548139999
+            ],
+            [
+              -71.111063868,
+              -32.009847129
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030795-9",
+        "nombre": "CAMPANA 1/10",
+        "titular": "AGUILERA TAPIA JAIME DEL TRANS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.140867402,
+              -32.017013407
+            ],
+            [
+              -71.130286132,
+              -32.017191623
+            ],
+            [
+              -71.130912525,
+              -32.044237312
+            ],
+            [
+              -71.1414968999999,
+              -32.0440589099999
+            ],
+            [
+              -71.140867402,
+              -32.017013407
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031910-8",
+        "nombre": "EL CANELO 3",
+        "titular": "PRIETO ROJAS HUGO SEBASTIAN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1491928199999,
+              -32.0335571539999
+            ],
+            [
+              -71.143901274,
+              -32.0336467609999
+            ],
+            [
+              -71.1440694039999,
+              -32.040858874
+            ],
+            [
+              -71.149361363,
+              -32.0407692429999
+            ],
+            [
+              -71.1491928199999,
+              -32.0335571539999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031141-7",
+        "nombre": "CHELE NORTE 1/8",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 40,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.123920018,
+              -32.0623921439999
+            ],
+            [
+              -71.113333411,
+              -32.062569169
+            ],
+            [
+              -71.113540819,
+              -32.071584447
+            ],
+            [
+              -71.124128464,
+              -32.07140736
+            ],
+            [
+              -71.123920018,
+              -32.0623921439999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031055-0",
+        "nombre": "CENTINELA 1/10",
+        "titular": "EMPRESA CONSTRUTORA INDYGO LTD",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS"
+      }
+    },
     {
       "type": "Feature",
       "geometry": {
@@ -60,10 +212,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 94,
-        "comuna": "LOS VILOS",
-        "ano": "2025",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -102,10 +251,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "LOS VILOS",
-        "ano": "2023",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -144,10 +290,46 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 50,
-        "comuna": "LOS VILOS",
-        "ano": "2006",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0849183669999,
+              -32.0238079879999
+            ],
+            [
+              -71.0775106739999,
+              -32.0239295879999
+            ],
+            [
+              -71.077714263,
+              -32.0329451279999
+            ],
+            [
+              -71.085122681,
+              -32.032823486
+            ],
+            [
+              -71.0849183669999,
+              -32.0238079879999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200104482-9",
+        "nombre": "YENDRICK A6, DEL 1 AL 20",
+        "titular": "LEON BARAHONA EUGENIO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 70,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -194,10 +376,93 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 65,
-        "comuna": "LOS VILOS",
-        "ano": "2015",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.156760256,
+              -32.0176459379999
+            ],
+            [
+              -71.149353403,
+              -32.0177717129999
+            ],
+            [
+              -71.149648236,
+              -32.030392891
+            ],
+            [
+              -71.1538813079999,
+              -32.030321038
+            ],
+            [
+              -71.153691379,
+              -32.0222074489999
+            ],
+            [
+              -71.156865894,
+              -32.022153483
+            ],
+            [
+              -71.156760256,
+              -32.0176459379999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031269-3",
+        "nombre": "ESPERANZA 1/14",
+        "titular": "SILVA PINO MARCELO ENRIQUE",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 71,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.144570824,
+              -32.0169508229999
+            ],
+            [
+              -71.133989587,
+              -32.017129348
+            ],
+            [
+              -71.134617067,
+              -32.044174972
+            ],
+            [
+              -71.14520141,
+              -32.04399626
+            ],
+            [
+              -71.144570824,
+              -32.0169508229999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031916-7",
+        "nombre": "TILAMA",
+        "titular": "PASTEN SILVA CESAR ROGERS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -236,10 +501,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 30,
-        "comuna": "LOS VILOS",
-        "ano": "2012",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -310,10 +572,179 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 504,
-        "comuna": "LOS VILOS",
-        "ano": "2012",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0775106739999,
+              -32.0239295879999
+            ],
+            [
+              -71.070102936,
+              -32.024050756
+            ],
+            [
+              -71.070305801,
+              -32.033066338
+            ],
+            [
+              -71.077714263,
+              -32.0329451279999
+            ],
+            [
+              -71.0775106739999,
+              -32.0239295879999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200104483-7",
+        "nombre": "YENDRICK A5, DEL 1 AL 20",
+        "titular": "LEON BARAHONA EUGENIO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 70,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.172185247,
+              -31.9984434369999
+            ],
+            [
+              -71.151027313,
+              -31.9988040279999
+            ],
+            [
+              -71.151448578,
+              -32.0168343089999
+            ],
+            [
+              -71.1726106469999,
+              -32.016473467
+            ],
+            [
+              -71.172185247,
+              -31.9984434369999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030690-1",
+        "nombre": "PATAGUA 10 1/40",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 400,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.145531894,
+              -32.01164761
+            ],
+            [
+              -71.1402995879999,
+              -32.012319272
+            ],
+            [
+              -71.1407724859999,
+              -32.014994182
+            ],
+            [
+              -71.146004939,
+              -32.0143224939999
+            ],
+            [
+              -71.145531894,
+              -32.01164761
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030113-6",
+        "nombre": "SARA I/III",
+        "titular": "MERCADO CUEVAS NANCY ESTELA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 15,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.17154786,
+              -31.971398286
+            ],
+            [
+              -71.1620296249999,
+              -31.9715608179999
+            ],
+            [
+              -71.1620719049999,
+              -31.973363843
+            ],
+            [
+              -71.1599566899999,
+              -31.973399867
+            ],
+            [
+              -71.159914452,
+              -31.971596839
+            ],
+            [
+              -71.150396123,
+              -31.9717585
+            ],
+            [
+              -71.151027313,
+              -31.9988040279999
+            ],
+            [
+              -71.172185247,
+              -31.9984434369999
+            ],
+            [
+              -71.17154786,
+              -31.971398286
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030646-4",
+        "nombre": "PATAGUA 5 1/60",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 596,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -352,10 +783,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 50,
-        "comuna": "LOS VILOS",
-        "ano": "1999",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -394,10 +822,183 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "LOS VILOS",
-        "ano": "2023",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.162705859,
+              -32.0331391029999
+            ],
+            [
+              -71.1673584549999,
+              -32.0312907219999
+            ],
+            [
+              -71.1617666289999,
+              -32.021075889
+            ],
+            [
+              -71.154092785,
+              -32.024124316
+            ],
+            [
+              -71.159683985,
+              -32.034339512
+            ],
+            [
+              -71.162705859,
+              -32.0331391029999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030136-5",
+        "nombre": "SANTA ADELA 1/20",
+        "titular": "VARAS DONOSO LINDOR DEL CARMEN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.134518651,
+              -32.017120443
+            ],
+            [
+              -71.130286132,
+              -32.017191623
+            ],
+            [
+              -71.130473961,
+              -32.025305343
+            ],
+            [
+              -71.134706853,
+              -32.02523414
+            ],
+            [
+              -71.134518651,
+              -32.017120443
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031056-9",
+        "nombre": "LUCAS 1/9",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 36,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1581460899999,
+              -32.0316013039999
+            ],
+            [
+              -71.1560295319999,
+              -32.03163732
+            ],
+            [
+              -71.1561774629999,
+              -32.037947872
+            ],
+            [
+              -71.158294166,
+              -32.0379118459999
+            ],
+            [
+              -71.1582306989999,
+              -32.0352073289999
+            ],
+            [
+              -71.159289018,
+              -32.035189305
+            ],
+            [
+              -71.1592678539999,
+              -32.034287799
+            ],
+            [
+              -71.158209545,
+              -32.034305823
+            ],
+            [
+              -71.1581460899999,
+              -32.0316013039999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031256-1",
+        "nombre": "CATA 1/7",
+        "titular": "SLM CATA 1/8",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 15,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.076232574,
+              -32.032969405
+            ],
+            [
+              -71.06564903,
+              -32.0331423059999
+            ],
+            [
+              -71.06585153,
+              -32.0421579009999
+            ],
+            [
+              -71.07643611,
+              -32.041984939
+            ],
+            [
+              -71.076232574,
+              -32.032969405
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200100825-3",
+        "nombre": "YENDRICK UNO, DEL 1 AL 20",
+        "titular": "LEON BARAHONA EUGENIO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -436,10 +1037,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "LOS VILOS",
-        "ano": "2023",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -520,10 +1118,46 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "LOS VILOS",
-        "ano": "1996",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1285214549999,
+              -31.9811461259999
+            ],
+            [
+              -71.110540097,
+              -31.98144652
+            ],
+            [
+              -71.110953158,
+              -31.999477327
+            ],
+            [
+              -71.128938029,
+              -31.9991767229999
+            ],
+            [
+              -71.1285214549999,
+              -31.9811461259999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030786-K",
+        "nombre": "POLACO 3 1/36",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 340,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -562,10 +1196,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 30,
-        "comuna": "LOS VILOS",
-        "ano": "2000",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -652,10 +1283,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 60,
-        "comuna": "LOS VILOS",
-        "ano": "2016",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -694,10 +1322,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "LOS VILOS",
-        "ano": "2024",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -792,10 +1417,85 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 49,
-        "comuna": "LOS VILOS",
-        "ano": "2012",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1478503709999,
+              -32.021404666
+            ],
+            [
+              -71.142559519,
+              -32.021494186
+            ],
+            [
+              -71.1427694609999,
+              -32.030509352
+            ],
+            [
+              -71.14806083,
+              -32.0304197999999
+            ],
+            [
+              -71.1478503709999,
+              -32.021404666
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031142-5",
+        "nombre": "MANDELA 1/10",
+        "titular": "FERNANDEZ CHACANA CARLOS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0846993439999,
+              -32.032830448
+            ],
+            [
+              -71.076232574,
+              -32.032969405
+            ],
+            [
+              -71.076395395,
+              -32.040181834
+            ],
+            [
+              -71.084862828,
+              -32.040042839
+            ],
+            [
+              -71.0846993439999,
+              -32.032830448
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200104485-3",
+        "nombre": "YENDRICK A4, 1 AL 16",
+        "titular": "LEON BARAHONA EUGENIO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 64,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -856,10 +1556,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 576,
-        "comuna": "LOS VILOS",
-        "ano": "2004",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -914,10 +1611,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 56,
-        "comuna": "LOS VILOS",
-        "ano": "2012",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -972,10 +1666,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 84,
-        "comuna": "LOS VILOS",
-        "ano": "2015",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -1014,10 +1705,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "LOS VILOS",
-        "ano": "2023",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -1056,10 +1744,46 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "LOS VILOS",
-        "ano": "2023",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.163522284,
+              -32.0351171199999
+            ],
+            [
+              -71.1582306989999,
+              -32.0352073289999
+            ],
+            [
+              -71.158315323,
+              -32.038813352
+            ],
+            [
+              -71.1636071149999,
+              -32.038723131
+            ],
+            [
+              -71.163522284,
+              -32.0351171199999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030588-3",
+        "nombre": "ORIANA 1/4",
+        "titular": "TAPIA VILLA JUANA ROSA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 20,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -1098,10 +1822,7 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "LOS VILOS",
-        "ano": "2024",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -1148,10 +1869,124 @@
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 155,
-        "comuna": "LOS VILOS",
-        "ano": "2012",
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.149361363,
+              -32.0407692429999
+            ],
+            [
+              -71.1440694039999,
+              -32.040858874
+            ],
+            [
+              -71.144279651,
+              -32.049874003
+            ],
+            [
+              -71.149572128,
+              -32.04978434
+            ],
+            [
+              -71.149361363,
+              -32.0407692429999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031140-9",
+        "nombre": "CHELE 1/10",
+        "titular": "MINERA LOS VILOS S.A.",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.150396123,
+              -31.9717585
+            ],
+            [
+              -71.12924401,
+              -31.972115193
+            ],
+            [
+              -71.129869003,
+              -31.9991610939999
+            ],
+            [
+              -71.151027313,
+              -31.9988040279999
+            ],
+            [
+              -71.150396123,
+              -31.9717585
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030647-2",
+        "nombre": "PATAGUA 6 1/60",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 600,
+        "comuna": "LOS VILOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.110540097,
+              -31.98144652
+            ],
+            [
+              -71.057652209,
+              -31.982315281
+            ],
+            [
+              -71.058054937,
+              -32.000346693
+            ],
+            [
+              -71.110953158,
+              -31.999477327
+            ],
+            [
+              -71.110540097,
+              -31.98144652
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030787-8",
+        "nombre": "POLACO 4 1/100",
+        "titular": "MINERA LOS PELAMBRES",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 1000,
+        "comuna": "LOS VILOS"
       }
     },
     {
@@ -1190,10 +2025,7 @@
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 300,
-        "comuna": "LOS VILOS",
-        "ano": null,
-        "es_tenencia_proyecto": null,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "LOS VILOS"
       }
     }
   ]
