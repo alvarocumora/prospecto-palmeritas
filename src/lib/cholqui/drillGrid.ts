@@ -146,7 +146,6 @@ function azimuthFor(lat: number, lng: number, center: { lat: number; lng: number
     : opposite;
 }
 
-
 /** Profundidad propuesta: 120 m base más el realce por puntaje, en tramos de 10 m. */
 function depthFor(score: number): number {
   const raw = 120 + score * 100;
