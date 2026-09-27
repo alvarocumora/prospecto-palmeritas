@@ -1,0 +1,150 @@
+{
+  "type": "FeatureCollection",
+  "name": "elara1_yacimientos",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "fuente": "SERNAGEOMIN (copias oficiales SIGEX/ArcGIS Online)",
+    "n": 7,
+    "nota": "Depósitos en ~0.3° alrededor (contexto de distrito)."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.2630559999999,
+          -26.802222
+        ]
+      },
+      "properties": {
+        "nombre": "Can Can",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Epitermal de alta sulfuración",
+        "franja": "Mioceno",
+        "estado": "Mina paralizada",
+        "tipo": "MET",
+        "criticos": "Oro, Plata"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.954,
+          -26.838
+        ]
+      },
+      "properties": {
+        "nombre": "Inca de Oro",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Pórfido de Cu-Mo",
+        "franja": "Cretácico Superior",
+        "estado": "Mina en producción",
+        "tipo": "MET",
+        "criticos": "Cobre"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.2524999999999,
+          -26.835
+        ]
+      },
+      "properties": {
+        "nombre": "La Coipa",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Epitermal de alta sulfuración",
+        "franja": "Mioceno",
+        "estado": "Mina en producción",
+        "tipo": "MET",
+        "criticos": "Oro, Plata"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.2524999999999,
+          -26.835
+        ]
+      },
+      "properties": {
+        "nombre": "La Coipa",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Epitermal de alta sulfuración",
+        "franja": "Mioceno",
+        "estado": "Mina en producción",
+        "tipo": "MET",
+        "criticos": "Oro, Plata"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.2524999999999,
+          -26.835
+        ]
+      },
+      "properties": {
+        "nombre": "La Coipa",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Epitermal de alta sulfuración",
+        "franja": "Mioceno",
+        "estado": "Mina en producción",
+        "tipo": "MET",
+        "criticos": "Oro, Plata"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.2524999999999,
+          -26.835
+        ]
+      },
+      "properties": {
+        "nombre": "La Coipa",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Epitermal de alta sulfuración",
+        "franja": "Mioceno",
+        "estado": "Mina en producción",
+        "tipo": "MET",
+        "criticos": "Oro, Plata"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -69.239,
+          -27.2859999999999
+        ]
+      },
+      "properties": {
+        "nombre": "La Pepa",
+        "sistema": "Magmático-Hidrotermal",
+        "modelo": "Pórfido de Au",
+        "franja": "Mioceno",
+        "estado": "Prospecto/Proyecto",
+        "tipo": "MET",
+        "criticos": "Oro"
+      }
+    }
+  ]
+}

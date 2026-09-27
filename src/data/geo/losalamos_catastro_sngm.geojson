@@ -1,11 +1,56 @@
 {
   "type": "FeatureCollection",
   "name": "losalamos_catastro_sngm",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
   "metadata": {
-    "fuente": "SERNAGEOMIN",
-    "n": 5
+    "fuente": "SERNAGEOMIN (copias oficiales SIGEX/ArcGIS Online)",
+    "n": 7
   },
   "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.3570764579999,
+              -37.660697047
+            ],
+            [
+              -73.334411224,
+              -37.660379126
+            ],
+            [
+              -73.334209857,
+              -37.6693883619999
+            ],
+            [
+              -73.3568778279999,
+              -37.669706386
+            ],
+            [
+              -73.3570764579999,
+              -37.660697047
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200109107-K",
+        "nombre": "NUEVA CALIFORNIA",
+        "titular": "CARRILLO CORNEJO ROBERTO A.",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "LOS ALAMOS"
+      }
+    },
     {
       "type": "Feature",
       "geometry": {
@@ -36,11 +81,13 @@
         ]
       },
       "properties": {
+        "rol": "083040093-1",
         "nombre": "CERRO NEGRO 1/10",
         "titular": "ESCOBAR SIERRA VICTOR MANUEL",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
-        "fuente": "SERNAGEOMIN catastro_SNGM"
+        "hectareas": 100,
+        "comuna": "LOS ALAMOS"
       }
     },
     {
@@ -81,11 +128,52 @@
         ]
       },
       "properties": {
+        "rol": "083040079-6",
         "nombre": "HAMN 1/12",
         "titular": "MUNOZ MUNOZ DANILO ALFONSO",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
-        "fuente": "SERNAGEOMIN catastro_SNGM"
+        "hectareas": 81,
+        "comuna": "LOS ALAMOS"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -73.354044313,
+              -37.6696668709999
+            ],
+            [
+              -73.337043334,
+              -37.6694283529999
+            ],
+            [
+              -73.3368422199999,
+              -37.678437587
+            ],
+            [
+              -73.353845252,
+              -37.6786761819999
+            ],
+            [
+              -73.354044313,
+              -37.6696668709999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "083040076-1",
+        "nombre": "LAS NINAS 1/15",
+        "titular": "CARRILLO CORNEJO ROBERTO A.",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 150,
+        "comuna": "LOS ALAMOS"
       }
     },
     {
@@ -118,11 +206,13 @@
         ]
       },
       "properties": {
+        "rol": "200107709-3",
         "nombre": "MINERA LOS ALAMOS",
         "titular": "CLAUDIO ALEJANDRO GONZALEZ GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
-        "fuente": "SERNAGEOMIN catastro_SNGM"
+        "hectareas": 400,
+        "comuna": "LOS ALAMOS"
       }
     },
     {
@@ -155,11 +245,13 @@
         ]
       },
       "properties": {
+        "rol": "083040094-K",
         "nombre": "KOLIKO 1/10",
         "titular": "CARCAMO LOPEZ HERNAN PATRICIO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
-        "fuente": "SERNAGEOMIN catastro_SNGM"
+        "hectareas": 98,
+        "comuna": "LOS ALAMOS"
       }
     },
     {
@@ -192,11 +284,13 @@
         ]
       },
       "properties": {
+        "rol": "083040078-8",
         "nombre": "LA MARRE 1/10",
         "titular": "SLM SOC MINERA LA MARRE 1/10",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
-        "fuente": "SERNAGEOMIN catastro_SNGM"
+        "hectareas": 100,
+        "comuna": "LOS ALAMOS"
       }
     }
   ]

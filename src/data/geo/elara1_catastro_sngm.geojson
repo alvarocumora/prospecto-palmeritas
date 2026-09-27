@@ -1,0 +1,1701 @@
+{
+  "type": "FeatureCollection",
+  "name": "elara1_catastro_sngm",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "fuente": "SERNAGEOMIN (copias oficiales SIGEX/ArcGIS Online)",
+    "n": 43
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547202216,
+              -27.1797631749999
+            ],
+            [
+              -69.51691869,
+              -27.1798780459999
+            ],
+            [
+              -69.516960297,
+              -27.1889057989999
+            ],
+            [
+              -69.54724626,
+              -27.188790883
+            ],
+            [
+              -69.547202216,
+              -27.1797631749999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q431-0",
+        "nombre": "LADERA 73",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577119121,
+              -27.1083228269999
+            ],
+            [
+              -69.5468549949999,
+              -27.108443866
+            ],
+            [
+              -69.5468988759999,
+              -27.117471667
+            ],
+            [
+              -69.577165431,
+              -27.117350581
+            ],
+            [
+              -69.577119121,
+              -27.1083228269999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q396-9",
+        "nombre": "LADERA 86",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.643175184,
+              -27.192680948
+            ],
+            [
+              -69.6421656369999,
+              -27.1926855749999
+            ],
+            [
+              -69.6421708079999,
+              -27.193588329
+            ],
+            [
+              -69.643180362,
+              -27.193583702
+            ],
+            [
+              -69.643175184,
+              -27.192680948
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200101734-1",
+        "nombre": "SAN MIGUEL",
+        "titular": "SLM SAN MIGUEL UNA DE LA SIERRA LADRILLO DE PLATA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 1,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.667523877,
+              -27.0427048829999
+            ],
+            [
+              -69.6473598979999,
+              -27.0427990699999
+            ],
+            [
+              -69.6474116969999,
+              -27.0518267909999
+            ],
+            [
+              -69.667577289,
+              -27.0517325669999
+            ],
+            [
+              -69.667523877,
+              -27.0427048829999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q528-7",
+        "nombre": "RELINCHO I",
+        "titular": "SLM RELINCHO I DE LA SRRA GLOR",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547334409,
+              -27.206846264
+            ],
+            [
+              -69.517043568,
+              -27.2069612679999
+            ],
+            [
+              -69.517085233,
+              -27.215988986
+            ],
+            [
+              -69.5473785149999,
+              -27.215873937
+            ],
+            [
+              -69.547334409,
+              -27.206846264
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q459-0",
+        "nombre": "LADERA 76",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.667630727,
+              -27.0607602389999
+            ],
+            [
+              -69.6575471359999,
+              -27.06080773
+            ],
+            [
+              -69.6577051749999,
+              -27.087890731
+            ],
+            [
+              -69.667791189,
+              -27.0878431849999
+            ],
+            [
+              -69.667630727,
+              -27.0607602389999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q522-8",
+        "nombre": "RELINCHO III",
+        "titular": "SLM RELINCHO III D LA SRRA GLO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577536687,
+              -27.1895721929999
+            ],
+            [
+              -69.547250665,
+              -27.1896936529999
+            ],
+            [
+              -69.547294732,
+              -27.1987213479999
+            ],
+            [
+              -69.577583191,
+              -27.198599841
+            ],
+            [
+              -69.577536687,
+              -27.1895721929999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q376-4",
+        "nombre": "LADERA 95",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.712607651,
+              -26.9973442359999
+            ],
+            [
+              -69.702529816,
+              -26.9973948419999
+            ],
+            [
+              -69.702698206,
+              -27.024477835
+            ],
+            [
+              -69.712778456,
+              -27.02442717
+            ],
+            [
+              -69.712607651,
+              -26.9973442359999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201C594-9",
+        "nombre": "RESGUARDO 5, 1/60",
+        "titular": "SCM RESGUARDO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5772117619999,
+              -27.126378324
+            ],
+            [
+              -69.546942777,
+              -27.126499456
+            ],
+            [
+              -69.5469866999999,
+              -27.1355272339999
+            ],
+            [
+              -69.577258114,
+              -27.135406055
+            ],
+            [
+              -69.5772117619999,
+              -27.126378324
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q462-0",
+        "nombre": "LADERA 88",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577676266,
+              -27.2166551019999
+            ],
+            [
+              -69.547382926,
+              -27.216776704
+            ],
+            [
+              -69.547427055,
+              -27.225804363
+            ],
+            [
+              -69.577722836,
+              -27.2256827149999
+            ],
+            [
+              -69.577676266,
+              -27.2166551019999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q399-3",
+        "nombre": "LADERA 98",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577629718,
+              -27.2076274779999
+            ],
+            [
+              -69.5473388189999,
+              -27.207749032
+            ],
+            [
+              -69.547382926,
+              -27.216776704
+            ],
+            [
+              -69.577676266,
+              -27.2166551019999
+            ],
+            [
+              -69.577629718,
+              -27.2076274779999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q437-K",
+        "nombre": "LADERA 97",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.677443325,
+              -27.01557364
+            ],
+            [
+              -69.66736379,
+              -27.015621761
+            ],
+            [
+              -69.667523877,
+              -27.0427048829999
+            ],
+            [
+              -69.677605829,
+              -27.0426567059999
+            ],
+            [
+              -69.677443325,
+              -27.01557364
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P778-0",
+        "nombre": "SALTA 7014A",
+        "titular": "VALE EXPLORACIONES CHILE LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5773973029999,
+              -27.1624891769999
+            ],
+            [
+              -69.54711859,
+              -27.162610496
+            ],
+            [
+              -69.547162594,
+              -27.171638227
+            ],
+            [
+              -69.577443742,
+              -27.1715168599999
+            ],
+            [
+              -69.5773973029999,
+              -27.1624891769999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q463-9",
+        "nombre": "LADERA 92",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577072834,
+              -27.099295061
+            ],
+            [
+              -69.5468111339999,
+              -27.099416053
+            ],
+            [
+              -69.5468549949999,
+              -27.108443866
+            ],
+            [
+              -69.577119121,
+              -27.1083228269999
+            ],
+            [
+              -69.577072834,
+              -27.099295061
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q434-5",
+        "nombre": "LADERA 85",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.546982306,
+              -27.134624457
+            ],
+            [
+              -69.5167109499999,
+              -27.134739106
+            ],
+            [
+              -69.516752459,
+              -27.143766918
+            ],
+            [
+              -69.547026247,
+              -27.1436522239999
+            ],
+            [
+              -69.546982306,
+              -27.134624457
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q457-4",
+        "nombre": "LADERA 68",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.667577289,
+              -27.0517325669999
+            ],
+            [
+              -69.6474116969999,
+              -27.0518267909999
+            ],
+            [
+              -69.64746352,
+              -27.060854499
+            ],
+            [
+              -69.667630727,
+              -27.0607602389999
+            ],
+            [
+              -69.667577289,
+              -27.0517325669999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q520-1",
+        "nombre": "RELINCHO II",
+        "titular": "SLM RELINCHO II DE LA SRRA LA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577304489,
+              -27.1444337739999
+            ],
+            [
+              -69.547030642,
+              -27.144555
+            ],
+            [
+              -69.547074606,
+              -27.153582754
+            ],
+            [
+              -69.577350885,
+              -27.153461481
+            ],
+            [
+              -69.577304489,
+              -27.1444337739999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q397-7",
+        "nombre": "LADERA 90",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.546938386,
+              -27.125596678
+            ],
+            [
+              -69.5166694599999,
+              -27.1257112829999
+            ],
+            [
+              -69.5167109499999,
+              -27.134739106
+            ],
+            [
+              -69.546982306,
+              -27.134624457
+            ],
+            [
+              -69.546938386,
+              -27.125596678
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q374-8",
+        "nombre": "LADERA 67",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.546894487,
+              -27.116568887
+            ],
+            [
+              -69.516627989,
+              -27.1166834479999
+            ],
+            [
+              -69.5166694599999,
+              -27.1257112829999
+            ],
+            [
+              -69.546938386,
+              -27.125596678
+            ],
+            [
+              -69.546894487,
+              -27.116568887
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q391-8",
+        "nombre": "LADERA 66",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547158193,
+              -27.1707354549999
+            ],
+            [
+              -69.516877103,
+              -27.1708502819999
+            ],
+            [
+              -69.51691869,
+              -27.1798780459999
+            ],
+            [
+              -69.547202216,
+              -27.1797631749999
+            ],
+            [
+              -69.547158193,
+              -27.1707354549999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q458-2",
+        "nombre": "LADERA 72",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577165431,
+              -27.117350581
+            ],
+            [
+              -69.5468988759999,
+              -27.117471667
+            ],
+            [
+              -69.546942777,
+              -27.126499456
+            ],
+            [
+              -69.5772117619999,
+              -27.126378324
+            ],
+            [
+              -69.577165431,
+              -27.117350581
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q412-4",
+        "nombre": "LADERA 87",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577258114,
+              -27.135406055
+            ],
+            [
+              -69.5469866999999,
+              -27.1355272339999
+            ],
+            [
+              -69.547030642,
+              -27.144555
+            ],
+            [
+              -69.577304489,
+              -27.1444337739999
+            ],
+            [
+              -69.577258114,
+              -27.135406055
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q435-3",
+        "nombre": "LADERA 89",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.6575471359999,
+              -27.06080773
+            ],
+            [
+              -69.64746352,
+              -27.060854499
+            ],
+            [
+              -69.6476191369999,
+              -27.087937554
+            ],
+            [
+              -69.6577051749999,
+              -27.087890731
+            ],
+            [
+              -69.6575471359999,
+              -27.06080773
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q521-K",
+        "nombre": "RELINCHO IV",
+        "titular": "SLM RELINCHO IV DE LA SRRA GLO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5468506079999,
+              -27.107541085
+            ],
+            [
+              -69.516586538,
+              -27.107655602
+            ],
+            [
+              -69.516627989,
+              -27.1166834479999
+            ],
+            [
+              -69.546894487,
+              -27.116568887
+            ],
+            [
+              -69.5468506079999,
+              -27.107541085
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q429-9",
+        "nombre": "LADERA 65",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577490204,
+              -27.1805445319999
+            ],
+            [
+              -69.5472066199999,
+              -27.180665946
+            ],
+            [
+              -69.547250665,
+              -27.1896936529999
+            ],
+            [
+              -69.577536687,
+              -27.1895721929999
+            ],
+            [
+              -69.577490204,
+              -27.1805445319999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q398-5",
+        "nombre": "LADERA 94",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.70264205,
+              -27.0154501819999
+            ],
+            [
+              -69.692562579,
+              -27.0155001059999
+            ],
+            [
+              -69.69261793,
+              -27.0245277779999
+            ],
+            [
+              -69.702698206,
+              -27.024477835
+            ],
+            [
+              -69.70264205,
+              -27.0154501819999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201C596-5",
+        "nombre": "RESGUARDO 7, 1/20",
+        "titular": "SCM RESGUARDO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547070209,
+              -27.152679979
+            ],
+            [
+              -69.516793988,
+              -27.1527947179999
+            ],
+            [
+              -69.516835536,
+              -27.161822505
+            ],
+            [
+              -69.5471141899999,
+              -27.1617077229999
+            ],
+            [
+              -69.547070209,
+              -27.152679979
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q392-6",
+        "nombre": "LADERA 70",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5471141899999,
+              -27.1617077229999
+            ],
+            [
+              -69.516835536,
+              -27.161822505
+            ],
+            [
+              -69.516877103,
+              -27.1708502819999
+            ],
+            [
+              -69.547158193,
+              -27.1707354549999
+            ],
+            [
+              -69.5471141899999,
+              -27.1617077229999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q409-4",
+        "nombre": "LADERA 71",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5473785149999,
+              -27.215873937
+            ],
+            [
+              -69.517085233,
+              -27.215988986
+            ],
+            [
+              -69.517126917,
+              -27.225016691
+            ],
+            [
+              -69.547422641,
+              -27.224901598
+            ],
+            [
+              -69.5473785149999,
+              -27.215873937
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q432-9",
+        "nombre": "LADERA 77",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.66736379,
+              -27.015621761
+            ],
+            [
+              -69.65728423,
+              -27.01566916
+            ],
+            [
+              -69.6574419,
+              -27.042752338
+            ],
+            [
+              -69.667523877,
+              -27.0427048829999
+            ],
+            [
+              -69.66736379,
+              -27.015621761
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P690-3",
+        "nombre": "SALTA 7009A",
+        "titular": "VALE EXPLORACIONES CHILE LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547290324,
+              -27.1978185789999
+            ],
+            [
+              -69.517001923,
+              -27.197933539
+            ],
+            [
+              -69.517043568,
+              -27.2069612679999
+            ],
+            [
+              -69.547334409,
+              -27.206846264
+            ],
+            [
+              -69.547290324,
+              -27.1978185789999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q410-8",
+        "nombre": "LADERA 75",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.546806749,
+              -27.0985132709999
+            ],
+            [
+              -69.516545107,
+              -27.098627743
+            ],
+            [
+              -69.516586538,
+              -27.107655602
+            ],
+            [
+              -69.5468506079999,
+              -27.107541085
+            ],
+            [
+              -69.546806749,
+              -27.0985132709999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q456-6",
+        "nombre": "LADERA 64",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5363705669999,
+              -27.025209633
+            ],
+            [
+              -69.516209235,
+              -27.025284986
+            ],
+            [
+              -69.516250509,
+              -27.0343129399999
+            ],
+            [
+              -69.536413453,
+              -27.034237557
+            ],
+            [
+              -69.5363705669999,
+              -27.025209633
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P506-0",
+        "nombre": "BASTET 8A",
+        "titular": "INVERSIONES AMERICA SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.7227951359999,
+              -27.014445409
+            ],
+            [
+              -69.715739603,
+              -27.0144814399999
+            ],
+            [
+              -69.7156881459999,
+              -27.0063565639999
+            ],
+            [
+              -69.712664559,
+              -27.0063718919999
+            ],
+            [
+              -69.712767061,
+              -27.022621645
+            ],
+            [
+              -69.722847123,
+              -27.0225702619999
+            ],
+            [
+              -69.7227951359999,
+              -27.014445409
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201E003-4",
+        "nombre": "RESGUARDO D 1/31",
+        "titular": "SCM RESGUARDO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 137,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.697602318,
+              -27.015475234
+            ],
+            [
+              -69.6875228339999,
+              -27.0155247979999
+            ],
+            [
+              -69.6876877559999,
+              -27.042607807
+            ],
+            [
+              -69.697769657,
+              -27.042558186
+            ],
+            [
+              -69.697602318,
+              -27.015475234
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P383-1",
+        "nombre": "SALTA 9001",
+        "titular": "VALE EXPLORACIONES CHILE LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577443742,
+              -27.1715168599999
+            ],
+            [
+              -69.547162594,
+              -27.171638227
+            ],
+            [
+              -69.5472066199999,
+              -27.180665946
+            ],
+            [
+              -69.577490204,
+              -27.1805445319999
+            ],
+            [
+              -69.577443742,
+              -27.1715168599999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q436-1",
+        "nombre": "LADERA 93",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577350885,
+              -27.153461481
+            ],
+            [
+              -69.547074606,
+              -27.153582754
+            ],
+            [
+              -69.54711859,
+              -27.162610496
+            ],
+            [
+              -69.5773973029999,
+              -27.1624891769999
+            ],
+            [
+              -69.577350885,
+              -27.153461481
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q413-2",
+        "nombre": "LADERA 91",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.6875228339999,
+              -27.0155247979999
+            ],
+            [
+              -69.677443325,
+              -27.01557364
+            ],
+            [
+              -69.677605829,
+              -27.0426567059999
+            ],
+            [
+              -69.6876877559999,
+              -27.042607807
+            ],
+            [
+              -69.6875228339999,
+              -27.0155247979999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P380-7",
+        "nombre": "SALTA 9002",
+        "titular": "VALE EXPLORACIONES CHILE LTDA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.547026247,
+              -27.1436522239999
+            ],
+            [
+              -69.516752459,
+              -27.143766918
+            ],
+            [
+              -69.516793988,
+              -27.1527947179999
+            ],
+            [
+              -69.547070209,
+              -27.152679979
+            ],
+            [
+              -69.547026247,
+              -27.1436522239999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q430-2",
+        "nombre": "LADERA 69",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.5363277009999,
+              -27.0161816959999
+            ],
+            [
+              -69.51616798,
+              -27.0162570209999
+            ],
+            [
+              -69.516209235,
+              -27.025284986
+            ],
+            [
+              -69.5363705669999,
+              -27.025209633
+            ],
+            [
+              -69.5363277009999,
+              -27.0161816959999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201P514-1",
+        "nombre": "BASTET 7A",
+        "titular": "INVERSIONES AMERICA SPA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.7406711099999,
+              -27.127200334
+            ],
+            [
+              -69.710402874,
+              -27.127356697
+            ],
+            [
+              -69.710459924,
+              -27.136384189
+            ],
+            [
+              -69.7407305899999,
+              -27.136227767
+            ],
+            [
+              -69.7406711099999,
+              -27.127200334
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "032015989-K",
+        "nombre": "VOLCAN B 1/30",
+        "titular": "FORMAS ORTIZ CESAR BERNARDO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.577583191,
+              -27.198599841
+            ],
+            [
+              -69.547294732,
+              -27.1987213479999
+            ],
+            [
+              -69.5473388189999,
+              -27.207749032
+            ],
+            [
+              -69.577629718,
+              -27.2076274779999
+            ],
+            [
+              -69.577583191,
+              -27.198599841
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q464-7",
+        "nombre": "LADERA 96",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.54724626,
+              -27.188790883
+            ],
+            [
+              -69.516960297,
+              -27.1889057989999
+            ],
+            [
+              -69.517001923,
+              -27.197933539
+            ],
+            [
+              -69.547290324,
+              -27.1978185789999
+            ],
+            [
+              -69.54724626,
+              -27.188790883
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "03201Q393-4",
+        "nombre": "LADERA 74",
+        "titular": "BHP EXPLORATION CHILE SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "COPIAPO"
+      }
+    }
+  ]
+}
