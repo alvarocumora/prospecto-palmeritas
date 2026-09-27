@@ -63,9 +63,7 @@ export function buildPygimliErtIpSpec(args: {
 
   const measurementColumn = args.mode === "ert" ? "rhoa" : "ip";
   if (!columns.includes(measurementColumn)) {
-    throw new Error(
-      `PYGIMLI_MEASUREMENT_COLUMN_REQUIRED:${dataset.id}:${measurementColumn}`,
-    );
+    throw new Error(`PYGIMLI_MEASUREMENT_COLUMN_REQUIRED:${dataset.id}:${measurementColumn}`);
   }
 
   const relativeError = args.relativeError ?? 0.03;
