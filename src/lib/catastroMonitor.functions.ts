@@ -30,9 +30,7 @@ export const checkMyWatchlist = createServerFn({ method: "POST" })
   .middleware([requireCatastroRole])
   .handler(async ({ context }): Promise<{ checked: number; newAlerts: number }> => {
     const { supabase, userId } = context;
-    const { data: watches } = await supabase
-      .from("catastro_watchlist")
-      .select("concession_code");
+    const { data: watches } = await supabase.from("catastro_watchlist").select("concession_code");
     const codes = [...new Set((watches ?? []).map((w) => w.concession_code as string))];
     if (codes.length === 0) return { checked: 0, newAlerts: 0 };
 
@@ -49,7 +47,8 @@ export const checkMyWatchlist = createServerFn({ method: "POST" })
     const live = liveByCode(
       await sngmQueryGeoJSON(SNGM_CONCESIONES_URL, {
         where: `NUMERO_ROL IN (${inList})`,
-        outFields: "NUMERO_ROL,DV_ROL,TITULAR_NOMBRE,HECTAREAS,SITUACION_CONCESION,FECHA_VENCIMIENTO,NOMBRE",
+        outFields:
+          "NUMERO_ROL,DV_ROL,TITULAR_NOMBRE,HECTAREAS,SITUACION_CONCESION,FECHA_VENCIMIENTO,NOMBRE",
         returnGeometry: false,
         limit: 2000,
       }),
@@ -66,12 +65,32 @@ export const checkMyWatchlist = createServerFn({ method: "POST" })
 
     const now = Date.now();
     const toInsert: Array<{
-      user_id: string; concession_code: string; alert_type: AlertType;
-      severity: Sev; title: string; message: string; payload: Record<string, unknown>;
+      user_id: string;
+      concession_code: string;
+      alert_type: AlertType;
+      severity: Sev;
+      title: string;
+      message: string;
+      payload: Record<string, unknown>;
     }> = [];
-    const push = (code: string, type: AlertType, sev: Sev, title: string, message: string, payload: Record<string, unknown>) => {
+    const push = (
+      code: string,
+      type: AlertType,
+      sev: Sev,
+      title: string,
+      message: string,
+      payload: Record<string, unknown>,
+    ) => {
       if (open.has(`${code}|${type}`)) return;
-      toInsert.push({ user_id: userId, concession_code: code, alert_type: type, severity: sev, title, message, payload });
+      toInsert.push({
+        user_id: userId,
+        concession_code: code,
+        alert_type: type,
+        severity: sev,
+        title,
+        message,
+        payload,
+      });
     };
 
     for (const code of codes) {
@@ -79,31 +98,64 @@ export const checkMyWatchlist = createServerFn({ method: "POST" })
       const base = cache.get(code);
       const label = (base?.name as string) || (l?.NOMBRE as string) || code;
       if (!l || l.SITUACION_CONCESION === "ELIMINADA") {
-        push(code, "missing", "critical", `${label}: sin registro vigente`,
+        push(
+          code,
+          "missing",
+          "critical",
+          `${label}: sin registro vigente`,
           "La concesión ya no aparece vigente en el catastro (¿eliminada o extinguida? — terreno posiblemente liberado).",
-          { code });
+          { code },
+        );
         continue;
       }
       if (base) {
         const holder = (l.TITULAR_NOMBRE as string) ?? null;
         if (holder && base.holder && holder !== base.holder)
-          push(code, "holder_change", "warning", `${label}: cambio de titular`,
-            `Titular: "${base.holder}" → "${holder}".`, { code, from: base.holder, to: holder });
+          push(
+            code,
+            "holder_change",
+            "warning",
+            `${label}: cambio de titular`,
+            `Titular: "${base.holder}" → "${holder}".`,
+            { code, from: base.holder, to: holder },
+          );
         const areaL = Number(l.HECTAREAS);
-        if (base.area_ha != null && Number.isFinite(areaL) && Math.abs(areaL - Number(base.area_ha)) > 0.5)
-          push(code, "area_change", "warning", `${label}: cambio de superficie`,
-            `Superficie: ${base.area_ha} → ${areaL} ha.`, { code, from: base.area_ha, to: areaL });
+        if (
+          base.area_ha != null &&
+          Number.isFinite(areaL) &&
+          Math.abs(areaL - Number(base.area_ha)) > 0.5
+        )
+          push(
+            code,
+            "area_change",
+            "warning",
+            `${label}: cambio de superficie`,
+            `Superficie: ${base.area_ha} → ${areaL} ha.`,
+            { code, from: base.area_ha, to: areaL },
+          );
         const status = (l.SITUACION_CONCESION as string) ?? null;
         if (status && base.status && status !== base.status)
-          push(code, "status_change", "warning", `${label}: cambio de situación`,
-            `Situación: "${base.status}" → "${status}".`, { code, from: base.status, to: status });
+          push(
+            code,
+            "status_change",
+            "warning",
+            `${label}: cambio de situación`,
+            `Situación: "${base.status}" → "${status}".`,
+            { code, from: base.status, to: status },
+          );
       }
       const venc = Number(l.FECHA_VENCIMIENTO);
       if (Number.isFinite(venc)) {
         const days = Math.round((venc - now) / DAY);
         if (days >= 0 && days <= 90)
-          push(code, "expiring", days <= 30 ? "critical" : "info", `${label}: vence en ${days} días`,
-            `Fecha de vencimiento: ${new Date(venc).toISOString().slice(0, 10)}.`, { code, days });
+          push(
+            code,
+            "expiring",
+            days <= 30 ? "critical" : "info",
+            `${label}: vence en ${days} días`,
+            `Fecha de vencimiento: ${new Date(venc).toISOString().slice(0, 10)}.`,
+            { code, days },
+          );
       }
     }
 
