@@ -3,7 +3,11 @@ import type { Map as LeafletMap, Layer, GeoJSON as LeafletGeoJSON, TileLayer } f
 import "leaflet/dist/leaflet.css";
 import type { Feature, FeatureCollection } from "geojson";
 import { buildGeophysicsOverlays } from "@/components/map/geophysicsOverlays";
-import { buildGeophysicsLayer } from "@/components/map/geophysicsLayers";
+import {
+  buildGeophysicsLayer,
+  buildGeophysicsSurfaceLayer,
+} from "@/components/map/geophysicsLayers";
+import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
 import type { GeophysicsData } from "@/types/geophysics";
 
 /**
@@ -63,6 +67,9 @@ type LayerKey =
   | "magneticaRegional"
   | "gravedadRegional"
   | "geofisicaProyecto"
+  | "magSurfaceProject"
+  | "ipChargeSurfaceProject"
+  | "ipResSurfaceProject"
   | "relieve"
   | "sondajes"
   | "ensayes"
@@ -88,11 +95,14 @@ const LAYER_SECTIONS: ReadonlyArray<{
   },
   {
     title: "Geofísica",
-    note: "Contexto regional. No equivale a geofísica de detalle del prospecto.",
+    note: "Regional = contexto. Superficies de proyecto = IDW derivado de estaciones CAMPO; no son inversión.",
     layers: [
       ["magneticaRegional", "Anomalía magnética · EMAG2 v3"],
       ["gravedadRegional", "Anomalía Bouguer · WGM2012"],
-      ["geofisicaProyecto", "Geofísica de proyecto · estaciones/líneas"],
+      ["geofisicaProyecto", "Estaciones y líneas · proyecto"],
+      ["magSurfaceProject", "Halo magnético residual · CAMPO → IDW"],
+      ["ipChargeSurfaceProject", "Halo IP cargabilidad · CAMPO → IDW"],
+      ["ipResSurfaceProject", "Halo IP resistividad · CAMPO → IDW"],
     ],
   },
   {
@@ -136,6 +146,9 @@ export function ProjectMasterViewer({
     magneticaRegional: false,
     gravedadRegional: false,
     geofisicaProyecto: true,
+    magSurfaceProject: true,
+    ipChargeSurfaceProject: false,
+    ipResSurfaceProject: false,
     relieve: false,
     sondajes: true,
     ensayes: true,
@@ -172,9 +185,38 @@ export function ProjectMasterViewer({
 
       const sel = (kind: LayerKey, props: Record<string, unknown>) => setSelected({ kind, props });
 
-      // --- Geofísica del proyecto: líneas y estaciones cargadas en la base.
-      // buildGeophysicsLayer mantiene la distinción REAL/CAMPO vs SIMULADO.
+      // --- Geofísica del proyecto: superficies primero, estaciones/líneas encima.
+      // Las superficies sólo aceptan estaciones CAMPO (is_synthetic=false) y
+      // se etiquetan como DERIVADO/IDW, nunca como inversión ni observación directa.
       if (geophysics && (geophysics.lines.length || geophysics.stations.length)) {
+        const magneticSurface = buildFieldGeophysicsSurface(
+          geophysics.stations,
+          "mag_residual_nt",
+        );
+        const ipChargeSurface = buildFieldGeophysicsSurface(
+          geophysics.stations,
+          "ip_chargeability_mvv",
+        );
+        const ipResSurface = buildFieldGeophysicsSurface(
+          geophysics.stations,
+          "ip_resistivity_ohmm",
+        );
+
+        if (magneticSurface) {
+          groups.current.magSurfaceProject = buildGeophysicsSurfaceLayer(L, magneticSurface).addTo(
+            map,
+          );
+        }
+        if (ipChargeSurface) {
+          groups.current.ipChargeSurfaceProject = buildGeophysicsSurfaceLayer(
+            L,
+            ipChargeSurface,
+          );
+        }
+        if (ipResSurface) {
+          groups.current.ipResSurfaceProject = buildGeophysicsSurfaceLayer(L, ipResSurface);
+        }
+
         groups.current.geofisicaProyecto = buildGeophysicsLayer(
           L,
           geophysics.surveys,
