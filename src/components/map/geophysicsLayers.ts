@@ -173,7 +173,6 @@ export function fitToGeophysics(
   if (pts.length) map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
 }
 
-
 function surfaceColor(surface: GeophysicsSurface, normalized: number, value: number): string {
   if (surface.metric === "mag_residual_nt") {
     const span = Math.max(Math.abs(surface.min), Math.abs(surface.max), 1);
@@ -196,10 +195,7 @@ function surfaceColor(surface: GeophysicsSurface, normalized: number, value: num
  * Renders an IDW surface derived exclusively from non-synthetic field stations.
  * This is a visualization/interpolation layer, NOT a geophysical inversion.
  */
-export function buildGeophysicsSurfaceLayer(
-  L: LeafletNS,
-  surface: GeophysicsSurface,
-): LayerGroup {
+export function buildGeophysicsSurfaceLayer(L: LeafletNS, surface: GeophysicsSurface): LayerGroup {
   const group = L.layerGroup();
 
   for (const cell of surface.cells) {
