@@ -32,6 +32,8 @@ export type GeophysicsSurfaceOptions = {
   power?: number;
   minPoints?: number;
   paddingFraction?: number;
+  /** Maximum support radius as a multiple of median nearest-neighbour spacing. */
+  maxSupportFactor?: number;
 };
 
 function median(values: number[]): number {
@@ -99,6 +101,7 @@ export function buildFieldGeophysicsSurface(
   const gridSize = Math.max(8, Math.min(options.gridSize ?? 28, 80));
   const power = Math.max(1, Math.min(options.power ?? 2, 4));
   const paddingFraction = Math.max(0, Math.min(options.paddingFraction ?? 0.08, 0.3));
+  const maxSupportFactor = Math.max(1, Math.min(options.maxSupportFactor ?? 2.5, 6));
 
   const lats = points.map((point) => point.lat);
   const lngs = points.map((point) => point.lng);
@@ -117,6 +120,18 @@ export function buildFieldGeophysicsSurface(
   const meanLatRad = ((south + north) / 2) * (Math.PI / 180);
   const cosLat = Math.max(Math.cos(meanLatRad), 0.2);
 
+  const nearestNeighbourDistances = points.map((point, index) => {
+    let nearest = Number.POSITIVE_INFINITY;
+    points.forEach((candidate, candidateIndex) => {
+      if (candidateIndex === index) return;
+      const dy = point.lat - candidate.lat;
+      const dx = (point.lng - candidate.lng) * cosLat;
+      nearest = Math.min(nearest, Math.sqrt(dx * dx + dy * dy));
+    });
+    return nearest;
+  });
+  const supportRadius = median(nearestNeighbourDistances) * maxSupportFactor;
+
   const rawCells: Array<Omit<GeophysicsSurfaceCell, "normalized">> = [];
   for (let row = 0; row < gridSize; row += 1) {
     for (let col = 0; col < gridSize; col += 1) {
@@ -125,11 +140,14 @@ export function buildFieldGeophysicsSurface(
       let weighted = 0;
       let weights = 0;
       let exact: number | null = null;
+      let nearestDistance = Number.POSITIVE_INFINITY;
 
       for (const point of points) {
         const dy = lat - point.lat;
         const dx = (lng - point.lng) * cosLat;
         const d2 = dx * dx + dy * dy;
+        const distance = Math.sqrt(d2);
+        nearestDistance = Math.min(nearestDistance, distance);
         if (d2 < 1e-14) {
           exact = point.value;
           break;
@@ -139,6 +157,7 @@ export function buildFieldGeophysicsSurface(
         weights += weight;
       }
 
+      if (nearestDistance > supportRadius) continue;
       const value = exact ?? weighted / weights;
       rawCells.push({
         lat,
@@ -152,6 +171,7 @@ export function buildFieldGeophysicsSurface(
     }
   }
 
+  if (!rawCells.length) return null;
   const values = rawCells.map((cell) => cell.value);
   const min = Math.min(...values);
   const max = Math.max(...values);
