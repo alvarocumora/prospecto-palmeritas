@@ -28,6 +28,8 @@ import { RoleQuickStart } from "@/features/home/RoleQuickStart";
 import { getBusinessOverview } from "@/lib/businessOverview.functions";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
 import { normalizeEvent } from "@/lib/tradeTimeline";
+import { KpiTile } from "@/components/ui-system";
+import { cn } from "@/lib/utils";
 
 // INICIO = Centro de Negocios: cierres, clientes, pedidos de commodities,
 // firmas y envíos — datos reales del usuario, cross-proyecto. La visión
@@ -460,18 +462,20 @@ function Kpi({
   warn?: boolean;
   compact?: boolean;
 }) {
+  // Adopta el design system (KpiTile) manteniendo el comportamiento clickable.
   return (
-    <Link
-      to={to}
-      className={`block rounded-md border bg-bg-secondary/20 hover:border-primary/50 transition-colors ${
-        warn ? "border-red-500/40" : "border-border"
-      } ${compact ? "p-3" : "p-4"}`}
-    >
-      <div className="flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-        {icon} {label}
-      </div>
-      <div className={`font-mono font-bold mt-1 ${compact ? "text-lg" : "text-2xl"}`}>{value}</div>
-      {hint && <div className="text-[11px] text-muted-foreground mt-0.5">{hint}</div>}
+    <Link to={to} className="block">
+      <KpiTile
+        label={label}
+        value={value}
+        sub={hint}
+        icon={icon}
+        className={cn(
+          "h-full transition-colors hover:border-primary/50",
+          warn && "border-red-500/40",
+          compact && "px-3 py-2",
+        )}
+      />
     </Link>
   );
 }
