@@ -1,0 +1,386 @@
+{
+  "type": "FeatureCollection",
+  "name": "losverdes_sur_catastro_sngm",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "fuente": "SERNAGEOMIN — Propiedad Minera (SIGEX), copia hosted en ArcGIS Online (Marcelo_Layer capa WGS84_Concesion)",
+    "n": 8,
+    "fecha_actualizacion_datos": [],
+    "guarda": "Copia oficial SIGEX; puede ir por detrás del visor en vivo. Confirmar vigencia/prioridad en Oficina Judicial Virtual antes de constituir."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1317030559999,
+              -32.0554974089999
+            ],
+            [
+              -71.126410188,
+              -32.0555863399999
+            ],
+            [
+              -71.1266188229999,
+              -32.064601551
+            ],
+            [
+              -71.1319122089999,
+              -32.0645125889999
+            ],
+            [
+              -71.1317030559999,
+              -32.0554974089999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030672-3",
+        "nombre": "SANTA CAROLINA 2 1/10",
+        "titular": "SOCIEDAD MINERA M.V. SPA 00",
+        "titular_rut": "078215488-5",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.132377382,
+              -32.107343425
+            ],
+            [
+              -71.1281407009999,
+              -32.107414712
+            ],
+            [
+              -71.128224379,
+              -32.1110207639999
+            ],
+            [
+              -71.117632194,
+              -32.1111983879999
+            ],
+            [
+              -71.117424065,
+              -32.1021831909999
+            ],
+            [
+              -71.116364945,
+              -32.102200898
+            ],
+            [
+              -71.11669783,
+              -32.116625217
+            ],
+            [
+              -71.1325870219999,
+              -32.1163585269999
+            ],
+            [
+              -71.132377382,
+              -32.107343425
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030918-8",
+        "nombre": "TILAMA A 1/24",
+        "titular": "DE AMESTICA OLIVEROS MARCO A.  0",
+        "titular_rut": "009950649-0",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 116,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.14296902,
+              -32.1071645869999
+            ],
+            [
+              -71.132377382,
+              -32.107343425
+            ],
+            [
+              -71.1327967559999,
+              -32.1253736149999
+            ],
+            [
+              -71.143390473,
+              -32.1251946529999
+            ],
+            [
+              -71.14296902,
+              -32.1071645869999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043030920-K",
+        "nombre": "TILAMA C 1/40",
+        "titular": "DE AMESTICA OLIVEROS MARCO A.  0",
+        "titular_rut": "009950649-0",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.123920018,
+              -32.0623921439999
+            ],
+            [
+              -71.113333411,
+              -32.062569169
+            ],
+            [
+              -71.113540819,
+              -32.071584447
+            ],
+            [
+              -71.124128464,
+              -32.07140736
+            ],
+            [
+              -71.123920018,
+              -32.0623921439999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031055-0",
+        "nombre": "CENTINELA 1/10",
+        "titular": "EMPRESA CONSTRUTORA INDYGO LTD  0",
+        "titular_rut": "078997400-4",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.099364715,
+              -32.0537826099999
+            ],
+            [
+              -71.099570683,
+              -32.0627979819999
+            ],
+            [
+              -71.1101574099999,
+              -32.0626221049999
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031292-8",
+        "nombre": "LAS TRANCAS1/20",
+        "titular": "SOCIEDAD DE EXPLOTACIONES MINA  0",
+        "titular_rut": "076732068-K",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.166861012,
+              -32.086917082
+            ],
+            [
+              -71.153095116,
+              -32.087151864
+            ],
+            [
+              -71.1532431639999,
+              -32.093462372
+            ],
+            [
+              -71.1638330549999,
+              -32.0932818589999
+            ],
+            [
+              -71.163769289,
+              -32.090577375
+            ],
+            [
+              -71.166946144,
+              -32.090523054
+            ],
+            [
+              -71.166861012,
+              -32.086917082
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031302-9",
+        "nombre": "LA COMPLICA 1/13",
+        "titular": "OLIVARES DIAZ JOEL DEL CARMEN  0",
+        "titular_rut": "010800175-5",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 82,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.120536004,
+              -32.053430095
+            ],
+            [
+              -71.1099504059999,
+              -32.053606794
+            ],
+            [
+              -71.1101574099999,
+              -32.0626221049999
+            ],
+            [
+              -71.120744045,
+              -32.062445344
+            ],
+            [
+              -71.120536004,
+              -32.053430095
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "043031907-8",
+        "nombre": "PLAZETAS",
+        "titular": "FERNANDEZ CHACANA CARLOS  0",
+        "titular_rut": "015056521-9",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "vencimiento": null,
+        "comuna": "LOS VILOS",
+        "datum": "0",
+        "huso": 19
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.090824316,
+              -32.1103092019999
+            ],
+            [
+              -71.085528149,
+              -32.110396559
+            ],
+            [
+              -71.085589657,
+              -32.113101172
+            ],
+            [
+              -71.090885981,
+              -32.113013806
+            ],
+            [
+              -71.090824316,
+              -32.1103092019999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "052021645-6",
+        "nombre": "LAS CARDITAS 1/5",
+        "titular": "ABALLAY VALENCIA HUMBERTO  0",
+        "titular_rut": "011188399-8",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 15,
+        "vencimiento": null,
+        "comuna": "PETORCA",
+        "datum": "0",
+        "huso": 19
+      }
+    }
+  ]
+}
