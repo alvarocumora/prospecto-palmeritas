@@ -1,10 +1,11 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Bell, Trash2, MapPin, Crown, ExternalLink, AlertTriangle, Loader2 } from "lucide-react";
+import { Bell, Trash2, MapPin, Crown, ExternalLink, AlertTriangle, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { supabase } from "@/integrations/supabase/client";
+import { checkMyWatchlist } from "@/lib/catastroMonitor.functions";
 import {
   listMyAlerts,
   listMyWatchlist,
@@ -54,6 +55,19 @@ function WatchlistPage() {
     mutationFn: (id: string) => markRead({ data: { id } }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["catastro-alerts"] }),
   });
+  const check = useServerFn(checkMyWatchlist);
+  const checkMut = useMutation({
+    mutationFn: () => check({ data: undefined }),
+    onSuccess: (r) => {
+      toast.success(
+        r.newAlerts > 0
+          ? `${r.newAlerts} alerta(s) nueva(s) sobre ${r.checked} concesión(es).`
+          : `Sin cambios en ${r.checked} concesión(es) monitoreada(s).`,
+      );
+      qc.invalidateQueries({ queryKey: ["catastro-alerts"] });
+    },
+    onError: () => toast.error("No se pudo revisar el catastro."),
+  });
 
   return (
     <PublicCatastroShell>
@@ -65,15 +79,30 @@ function WatchlistPage() {
               Concesiones que sigues y alertas de cambios en SERNAGEOMIN.
             </p>
           </div>
-          {wl.data && (
-            <div className="text-right">
-              <div className="text-[10px] font-mono uppercase text-muted-foreground">Plan</div>
-              <div className="text-sm font-semibold capitalize">{wl.data.plan}</div>
-              <div className="text-[10px] font-mono text-muted-foreground">
-                {wl.data.used} / {wl.data.maxWatches === 99999 ? "∞" : wl.data.maxWatches}
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => checkMut.mutate()}
+              disabled={checkMut.isPending || !wl.data?.items.length}
+              className="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-gold bg-gold/10 text-gold text-xs font-mono hover:bg-gold/20 disabled:opacity-50 transition-colors"
+            >
+              {checkMut.isPending ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="w-3.5 h-3.5" />
+              )}
+              Revisar ahora
+            </button>
+            {wl.data && (
+              <div className="text-right">
+                <div className="text-[10px] font-mono uppercase text-muted-foreground">Plan</div>
+                <div className="text-sm font-semibold capitalize">{wl.data.plan}</div>
+                <div className="text-[10px] font-mono text-muted-foreground">
+                  {wl.data.used} / {wl.data.maxWatches === 99999 ? "∞" : wl.data.maxWatches}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         <section className="mb-10">
