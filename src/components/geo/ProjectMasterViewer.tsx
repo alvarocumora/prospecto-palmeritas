@@ -388,7 +388,9 @@ export function ProjectMasterViewer({
         const g = L.geoJSON(franjas as never, {
           style: { color: "#7c3aed", weight: 1, fillColor: "#7c3aed", fillOpacity: 0.06 },
           onEachFeature: (f: Feature, layer) =>
-            layer.on("click", () =>\n              sel("franjas", (f.properties ?? {}) as Record<string, unknown>),\n            ),
+            layer.on("click", () =>
+              sel("franjas", (f.properties ?? {}) as Record<string, unknown>),
+            ),
         });
         groups.current.franjas = L.layerGroup([g]);
       }
@@ -407,7 +409,9 @@ export function ProjectMasterViewer({
                 html: '<div style="width:12px;height:12px;background:#dc2626;border:1.5px solid #fff;transform:rotate(45deg)"></div>',
                 iconSize: [12, 12],
               }),
-            }).on("click", () =>\n              sel("yacimientos", (f.properties ?? {}) as Record<string, unknown>),\n            ),
+            }).on("click", () =>
+              sel("yacimientos", (f.properties ?? {}) as Record<string, unknown>),
+            ),
           );
         }
         groups.current.yacimientos = L.layerGroup(items).addTo(map);
@@ -531,7 +535,17 @@ export function ProjectMasterViewer({
       gravedadRegional: 1,
       relieve: 1,
     }),
-    [\n      concessions,\n      anomalies,\n      drillGrid,\n      assays,\n      pedimentos,\n      geophysicsStatus,\n      franjas,\n      yacimientos,\n      geoquimica,\n    ],
+    [
+      concessions,
+      anomalies,
+      drillGrid,
+      assays,
+      pedimentos,
+      geophysicsStatus,
+      franjas,
+      yacimientos,
+      geoquimica,
+    ],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
   const COUNTED: ReadonlyArray<LayerKey> = [
