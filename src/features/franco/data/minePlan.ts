@@ -187,7 +187,11 @@ export const VARIABLE_COSTS: Array<{ key: string; label: string; clpPerT: number
   { key: "carguio", label: "Carguío", clpPerT: 2_600 },
   { key: "haul", label: "Transporte interno", clpPerT: 2_400 },
   { key: "chancado", label: "Chancado (insumos y desgaste)", clpPerT: 6_800 },
-  { key: "flete", label: "Transporte a planta ENAMI (130 km × CLP 90/t·km)", clpPerT: 11_700 },
+  {
+    key: "flete",
+    label: "Flete supuesto histórico (130 km × CLP 90/t·km; distancia/tarifa por verificar)",
+    clpPerT: 11_700,
+  },
   { key: "insumos", label: "Insumos, energía y servicios de mina", clpPerT: 3_000 },
 ];
 
@@ -361,7 +365,13 @@ export type MinePlanResult = {
   operatingSurplusClp: number;
   netAfterCapexClp: number;
   capexClp: number;
+  /** @deprecated Métrica de escenario; no usar como KPI de decisión. */
   paybackMonth: number | null;
+  /** Payback matemático del escenario, visible sólo como sensibilidad. */
+  scenarioPaybackMonth: number | null;
+  /** Bloqueado hasta validar inventario, metalurgia, aceptación, distancia, flete y liquidación. */
+  decisionGradePaybackMonth: number | null;
+  commercialReadiness: "PENDING_DD";
   breakevenRate: number | null;
   avgUnitCostClpT: number;
   marginClpT: number;
@@ -439,6 +449,9 @@ export function projectCashflow(input: Partial<MinePlanParams> = {}): MinePlanRe
     netAfterCapexClp: surplus - capex,
     capexClp: capex,
     paybackMonth,
+    scenarioPaybackMonth: paybackMonth,
+    decisionGradePaybackMonth: null,
+    commercialReadiness: "PENDING_DD",
     breakevenRate: breakevenRate(params.gradePct),
     avgUnitCostClpT: cumulativeT > 0 ? totalCost / cumulativeT : 0,
     marginClpT: cumulativeT > 0 ? surplus / cumulativeT : 0,

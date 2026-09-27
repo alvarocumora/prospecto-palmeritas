@@ -79,6 +79,9 @@ describe("projectCashflow", () => {
       3,
     );
     expect(p.operatingSurplusClp).toBeCloseTo(p.totalRevenueClp - p.totalCostClp, 3);
+    expect(p.scenarioPaybackMonth).toBe(p.paybackMonth);
+    expect(p.decisionGradePaybackMonth).toBeNull();
+    expect(p.commercialReadiness).toBe("PENDING_DD");
   });
 
   it("20.000 t/mes produce más mineral y más superávit que 15.000", () => {
