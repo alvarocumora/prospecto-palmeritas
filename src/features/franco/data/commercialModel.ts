@@ -5,11 +5,7 @@
  * A destination is not decision-grade until product acceptance, road distance,
  * freight quote and settlement terms have been verified.
  */
-import {
-  CHOLQUI_CONCEPTUAL,
-  CHOLQUI_ENAMI,
-  CHOLQUI_PLAN_TONNES,
-} from "./cholqui";
+import { CHOLQUI_CONCEPTUAL, CHOLQUI_ENAMI, CHOLQUI_PLAN_TONNES } from "./cholqui";
 import { buildRamp, DEFAULT_PLAN, tariffForGrade } from "./minePlan";
 
 export type VerificationStatus = "VERIFIED" | "PENDING_DD";
