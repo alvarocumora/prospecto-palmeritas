@@ -168,7 +168,7 @@ export function ProjectMasterViewer({
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     tenencia: true,
     halos: true,
-    magneticaRegional: false,
+    magneticaRegional: true,
     gravedadRegional: false,
     geofisicaProyecto: true,
     magSurfaceProject: true,
@@ -202,8 +202,10 @@ export function ProjectMasterViewer({
         maxZoom: 17,
       });
 
-      // --- Geofísica pública regional. Se mantiene apagada por defecto para no
-      // confundir contexto regional con evidencia de detalle del prospecto.
+      // --- Geofísica pública regional REAL (WMS): EMAG2 v3 (NOAA, magnetometría),
+      // WGM2012 Bouguer (BGI, gravedad), hillshade SRTM (Esri). La magnética queda
+      // visible por defecto para que la geofísica real se vea al abrir; los badges
+      // DERIVADO + escala (~3.7 km reg.) evitan confundirla con detalle de prospecto.
       const regionalOverlays = buildGeophysicsOverlays(L);
       groups.current.magneticaRegional = regionalOverlays["Magnetometría EMAG2 (regional)"];
       groups.current.gravedadRegional = regionalOverlays["Gravimetría Bouguer WGM2012 (regional)"];
