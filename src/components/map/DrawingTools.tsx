@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Pencil, Trash2, Download, X, Square, Minus, MapPin, Landmark, Loader2 } from "lucide-react";
+import { Pencil, Trash2, Download, X, Square, Minus, MapPin, Landmark, Loader2, FileText } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import type { FeatureGroup, Map as LeafletMap } from "leaflet";
 import type { Feature, FeatureCollection, Geometry, Polygon } from "geojson";
@@ -7,6 +7,7 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import type { LeafletNS } from "./types";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
 import type { PedimentoResult } from "@/lib/pedimentoGeometry";
+import { downloadPedimentoEscrito } from "@/lib/pedimentoEscritoPdf";
 
 interface Props {
   open: boolean;
@@ -277,13 +278,22 @@ export function DrawingTools({ open, onClose, map, L }: Props) {
             <div className="text-[9px] text-amber-600">
               Borrador. Vacancia indicativa; confirmar prioridad en la Oficina Judicial Virtual.
             </div>
-            <button
-              type="button"
-              onClick={exportPedimentoGeoJSON}
-              className="mt-1 w-full inline-flex items-center gap-2 px-2 py-1 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors"
-            >
-              <Download className="w-3 h-3" /> Exportar pedimento GeoJSON
-            </button>
+            <div className="mt-1 grid grid-cols-2 gap-1">
+              <button
+                type="button"
+                onClick={exportPedimentoGeoJSON}
+                className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded border border-border bg-bg-secondary text-foreground hover:bg-accent transition-colors"
+              >
+                <Download className="w-3 h-3" /> GeoJSON
+              </button>
+              <button
+                type="button"
+                onClick={() => ped && downloadPedimentoEscrito(ped, "pedimento")}
+                className="inline-flex items-center justify-center gap-1 px-2 py-1 rounded border border-gold bg-gold/10 text-gold hover:bg-gold/20 transition-colors"
+              >
+                <FileText className="w-3 h-3" /> Escrito
+              </button>
+            </div>
           </div>
         )}
       </div>
