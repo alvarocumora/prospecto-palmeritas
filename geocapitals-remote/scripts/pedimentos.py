@@ -34,7 +34,17 @@ def _utm_for_lon(lon: float) -> str:
 
 def load_catastro(path: str):
     d = json.loads(Path(path).read_text())
-    return [shape(f["geometry"]) for f in d["features"] if f.get("geometry")]
+    out = []
+    for f in d["features"]:
+        if not f.get("geometry"):
+            continue
+        g = shape(f["geometry"])
+        # explotar MultiPolygon -> Polygon (el catastro SERNAGEOMIN trae ambos)
+        if g.geom_type == "MultiPolygon":
+            out.extend(list(g.geoms))
+        elif g.geom_type == "Polygon":
+            out.append(g)
+    return out
 
 
 def max_rectangle(anomaly_lonlat, concessions_wgs, aoi_wgs, utm,

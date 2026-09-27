@@ -1,0 +1,121 @@
+{
+  "type": "FeatureCollection",
+  "name": "elara1_pedimento_sur",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "veredicto": "El clúster Al-OH fuerte del sur esta sobre el campo BHP 03201Q4xx (EN TRAMITE), no pedible. El pedimento que SI tiene sentido es PED-EL-S1r: el suelo vacante verificado (600 ha) encajado entre ELARA (N) y BHP (E).",
+    "valor_pedimento": "Posicional: contiguo a ELARA, pegado al flanco oeste de BHP, primero en la fila si BHP caduca. NO captura anomalias fuertes (estan en BHP).",
+    "fuente_vacancia": "Visor Catastro Minero Online SERNAGEOMIN, captura del operador 2026-09-27 (cursor E439006/N6995443).",
+    "datum": "PSAD56 / UTM 19S (EPSG:24879)",
+    "guardas": "Borde BHP digitalizado del cursor (±200 m). Vacancia verificada para esta caja contra la captura; poligonos oficiales por confirmar antes de constituir. Terreno de cañón (pendiente). Al-OH no mide ley. Requiere estudio de titulos + Convenio 169."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.63769048103266,
+              -27.15149412682648
+            ],
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ],
+            [
+              -69.61765534821825,
+              -27.178667963664108
+            ],
+            [
+              -69.63784434895707,
+              -27.17857761259947
+            ],
+            [
+              -69.63769048103266,
+              -27.15149412682648
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-EL-S1r",
+        "nombre": "ELARA Sur (revisado, vacante)",
+        "estado": "PROPUESTA VIABLE (vacante verificado)",
+        "area_ha": 600,
+        "lados_m": {
+          "E-W": 2000,
+          "N-S": 3000
+        },
+        "corners_psad56_utm19s": {
+          "NW": [
+            437000,
+            6997000
+          ],
+          "NE": [
+            439000,
+            6997000
+          ],
+          "SE": [
+            439000,
+            6994000
+          ],
+          "SW": [
+            437000,
+            6994000
+          ]
+        },
+        "datum": "PSAD56 / UTM 19S (EPSG:24879)",
+        "contiguo_a": "ELARA 1 (borde sur, N6997000) — columna continua",
+        "abuts": "campo BHP 03201Q4xx por el E (E~439000)",
+        "valor": "posicional/estratégico: retiene el suelo vacante mas cercano al clúster Al-OH (a ~174 m del target z=7.0, que esta dentro de BHP) y queda primero en la fila si un rol 03201Q4xx EN TRAMITE caduca. Mismo corredor estructural.",
+        "anomalias_fuertes_dentro": 0,
+        "procedencia": "PROPUESTA / BORRADOR"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ],
+            [
+              -69.59732212554178,
+              -27.151671717668084
+            ],
+            [
+              -69.59746625447147,
+              -27.178755409323983
+            ],
+            [
+              -69.61765534821825,
+              -27.178667963664108
+            ],
+            [
+              -69.61750634974301,
+              -27.151584373267564
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "code": "PED-EL-S1_zona_BHP",
+        "estado": "OCUPADO (BHP 03201Q4xx, EN TRAMITE)",
+        "nota": "Alberga las 6 anomalias Al-OH fuertes del sur. No pedible mientras BHP mantenga prioridad.",
+        "borde_oeste_psad56_E": 439000,
+        "borde_digitalizado": true,
+        "precision": "±200 m (lectura de cursor)"
+      }
+    }
+  ]
+}
