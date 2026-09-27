@@ -75,9 +75,7 @@ export function buildFieldGeophysicsSurface(
 ): GeophysicsSurface | null {
   const field = stations.filter(
     (station) =>
-      !station.is_synthetic &&
-      Number.isFinite(station.lat) &&
-      Number.isFinite(station.lng),
+      !station.is_synthetic && Number.isFinite(station.lat) && Number.isFinite(station.lng),
   );
   const magneticValues = field
     .map((station) => station.mag_nt)
