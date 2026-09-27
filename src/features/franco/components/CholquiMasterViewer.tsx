@@ -1,5 +1,7 @@
 import type { FeatureCollection } from "geojson";
 import { ProjectMasterViewer, type AssayPoint } from "@/components/geo/ProjectMasterViewer";
+import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
+import { useProjects } from "@/hooks/useProjects";
 // Catastro OFICIAL directo de SERNAGEOMIN (no el KMZ del operador).
 import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
@@ -47,6 +49,14 @@ const coverage = cov
   : null;
 
 export function CholquiMasterViewer() {
+  const { projects } = useProjects();
+  const project = projects.find(
+    (candidate) =>
+      candidate.code?.toUpperCase() === CHOLQUI.code ||
+      candidate.name?.toLowerCase().includes("cholqui"),
+  );
+  const { data: geophysics } = useProjectGeophysicsData(project?.id);
+
   return (
     <ProjectMasterViewer
       projectName={CHOLQUI.name}
@@ -57,6 +67,7 @@ export function CholquiMasterViewer() {
       pedimentos={pedimentos}
       assays={assays}
       coverage={coverage}
+      geophysics={geophysics}
     />
   );
 }

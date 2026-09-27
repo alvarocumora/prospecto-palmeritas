@@ -3,7 +3,13 @@ import {
   type GeoscienceDataset,
 } from "../geoscience-registry/types";
 
-export type GeoscienceComputeEngine = "simpeg" | "gempy" | "pygimli" | "gstools" | "custom";
+export type GeoscienceComputeEngine =
+  | "simpeg"
+  | "gempy"
+  | "loopstructural"
+  | "pygimli"
+  | "gstools"
+  | "custom";
 
 export type GeoscienceComputeJobType =
   | "magnetic_inversion"

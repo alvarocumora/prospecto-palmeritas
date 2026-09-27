@@ -10,7 +10,7 @@ import type { LeafletNS } from "./types";
  */
 export function buildGeophysicsOverlays(L: LeafletNS) {
   const emag2 = L.tileLayer.wms(
-    "https://gis.ngdc.noaa.gov/arcgis/services/EMAG2_V3/MapServer/WMSServer",
+    "https://gis.ngdc.noaa.gov/arcgis/services/EMAG2v3/ImageServer/WMSServer",
     {
       layers: "0",
       format: "image/png",

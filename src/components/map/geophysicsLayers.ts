@@ -1,5 +1,6 @@
 import type { LayerGroup, Map as LeafletMap } from "leaflet";
 import type { LeafletNS } from "./types";
+import type { GeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
 import type {
   GeophysicsLine,
   GeophysicsStation,
@@ -170,4 +171,56 @@ export function fitToGeophysics(
   }
   for (const s of stations) pts.push([s.lat, s.lng]);
   if (pts.length) map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
+}
+
+function surfaceColor(surface: GeophysicsSurface, normalized: number, value: number): string {
+  if (surface.metric === "mag_residual_nt") {
+    const span = Math.max(Math.abs(surface.min), Math.abs(surface.max), 1);
+    return magColor(value, span);
+  }
+  const t = Math.max(0, Math.min(1, normalized));
+  if (surface.metric === "ip_chargeability_mvv") {
+    const r = Math.round(237 - 128 * t);
+    const g = Math.round(233 - 193 * t);
+    const b = Math.round(254 - 37 * t);
+    return `rgb(${r},${g},${b})`;
+  }
+  const r = Math.round(224 - 194 * t);
+  const g = Math.round(242 - 107 * t);
+  const b = Math.round(254 - 26 * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+/**
+ * Renders an IDW surface derived exclusively from non-synthetic field stations.
+ * This is a visualization/interpolation layer, NOT a geophysical inversion.
+ */
+export function buildGeophysicsSurfaceLayer(L: LeafletNS, surface: GeophysicsSurface): LayerGroup {
+  const group = L.layerGroup();
+
+  for (const cell of surface.cells) {
+    const rectangle = L.rectangle(
+      [
+        [cell.south, cell.west],
+        [cell.north, cell.east],
+      ],
+      {
+        stroke: false,
+        fillColor: surfaceColor(surface, cell.normalized, cell.value),
+        fillOpacity: 0.42,
+        interactive: true,
+      },
+    );
+    rectangle.bindTooltip(
+      `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;">
+        <strong>${cell.value.toFixed(2)} ${surface.unit}</strong><br/>
+        DERIVADO · IDW desde ${surface.sourceCount} estaciones CAMPO<br/>
+        No es inversión geofísica.
+      </div>`,
+      { sticky: true },
+    );
+    group.addLayer(rectangle);
+  }
+
+  return group;
 }
