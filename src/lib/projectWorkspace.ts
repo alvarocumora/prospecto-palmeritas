@@ -24,12 +24,7 @@ export const PROJECT_WORKSPACE_SECTION_LABELS: Record<ProjectWorkspaceSection, s
   validation: "Validación",
 };
 
-export const PROJECT_EVIDENCE_STATES = [
-  "verified",
-  "derived",
-  "conceptual",
-  "pending",
-] as const;
+export const PROJECT_EVIDENCE_STATES = ["verified", "derived", "conceptual", "pending"] as const;
 
 export type ProjectEvidenceState = (typeof PROJECT_EVIDENCE_STATES)[number];
 
