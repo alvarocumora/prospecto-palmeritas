@@ -30,6 +30,10 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import {
+  ProjectReadinessStrip,
+  ProjectWorkspaceShell,
+} from "@/components/project-workspace/ProjectWorkspaceShell";
 // Visor estratégico 2D (focus exploración + certificación). El 3D queda
 // disponible bajo demanda para no bloquear el flujo principal.
 import { LosVerdesStrategicMap } from "@/components/live/LosVerdesStrategicMap";
@@ -310,183 +314,110 @@ function LiveLosVerdesPage() {
   const totals = miningQ.data?.totals;
 
   return (
-    <div data-theme="im-light" className="bg-background text-foreground min-h-screen">
-      <section className="relative min-h-[520px] overflow-hidden bg-foreground text-background">
-        <img
-          src={losVerdesImage.url}
-          alt="Vista del Distrito Los Verdes–Tilama"
-          className="absolute inset-0 h-full w-full object-cover opacity-35"
-        />
-        <div className="absolute inset-0 bg-foreground/60" />
-        <div className="relative mx-auto grid max-w-[1600px] gap-8 px-5 py-12 md:grid-cols-[minmax(0,1fr)_190px] md:px-10 md:py-16">
-          <div className="self-end max-w-4xl">
-            <div className="font-mono text-[11px] uppercase tracking-[0.24em] text-primary-foreground/70">
-              Geocapitals · Live map público · LV-TIL-001
-            </div>
-            <h1 className="mt-4 font-serif text-4xl leading-tight text-primary-foreground md:text-6xl">
-              Distrito Cuprífero Los Verdes–Tilama
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-6 text-primary-foreground/75">
-              Catastro, evidencia geoquímica, targets y análisis geoespacial en una ficha técnica
-              trazable para evaluación minera.
-            </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <ProjectDocsMenu
-                className="h-10 px-5"
-                disabled={!reportQ.data}
-                build={() => (reportQ.data ? buildLosVerdesDoc(reportQ.data) : null)}
-              />
-              <Button
-                onClick={handlePdf}
-                disabled={pdfBusy || !reportQ.data}
-                variant="outline"
-                className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-              >
-                {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />} Informe extendido
-              </Button>
-              <Button
-                variant="outline"
-                className="h-10 border-primary-foreground/30 bg-transparent text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground"
-                onClick={() =>
-                  void navigator.clipboard
-                    .writeText(liveUrl)
-                    .then(() => toast.success("Enlace copiado"))
-                }
-              >
-                <Copy /> Copiar enlace público
-              </Button>
-            </div>
-          </div>
-          <aside className="self-end border border-primary-foreground/20 bg-foreground/50 p-3 backdrop-blur-sm">
-            {qr ? (
-              <img
-                src={qr}
-                alt="QR de la ficha pública Los Verdes–Tilama"
-                className="aspect-square w-full bg-primary-foreground p-2"
-              />
-            ) : (
-              <div className="grid aspect-square place-items-center">
-                <Loader2 className="animate-spin text-primary-foreground" />
-              </div>
-            )}
-            <div className="mt-3 font-mono text-[10px] uppercase text-primary-foreground/60">
-              Enlace público verificable
-            </div>
-            <div className="mt-1 break-all text-xs text-primary-foreground">
-              geocapitals.com/live/losverdes
-            </div>
-          </aside>
-        </div>
-        <div className="relative border-t border-primary-foreground/15 bg-foreground/70 px-5 py-4 backdrop-blur-sm md:px-10">
-          <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-between gap-3 text-xs text-primary-foreground/70">
-            <span className="inline-flex items-center gap-2 font-medium text-primary-foreground">
-              <CheckCircle2 className="h-4 w-4" /> Evidencia geológica consolidada
-            </span>
-            <span>
-              {stats?.samplesTotal ?? "—"} muestras · {stats?.concessionsTotal ?? "—"} concesiones ·{" "}
-              {stats?.targetsTotal ?? "—"} targets
-            </span>
-          </div>
-        </div>
-      </section>
-
-      {/* Banner */}
-      <div className="bg-gold/10 border-b border-gold/30 px-4 py-2 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
-          <MapPin className="w-3 h-3 text-gold" />
-          <div className="font-mono text-[11px] uppercase tracking-wider text-gold">
-            Live · Los Verdes · Tilama
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Acciones de escritura solo para super-admin (no en la vista pública compartida). */}
-          {isAdmin && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleGenConceptual}
-                disabled={genBusy}
-                className="h-7 text-[11px] border-orange-400/50 text-orange-300 hover:bg-orange-500/10"
-                title="Genera sondajes virtuales, block model IDW y pit shells (etiquetado CONCEPTUAL)"
-              >
-                {genBusy ? (
-                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                ) : (
-                  <Sparkles className="w-3 h-3 mr-1.5" />
-                )}
-                Generar modelo conceptual
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleSyncCatastro}
-                disabled={catBusy}
-                className="h-7 text-[11px] border-gold/40 text-gold hover:bg-gold/10"
-              >
-                {catBusy ? (
-                  <Loader2 className="w-3 h-3 mr-1.5 animate-spin" />
-                ) : (
-                  <Layers className="w-3 h-3 mr-1.5" />
-                )}
-                Sincronizar catastro SERNAGEOMIN
-              </Button>
-            </>
-          )}
-          <a
-            href="/reports/losverdes/pre43101"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center h-7 px-3 rounded-md text-[11px] font-medium bg-gold hover:bg-gold/90 text-background transition-colors"
-            title="Informe Técnico Pre-NI 43-101 / JORC con narrativa IA por sección + visor 3D"
+    <ProjectWorkspaceShell
+      code={reportQ.data?.project.code ?? "LV-TIL-001"}
+      name={reportQ.data?.project.name ?? "Distrito Cuprífero Los Verdes–Tilama"}
+      subtitle="Workspace técnico, económico y de inversión"
+      stage="Exploración"
+      commodity={reportQ.data?.project.commodity ?? "Cu"}
+      location={[reportQ.data?.project.region, reportQ.data?.project.country].filter(Boolean).join(" · ")}
+      tabs={[
+        { id: "overview", label: "Resumen" },
+        { id: "exploration", label: "Exploración" },
+        { id: "resource", label: "Modelo / recurso" },
+        { id: "mine-plan", label: "Explotación" },
+        { id: "economics", label: "Economía" },
+        { id: "validation", label: "Validación" },
+        { id: "investment", label: "Inversión" },
+      ]}
+      metrics={[
+        {
+          label: "Catastro",
+          value: stats ? `${stats.concessionsTotal} concesiones` : "—",
+          detail: stats ? `${stats.concessionsHa.toFixed(0)} ha vinculadas` : "Cargando",
+          status: "verified",
+        },
+        {
+          label: "Muestreo",
+          value: stats ? `${stats.samplesTotal} muestras` : "—",
+          detail: stats?.cuAvgPct != null ? `Cu prom. ${stats.cuAvgPct.toFixed(2)}%` : "Sin promedio",
+          status: "verified",
+        },
+        {
+          label: "Targets",
+          value: stats ? `${stats.targetsTotal}` : "—",
+          detail: stats ? `${stats.targetsCritical} críticos · ${stats.targetsHigh} alta` : "Cargando",
+          status: "derived",
+        },
+        {
+          label: "Plan conceptual",
+          value: totals ? fmtT(totals.veinTonnes) : "—",
+          detail: totals ? `NPV escenario ${fmtUsd(totals.npvUsdTotal)}` : "Sin modelo",
+          status: "proposed",
+        },
+      ]}
+      actions={
+        <>
+          <ProjectDocsMenu
+            className="h-9"
+            disabled={!reportQ.data}
+            build={() => (reportQ.data ? buildLosVerdesDoc(reportQ.data) : null)}
+          />
+          <Button
+            onClick={handlePdf}
+            disabled={pdfBusy || !reportQ.data}
+            variant="outline"
+            size="sm"
           >
-            <FileDown className="w-3 h-3 mr-1.5" />
-            Pre-NI 43-101
-          </a>
-        </div>
+            {pdfBusy ? <Loader2 className="animate-spin" /> : <FileDown />}
+            Informe
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              void navigator.clipboard.writeText(liveUrl).then(() => toast.success("Enlace copiado"))
+            }
+          >
+            <Copy />
+            Compartir
+          </Button>
+        </>
+      }
+    >
+      <div id="overview" className="space-y-3">
+        <ProjectReadinessStrip
+          catastro={stats ? `${stats.concessionsTotal} registros · geometría en visor` : "Cargando"}
+          exploration={stats ? `${stats.samplesTotal} muestras · ${stats.satTotal} anomalías SAT` : "Cargando"}
+          economics={totals ? "Modelo conceptual disponible" : "Pendiente"}
+          validation="Sin recurso/reserva certificado"
+        />
+        {isAdmin && (
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-hairline bg-surface-2 px-3 py-2">
+            <span className="mr-auto text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+              Herramientas de validación
+            </span>
+            <Button size="sm" variant="outline" onClick={handleSyncCatastro} disabled={catBusy}>
+              {catBusy ? <Loader2 className="animate-spin" /> : <Layers />}
+              Sincronizar SERNAGEOMIN
+            </Button>
+            <Button size="sm" variant="outline" onClick={handleGenConceptual} disabled={genBusy}>
+              {genBusy ? <Loader2 className="animate-spin" /> : <Sparkles />}
+              Modelo conceptual
+            </Button>
+            <a
+              href="/reports/losverdes/pre43101"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-8 items-center rounded-md border border-hairline px-3 text-xs font-medium text-content hover:bg-accent-brand-subtle"
+              title="Borrador técnico preliminar; no constituye un informe NI 43-101/JORC"
+            >
+              <FileDown className="mr-1.5 h-3.5 w-3.5" />
+              Informe técnico
+            </a>
+          </div>
+        )}
       </div>
-
-      <div className="p-3 md:p-4 space-y-4 max-w-[1600px] mx-auto">
-        {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          <KPI
-            icon={<TestTube2 className="w-4 h-4" />}
-            label="Muestras"
-            value={stats?.samplesTotal ?? "—"}
-            sub={stats?.cuAvgPct != null ? `Cu prom. ${stats.cuAvgPct.toFixed(2)}%` : ""}
-          />
-          <KPI
-            icon={<Layers className="w-4 h-4" />}
-            label="Concesiones"
-            value={stats?.concessionsTotal ?? "—"}
-            sub={stats ? `${stats.concessionsHa.toFixed(0)} ha` : ""}
-          />
-          <KPI
-            icon={<Satellite className="w-4 h-4" />}
-            label="Anom. SAT"
-            value={stats?.satTotal ?? "—"}
-            sub={stats ? `${stats.satHigh} alta · ${stats.satMedium} media` : ""}
-          />
-          <KPI
-            icon={<Target className="w-4 h-4" />}
-            label="Targets"
-            value={stats?.targetsTotal ?? "—"}
-            sub={stats ? `${stats.targetsCritical} crit · ${stats.targetsHigh} alta` : ""}
-          />
-          <KPI
-            icon={<Pickaxe className="w-4 h-4" />}
-            label="Vetas"
-            value={miningQ.data?.veins.length ?? "—"}
-            sub={totals ? `${fmtT(totals.veinTonnes)} conceptual` : ""}
-          />
-          <KPI
-            icon={<Pickaxe className="w-4 h-4" />}
-            label="NPV plan @8%"
-            value={totals ? fmtUsd(totals.npvUsdTotal) : "—"}
-            sub={totals ? `CAPEX ${fmtUsd(totals.capexUsdTotal)}` : ""}
-          />
-        </div>
 
         {stats && (
           <section className="grid gap-px border border-border bg-border md:grid-cols-4">
@@ -675,14 +606,13 @@ function LiveLosVerdesPage() {
           Geocapitals · Ficha técnica pública · Muestreo cargado en estado borrador · Sin recursos
           ni reservas certificados.
         </footer>
-      </div>
       <TargetExplainerDialog
         open={aiTarget !== null}
         targetCode={aiTarget?.code ?? null}
         targetName={aiTarget?.name ?? null}
         onClose={() => setAiTarget(null)}
       />
-    </div>
+    </ProjectWorkspaceShell>
   );
 }
 
