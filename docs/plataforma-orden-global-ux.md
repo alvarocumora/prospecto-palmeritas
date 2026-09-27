@@ -20,6 +20,26 @@ de **inversión, trading y exploración**. Es el plano; la ejecución es increme
   vs. catastro público).
 - Resultado: el usuario salta entre "mini-apps" en vez de una plataforma.
 
+## 1b. Corrección tras revisión de código (importante)
+
+El **dashboard autenticado YA está unificado** — no hay que reconstruirlo:
+- `_authenticated.tsx` es el shell único: `TopBar` (con **conmutador de proyecto** +
+  breadcrumb), `CommandRail` (nav lateral agrupado), `ModuleSwitcher` (conmutador de
+  espacios), `StatusBar`, `MobileBottomNav`, `WorkspaceTabs`, gating por rol/plan.
+- `WORKSPACE_NAV` ya agrupa el nav: INICIO · CATASTRO & EXPLORACIÓN · CAPITAL &
+  DEALS · TRADE & COMMODITIES · ADMINISTRACIÓN (≈ los 4 espacios de abajo).
+- `ModuleKey = catastro | commodities | capital` (+ core) ≈ Explorar/Comercializar/
+  Invertir; ADMINISTRACIÓN es el back-office.
+
+**Conclusión:** el "paso 2" (AppShell unificado + conmutador de proyecto) está
+sustancialmente hecho. El trabajo real de orden global es:
+1. **Adoptar el design system** (`ui-system/`) en el CONTENIDO de las secciones,
+   que es lo visualmente disparejo (cabeceras, tarjetas, KPIs, paneles).
+2. **Alinear** el naming de grupos/módulos a los 4 espacios si se desea (cosmético).
+3. **Sitio público** (AppShell marketing) y los visores por proyecto: unificar el
+   lenguaje visual con el mismo design system.
+El resto de este documento (4 espacios, principios) sigue válido como guía.
+
 ## 2. Principio de orden: 4 espacios de trabajo (workspaces)
 
 Reagrupar las ~80 rutas en **4 espacios**, alineados al negocio (inversión, trading,
