@@ -9,6 +9,7 @@ import {
 } from "@/components/map/geophysicsLayers";
 import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
 import type { GeophysicsData } from "@/types/geophysics";
+import { EvidenceBadge, type Evidence } from "@/components/ui-system";
 
 /**
  * Visor geoespacial maestro, genérico por proyecto. Reemplaza los mapas apilados
@@ -145,14 +146,7 @@ const PROV: Record<ProvKind, { label: string; bg: string }> = {
 
 // Badge de evidencia + escala/resolución por capa: hace evidente qué está viendo
 // el usuario y evita que un raster regional se confunda con geofísica de detalle.
-type Evidence = "OFICIAL" | "MEDIDO" | "DERIVADO" | "INTERPRETADO" | "PROPUESTO";
-const EVIDENCE_BG: Record<Evidence, string> = {
-  OFICIAL: "#15803d",
-  MEDIDO: "#0369a1",
-  DERIVADO: "#7c3aed",
-  INTERPRETADO: "#a16207",
-  PROPUESTO: "#b45309",
-};
+// El badge vive en el design system (@/components/ui-system).
 const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   tenencia: { evidence: "OFICIAL", scale: "catastro" },
   relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
@@ -643,15 +637,12 @@ export function ProjectMasterViewer({
                             <span className="shrink-0 text-content-subtle">· {counts[k]}</span>
                           )}
                         </span>
-                        <span className="mt-0.5 flex items-center gap-1">
-                          <span
-                            className="rounded px-1 text-[8px] font-bold leading-tight text-white"
-                            style={{ background: EVIDENCE_BG[LAYER_META[k].evidence] }}
-                          >
-                            {LAYER_META[k].evidence}
-                          </span>
-                          <span className="text-[9px] text-content-subtle">{LAYER_META[k].scale}</span>
-                        </span>
+                        <EvidenceBadge
+                          kind={LAYER_META[k].evidence}
+                          scale={LAYER_META[k].scale}
+                          size="xs"
+                          className="mt-0.5"
+                        />
                       </span>
                     </label>
                   ))}
