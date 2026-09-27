@@ -123,6 +123,31 @@ const PROV: Record<ProvKind, { label: string; bg: string }> = {
   contexto: { label: "CONTEXTO — verificar tenencia", bg: "#b45309" },
 };
 
+// Badge de evidencia + escala/resolución por capa: hace evidente qué está viendo
+// el usuario y evita que un raster regional se confunda con geofísica de detalle.
+type Evidence = "OFICIAL" | "MEDIDO" | "DERIVADO" | "INTERPRETADO" | "PROPUESTO";
+const EVIDENCE_BG: Record<Evidence, string> = {
+  OFICIAL: "#15803d",
+  MEDIDO: "#0369a1",
+  DERIVADO: "#7c3aed",
+  INTERPRETADO: "#a16207",
+  PROPUESTO: "#b45309",
+};
+const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
+  tenencia: { evidence: "OFICIAL", scale: "catastro" },
+  relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
+  halos: { evidence: "DERIVADO", scale: "10–20 m" },
+  magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
+  gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
+  geofisicaProyecto: { evidence: "MEDIDO", scale: "estaciones" },
+  magSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
+  ipChargeSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
+  ipResSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
+  ensayes: { evidence: "MEDIDO", scale: "puntual" },
+  sondajes: { evidence: "PROPUESTO", scale: "conceptual" },
+  pedimentos: { evidence: "PROPUESTO", scale: "borrador" },
+};
+
 export function ProjectMasterViewer({
   projectName,
   center,
@@ -156,6 +181,7 @@ export function ProjectMasterViewer({
   });
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
+  const [collapsed, setCollapsed] = useState(false);
 
   // Construcción imperativa del mapa (client-only; leaflet toca window).
   useEffect(() => {
@@ -402,6 +428,44 @@ export function ProjectMasterViewer({
     };
   }, [geophysics]);
 
+  // Conteo de datos reales por capa. Las capas sin datos NO se muestran en la
+  // leyenda (evita el visor "recargado" con capas vacías, p.ej. geofísica en 0).
+  const counts = useMemo<Record<LayerKey, number>>(
+    () => ({
+      tenencia: concessions?.features?.length ?? 0,
+      halos: anomalies?.features?.length ?? 0,
+      sondajes: drillGrid?.features?.length ?? 0,
+      ensayes: assays.length,
+      pedimentos: pedimentos?.features?.length ?? 0,
+      geofisicaProyecto: geophysicsStatus.field + geophysicsStatus.synthetic,
+      magSurfaceProject: geophysicsStatus.magnetic >= 4 ? geophysicsStatus.magnetic : 0,
+      ipChargeSurfaceProject: geophysicsStatus.ipCharge >= 4 ? geophysicsStatus.ipCharge : 0,
+      ipResSurfaceProject: geophysicsStatus.ipRes >= 4 ? geophysicsStatus.ipRes : 0,
+      // Contexto global (siempre disponible; sin conteo de features de proyecto).
+      magneticaRegional: 1,
+      gravedadRegional: 1,
+      relieve: 1,
+    }),
+    [concessions, anomalies, drillGrid, assays, pedimentos, geophysicsStatus],
+  );
+  // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
+  const COUNTED: ReadonlyArray<LayerKey> = [
+    "tenencia",
+    "halos",
+    "sondajes",
+    "ensayes",
+    "pedimentos",
+    "geofisicaProyecto",
+  ];
+  const visibleSections = useMemo(
+    () =>
+      LAYER_SECTIONS.map((s) => ({
+        ...s,
+        layers: s.layers.filter(([k]) => counts[k] > 0),
+      })).filter((s) => s.layers.length > 0),
+    [counts],
+  );
+
   return (
     <div className="w-full overflow-hidden rounded-xl border border-hairline bg-surface">
       {/* Cabecera: métrica de cobertura + descargo del halo */}
@@ -437,74 +501,108 @@ export function ProjectMasterViewer({
         {/* Mapa */}
         <div ref={mapEl} className="h-full flex-1" />
 
-        {/* Panel de capas (izquierda-flotante) */}
-        <div className="pointer-events-auto absolute left-3 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 p-2 text-[12px] shadow">
-          <div className="mb-1 px-1 font-semibold text-content">Capas de evidencia</div>
-          {LAYER_SECTIONS.map((section, index) => (
-            <div
-              key={section.title}
-              className={index > 0 ? "mt-2 border-t border-hairline pt-2" : ""}
-            >
-              <div className="px-1 text-[10px] font-semibold uppercase tracking-wider text-content">
-                {section.title}
-              </div>
-              {section.note && (
-                <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
-                  {section.note}
+        {/* Panel de capas (izquierda-flotante) — colapsable; solo secciones con datos */}
+        <div className="pointer-events-auto absolute left-3 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
+          <button
+            type="button"
+            onClick={() => setCollapsed((c) => !c)}
+            className="flex w-full items-center justify-between px-2 py-1.5 font-semibold text-content"
+          >
+            <span>Capas de evidencia</span>
+            <span className="text-content-subtle">{collapsed ? "▸" : "▾"}</span>
+          </button>
+          {!collapsed && (
+            <div className="max-h-[70%] overflow-auto px-2 pb-2">
+              {visibleSections.map((section, index) => (
+                <div
+                  key={section.title}
+                  className={index > 0 ? "mt-2 border-t border-hairline pt-2" : ""}
+                >
+                  <div className="px-1 text-[10px] font-semibold uppercase tracking-wider text-content">
+                    {section.title}
+                  </div>
+                  {section.note && (
+                    <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                      {section.note}
+                    </div>
+                  )}
+                  {section.title === "Geofísica" && geophysicsStatus.field > 0 && (
+                    <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                      CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic}. Halo
+                      requiere ≥4 puntos CAMPO por variable.
+                    </div>
+                  )}
+                  {section.layers.map(([k, label]) => (
+                    <label key={k} className="flex cursor-pointer items-start gap-2 px-1 py-0.5">
+                      <input
+                        className="mt-0.5"
+                        type="checkbox"
+                        checked={visible[k]}
+                        onChange={(e) =>
+                          setVisible((state) => ({ ...state, [k]: e.target.checked }))
+                        }
+                      />
+                      <span className="min-w-0 flex-1 text-content-muted">
+                        <span className="flex items-center gap-1">
+                          <span className="truncate">{label}</span>
+                          {COUNTED.includes(k) && (
+                            <span className="shrink-0 text-content-subtle">· {counts[k]}</span>
+                          )}
+                        </span>
+                        <span className="mt-0.5 flex items-center gap-1">
+                          <span
+                            className="rounded px-1 text-[8px] font-bold leading-tight text-white"
+                            style={{ background: EVIDENCE_BG[LAYER_META[k].evidence] }}
+                          >
+                            {LAYER_META[k].evidence}
+                          </span>
+                          <span className="text-[9px] text-content-subtle">{LAYER_META[k].scale}</span>
+                        </span>
+                      </span>
+                    </label>
+                  ))}
                 </div>
-              )}
-              {section.title === "Geofísica" && (
-                <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
-                  CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic} · Mag:{" "}
-                  {geophysicsStatus.magnetic} · IP carg: {geophysicsStatus.ipCharge} · IP resist:{" "}
-                  {geophysicsStatus.ipRes}. Halo requiere ≥4 puntos CAMPO por variable.
-                </div>
-              )}
-              {section.layers.map(([k, label]) => (
-                <label key={k} className="flex cursor-pointer items-start gap-2 px-1 py-0.5">
-                  <input
-                    className="mt-0.5"
-                    type="checkbox"
-                    checked={visible[k]}
-                    onChange={(e) => setVisible((state) => ({ ...state, [k]: e.target.checked }))}
-                  />
-                  <span className="text-content-muted">{label}</span>
-                </label>
               ))}
+              <div className="my-2 border-t border-hairline" />
+              <div className="mb-1 px-1 font-semibold text-content">Base</div>
+              <div className="flex gap-1 px-1">
+                {(["sat", "topo"] as const).map((b) => (
+                  <button
+                    key={b}
+                    type="button"
+                    onClick={() => setBase(b)}
+                    className={`rounded px-2 py-0.5 text-[11px] ${
+                      base === b
+                        ? "bg-accent-brand text-accent-brand-contrast"
+                        : "border border-hairline"
+                    }`}
+                  >
+                    {b === "sat" ? "Satélite" : "Topo"}
+                  </button>
+                ))}
+              </div>
+              {counts.halos > 0 && (
+                <>
+                  <div className="my-2 border-t border-hairline" />
+                  <div className="mb-1 px-1 font-semibold text-content">
+                    Firma espectral · Sentinel-2
+                  </div>
+                  {legend.map((l) => (
+                    <div
+                      key={l.label}
+                      className="flex items-center gap-2 px-1 py-0.5 text-[11px] text-content-muted"
+                    >
+                      <span
+                        className="inline-block h-2.5 w-2.5 rounded-full"
+                        style={{ background: l.color }}
+                      />
+                      {l.label}
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
-          ))}
-          <div className="my-2 border-t border-hairline" />
-          <div className="mb-1 px-1 font-semibold text-content">Base</div>
-          <div className="flex gap-1 px-1">
-            {(["sat", "topo"] as const).map((b) => (
-              <button
-                key={b}
-                type="button"
-                onClick={() => setBase(b)}
-                className={`rounded px-2 py-0.5 text-[11px] ${
-                  base === b
-                    ? "bg-accent-brand text-accent-brand-contrast"
-                    : "border border-hairline"
-                }`}
-              >
-                {b === "sat" ? "Satélite" : "Topo"}
-              </button>
-            ))}
-          </div>
-          <div className="my-2 border-t border-hairline" />
-          <div className="mb-1 px-1 font-semibold text-content">Firma espectral · Sentinel-2</div>
-          {legend.map((l) => (
-            <div
-              key={l.label}
-              className="flex items-center gap-2 px-1 py-0.5 text-[11px] text-content-muted"
-            >
-              <span
-                className="inline-block h-2.5 w-2.5 rounded-full"
-                style={{ background: l.color }}
-              />
-              {l.label}
-            </div>
-          ))}
+          )}
         </div>
 
         {/* Inspector lateral (docked) */}
