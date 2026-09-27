@@ -8,13 +8,8 @@
     }
   },
   "metadata": {
-    "fuente": "SERNAGEOMIN catastro_SNGM",
-    "url": "https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index",
-    "endpoint": "services1.arcgis.com/.../Marcelo_Layer/FeatureServer/2 (WGS84_Concesion)",
-    "n_total": 62,
-    "n_tenencia_proyecto": 29,
-    "titular_proyecto": "GIANFRANCO DE MARTINO GONZALEZ",
-    "nota": "Descarga directa del catastro oficial. Situacion legal por concesion (mayoria EN TRAMITE)."
+    "fuente": "SERNAGEOMIN (copias oficiales SIGEX/ArcGIS Online)",
+    "n": 118
   },
   "features": [
     {
@@ -47,16 +42,13 @@
         ]
       },
       "properties": {
-        "rol": "136010674",
+        "rol": "136010674-4",
         "nombre": "TANTEHUE 39 1/12",
         "titular": "LECAROS EDWARDS MATIAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 96,
-        "comuna": "MELIPILLA",
-        "ano": "2016",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -89,16 +81,13 @@
         ]
       },
       "properties": {
-        "rol": "136010782",
+        "rol": "136010782-1",
         "nombre": "MUJERCITAS 1 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -131,16 +120,107 @@
         ]
       },
       "properties": {
-        "rol": "136010617",
+        "rol": "136010617-5",
         "nombre": "ELISA VI 1/40",
         "titular": "SCM LAS ABUELITAS",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 400,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9891097249999,
+              -33.768975284
+            ],
+            [
+              -70.9783170859999,
+              -33.769148802
+            ],
+            [
+              -70.978939108,
+              -33.79618944
+            ],
+            [
+              -70.9843371329999,
+              -33.7961027109999
+            ],
+            [
+              -70.983817312,
+              -33.773568928
+            ],
+            [
+              -70.989213902,
+              -33.773482037
+            ],
+            [
+              -70.9891097249999,
+              -33.768975284
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010482-2",
+        "nombre": "CARMEN ALTO 5 1/30",
+        "titular": "SLM CARMEN ALTO 5 1/30 MELIPIL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 175,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.995698116,
+              -33.913137059
+            ],
+            [
+              -70.9848873829999,
+              -33.913311802
+            ],
+            [
+              -70.9849919059999,
+              -33.91781846
+            ],
+            [
+              -70.989316437,
+              -33.917748665
+            ],
+            [
+              -70.989840538,
+              -33.9402818409999
+            ],
+            [
+              -70.996329014,
+              -33.9401767749999
+            ],
+            [
+              -70.995698116,
+              -33.913137059
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050382-4",
+        "nombre": "EL TREBOL 1/23",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "comuna": "ALHUE"
       }
     },
     {
@@ -173,16 +253,13 @@
         ]
       },
       "properties": {
-        "rol": "136010642",
+        "rol": "136010642-6",
         "nombre": "EVITA 1/26",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 260,
-        "comuna": "MELIPILLA",
-        "ano": "2013",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -215,16 +292,91 @@
         ]
       },
       "properties": {
-        "rol": "136010812",
+        "rol": "136010812-7",
         "nombre": "DOS MARIAS DOS 1/54",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 270,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.017799107,
+              -33.770308836
+            ],
+            [
+              -71.018500101,
+              -33.772949301
+            ],
+            [
+              -71.0199052729999,
+              -33.7726890719999
+            ],
+            [
+              -71.01920424,
+              -33.770048706
+            ],
+            [
+              -71.017799107,
+              -33.770308836
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260042-9",
+        "nombre": "LAS OVEJAS",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 4,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.99450601,
+              -33.7688881719999
+            ],
+            [
+              -70.9891097249999,
+              -33.768975284
+            ],
+            [
+              -70.98923474,
+              -33.7743833869999
+            ],
+            [
+              -70.994631364,
+              -33.7742962569999
+            ],
+            [
+              -70.99450601,
+              -33.7688881719999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135020051-3",
+        "nombre": "CARMENCITA 11 1/30",
+        "titular": "SLM CARMENCITA 11 1/30",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 30,
+        "comuna": "ISLA DE MAIPO"
       }
     },
     {
@@ -265,16 +417,52 @@
         ]
       },
       "properties": {
-        "rol": "200100291",
+        "rol": "200100291-3",
         "nombre": "TOKI 7 DEL 1 AL 14",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 54,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.992035455,
+              -33.895162996
+            ],
+            [
+              -70.9812269669999,
+              -33.8953373369999
+            ],
+            [
+              -70.981644145,
+              -33.91336404
+            ],
+            [
+              -70.992454905,
+              -33.913189581
+            ],
+            [
+              -70.992035455,
+              -33.895162996
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050260-7",
+        "nombre": "CARMEN 2 1/40",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "comuna": "ALHUE"
       }
     },
     {
@@ -307,16 +495,91 @@
         ]
       },
       "properties": {
-        "rol": "200102568",
+        "rol": "200102568-9",
         "nombre": "BUENA ESPERANZA",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.120337642,
+              -33.8585781689999
+            ],
+            [
+              -71.109534633,
+              -33.85876359
+            ],
+            [
+              -71.10975637,
+              -33.8677762789999
+            ],
+            [
+              -71.120560513,
+              -33.8675907959999
+            ],
+            [
+              -71.120337642,
+              -33.8585781689999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200101690-6",
+        "nombre": "ROSARIO 7 A",
+        "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.118147536,
+              -33.835533628
+            ],
+            [
+              -71.107347411,
+              -33.8357187459999
+            ],
+            [
+              -71.107458056,
+              -33.8402251159999
+            ],
+            [
+              -71.118258747,
+              -33.8400399659999
+            ],
+            [
+              -71.118147536,
+              -33.835533628
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010773-2",
+        "nombre": "CHACRILLAS 1/50",
+        "titular": "VARAS APABLAZA VICTOR HUGO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -349,16 +612,130 @@
         ]
       },
       "properties": {
-        "rol": "136010837",
+        "rol": "136010837-2",
         "nombre": "ESPERANZA 9",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.001275049,
+              -33.769427327
+            ],
+            [
+              -71.002009938,
+              -33.7703724519999
+            ],
+            [
+              -71.003820576,
+              -33.769390431
+            ],
+            [
+              -71.0030856769999,
+              -33.7684453169999
+            ],
+            [
+              -71.001275049,
+              -33.769427327
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130280102-5",
+        "nombre": "TORRE BLANCA",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 2,
+        "comuna": "EL MONTE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1241548639999,
+              -33.8163152669999
+            ],
+            [
+              -71.113357197,
+              -33.8165008199999
+            ],
+            [
+              -71.113578982,
+              -33.8255135489999
+            ],
+            [
+              -71.12437778,
+              -33.825327934
+            ],
+            [
+              -71.1241548639999,
+              -33.8163152669999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200105371-2",
+        "nombre": "ROSARIO 10",
+        "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9848769339999,
+              -33.7960940249999
+            ],
+            [
+              -70.965443944,
+              -33.7964052299999
+            ],
+            [
+              -70.965650056,
+              -33.8054188199999
+            ],
+            [
+              -70.985085081,
+              -33.80510751
+            ],
+            [
+              -70.9848769339999,
+              -33.7960940249999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010614-0",
+        "nombre": "ELISA III 1/20",
+        "titular": "SCM LAS ABUELITAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 180,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -391,16 +768,13 @@
         ]
       },
       "properties": {
-        "rol": "136010840",
+        "rol": "136010840-2",
         "nombre": "ESPERANZA 13",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -441,16 +815,132 @@
         ]
       },
       "properties": {
-        "rol": "136010809",
+        "rol": "136010809-7",
         "nombre": "LOBO 1/17",
         "titular": "JONATHAN CUSTODIO ADASME ADASME",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 82,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0214870849999,
+              -33.7684490739999
+            ],
+            [
+              -71.010694725,
+              -33.76862542
+            ],
+            [
+              -71.010821095,
+              -33.774033452
+            ],
+            [
+              -71.012224195,
+              -33.774010576
+            ],
+            [
+              -71.0122452749999,
+              -33.774911913
+            ],
+            [
+              -71.013000797,
+              -33.774899588
+            ],
+            [
+              -71.0130218859999,
+              -33.7758009249999
+            ],
+            [
+              -71.010863226,
+              -33.775836128
+            ],
+            [
+              -71.011137167,
+              -33.787553509
+            ],
+            [
+              -71.0219318969999,
+              -33.7873770369999
+            ],
+            [
+              -71.02163531,
+              -33.774758402
+            ],
+            [
+              -71.018721168,
+              -33.7748061199999
+            ],
+            [
+              -71.018700021,
+              -33.7739047859999
+            ],
+            [
+              -71.0183762309999,
+              -33.773910084
+            ],
+            [
+              -71.018355088,
+              -33.77300875
+            ],
+            [
+              -71.017275797,
+              -33.773026401
+            ],
+            [
+              -71.017191279,
+              -33.7694210609999
+            ],
+            [
+              -71.01934977,
+              -33.7693857529999
+            ],
+            [
+              -71.019370921,
+              -33.7702870869999
+            ],
+            [
+              -71.019511224,
+              -33.7702847909999
+            ],
+            [
+              -71.019532377,
+              -33.7711861249999
+            ],
+            [
+              -71.0206116429999,
+              -33.771168454
+            ],
+            [
+              -71.020590479,
+              -33.770267121
+            ],
+            [
+              -71.02152943,
+              -33.7702517399999
+            ],
+            [
+              -71.0214870849999,
+              -33.7684490739999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010479-2",
+        "nombre": "CARMEN ALTO 2 1/23",
+        "titular": "SLM CARMEN ALTO 2 1/23 MELIPIL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 188,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -515,16 +1005,13 @@
         ]
       },
       "properties": {
-        "rol": "130260201",
+        "rol": "130260201-4",
         "nombre": "ELISA 1/321",
         "titular": "SCM LAS ABUELITAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 1605,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -557,16 +1044,52 @@
         ]
       },
       "properties": {
-        "rol": "200101160",
+        "rol": "200101160-2",
         "nombre": "PALLOCABE 9 DEL 1 AL 20",
         "titular": "GIANFRNACO GIORGIO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0057483539999,
+              -33.777507145
+            ],
+            [
+              -71.006803122,
+              -33.777315065
+            ],
+            [
+              -71.0058830629999,
+              -33.773791827
+            ],
+            [
+              -71.004828335,
+              -33.7739838969999
+            ],
+            [
+              -71.0057483539999,
+              -33.777507145
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260019-4",
+        "nombre": "EL ESPINO",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 4,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -615,16 +1138,13 @@
         ]
       },
       "properties": {
-        "rol": "130260004",
+        "rol": "130260004-6",
         "nombre": "LAS ABUELITAS 1/6",
         "titular": "SOC MINERA LAS ABUELITAS LTDA",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 159,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -657,16 +1177,52 @@
         ]
       },
       "properties": {
-        "rol": "200100269",
+        "rol": "200100269-7",
         "nombre": "TOKI 4 DEL 1 AL 4",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 8,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.042921764,
+              -33.761784303
+            ],
+            [
+              -71.032130383,
+              -33.761962492
+            ],
+            [
+              -71.032747839,
+              -33.7881009459999
+            ],
+            [
+              -71.043542493,
+              -33.787922581
+            ],
+            [
+              -71.042921764,
+              -33.761784303
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010349-4",
+        "nombre": "ELIANA II 1/58",
+        "titular": "SOPROCAL CALERIAS E INDUSTR SA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 290,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -699,16 +1255,13 @@
         ]
       },
       "properties": {
-        "rol": "136010672",
+        "rol": "136010672-8",
         "nombre": "TANTEHUE 37 1/12",
         "titular": "LECAROS EDWARDS MATIAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 96,
-        "comuna": "MELIPILLA",
-        "ano": "2015",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -718,39 +1271,75 @@
         "coordinates": [
           [
             [
-              -71.023692464,
-              -33.8543334309999
+              -71.1030719519999,
+              -33.898420346
             ],
             [
-              -71.01288933,
-              -33.854510363
+              -71.098748703,
+              -33.898494098
             ],
             [
-              -71.0133125199999,
-              -33.872536838
+              -71.0988370649999,
+              -33.902099177
             ],
             [
-              -71.024117922,
-              -33.8723597859999
+              -71.1031604949999,
+              -33.902025415
             ],
             [
-              -71.023692464,
-              -33.8543334309999
+              -71.1030719519999,
+              -33.898420346
             ]
           ]
         ]
       },
       "properties": {
-        "rol": "136010832",
-        "nombre": "ESPERANZA 3",
-        "titular": "GIANFRANCO DE MARTINO GONZALEZ",
-        "situacion": "EN TRAMITE",
-        "tipo": "EXPLORACION",
-        "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "rol": "136010774-0",
+        "nombre": "TANTEHUE 1/16",
+        "titular": "MACAYA DANUS GONZALO NICOLAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 16,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.010663138,
+              -33.767273412
+            ],
+            [
+              -71.006346236,
+              -33.767343683
+            ],
+            [
+              -71.0064302919999,
+              -33.770949048
+            ],
+            [
+              -71.0107473749999,
+              -33.7708787679999
+            ],
+            [
+              -71.010663138,
+              -33.767273412
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135030263-4",
+        "nombre": "LOS GATOS 1/4",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 16,
+        "comuna": "EL MONTE"
       }
     },
     {
@@ -783,16 +1372,52 @@
         ]
       },
       "properties": {
-        "rol": "136010838",
+        "rol": "136010838-0",
         "nombre": "ESPERANZA 10",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.023692464,
+              -33.8543334309999
+            ],
+            [
+              -71.01288933,
+              -33.854510363
+            ],
+            [
+              -71.0133125199999,
+              -33.872536838
+            ],
+            [
+              -71.024117922,
+              -33.8723597859999
+            ],
+            [
+              -71.023692464,
+              -33.8543334309999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010832-1",
+        "nombre": "ESPERANZA 3",
+        "titular": "GIANFRANCO DE MARTINO GONZALEZ",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -841,16 +1466,13 @@
         ]
       },
       "properties": {
-        "rol": "136010615",
+        "rol": "136010615-9",
         "nombre": "ELISA IV 1/80",
         "titular": "SCM LAS ABUELITAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 730,
-        "comuna": "MELIPILLA",
-        "ano": "2013",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -883,16 +1505,13 @@
         ]
       },
       "properties": {
-        "rol": "136010811",
+        "rol": "136010811-9",
         "nombre": "DOS MARIAS 1 1/54",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 270,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -925,16 +1544,296 @@
         ]
       },
       "properties": {
-        "rol": "136010841",
+        "rol": "136010841-0",
         "nombre": "ESPERANZA 14",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.998823021,
+              -33.768818312
+            ],
+            [
+              -70.99450601,
+              -33.7688881719999
+            ],
+            [
+              -70.994631364,
+              -33.7742962569999
+            ],
+            [
+              -70.9957106859999,
+              -33.774278803
+            ],
+            [
+              -70.995731593,
+              -33.7751801489999
+            ],
+            [
+              -71.000048916,
+              -33.7751102349999
+            ],
+            [
+              -70.999944166,
+              -33.770603513
+            ],
+            [
+              -70.998864892,
+              -33.770621003
+            ],
+            [
+              -70.998823021,
+              -33.768818312
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135020044-0",
+        "nombre": "ORO NEGRO 1/7",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 32,
+        "comuna": "ISLA DE MAIPO"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127751196,
+              -33.890783299
+            ],
+            [
+              -71.10937921,
+              -33.8910993179999
+            ],
+            [
+              -71.1095567949999,
+              -33.898309433
+            ],
+            [
+              -71.127930324,
+              -33.897993329
+            ],
+            [
+              -71.127751196,
+              -33.890783299
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010664-7",
+        "nombre": "TANTEHUE 30 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1254960489999,
+              -33.802848524
+            ],
+            [
+              -71.1147000829999,
+              -33.803034129
+            ],
+            [
+              -71.1149218959999,
+              -33.81204687
+            ],
+            [
+              -71.125718992,
+              -33.8118612019999
+            ],
+            [
+              -71.1254960489999,
+              -33.802848524
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200102575-1",
+        "nombre": "LA BENDICION",
+        "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.006377755,
+              -33.768695695
+            ],
+            [
+              -71.004219264,
+              -33.768730776
+            ],
+            [
+              -71.004250752,
+              -33.770082789
+            ],
+            [
+              -71.003171488,
+              -33.770100316
+            ],
+            [
+              -71.00319247,
+              -33.771001659
+            ],
+            [
+              -71.004271745,
+              -33.770984132
+            ],
+            [
+              -71.0043242309999,
+              -33.773237487
+            ],
+            [
+              -71.006482835,
+              -33.7732023999999
+            ],
+            [
+              -71.0065458939999,
+              -33.7759064219999
+            ],
+            [
+              -71.007625229,
+              -33.7758888619999
+            ],
+            [
+              -71.007667295,
+              -33.777691542
+            ],
+            [
+              -71.0065879379999,
+              -33.777709102
+            ],
+            [
+              -71.006608962,
+              -33.7786104419999
+            ],
+            [
+              -71.0044502229999,
+              -33.7786455359999
+            ],
+            [
+              -71.0044082219999,
+              -33.7768428529999
+            ],
+            [
+              -71.003328874,
+              -33.776860385
+            ],
+            [
+              -71.003286899,
+              -33.775057701
+            ],
+            [
+              -71.000048916,
+              -33.7751102349999
+            ],
+            [
+              -71.000342342,
+              -33.787729037
+            ],
+            [
+              -71.011137167,
+              -33.787553509
+            ],
+            [
+              -71.010757906,
+              -33.771329437
+            ],
+            [
+              -71.0064408,
+              -33.7713997189999
+            ],
+            [
+              -71.006377755,
+              -33.768695695
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010480-6",
+        "nombre": "CARMEN ALTO 3 1/26",
+        "titular": "SLM CARMEN ALTO 3 1/26 MELIPIL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 155,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.019554695,
+              -33.7713687999999
+            ],
+            [
+              -71.019905165,
+              -33.772689073
+            ],
+            [
+              -71.022012961,
+              -33.772298744
+            ],
+            [
+              -71.0216624619999,
+              -33.770978568
+            ],
+            [
+              -71.019554695,
+              -33.7713687999999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260023-2",
+        "nombre": "HECHICERA",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 3,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -967,16 +1866,52 @@
         ]
       },
       "properties": {
-        "rol": "136010804",
+        "rol": "136010804-6",
         "nombre": "CERRO ALTO 2 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": "2024",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.110295026,
+              -33.823766501
+            ],
+            [
+              -71.099496326,
+              -33.823950875
+            ],
+            [
+              -71.099716719,
+              -33.832963674
+            ],
+            [
+              -71.1105165509999,
+              -33.832779237
+            ],
+            [
+              -71.110295026,
+              -33.823766501
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200105339-9",
+        "nombre": "ROSARIO 9",
+        "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1009,16 +1944,13 @@
         ]
       },
       "properties": {
-        "rol": "200101669",
+        "rol": "200101669-8",
         "nombre": "ROSARIO 2 A",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1059,16 +1991,13 @@
         ]
       },
       "properties": {
-        "rol": "200100289",
+        "rol": "200100289-1",
         "nombre": "TOKI 6 DEL 1 AL 14",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 52,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1101,16 +2030,169 @@
         ]
       },
       "properties": {
-        "rol": "136010675",
+        "rol": "136010675-2",
         "nombre": "TANTEHUE 40 1/18",
         "titular": "LECAROS EDWARDS MATIAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 144,
-        "comuna": "MELIPILLA",
-        "ano": "2016",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.104496911,
+              -33.7634544869999
+            ],
+            [
+              -71.072123107,
+              -33.7640024
+            ],
+            [
+              -71.072340136,
+              -33.773015444
+            ],
+            [
+              -71.104717325,
+              -33.7724673459999
+            ],
+            [
+              -71.104496911,
+              -33.7634544869999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010821-6",
+        "nombre": "FUNDO I 1",
+        "titular": "RIO NEGRO S.A.",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 300,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.961779424,
+              -33.848761329
+            ],
+            [
+              -70.958538582,
+              -33.8488128719999
+            ],
+            [
+              -70.9586414669999,
+              -33.853319649
+            ],
+            [
+              -70.9618824789999,
+              -33.853268097
+            ],
+            [
+              -70.961779424,
+              -33.848761329
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "134040200-2",
+        "nombre": "MONICA III 1/5",
+        "titular": "MINERA SANTA GEMITA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 15,
+        "comuna": "PAINE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.995777537,
+              -33.800426527
+            ],
+            [
+              -70.9849809959999,
+              -33.800600769
+            ],
+            [
+              -70.985189189,
+              -33.809614247
+            ],
+            [
+              -70.9959868609999,
+              -33.8094399459999
+            ],
+            [
+              -70.995777537,
+              -33.800426527
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010548-9",
+        "nombre": "MATER II 1/10",
+        "titular": "SLM MATER II 1/10 MELIPILLA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.11764311,
+              -33.8400505449999
+            ],
+            [
+              -71.106842414,
+              -33.8402356409999
+            ],
+            [
+              -71.1070637129999,
+              -33.849248373
+            ],
+            [
+              -71.1178655419999,
+              -33.8490632149999
+            ],
+            [
+              -71.11764311,
+              -33.8400505449999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010736-8",
+        "nombre": "LA CHACRILLA 1/20",
+        "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1143,16 +2225,52 @@
         ]
       },
       "properties": {
-        "rol": "136010835",
+        "rol": "136010835-6",
         "nombre": "ESPERANZA 6",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.12739313,
+              -33.876363211
+            ],
+            [
+              -71.109024231,
+              -33.876679059
+            ],
+            [
+              -71.109201689,
+              -33.883889193
+            ],
+            [
+              -71.127572131,
+              -33.8835732599999
+            ],
+            [
+              -71.12739313,
+              -33.876363211
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010661-2",
+        "nombre": "TANTEHUE 28 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1193,16 +2311,130 @@
         ]
       },
       "properties": {
-        "rol": "136010806",
+        "rol": "136010806-2",
         "nombre": "ATACAMITA 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 97,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.958476861,
+              -33.846108804
+            ],
+            [
+              -70.9530756089999,
+              -33.8461945129999
+            ],
+            [
+              -70.95328081,
+              -33.855208096
+            ],
+            [
+              -70.958682628,
+              -33.8551223589999
+            ],
+            [
+              -70.958476861,
+              -33.846108804
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "134030006-4",
+        "nombre": "MONICA 1/5",
+        "titular": "MINERA SANTA GEMITA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 50,
+        "comuna": "BUIN"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.119237367,
+              -33.849039632
+            ],
+            [
+              -71.108435551,
+              -33.849224911
+            ],
+            [
+              -71.108657092,
+              -33.8582376209999
+            ],
+            [
+              -71.119460042,
+              -33.8580522789999
+            ],
+            [
+              -71.119237367,
+              -33.849039632
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010813-5",
+        "nombre": "AMANECER 1/20",
+        "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.018888265,
+              -33.774284199
+            ],
+            [
+              -71.02205007,
+              -33.773698714
+            ],
+            [
+              -71.021699457,
+              -33.772378541
+            ],
+            [
+              -71.0185378039999,
+              -33.772964013
+            ],
+            [
+              -71.018888265,
+              -33.774284199
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260055-0",
+        "nombre": "SAN JOSE",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 4,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1235,16 +2467,13 @@
         ]
       },
       "properties": {
-        "rol": "136010475",
+        "rol": "136010475-K",
         "nombre": "HORCON I 1/20",
         "titular": "MINERA FLORIDA LIMITADA",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": "2001",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1277,16 +2506,13 @@
         ]
       },
       "properties": {
-        "rol": "200101666",
+        "rol": "200101666-3",
         "nombre": "ROSARIO 6 A",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1319,16 +2545,13 @@
         ]
       },
       "properties": {
-        "rol": "136010737",
+        "rol": "136010737-6",
         "nombre": "MINITAS GRANDES 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": "2021",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1369,16 +2592,13 @@
         ]
       },
       "properties": {
-        "rol": "200100195",
+        "rol": "200100195-K",
         "nombre": "PALLOCABE 6 DEL 1 AL 16",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 106,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1411,16 +2631,13 @@
         ]
       },
       "properties": {
-        "rol": "136010836",
+        "rol": "136010836-4",
         "nombre": "ESPERANZA 7",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1453,16 +2670,91 @@
         ]
       },
       "properties": {
-        "rol": "136010839",
+        "rol": "136010839-9",
         "nombre": "ESPERANZA 12",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9848873829999,
+              -33.913311802
+            ],
+            [
+              -70.972995469,
+              -33.9135029249999
+            ],
+            [
+              -70.973099367,
+              -33.918009615
+            ],
+            [
+              -70.9849919059999,
+              -33.91781846
+            ],
+            [
+              -70.9848873829999,
+              -33.913311802
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050378-6",
+        "nombre": "ESMERALDA 1/11",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 55,
+        "comuna": "ALHUE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127572131,
+              -33.8835732599999
+            ],
+            [
+              -71.109201689,
+              -33.883889193
+            ],
+            [
+              -71.10937921,
+              -33.8910993179999
+            ],
+            [
+              -71.127751196,
+              -33.890783299
+            ],
+            [
+              -71.127572131,
+              -33.8835732599999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010662-0",
+        "nombre": "TANTEHUE 29 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1495,16 +2787,52 @@
         ]
       },
       "properties": {
-        "rol": "200100679",
+        "rol": "200100679-K",
         "nombre": "PALLOCABE 8 DEL 1 AL 22",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 132,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.010913139,
+              -33.7744052479999
+            ],
+            [
+              -71.011146818,
+              -33.7752854469999
+            ],
+            [
+              -71.01220075,
+              -33.77509027
+            ],
+            [
+              -71.0119670299999,
+              -33.774210164
+            ],
+            [
+              -71.010913139,
+              -33.7744052479999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260018-6",
+        "nombre": "EL DURAZNO",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 1,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1537,16 +2865,13 @@
         ]
       },
       "properties": {
-        "rol": "136010673",
+        "rol": "136010673-6",
         "nombre": "TANTEHUE 38 1/12",
         "titular": "LECAROS EDWARDS MATIAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 96,
-        "comuna": "MELIPILLA",
-        "ano": "2015",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1579,16 +2904,13 @@
         ]
       },
       "properties": {
-        "rol": "136010784",
+        "rol": "136010784-8",
         "nombre": "MUJERCITAS 3 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": "2024",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1621,16 +2943,52 @@
         ]
       },
       "properties": {
-        "rol": "200101661",
+        "rol": "200101661-2",
         "nombre": "ROSARIO 1 A",
         "titular": "AGRICOLA E INMOBILIARIA INVERGRAF LTDA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.98391077,
+              -33.9178358849999
+            ],
+            [
+              -70.973099367,
+              -33.918009615
+            ],
+            [
+              -70.973515189,
+              -33.9360363399999
+            ],
+            [
+              -70.984328867,
+              -33.935862492
+            ],
+            [
+              -70.98391077,
+              -33.9178358849999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050400-6",
+        "nombre": "FARELLON 1/20",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "comuna": "ALHUE"
       }
     },
     {
@@ -1671,16 +3029,52 @@
         ]
       },
       "properties": {
-        "rol": "200100263",
+        "rol": "200100263-8",
         "nombre": "TOKI 1 DEL 1 AL 16",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 68,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127345154,
+              -33.8962001579999
+            ],
+            [
+              -71.100325714,
+              -33.89666392
+            ],
+            [
+              -71.100436244,
+              -33.901170266
+            ],
+            [
+              -71.127457103,
+              -33.900706425
+            ],
+            [
+              -71.127345154,
+              -33.8962001579999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010638-8",
+        "nombre": "LAS ARENAS 1/25",
+        "titular": "PAVEZ BECKER LUIS HERNAN",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 125,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1713,16 +3107,13 @@
         ]
       },
       "properties": {
-        "rol": "136010833",
+        "rol": "136010833-K",
         "nombre": "ESPERANZA 4",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1755,16 +3146,68 @@
         ]
       },
       "properties": {
-        "rol": "200101652",
+        "rol": "200101652-3",
         "nombre": "ROSARIO 3 A ",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0322793509999,
+              -33.768271785
+            ],
+            [
+              -71.0214870849999,
+              -33.7684490739999
+            ],
+            [
+              -71.02152943,
+              -33.7702517399999
+            ],
+            [
+              -71.022608684,
+              -33.770234052
+            ],
+            [
+              -71.0226934299999,
+              -33.77383938
+            ],
+            [
+              -71.021614132,
+              -33.77385707
+            ],
+            [
+              -71.021698849,
+              -33.777462398
+            ],
+            [
+              -71.032492243,
+              -33.7772850489999
+            ],
+            [
+              -71.0322793509999,
+              -33.768271785
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010488-1",
+        "nombre": "CARMENCITA 1 1/96",
+        "titular": "SLM CARMENCITA 1 1/96 MELIPILL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 96,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1797,16 +3240,13 @@
         ]
       },
       "properties": {
-        "rol": "200101679",
+        "rol": "200101679-5",
         "nombre": "ROSARIO 4 A",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1839,16 +3279,13 @@
         ]
       },
       "properties": {
-        "rol": "200105563",
+        "rol": "200105563-4",
         "nombre": "EUROPA 8B",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -1881,16 +3318,52 @@
         ]
       },
       "properties": {
-        "rol": "200100292",
+        "rol": "200100292-1",
         "nombre": "TOKI 8 DEL 1 AL 20",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0010129579999,
+              -33.7701353419999
+            ],
+            [
+              -70.999933692,
+              -33.770152841
+            ],
+            [
+              -70.9999546399999,
+              -33.771054186
+            ],
+            [
+              -71.001033917,
+              -33.7710366859999
+            ],
+            [
+              -71.0010129579999,
+              -33.7701353419999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135020050-5",
+        "nombre": "CARMENCITA SIETE 1",
+        "titular": "SLM CARMENCITA 7 1/6",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 1,
+        "comuna": "ISLA DE MAIPO"
       }
     },
     {
@@ -1923,16 +3396,13 @@
         ]
       },
       "properties": {
-        "rol": "136050262",
+        "rol": "136050262-3",
         "nombre": "CARMEN 5 1/20",
         "titular": "MINERA FLORIDA LIMITADA",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "ALHUE",
-        "ano": "1995",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "ALHUE"
       }
     },
     {
@@ -1965,16 +3435,13 @@
         ]
       },
       "properties": {
-        "rol": "136010787",
+        "rol": "136010787-2",
         "nombre": "ROSALBA  1/16",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 80,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2007,16 +3474,52 @@
         ]
       },
       "properties": {
-        "rol": "200101689",
+        "rol": "200101689-2",
         "nombre": "LAS GUIAS ANTIGUA 1 A",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.104717325,
+              -33.7724673459999
+            ],
+            [
+              -71.08313263,
+              -33.7728336869999
+            ],
+            [
+              -71.083350884,
+              -33.781846656
+            ],
+            [
+              -71.104937837,
+              -33.78148019
+            ],
+            [
+              -71.104717325,
+              -33.7724673459999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010820-8",
+        "nombre": "FUNDO I 2",
+        "titular": "RIO NEGRO S.A.",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2057,16 +3560,13 @@
         ]
       },
       "properties": {
-        "rol": "200104425",
+        "rol": "200104425-K",
         "nombre": "ESPERANZA DOS DEL 1 AL 20",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2099,16 +3599,60 @@
         ]
       },
       "properties": {
-        "rol": "200100124",
+        "rol": "200100124-0",
         "nombre": "PALLOCABE 1 DEL 1 AL 10",
         "titular": "GIANFRNACO GIORGIO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 60,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9951710249999,
+              -33.774287531
+            ],
+            [
+              -70.9897744039999,
+              -33.7743746849999
+            ],
+            [
+              -70.9897535599999,
+              -33.7734733349999
+            ],
+            [
+              -70.9843569719999,
+              -33.7735602499999
+            ],
+            [
+              -70.9849809959999,
+              -33.800600769
+            ],
+            [
+              -70.995777537,
+              -33.800426527
+            ],
+            [
+              -70.9951710249999,
+              -33.774287531
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010547-0",
+        "nombre": "MATER I 1/30",
+        "titular": "SLM MATER I 1/30 MELIPILLA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 295,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2141,16 +3685,13 @@
         ]
       },
       "properties": {
-        "rol": "136010735",
+        "rol": "136010735-K",
         "nombre": "LAS GUIAS 1/20",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": "2021",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2183,16 +3724,13 @@
         ]
       },
       "properties": {
-        "rol": "200100264",
+        "rol": "200100264-6",
         "nombre": "TOKI 2 DEL 1 AL 20",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2225,16 +3763,52 @@
         ]
       },
       "properties": {
-        "rol": "136010834",
+        "rol": "136010834-8",
         "nombre": "ESPERANZA 5",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9787316749999,
+              -33.7871759079999
+            ],
+            [
+              -70.967936685,
+              -33.7873486
+            ],
+            [
+              -70.968142988,
+              -33.79636219
+            ],
+            [
+              -70.978939108,
+              -33.79618944
+            ],
+            [
+              -70.9787316749999,
+              -33.7871759079999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010613-2",
+        "nombre": "ELISA II 1/10",
+        "titular": "SCM LAS ABUELITAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2331,16 +3905,177 @@
         ]
       },
       "properties": {
-        "rol": "200100192",
+        "rol": "200100192-5",
         "nombre": "PALLOCABE 2 DEL 1 AL 20",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 103,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.032492243,
+              -33.7772850489999
+            ],
+            [
+              -71.021698849,
+              -33.777462398
+            ],
+            [
+              -71.0219318969999,
+              -33.7873770369999
+            ],
+            [
+              -71.028408691,
+              -33.787270701
+            ],
+            [
+              -71.02842995,
+              -33.788172028
+            ],
+            [
+              -71.032747839,
+              -33.7881009459999
+            ],
+            [
+              -71.032492243,
+              -33.7772850489999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010489-K",
+        "nombre": "CARMENCITA 2 1/114",
+        "titular": "SLM CARMENCITA 2 1/114 MELIPIL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 114,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.127214193,
+              -33.869153153
+            ],
+            [
+              -71.1088468359999,
+              -33.869468916
+            ],
+            [
+              -71.109024231,
+              -33.876679059
+            ],
+            [
+              -71.12739313,
+              -33.876363211
+            ],
+            [
+              -71.127214193,
+              -33.869153153
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010660-4",
+        "nombre": "TANTEHUE 27 1/17",
+        "titular": "LECAROS EDWARDS MATIAS",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 136,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.124598522,
+              -33.89444429
+            ],
+            [
+              -71.1029834239999,
+              -33.8948152749999
+            ],
+            [
+              -71.103204773,
+              -33.9038279489999
+            ],
+            [
+              -71.124822141,
+              -33.903456838
+            ],
+            [
+              -71.124598522,
+              -33.89444429
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200107016-1",
+        "nombre": "PLACILLA 2",
+        "titular": "MACAYA DANUS GONZALO NICOLAS",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 200,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.001877497,
+              -33.7741108719999
+            ],
+            [
+              -71.0033863039999,
+              -33.773292494
+            ],
+            [
+              -71.0016223389999,
+              -33.7710243559999
+            ],
+            [
+              -71.0001135529999,
+              -33.771842711
+            ],
+            [
+              -71.001877497,
+              -33.7741108719999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130280019-3",
+        "nombre": "CONSUELO",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 5,
+        "comuna": "EL MONTE"
       }
     },
     {
@@ -2373,16 +4108,91 @@
         ]
       },
       "properties": {
-        "rol": "136010476",
+        "rol": "136010476-8",
         "nombre": "HORCON II 1/20",
         "titular": "MINERA FLORIDA LIMITADA",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": "2001",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9954880029999,
+              -33.904123791
+            ],
+            [
+              -70.992245134,
+              -33.9041762959999
+            ],
+            [
+              -70.992454905,
+              -33.913189581
+            ],
+            [
+              -70.995698116,
+              -33.913137059
+            ],
+            [
+              -70.9954880029999,
+              -33.904123791
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050174-0",
+        "nombre": "CARMEN 6 1/5",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 30,
+        "comuna": "ALHUE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.130157289,
+              -33.840556218
+            ],
+            [
+              -71.1193566159999,
+              -33.8407424129999
+            ],
+            [
+              -71.119579233,
+              -33.8497550709999
+            ],
+            [
+              -71.1303810379999,
+              -33.849568814
+            ],
+            [
+              -71.130157289,
+              -33.840556218
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200105345-3",
+        "nombre": "ROSARIO 12",
+        "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLORACION",
+        "hectareas": 100,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2415,16 +4225,13 @@
         ]
       },
       "properties": {
-        "rol": "200102158",
+        "rol": "200102158-6",
         "nombre": "PALLOCABE 10 1/6",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 18,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2457,16 +4264,130 @@
         ]
       },
       "properties": {
-        "rol": "136010676",
+        "rol": "136010676-0",
         "nombre": "TANTEHUE 41 1/16",
         "titular": "LECAROS EDWARDS MATIAS",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 128,
-        "comuna": "MELIPILLA",
-        "ano": "2015",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.964290849,
+              -33.864049896
+            ],
+            [
+              -70.953486101,
+              -33.8642216659999
+            ],
+            [
+              -70.9536914839999,
+              -33.873235221
+            ],
+            [
+              -70.964497366,
+              -33.8730633929999
+            ],
+            [
+              -70.964290849,
+              -33.864049896
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200102165-9",
+        "nombre": "SAN LORENZO 1 AL 20",
+        "titular": "MEDINA GRANIFO MANUEL FILOMENO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 100,
+        "comuna": "PAINE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.107276611,
+              -33.832834668
+            ],
+            [
+              -71.100796707,
+              -33.832945273
+            ],
+            [
+              -71.1009069959999,
+              -33.837451664
+            ],
+            [
+              -71.107387241,
+              -33.83734104
+            ],
+            [
+              -71.107276611,
+              -33.832834668
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010775-9",
+        "nombre": "MONA BLANCA 1/30",
+        "titular": "VARAS APABLAZA VICTOR HUGO",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 30,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.972912368,
+              -33.9098975699999
+            ],
+            [
+              -70.9621018949999,
+              -33.910070299
+            ],
+            [
+              -70.962515276,
+              -33.928097167
+            ],
+            [
+              -70.973328023,
+              -33.927924321
+            ],
+            [
+              -70.972912368,
+              -33.9098975699999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050396-4",
+        "nombre": "ESMERALDA 1/20",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "comuna": "ALHUE"
       }
     },
     {
@@ -2499,16 +4420,91 @@
         ]
       },
       "properties": {
-        "rol": "200100268",
+        "rol": "200100268-9",
         "nombre": "TOKI 3 DEL 1 AL 8",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 40,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.004271745,
+              -33.770984132
+            ],
+            [
+              -70.9999546399999,
+              -33.771054186
+            ],
+            [
+              -71.00003844,
+              -33.7746595629999
+            ],
+            [
+              -71.004355726,
+              -33.7745894999999
+            ],
+            [
+              -71.004271745,
+              -33.770984132
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135030264-2",
+        "nombre": "REGALO 1/4",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 16,
+        "comuna": "EL MONTE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.107895458,
+              -33.84923415
+            ],
+            [
+              -71.105735081,
+              -33.849271083
+            ],
+            [
+              -71.105779325,
+              -33.851073629
+            ],
+            [
+              -71.107939747,
+              -33.851036694
+            ],
+            [
+              -71.107895458,
+              -33.84923415
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "200104489-6",
+        "nombre": "NACIMIENTO 1 AL 4",
+        "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 4,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2541,16 +4537,13 @@
         ]
       },
       "properties": {
-        "rol": "136010616",
+        "rol": "136010616-7",
         "nombre": "ELISA V 1/40",
         "titular": "SCM LAS ABUELITAS",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLOTACION",
         "hectareas": 400,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2583,16 +4576,52 @@
         ]
       },
       "properties": {
-        "rol": "136010830",
+        "rol": "136010830-5",
         "nombre": "ESPERANZA 1",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.006297506,
+              -33.903948159
+            ],
+            [
+              -70.9954880029999,
+              -33.904123791
+            ],
+            [
+              -70.9959083209999,
+              -33.9221503119999
+            ],
+            [
+              -71.006720098,
+              -33.921974561
+            ],
+            [
+              -71.006297506,
+              -33.903948159
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050259-3",
+        "nombre": "LOS ALERCES 1/20",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 200,
+        "comuna": "ALHUE"
       }
     },
     {
@@ -2625,16 +4654,13 @@
         ]
       },
       "properties": {
-        "rol": "136010842",
+        "rol": "136010842-9",
         "nombre": "ESPERANZA 15",
         "titular": "GIANFRANCO DE MARTINO GONZALEZ",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 200,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": true,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2667,16 +4693,91 @@
         ]
       },
       "properties": {
-        "rol": "136010738",
+        "rol": "136010738-4",
         "nombre": "MINITAS CHICAS 1/10",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 40,
-        "comuna": "MELIPILLA",
-        "ano": "2021",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.989316437,
+              -33.917748665
+            ],
+            [
+              -70.98391077,
+              -33.9178358849999
+            ],
+            [
+              -70.9844334489999,
+              -33.940369135
+            ],
+            [
+              -70.989840538,
+              -33.9402818409999
+            ],
+            [
+              -70.989316437,
+              -33.917748665
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136050379-4",
+        "nombre": "ESMERALDA 2 1/125",
+        "titular": "MINERA FLORIDA LIMITADA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 125,
+        "comuna": "ALHUE"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.000048916,
+              -33.7751102349999
+            ],
+            [
+              -70.995731593,
+              -33.7751801489999
+            ],
+            [
+              -70.996024386,
+              -33.7877989839999
+            ],
+            [
+              -71.000342342,
+              -33.787729037
+            ],
+            [
+              -71.000048916,
+              -33.7751102349999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010481-4",
+        "nombre": "CARMEN ALTO 4 1/14",
+        "titular": "SLM CARMEN ALTO 4 1/14 MELIPIL",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 56,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2709,16 +4810,13 @@
         ]
       },
       "properties": {
-        "rol": "200101656",
+        "rol": "200101656-6",
         "nombre": "ROSARIO 5 A ",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2783,16 +4881,68 @@
         ]
       },
       "properties": {
-        "rol": "200100706",
+        "rol": "200100706-0",
         "nombre": "AZUL1 AL 6",
         "titular": "GOMEZ NAVARRO RAUL ALEJANDRO",
         "situacion": "CONSTITUIDA",
         "tipo": "EXPLOTACION",
         "hectareas": 21,
-        "comuna": "MELIPILLA",
-        "ano": "2025",
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.1345498279999,
+              -33.903288602
+            ],
+            [
+              -71.109690025,
+              -33.9037170139999
+            ],
+            [
+              -71.109778864,
+              -33.907322064
+            ],
+            [
+              -71.1032933399999,
+              -33.9074330139999
+            ],
+            [
+              -71.103138358,
+              -33.901124148
+            ],
+            [
+              -71.0923298659999,
+              -33.901308263
+            ],
+            [
+              -71.092550148,
+              -33.9103209899999
+            ],
+            [
+              -71.134707136,
+              -33.909597338
+            ],
+            [
+              -71.1345498279999,
+              -33.903288602
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "136010756-2",
+        "nombre": "FENIX 1/39",
+        "titular": "MORAN OVALLE JOSE",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 279,
+        "comuna": "MELIPILLA"
       }
     },
     {
@@ -2825,16 +4975,91 @@
         ]
       },
       "properties": {
-        "rol": "200105350",
+        "rol": "200105350-K",
         "nombre": "ROSARIO 8",
         "titular": "AGRICOLA E INMOBILIARIA INVERGAF LIMITADA",
         "situacion": "EN TRAMITE",
         "tipo": "EXPLORACION",
         "hectareas": 100,
-        "comuna": "MELIPILLA",
-        "ano": null,
-        "es_tenencia_proyecto": false,
-        "fuente": "SERNAGEOMIN catastro_SNGM (FeatureServer v2)"
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.004808571,
+              -33.7781396399999
+            ],
+            [
+              -71.005863349,
+              -33.7779475679999
+            ],
+            [
+              -71.0047133309999,
+              -33.7735435079999
+            ],
+            [
+              -71.003658603,
+              -33.7737355679999
+            ],
+            [
+              -71.004808571,
+              -33.7781396399999
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "130260031-3",
+        "nombre": "ANTIGUO ESPINO",
+        "titular": "MINERA CEMIN PULLALLI SPA",
+        "situacion": "CONSTITUIDA",
+        "tipo": "EXPLOTACION",
+        "hectareas": 5,
+        "comuna": "MELIPILLA"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.003171488,
+              -33.770100316
+            ],
+            [
+              -71.0010129579999,
+              -33.7701353419999
+            ],
+            [
+              -71.001033917,
+              -33.7710366859999
+            ],
+            [
+              -71.00319247,
+              -33.771001659
+            ],
+            [
+              -71.003171488,
+              -33.770100316
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "rol": "135020062-9",
+        "nombre": "MARIA 1/2",
+        "titular": "CIFUENTES GALVIZA MARIA LEONTI",
+        "situacion": "EN TRAMITE",
+        "tipo": "EXPLOTACION",
+        "hectareas": 2,
+        "comuna": "ISLA DE MAIPO"
       }
     }
   ]

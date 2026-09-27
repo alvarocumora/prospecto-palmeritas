@@ -7,6 +7,9 @@ import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
 import drillRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
 import pedimentosRaw from "@/data/geo/cholqui_pedimentos.geojson?raw";
+// Inteligencia de catastro (data oficial SERNAGEOMIN vía ArcGIS Online):
+import franjasRaw from "@/data/geo/cholqui_franjas.geojson?raw";
+import yacimientosRaw from "@/data/geo/cholqui_yacimientos.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
 
 /** Visor maestro unificado de Cholqui: reemplaza los 3 mapas apilados por uno solo. */
@@ -22,6 +25,8 @@ const concessions = parse(concessionsRaw);
 const anomalies = parse(anomaliesRaw);
 const drillGrid = parse(drillRaw);
 const pedimentos = parse(pedimentosRaw);
+const franjas = parse(franjasRaw);
+const yacimientos = parse(yacimientosRaw);
 
 const norm = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
 const assayBy = new Map(CHOLQUI_ASSAYS.map((a) => [norm(a.sample), a]));
@@ -68,6 +73,8 @@ export function CholquiMasterViewer() {
       assays={assays}
       coverage={coverage}
       geophysics={geophysics}
+      franjas={franjas}
+      yacimientos={yacimientos}
     />
   );
 }

@@ -45,6 +45,10 @@ export type MasterViewerProps = {
   assays?: AssayPoint[];
   coverage?: { typicalPct?: number; bestcasePct?: number; conclusive?: boolean } | null;
   geophysics?: GeophysicsData | null;
+  // Capas de inteligencia de catastro (data oficial SERNAGEOMIN, ArcGIS Online):
+  franjas?: FeatureCollection | null; // franjas metalogénicas (contexto de sistema mineral)
+  yacimientos?: FeatureCollection | null; // depósitos conocidos / minerales críticos (Merge_RR)
+  geoquimica?: FeatureCollection | null; // muestras de sedimento (multi-elemento medido)
   height?: number;
 };
 
@@ -71,6 +75,9 @@ type LayerKey =
   | "ipChargeSurfaceProject"
   | "ipResSurfaceProject"
   | "relieve"
+  | "franjas"
+  | "yacimientos"
+  | "geoquimica"
   | "sondajes"
   | "ensayes"
   | "pedimentos";
@@ -106,6 +113,19 @@ const LAYER_SECTIONS: ReadonlyArray<{
     ],
   },
   {
+    title: "Distrito / metalogenia",
+    note: "Contexto oficial SERNAGEOMIN: franja metalogénica y depósitos conocidos cercanos.",
+    layers: [
+      ["franjas", "Franjas metalogénicas"],
+      ["yacimientos", "Yacimientos / minerales críticos"],
+    ],
+  },
+  {
+    title: "Geoquímica",
+    note: "Sedimento fluvial medido (SERNAGEOMIN). Dispersión regional, no ley in situ.",
+    layers: [["geoquimica", "Geoquímica de sedimentos · Cu"]],
+  },
+  {
     title: "Exploración",
     layers: [
       ["ensayes", "Ensayes certificados"],
@@ -136,6 +156,9 @@ const EVIDENCE_BG: Record<Evidence, string> = {
 const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   tenencia: { evidence: "OFICIAL", scale: "catastro" },
   relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
+  franjas: { evidence: "OFICIAL", scale: "regional" },
+  yacimientos: { evidence: "OFICIAL", scale: "depósito" },
+  geoquimica: { evidence: "MEDIDO", scale: "sedimento" },
   halos: { evidence: "DERIVADO", scale: "10–20 m" },
   magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
   gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
@@ -158,6 +181,9 @@ export function ProjectMasterViewer({
   assays = [],
   coverage,
   geophysics = null,
+  franjas = null,
+  yacimientos = null,
+  geoquimica = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
@@ -175,6 +201,9 @@ export function ProjectMasterViewer({
     ipChargeSurfaceProject: false,
     ipResSurfaceProject: false,
     relieve: false,
+    franjas: false,
+    yacimientos: true,
+    geoquimica: true,
     sondajes: true,
     ensayes: true,
     pedimentos: true,
@@ -360,6 +389,63 @@ export function ProjectMasterViewer({
         groups.current.pedimentos = L.layerGroup([g]).addTo(map);
       }
 
+      // --- Franjas metalogénicas (contexto oficial; polígono tenue de fondo)
+      if (franjas?.features?.length) {
+        const g = L.geoJSON(franjas as never, {
+          style: { color: "#7c3aed", weight: 1, fillColor: "#7c3aed", fillOpacity: 0.06 },
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () => sel("franjas", (f.properties ?? {}) as Record<string, unknown>)),
+        });
+        groups.current.franjas = L.layerGroup([g]);
+      }
+
+      // --- Yacimientos / minerales críticos (depósitos conocidos; rombo)
+      if (yacimientos?.features?.length) {
+        const items: L.Layer[] = [];
+        for (const f of yacimientos.features) {
+          const gm = f.geometry;
+          if (!gm || gm.type !== "Point") continue;
+          const [lng, lat] = gm.coordinates as [number, number];
+          items.push(
+            L.marker([lat, lng], {
+              icon: L.divIcon({
+                className: "",
+                html: '<div style="width:12px;height:12px;background:#dc2626;border:1.5px solid #fff;transform:rotate(45deg)"></div>',
+                iconSize: [12, 12],
+              }),
+            }).on("click", () => sel("yacimientos", (f.properties ?? {}) as Record<string, unknown>)),
+          );
+        }
+        groups.current.yacimientos = L.layerGroup(items).addTo(map);
+      }
+
+      // --- Geoquímica de sedimentos (símbolo graduado por Cu; MEDIDO)
+      if (geoquimica?.features?.length) {
+        const cus = geoquimica.features
+          .map((f) => Number((f.properties as Record<string, unknown>)?.Cu))
+          .filter((x) => Number.isFinite(x));
+        const cuMax = cus.length ? Math.max(...cus) : 1;
+        const items: L.Layer[] = [];
+        for (const f of geoquimica.features) {
+          const gm = f.geometry;
+          if (!gm || gm.type !== "Point") continue;
+          const [lng, lat] = gm.coordinates as [number, number];
+          const cu = Number((f.properties as Record<string, unknown>)?.Cu) || 0;
+          items.push(
+            L.circleMarker([lat, lng], {
+              radius: 4 + 8 * (cu / (cuMax || 1)),
+              color: "#7f1d1d",
+              weight: 0.8,
+              fillColor: "#f97316",
+              fillOpacity: 0.8,
+            }).on("click", () =>
+              sel("geoquimica", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+          );
+        }
+        groups.current.geoquimica = L.layerGroup(items).addTo(map);
+      }
+
       // Encuadrar a lo que exista
       try {
         const bounds = L.latLngBounds([]);
@@ -439,6 +525,9 @@ export function ProjectMasterViewer({
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
       pedimentos: pedimentos?.features?.length ?? 0,
+      franjas: franjas?.features?.length ?? 0,
+      yacimientos: yacimientos?.features?.length ?? 0,
+      geoquimica: geoquimica?.features?.length ?? 0,
       geofisicaProyecto: geophysicsStatus.field + geophysicsStatus.synthetic,
       magSurfaceProject: geophysicsStatus.magnetic >= 4 ? geophysicsStatus.magnetic : 0,
       ipChargeSurfaceProject: geophysicsStatus.ipCharge >= 4 ? geophysicsStatus.ipCharge : 0,
@@ -448,7 +537,7 @@ export function ProjectMasterViewer({
       gravedadRegional: 1,
       relieve: 1,
     }),
-    [concessions, anomalies, drillGrid, assays, pedimentos, geophysicsStatus],
+    [concessions, anomalies, drillGrid, assays, pedimentos, geophysicsStatus, franjas, yacimientos, geoquimica],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
   const COUNTED: ReadonlyArray<LayerKey> = [
@@ -458,6 +547,9 @@ export function ProjectMasterViewer({
     "ensayes",
     "pedimentos",
     "geofisicaProyecto",
+    "franjas",
+    "yacimientos",
+    "geoquimica",
   ];
   const visibleSections = useMemo(
     () =>
@@ -697,6 +789,31 @@ function Inspector({
       ["Cara norte", cn.N != null ? `E ${cn.E_centro} · N ${cn.N}` : undefined],
       ["Datum", p.datum ?? "UTM 19S (SIRGAS)"],
     ];
+  } else if (selected.kind === "franjas") {
+    title = "Franja metalogénica";
+    prov = "contexto";
+    rows = [["Franja", p.franja ?? p.Franja]];
+  } else if (selected.kind === "yacimientos") {
+    title = `Yacimiento ${p.nombre ?? ""}`;
+    prov = "contexto";
+    rows = [
+      ["Sistema mineral", p.sistema],
+      ["Modelo de depósito", p.modelo],
+      ["Minerales críticos", p.criticos],
+      ["Estado", p.estado],
+      ["Franja", p.franja],
+    ];
+  } else if (selected.kind === "geoquimica") {
+    title = `Sedimento ${p.muestra ?? ""}`;
+    prov = "certificado";
+    rows = [
+      ["Cu (ppm)", num(p.Cu, 1)],
+      ["Au (ppb)", num(p.Au, 1)],
+      ["Ag (ppm)", num(p.Ag, 2)],
+      ["As (ppm)", num(p.As, 1)],
+      ["Mo (ppm)", num(p.Mo, 1)],
+      ["La/Ce/Nd (ppm)", `${num(p.La, 0)} / ${num(p.Ce, 0)} / ${num(p.Nd, 0)}`],
+    ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
     prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
@@ -727,13 +844,19 @@ function Inspector({
       ))}
       {(selected.kind === "halos" ||
         selected.kind === "sondajes" ||
-        selected.kind === "pedimentos") && (
+        selected.kind === "pedimentos" ||
+        selected.kind === "geoquimica" ||
+        selected.kind === "yacimientos") && (
         <div className="mt-3 rounded bg-surface-2 p-2 text-[10px] text-content-subtle">
           {selected.kind === "halos"
             ? "Detección satelital (Sentinel-2). Anomalía espectral, no identificación mineral ni extensión medida. Requiere verificación de terreno."
             : selected.kind === "sondajes"
               ? "Plataforma propuesta (conceptual). No perforada; no estima recursos ni reservas (NI 43-101)."
-              : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
+              : selected.kind === "geoquimica"
+                ? "Geoquímica de sedimento fluvial (SERNAGEOMIN). Dispersión regional en la cuenca, NO ley in situ. Orienta, no prueba mineralización."
+                : selected.kind === "yacimientos"
+                  ? "Depósito conocido (SERNAGEOMIN, Minerales Críticos). Contexto de distrito; verificar distancia y sistema mineral. No implica continuidad al predio."
+                  : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
         </div>
       )}
     </div>
