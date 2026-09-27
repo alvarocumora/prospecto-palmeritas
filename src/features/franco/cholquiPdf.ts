@@ -305,11 +305,36 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
   table(
     ["Materia", "Clase", "Confianza", "Estado"],
     [
-      ["Ensayes de superficie", "CERTIFIED", "Alta", `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes`],
-      ["Geología de terreno", "OBSERVED", "Media", `${CHOLQUI_GEOLOGY.observaciones} observaciones; continuidad no demostrada`],
-      ["Propiedad minera", "DOCUMENTARY", "Media", "Dominio, vigencia y matriz única pendientes de cierre DD"],
-      ["Potencial La Maza", "INTERPRETED", "Baja", `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t conceptuales · no es recurso`],
-      ["Metalurgia", "PENDING_DD", "Baja", "Sin recuperación, consumo de ácido ni cinética validados"],
+      [
+        "Ensayes de superficie",
+        "CERTIFIED",
+        "Alta",
+        `${CHOLQUI_ASSAYS.length} muestras · ${CHOLQUI_ASSAY_REPORTS.length} informes`,
+      ],
+      [
+        "Geología de terreno",
+        "OBSERVED",
+        "Media",
+        `${CHOLQUI_GEOLOGY.observaciones} observaciones; continuidad no demostrada`,
+      ],
+      [
+        "Propiedad minera",
+        "DOCUMENTARY",
+        "Media",
+        "Dominio, vigencia y matriz única pendientes de cierre DD",
+      ],
+      [
+        "Potencial La Maza",
+        "INTERPRETED",
+        "Baja",
+        `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t conceptuales · no es recurso`,
+      ],
+      [
+        "Metalurgia",
+        "PENDING_DD",
+        "Baja",
+        "Sin recuperación, consumo de ácido ni cinética validados",
+      ],
       ["Economía", "SCENARIO", "Baja", "Sensibilidades ilustrativas; sin VAN/TIR auditados"],
     ],
   );
