@@ -169,10 +169,6 @@ export function CholquiFieldProgramPanel() {
             </p>
           </div>
 
-              </table>
-            </div>
-          </div>
-
           {/* Actividades */}
           <div className="px-6 py-6 border-b border-hairline">
             <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
