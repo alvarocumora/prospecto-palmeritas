@@ -240,27 +240,17 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       if (block.kind === "kv") {
         need(70);
         y +=
-          editorialTable(doc, {
-            x: M,
-            y,
-            w: CW,
-            head: ["Concepto", "Detalle"],
-            rows: block.items.map(([k, v]) => [k, v]),
-            widths: [CW * 0.34, CW * 0.66],
-          }) + 16;
+          pagedTable(
+            ["Concepto", "Detalle"],
+            block.items.map(([k, v]) => [k, v]),
+            [CW * 0.34, CW * 0.66],
+          ) + 16;
       }
       if (block.kind === "table") {
         need(80);
-        y +=
-          editorialTable(doc, {
-            x: M,
-            y,
-            w: CW,
-            head: block.head,
-            rows: block.rows,
-            widths: block.widths?.map((p) => CW * p),
-          }) + 16;
+        y += pagedTable(block.head, block.rows, block.widths?.map((p) => CW * p)) + 16;
       }
+
     }
     n += 1;
   }
