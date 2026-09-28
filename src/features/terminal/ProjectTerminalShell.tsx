@@ -273,7 +273,7 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           {project.slug === "cholqui" && <ProjectDocsMenu build={() => buildCholquiDoc()} />}
-          {project.slug === "losverdes" && <ProjectDocsMenu build={() => buildLosVerdesDoc()} />}
+          {project.slug === "losverdes" && <LosVerdesDocsMenu />}
           <Link
             to="/contacto"
             className="inline-flex items-center justify-center gap-2 rounded-md border border-accent-brand px-5 py-2.5 text-sm text-accent-brand hover:bg-accent-brand-subtle"
