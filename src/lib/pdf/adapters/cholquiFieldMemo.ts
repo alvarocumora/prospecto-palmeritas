@@ -11,7 +11,7 @@ import { publicUrl } from "@/lib/publicUrl";
 import { CHOLQUI, CHOLQUI_ASSAYS } from "@/features/franco/data/cholqui";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import { buildFieldProgram, type FieldProgram } from "@/lib/cholqui/fieldProgram";
-import { cholquiTenurePolygons, concessionAt } from "./cholquiTargets";
+import { cholquiTenurePolygons, tenureAt } from "./cholquiTargets";
 import type { ProjectDoc } from "../model";
 
 export const CHOLQUI_FIELD_MEMO_VERSION = "v1.0";
