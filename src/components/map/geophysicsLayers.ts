@@ -1,6 +1,8 @@
 import type { LayerGroup, Map as LeafletMap } from "leaflet";
 import type { LeafletNS } from "./types";
 import type { GeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
+import type { AnomalySurface } from "@/lib/geoscience/anomalySurface";
+import { anomalyIntensityColor } from "@/lib/geoscience/anomalySurface";
 import type {
   GeophysicsLine,
   GeophysicsStation,
@@ -216,6 +218,41 @@ export function buildGeophysicsSurfaceLayer(L: LeafletNS, surface: GeophysicsSur
         <strong>${cell.value.toFixed(2)} ${surface.unit}</strong><br/>
         DERIVADO · IDW desde ${surface.sourceCount} estaciones CAMPO<br/>
         No es inversión geofísica.
+      </div>`,
+      { sticky: true },
+    );
+    group.addLayer(rectangle);
+  }
+
+  return group;
+}
+
+/**
+ * Renders an IDW-interpolated color surface (e.g. anomalías satelitales por
+ * z-score) as a grid of rectangles — mismo lenguaje visual que un mapa de
+ * kriging. Es interpolación/visualización, NO una medición continua.
+ */
+export function buildAnomalySurfaceLayer(L: LeafletNS, surface: AnomalySurface): LayerGroup {
+  const group = L.layerGroup();
+
+  for (const cell of surface.cells) {
+    const rectangle = L.rectangle(
+      [
+        [cell.south, cell.west],
+        [cell.north, cell.east],
+      ],
+      {
+        stroke: false,
+        fillColor: anomalyIntensityColor(cell.normalized),
+        fillOpacity: 0.45,
+        interactive: true,
+      },
+    );
+    rectangle.bindTooltip(
+      `<div style="font-family:'IBM Plex Mono',monospace;font-size:10px;">
+        <strong>${cell.value.toFixed(2)} ${surface.unit}</strong><br/>
+        DERIVADO · IDW desde ${surface.sourceCount} anomalías detectadas<br/>
+        Interpolación de intensidad, no es una medición continua.
       </div>`,
       { sticky: true },
     );

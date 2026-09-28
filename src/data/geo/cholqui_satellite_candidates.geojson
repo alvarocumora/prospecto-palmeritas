@@ -12,16 +12,20 @@
     "sensor": "Sentinel-2 L2A",
     "provenance": "DERIVADO / INTERPRETADO",
     "coverage": {
-      "typical_pct": 36.7,
-      "bestcase_pct": 72.9,
+      "typical_pct": 28.9,
+      "bestcase_pct": 49.2,
+      "interpretable_typical_pct": 28.9,
+      "interpretable_bestcase_pct": 49.2,
       "spectral_conclusive": true
     },
-    "config_sha256": "ea812882f68b71bd1ad396f1e8a4697956e5bffc6b973eb0cb2893b8863c6055",
-    "n": 15,
+    "config_sha256": "0e6f67de7e1b337d6f61c43682bab75df94b99faf9ebe54bcc50dc018ef07097",
+    "n": 57,
     "tenencia_fuente": "SERNAGEOMIN ArcGIS Online (titular De Martino/Gianfranco, 29 concesiones, comuna Melipilla)",
-    "candidatos_dentro_concesion": 7,
-    "candidatos_fuera_concesion": 8,
-    "nota_espacial": "dentro_concesion calculado contra el set COMPLETO de 29 concesiones De Martino en Melipilla (no solo TOKI/PALLOCABE/DOS MARIAS)."
+    "candidatos_dentro_concesion": 12,
+    "candidatos_fuera_concesion": 45,
+    "nota_espacial": "dentro_concesion calculado contra el set COMPLETO de 29 concesiones De Martino en Melipilla (no solo TOKI/PALLOCABE/DOS MARIAS).",
+    "scenes_used": 2,
+    "nota_metodologica": "Ampliación 2026-07: el pase original (n=15, 2 índices con candidatos: arcillas/AlOH e hidrotermal compuesto) cubría solo un subárea de ~8.5×4.6 km (Toki/Pallocabe/Esperanza). Este pase nuevo procesa Sentinel-2 L2A real (mosaico de 2 escenas, 2026-07-03, <0.01% nubes, vía Copernicus Data Space / Microsoft Planetary Computer) sobre las 29 concesiones De Martino COMPLETAS (~16×20 km), agregando IRON_OXIDE (B4/B2) como tercer índice con candidatos. Máscara real por banda SCL (excluye nubes/sombra/agua) + NDVI<0.25 (excluye vegetación). z-score y clustering (≥4 píxeles de 20 m conectados) sobre la población de píxeles válidos de TODA la tenencia — la escala de z_score de este lote NO es comparable 1:1 con el lote original (poblaciones de fondo distintas); candidatos_originales conservan su z_score/score tal cual se calcularon. Cobertura interpretable real recalculada sobre el área completa: 28.9% típico / 49.2% mejor caso (baja respecto al subárea original porque incluye zonas de sombra topográfica de cordillera no antes analizadas)."
   },
   "features": [
     {
@@ -607,6 +611,1644 @@
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
         "notes": "Anomalia Al-OH z=5.74 (gossan 4.51). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95457439405716,
+              -33.76879401965783
+            ],
+            [
+              -70.9534950785828,
+              -33.768811113879735
+            ],
+            [
+              -70.95351144894302,
+              -33.76953223388559
+            ],
+            [
+              -70.95459077344803,
+              -33.76951513920073
+            ],
+            [
+              -70.95457439405716,
+              -33.76879401965783
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.457,
+        "z_score": 4.11,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=4.11. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09180202739117,
+              -33.77321619824285
+            ],
+            [
+              -71.09158617160077,
+              -33.773219858257306
+            ],
+            [
+              -71.09160370159181,
+              -33.77394091617499
+            ],
+            [
+              -71.09181955918811,
+              -33.77393725606142
+            ],
+            [
+              -71.09180202739117,
+              -33.77321619824285
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.443,
+        "z_score": 3.99,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.99. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08480982241126,
+              -33.778744735440206
+            ],
+            [
+              -71.08394633969557,
+              -33.77875932640844
+            ],
+            [
+              -71.08397691196892,
+              -33.78002118272337
+            ],
+            [
+              -71.08484040732985,
+              -33.78000659106375
+            ],
+            [
+              -71.08480982241126,
+              -33.778744735440206
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "alta",
+        "score": 0.629,
+        "z_score": 5.66,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=5.66. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.00837054203818,
+              -33.88082354705737
+            ],
+            [
+              -71.0075059911172,
+              -33.88083764033803
+            ],
+            [
+              -71.00752288508615,
+              -33.881558723647814
+            ],
+            [
+              -71.00838744327076,
+              -33.88154462998612
+            ],
+            [
+              -71.00837054203818,
+              -33.88082354705737
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.442,
+        "z_score": 3.98,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.98. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.99950886664818,
+              -33.88096771587614
+            ],
+            [
+              -70.9990765881893,
+              -33.880974732213595
+            ],
+            [
+              -70.99908920549387,
+              -33.8815155474845
+            ],
+            [
+              -70.99952148667668,
+              -33.88150853100476
+            ],
+            [
+              -70.99950886664818,
+              -33.88096771587614
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.431,
+        "z_score": 3.88,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.88. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95757520813194,
+              -33.89101904017579
+            ],
+            [
+              -70.956062017062,
+              -33.89104308209822
+            ],
+            [
+              -70.95608260158225,
+              -33.89194446282044
+            ],
+            [
+              -70.9575958085514,
+              -33.891920420085576
+            ],
+            [
+              -70.95757520813194,
+              -33.89101904017579
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "alta",
+        "score": 0.731,
+        "z_score": 6.58,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=6.58. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02142969096892,
+              -33.90279160093216
+            ],
+            [
+              -71.02034873381793,
+              -33.902809341171256
+            ],
+            [
+              -71.02036574989049,
+              -33.903530416204816
+            ],
+            [
+              -71.02144671613055,
+              -33.90351267548625
+            ],
+            [
+              -71.02142969096892,
+              -33.90279160093216
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.499,
+        "z_score": 4.49,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=4.49. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03247679721295,
+              -33.90351144621418
+            ],
+            [
+              -71.03204441379162,
+              -33.90351858235408
+            ],
+            [
+              -71.0320572499799,
+              -33.90405938465748
+            ],
+            [
+              -71.03248963612795,
+              -33.90405224837293
+            ],
+            [
+              -71.03247679721295,
+              -33.90351144621418
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.431,
+        "z_score": 3.88,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.88. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03356631888346,
+              -33.90385413376755
+            ],
+            [
+              -71.0329177415385,
+              -33.90386484323975
+            ],
+            [
+              -71.03292630274716,
+              -33.90422537789852
+            ],
+            [
+              -71.03357488281887,
+              -33.90421466828159
+            ],
+            [
+              -71.03356631888346,
+              -33.90385413376755
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.413,
+        "z_score": 3.72,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.72. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03275291309582,
+              -33.9060316202019
+            ],
+            [
+              -71.03210431893285,
+              -33.90604232599304
+            ],
+            [
+              -71.0321214360571,
+              -33.90676339539677
+            ],
+            [
+              -71.03277003567423,
+              -33.9067526893163
+            ],
+            [
+              -71.03275291309582,
+              -33.9060316202019
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.442,
+        "z_score": 3.98,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.98. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03211715671897,
+              -33.906583128054486
+            ],
+            [
+              -71.0312523585149,
+              -33.9065973974242
+            ],
+            [
+              -71.03126519118915,
+              -33.90713819972304
+            ],
+            [
+              -71.03212999484751,
+              -33.90712393006409
+            ],
+            [
+              -71.03211715671897,
+              -33.906583128054486
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.492,
+        "z_score": 4.43,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=4.43. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95446604701868,
+              -33.925333240037716
+            ],
+            [
+              -70.95360101846498,
+              -33.92534697088339
+            ],
+            [
+              -70.9536092524337,
+              -33.925707521709406
+            ],
+            [
+              -70.95447428462764,
+              -33.92569379067823
+            ],
+            [
+              -70.95446604701868,
+              -33.925333240037716
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.495,
+        "z_score": 4.45,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=4.45. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95471937855473,
+              -33.92695228387081
+            ],
+            [
+              -70.95385433376592,
+              -33.926966017069184
+            ],
+            [
+              -70.95386256930364,
+              -33.92732656774574
+            ],
+            [
+              -70.95472761773298,
+              -33.92731283436184
+            ],
+            [
+              -70.95471937855473,
+              -33.92695228387081
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.418,
+        "z_score": 3.76,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=3.76. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95407471322366,
+              -33.92714285965677
+            ],
+            [
+              -70.95277714243144,
+              -33.9271634504859
+            ],
+            [
+              -70.95279772035649,
+              -33.92806482768523
+            ],
+            [
+              -70.95409530480102,
+              -33.92804423616064
+            ],
+            [
+              -70.95407471322366,
+              -33.92714285965677
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.505,
+        "z_score": 4.55,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía Al-OH / arcillas z=4.55. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.00961826488145,
+              -33.76790970967279
+            ],
+            [
+              -71.0078914349908,
+              -33.76793782540143
+            ],
+            [
+              -71.00791667341595,
+              -33.769019469899796
+            ],
+            [
+              -71.0096435249766,
+              -33.768991353029
+            ],
+            [
+              -71.00961826488145,
+              -33.76790970967279
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.797,
+        "z_score": 7.18,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=7.18. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.00660892191954,
+              -33.76849971905936
+            ],
+            [
+              -71.00617721091524,
+              -33.76850673983617
+            ],
+            [
+              -71.00618561657501,
+              -33.76886728837121
+            ],
+            [
+              -71.00661732938515,
+              -33.76886026749935
+            ],
+            [
+              -71.00660892191954,
+              -33.76849971905936
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.448,
+        "z_score": 4.03,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.03. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.11854120965525,
+              -33.77167786497051
+            ],
+            [
+              -71.11810951317958,
+              -33.7716852778602
+            ],
+            [
+              -71.11812726434079,
+              -33.772406323649996
+            ],
+            [
+              -71.11855896442778,
+              -33.77239891055958
+            ],
+            [
+              -71.11854120965525,
+              -33.77167786497051
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.406,
+        "z_score": 3.65,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=3.65. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08779116842693,
+              -33.78590786000536
+            ],
+            [
+              -71.08735939202337,
+              -33.785915168031416
+            ],
+            [
+              -71.08737251918424,
+              -33.786455961824814
+            ],
+            [
+              -71.08780429829837,
+              -33.786448653650375
+            ],
+            [
+              -71.08779116842693,
+              -33.78590786000536
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.465,
+        "z_score": 4.19,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.19. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08106867062511,
+              -33.820466122658196
+            ],
+            [
+              -71.08020476677949,
+              -33.820480703200396
+            ],
+            [
+              -71.08021786602384,
+              -33.82102149642532
+            ],
+            [
+              -71.08108177529999,
+              -33.82100691558721
+            ],
+            [
+              -71.08106867062511,
+              -33.820466122658196
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.487,
+        "z_score": 4.39,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.39. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08741082443723,
+              -33.82360497681907
+            ],
+            [
+              -71.08676287555672,
+              -33.82361594700233
+            ],
+            [
+              -71.08677601763289,
+              -33.8241567376929
+            ],
+            [
+              -71.08742397058685,
+              -33.82414576728701
+            ],
+            [
+              -71.08741082443723,
+              -33.82360497681907
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.435,
+        "z_score": 3.92,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=3.92. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03184113505911,
+              -33.840222992891015
+            ],
+            [
+              -71.03097700572515,
+              -33.84023723588436
+            ],
+            [
+              -71.03098127198993,
+              -33.8404175052972
+            ],
+            [
+              -71.03184540313605,
+              -33.84040326220753
+            ],
+            [
+              -71.03184113505911,
+              -33.840222992891015
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.474,
+        "z_score": 4.26,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.26. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02905402382106,
+              -33.84117060858507
+            ],
+            [
+              -71.02775781304373,
+              -33.84119194202867
+            ],
+            [
+              -71.02777485190533,
+              -33.84191302097396
+            ],
+            [
+              -71.02907107355627,
+              -33.84189168695322
+            ],
+            [
+              -71.02905402382106,
+              -33.84117060858507
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.521,
+        "z_score": 4.68,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.68. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95922136342404,
+              -33.849514215806515
+            ],
+            [
+              -70.95835710227382,
+              -33.84952795313503
+            ],
+            [
+              -70.95839002505684,
+              -33.850970169967816
+            ],
+            [
+              -70.95925430071388,
+              -33.8509564318961
+            ],
+            [
+              -70.95922136342404,
+              -33.849514215806515
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.863,
+        "z_score": 7.77,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=7.77. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9641991086181,
+              -33.84979566166954
+            ],
+            [
+              -70.96376697798893,
+              -33.849802548588805
+            ],
+            [
+              -70.9637834847139,
+              -33.85052365468001
+            ],
+            [
+              -70.96421561896972,
+              -33.85051676757445
+            ],
+            [
+              -70.9641991086181,
+              -33.84979566166954
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.745,
+        "z_score": 6.71,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=6.71. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0755395980601,
+              -33.85987297460507
+            ],
+            [
+              -71.07489137049217,
+              -33.859883892655155
+            ],
+            [
+              -71.07490881752031,
+              -33.860604948097155
+            ],
+            [
+              -71.07555705052941,
+              -33.86059402975181
+            ],
+            [
+              -71.0755395980601,
+              -33.85987297460507
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.482,
+        "z_score": 4.34,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.34. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.10396162363556,
+              -33.88175254675
+            ],
+            [
+              -71.10352936953694,
+              -33.88175992964562
+            ],
+            [
+              -71.10354264620865,
+              -33.882300709422
+            ],
+            [
+              -71.10397490303059,
+              -33.882293326376676
+            ],
+            [
+              -71.10396162363556,
+              -33.88175254675
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.69,
+        "z_score": 6.21,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=6.21. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.07570979019069,
+              -33.88475660962018
+            ],
+            [
+              -71.07506137455742,
+              -33.884767535587244
+            ],
+            [
+              -71.07507010688816,
+              -33.88512806182361
+            ],
+            [
+              -71.07571852524535,
+              -33.88511713570886
+            ],
+            [
+              -71.07570979019069,
+              -33.88475660962018
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.494,
+        "z_score": 4.44,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.44. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.07571852524535,
+              -33.88511713570886
+            ],
+            [
+              -71.07507010688816,
+              -33.88512806182361
+            ],
+            [
+              -71.07508320567545,
+              -33.885668851134824
+            ],
+            [
+              -71.07573162811856,
+              -33.88565792479854
+            ],
+            [
+              -71.07571852524535,
+              -33.88511713570886
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.592,
+        "z_score": 5.33,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=5.33. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.07485396735814,
+              -33.885131703104285
+            ],
+            [
+              -71.07442168818163,
+              -33.88513898452925
+            ],
+            [
+              -71.07443478288295,
+              -33.885679774061934
+            ],
+            [
+              -71.07486706478343,
+              -33.88567249248933
+            ],
+            [
+              -71.07485396735814,
+              -33.885131703104285
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.512,
+        "z_score": 4.61,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.61. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0702034373352,
+              -33.889538042048024
+            ],
+            [
+              -71.06869037728998,
+              -33.88956346619599
+            ],
+            [
+              -71.06869908439393,
+              -33.88992399360636
+            ],
+            [
+              -71.07021215079652,
+              -33.88989856911475
+            ],
+            [
+              -71.0702034373352,
+              -33.889538042048024
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.543,
+        "z_score": 4.88,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.88. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.11669503209636,
+              -33.89830550891898
+            ],
+            [
+              -71.11583036383291,
+              -33.89832036887792
+            ],
+            [
+              -71.11584372643847,
+              -33.89886114290859
+            ],
+            [
+              -71.1167084001528,
+              -33.89884628264844
+            ],
+            [
+              -71.11669503209636,
+              -33.89830550891898
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.515,
+        "z_score": 4.64,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.64. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.9722074764048,
+              -33.91603327821224
+            ],
+            [
+              -70.97155878243773,
+              -33.916043667888
+            ],
+            [
+              -70.97156708915571,
+              -33.91640421537462
+            ],
+            [
+              -70.9722157858516,
+              -33.91639382555848
+            ],
+            [
+              -70.9722074764048,
+              -33.91603327821224
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.468,
+        "z_score": 4.21,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.21. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.96119892943851,
+              -33.9264885422302
+            ],
+            [
+              -70.96011763341302,
+              -33.926505764468146
+            ],
+            [
+              -70.96017960037696,
+              -33.92920988405325
+            ],
+            [
+              -70.96126093053303,
+              -33.929192660070235
+            ],
+            [
+              -70.96119892943851,
+              -33.9264885422302
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.581,
+        "z_score": 5.23,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=5.23. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.04494443838786,
+              -33.927470209075835
+            ],
+            [
+              -71.04451193730361,
+              -33.92747739341514
+            ],
+            [
+              -71.04452486386641,
+              -33.9280181894109
+            ],
+            [
+              -71.04495736768052,
+              -33.92801100492601
+            ],
+            [
+              -71.04494443838786,
+              -33.927470209075835
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.58,
+        "z_score": 5.22,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=5.22. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.96263298689135,
+              -33.932416915958356
+            ],
+            [
+              -70.96025397164308,
+              -33.93245482585353
+            ],
+            [
+              -70.9602870293597,
+              -33.933897021613234
+            ],
+            [
+              -70.96266608466492,
+              -33.93385910966958
+            ],
+            [
+              -70.96263298689135,
+              -33.932416915958356
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.831,
+        "z_score": 7.48,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=7.48. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.96119761912433,
+              -33.93586625831276
+            ],
+            [
+              -70.96054877050575,
+              -33.93587659528557
+            ],
+            [
+              -70.96056943706982,
+              -33.93677796701762
+            ],
+            [
+              -70.96121829251737,
+              -33.93676762969572
+            ],
+            [
+              -70.96119761912433,
+              -33.93586625831276
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.484,
+        "z_score": 4.36,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.36. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.96229971752801,
+              -33.93675039323364
+            ],
+            [
+              -70.96165086263194,
+              -33.936760736249724
+            ],
+            [
+              -70.96166740565033,
+              -33.9374818330667
+            ],
+            [
+              -70.96231626600976,
+              -33.93747148977118
+            ],
+            [
+              -70.96229971752801,
+              -33.93675039323364
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.507,
+        "z_score": 4.56,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.56. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95784441160978,
+              -33.94060848865733
+            ],
+            [
+              -70.95719552571427,
+              -33.94061880922136
+            ],
+            [
+              -70.95721203357053,
+              -33.94133990751044
+            ],
+            [
+              -70.9578609249305,
+              -33.94132958666761
+            ],
+            [
+              -70.95784441160978,
+              -33.94060848865733
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "media",
+        "score": 0.511,
+        "z_score": 4.6,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=4.60. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.95485337302543,
+              -33.94227909537462
+            ],
+            [
+              -70.9542044732944,
+              -33.94228940061877
+            ],
+            [
+              -70.95422919902545,
+              -33.94337104965846
+            ],
+            [
+              -70.954878106954,
+              -33.94336074399674
+            ],
+            [
+              -70.95485337302543,
+              -33.94227909537462
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "IRON_OXIDE",
+        "severity": "alta",
+        "score": 0.624,
+        "z_score": 5.62,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía óxidos de hierro z=5.62. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.00961826488145,
+              -33.76790970967279
+            ],
+            [
+              -71.00853899648047,
+              -33.767927284832034
+            ],
+            [
+              -71.00855582736506,
+              -33.768648380901766
+            ],
+            [
+              -71.00963510479511,
+              -33.768630805266554
+            ],
+            [
+              -71.00961826488145,
+              -33.76790970967279
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "alta",
+        "score": 0.587,
+        "z_score": 5.28,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía alteración hidrotermal (compuesto) z=5.28. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.08761804250936,
+              -33.823240792377455
+            ],
+            [
+              -71.08675411436737,
+              -33.823255419846376
+            ],
+            [
+              -71.08677163690187,
+              -33.823976474135144
+            ],
+            [
+              -71.08763557228546,
+              -33.82396184627043
+            ],
+            [
+              -71.08761804250936,
+              -33.823240792377455
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.454,
+        "z_score": 4.08,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía alteración hidrotermal (compuesto) z=4.08. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -70.97263578328726,
+              -33.91584607623027
+            ],
+            [
+              -70.9713383981927,
+              -33.91586685657933
+            ],
+            [
+              -70.97135085684988,
+              -33.916407677888046
+            ],
+            [
+              -70.97264825013083,
+              -33.916386897117796
+            ],
+            [
+              -70.97263578328726,
+              -33.91584607623027
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.441,
+        "z_score": 3.97,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalía alteración hidrotermal (compuesto) z=3.97. DERIVADO Sentinel-2 (2026-07-03, pase tenencia completa)."
       }
     }
   ]

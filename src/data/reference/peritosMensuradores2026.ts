@@ -1,0 +1,155 @@
+/**
+ * Nómina oficial de Peritos Mensuradores 2026 — SERNAGEOMIN, Resolución
+ * Exenta N°0652 del 10-04-2026, firmada por Mauricio Lorca Miranda (Director
+ * Nacional (S)). Fundamento legal: artículo 71 del Código de Minería — la
+ * mensura de una pertenencia minera la realiza un ingeniero civil de minas
+ * o un perito elegido de esta nómina anual.
+ *
+ * Vigencia: hasta que se publique la nómina 2027. Los peritos que salieron
+ * de la nómina siguen habilitados para mensuras iniciadas en 2025 y en curso,
+ * hasta su término y aprobación técnica.
+ *
+ * Fuente primaria: PDF de la resolución, verificado línea por línea contra
+ * el original (114 nombres, 31 de ellos funcionarios del Departamento de
+ * Propiedad Minera de SERNAGEOMIN — no se distingue cuáles en el documento).
+ * Validación de integridad del documento original:
+ * https://doc.digital.gob.cl/validador/N2AKYJ-959
+ */
+
+export type PeritoMensurador = {
+  n: number;
+  nombre: string;
+  rut: string;
+};
+
+export const PERITOS_MENSURADORES_2026: PeritoMensurador[] = [
+  { n: 1, nombre: "David Antonio Aceval Canales", rut: "16.365.832-1" },
+  { n: 2, nombre: "Jorge Luis Aguirre Villanueva", rut: "14.191.496-0" },
+  { n: 3, nombre: "Peter Alejandro Alarcón Contreras", rut: "9.421.130-1" },
+  { n: 4, nombre: "Mónica Aída Alfaro Henríquez", rut: "13.010.126-7" },
+  { n: 5, nombre: "Francisco Javier Álvarez Fernández", rut: "17.275.826-6" },
+  { n: 6, nombre: "Mario Pascual Anacona Alvarado", rut: "9.224.446-6" },
+  { n: 7, nombre: "Juan Carlos Aravena Godoy", rut: "8.050.812-3" },
+  { n: 8, nombre: "Daniel Hernán Arenas Guzmán", rut: "6.065.816-1" },
+  { n: 9, nombre: "Bryan Gonzalo Armijo Cornejo", rut: "16.232.355-5" },
+  { n: 10, nombre: "Francisco Javier Balmaceda Cáceres", rut: "16.012.181-5" },
+  { n: 11, nombre: "Víctor Domingo Bavestrello Butrón", rut: "6.510.068-1" },
+  { n: 12, nombre: "Juan Apolonio Bedmar Rivera", rut: "6.920.725-1" },
+  { n: 13, nombre: "Wilfredo Haroldo Cañete Contreras", rut: "7.708.179-8" },
+  { n: 14, nombre: "Claudio Andrés Carrasco Sánchez", rut: "14.299.279-5" },
+  { n: 15, nombre: "Javiera Elisa Celis Vásquez", rut: "16.015.164-1" },
+  { n: 16, nombre: "Alex Sebastián Cepeda Cerda", rut: "17.708.361-5" },
+  { n: 17, nombre: "Luis Alberto Chandía Guzmán", rut: "5.805.303-1" },
+  { n: 18, nombre: "Leónidas de la Cruz Chávez Ossandón", rut: "13.760.330-6" },
+  { n: 19, nombre: "Jorge Antonio Cifuentes Gutiérrez", rut: "8.077.408-7" },
+  { n: 20, nombre: "Gilberto Henry Cisternas Olivares", rut: "10.863.530-4" },
+  { n: 21, nombre: "Silvia Eugenia Collao Contreras", rut: "7.819.190-2" },
+  { n: 22, nombre: "Fernando Patricio Contreras Anacona", rut: "7.397.960-9" },
+  { n: 23, nombre: "Karen Astrid Daza Santos", rut: "15.665.449-3" },
+  { n: 24, nombre: "José Miguel Díaz Poblete", rut: "13.477.786-9" },
+  { n: 25, nombre: "Basilio Ramiro Diez Santibáñez", rut: "6.524.167-6" },
+  { n: 26, nombre: "Gloria Isabel Espinosa Álvarez", rut: "8.764.583-5" },
+  { n: 27, nombre: "Gabriel Alejandro Espinosa Manosalva", rut: "17.318.479-4" },
+  { n: 28, nombre: "Antonio Eduardo Espinosa Ramírez", rut: "9.493.373-0" },
+  { n: 29, nombre: "Juan Pablo Espinoza González", rut: "14.174.200-0" },
+  { n: 30, nombre: "Carlos Ernesto Ferraz Aravena", rut: "7.664.207-9" },
+  { n: 31, nombre: "Rodrigo Alejandro Flores Urízar", rut: "12.569.776-3" },
+  { n: 32, nombre: "Francisco Segundo Fuentes Guerra", rut: "7.841.546-0" },
+  { n: 33, nombre: "Nicolás Andree Galaz Hormazábal", rut: "17.820.629-K" },
+  { n: 34, nombre: "Hugo Eloy Garrido Figueroa", rut: "7.027.908-8" },
+  { n: 35, nombre: "Marcela Isabel González Sánchez", rut: "15.313.673-4" },
+  { n: 36, nombre: "Álvaro Mauricio Guerrero Zuñiga", rut: "16.241.166-7" },
+  { n: 37, nombre: "Cristian Alberto Guzmán Ulloa", rut: "12.835.685-1" },
+  { n: 38, nombre: "Tamara Denisse Hernández Gallardo", rut: "16.543.936-8" },
+  { n: 39, nombre: "Renato Patricio Henríquez Hidalgo", rut: "10.888.656-0" },
+  { n: 40, nombre: "Ismael Andrés Hermosilla Cornejo", rut: "16.123.999-2" },
+  { n: 41, nombre: "Felipe Eugenio Huidobro Castillo", rut: "16.211.969-9" },
+  { n: 42, nombre: "Christian Eugenio Ibáñez Parra", rut: "13.911.013-7" },
+  { n: 43, nombre: "Sonia Katerin Iturra Carvajal", rut: "13.893.837-9" },
+  { n: 44, nombre: "Rodrigo Alejandro Kremer Alcarraz", rut: "15.982.158-7" },
+  { n: 45, nombre: "Carla Andrea Lagos Palavecino", rut: "15.962.676-8" },
+  { n: 46, nombre: "Roberto Antonio Latorre Saldivar", rut: "15.797.427-0" },
+  { n: 47, nombre: "Oscar Joel León Alvear", rut: "7.897.794-9" },
+  { n: 48, nombre: "Humberto Erley Maldonado Pérez", rut: "10.658.540-7" },
+  { n: 49, nombre: "Rodrigo Javier Marín Vergara", rut: "12.218.929-5" },
+  { n: 50, nombre: "Francisco Andrés Martínez Valenzuela", rut: "16.281.882-1" },
+  { n: 51, nombre: "Patricio Marcelo Maya Aguirre", rut: "12.216.698-8" },
+  { n: 52, nombre: "Herman Rodrigo Milla Álvarez", rut: "12.567.533-6" },
+  { n: 53, nombre: "Hugo Alejandro Mladineo Santibáñez", rut: "8.494.193-K" },
+  { n: 54, nombre: "Edith Esmeralda Mora Valdés", rut: "9.417.962-9" },
+  { n: 55, nombre: "Eduardo Mauricio Morales Farías", rut: "12.414.040-4" },
+  { n: 56, nombre: "José Darío Morales Iribarren", rut: "12.855.627-3" },
+  { n: 57, nombre: "Juan Francisco Morales Lira", rut: "6.718.456-4" },
+  { n: 58, nombre: "Tulio Gabriel Moreno Andreani", rut: "6.711.652-6" },
+  { n: 59, nombre: "Juan Carlos Muñoz Candia", rut: "13.724.223-0" },
+  { n: 60, nombre: "Moisés Emilio Norero Mora", rut: "10.491.958-8" },
+  { n: 61, nombre: "Jorge Andrés Ojeda Muñoz", rut: "17.177.287-7" },
+  { n: 62, nombre: "Pablo Sebastián Orellana Bastías", rut: "16.656.506-5" },
+  { n: 63, nombre: "Patricio Andrés Oro Prieto", rut: "11.874.890-5" },
+  { n: 64, nombre: "París Antonio Osorio González", rut: "13.254.616-9" },
+  { n: 65, nombre: "Valentina Isabel Osorio Ulloa", rut: "17.675.994-1" },
+  { n: 66, nombre: "Felipe Ignacio Osses Fuentes", rut: "17.484.255-8" },
+  { n: 67, nombre: "Yoanka Solange Oyanedel Araya", rut: "13.977.581-3" },
+  { n: 68, nombre: "Ismar Alejandro Páez Nazar", rut: "16.096.624-6" },
+  { n: 69, nombre: "Oscar Javier Pasten Álvarez", rut: "15.428.342-0" },
+  { n: 70, nombre: "Iván Patricio Pérez Lucar", rut: "11.865.318-1" },
+  { n: 71, nombre: "Evelyn Edith Pérez Medina", rut: "12.505.167-7" },
+  { n: 72, nombre: "Alexis Rodrigo Pinilla Castillo", rut: "13.757.292-3" },
+  { n: 73, nombre: "Alejandra del Pilar Pinto Livacic", rut: "12.615.828-9" },
+  { n: 74, nombre: "Carlos Felipe Pizarro Adasme", rut: "15.259.951-K" },
+  { n: 75, nombre: "José Miguel Poblete González", rut: "14.572.409-0" },
+  { n: 76, nombre: "Roberto Humberto Ramírez Juacida", rut: "7.250.670-7" },
+  { n: 77, nombre: "Francisco Javier Ramos Francés", rut: "21.902.411-8" },
+  { n: 78, nombre: "Vicente Octavio Rivas Osses", rut: "4.897.760-K" },
+  { n: 79, nombre: "Milton Eladio Rivera Piñones", rut: "11.384.309-8" },
+  { n: 80, nombre: "Karin Soledad Rivera Romero", rut: "11.721.290-4" },
+  { n: 81, nombre: "Juan Carlos Riveros Fuentes", rut: "13.622.409-3" },
+  { n: 82, nombre: "Cristián Andrés Rojas Ahumada", rut: "13.531.665-2" },
+  { n: 83, nombre: "Gustavo Orlando Rojas Carrasco", rut: "7.079.398-9" },
+  { n: 84, nombre: "Patricia Lorena del Carmen Romero Aránguiz", rut: "9.247.226-4" },
+  { n: 85, nombre: "Roberto Jesús Romero Parada", rut: "15.158.161-7" },
+  { n: 86, nombre: "Leonora Javiera Romo Martínez", rut: "9.899.255-3" },
+  { n: 87, nombre: "Javier Alejandro Romo González", rut: "10.753.063-0" },
+  { n: 88, nombre: "Fernando Alejandro Rosales Retamales", rut: "13.216.529-7" },
+  { n: 89, nombre: "Carlos Emilio Salomón Richards", rut: "7.711.857-8" },
+  { n: 90, nombre: "Ramón Mauricio Sánchez Muñoz", rut: "10.752.526-2" },
+  { n: 91, nombre: "Carlos Alberto Sandoval Arroyo", rut: "12.990.991-9" },
+  { n: 92, nombre: "Pedro Alfredo Santos Burgos", rut: "13.316.041-8" },
+  { n: 93, nombre: "Rufino Alberto Silva López", rut: "7.480.778-K" },
+  { n: 94, nombre: "Ángela Silvana Suckel D'arcangeli", rut: "8.811.360-8" },
+  { n: 95, nombre: "Nelson Francisco Tabilo López", rut: "16.053.886-4" },
+  { n: 96, nombre: "Ulises Antonio Tello Flores", rut: "9.506.799-9" },
+  { n: 97, nombre: "Arnaldo Cristian Tiffi Pascal", rut: "9.056.275-4" },
+  { n: 98, nombre: "Alamiro Enrique Toledo Toledo", rut: "9.098.875-1" },
+  { n: 99, nombre: "Roberto Andrés Torrejón Gallardo", rut: "7.115.055-0" },
+  { n: 100, nombre: "Cristopher Gonzalo Toro Montano", rut: "15.538.006-3" },
+  { n: 101, nombre: "Rodrigo Alfonso Urrutia Vidal", rut: "14.578.417-4" },
+  { n: 102, nombre: "Pablo Antonio Uzieda Rojas", rut: "12.219.623-2" },
+  { n: 103, nombre: "Gloria Aída Valenzuela Nievas", rut: "9.408.048-7" },
+  { n: 104, nombre: "Pablo Andrés Varela Ampuero", rut: "13.875.126-0" },
+  { n: 105, nombre: "Pedro Jorge Vargas Ayaviri", rut: "7.000.954-4" },
+  { n: 106, nombre: "José Luperfino Vega Martínez", rut: "8.166.923-6" },
+  { n: 107, nombre: "Daniela Alejandra Vega Vargas", rut: "16.382.051-K" },
+  { n: 108, nombre: "Roberto Cesar Vera Becerra", rut: "14.188.064-0" },
+  { n: 109, nombre: "Patricia Angélica Veraguas Bordoli", rut: "7.141.553-8" },
+  { n: 110, nombre: "Hugo Arturo Zamorano Márquez", rut: "8.143.018-7" },
+  { n: 111, nombre: "Jorge Antonio Hernández Medina", rut: "12.877.148-4" },
+  { n: 112, nombre: "Carlos Fernando Vargas Garrido", rut: "15.635.699-9" },
+  { n: 113, nombre: "Gino Román Rojas Seguel", rut: "13.458.717-2" },
+  { n: 114, nombre: "Victor Manuel Olguin Hidalgo", rut: "6.284.895-2" },
+] as const;
+
+export const PERITOS_MENSURADORES_2026_META = {
+  resolucion: "Resolución Exenta N°0652",
+  fecha: "2026-04-10",
+  organismo: "Servicio Nacional de Geología y Minería (SERNAGEOMIN)",
+  firmante: "Mauricio Lorca Miranda, Director Nacional (S)",
+  fundamentoLegal:
+    "Artículo 71 del Código de Minería (Ley N°18.248): la mensura de la pertenencia minera la realiza un ingeniero civil de minas elegido por el interesado, o un perito elegido de entre las personas que anualmente designe el Servicio mediante resolución, previa aprobación del Ministerio de Minería.",
+  vigencia:
+    "Hasta que se publique la Nómina de Peritos Mensuradores para el año 2027. Los peritos que no fueron renominados siguen habilitados para mensuras de concesiones iniciadas en 2025 y en curso, hasta su término y aprobación técnica.",
+  totalNominados: 114,
+  funcionariosPropiedadMinera: 31,
+  validacionDocumento: "https://doc.digital.gob.cl/validador/N2AKYJ-959",
+  fuenteUrl: "https://www.sernageomin.cl/",
+} as const;
