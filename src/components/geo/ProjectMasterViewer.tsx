@@ -280,10 +280,13 @@ export function ProjectMasterViewer({
       mapRef.current = map;
       basesRef.current.sat = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 },
+        // crossOrigin: Esri sirve CORS abierto; sin esto, capturar el mapa a PDF
+        // (html2canvas) produce un lienzo vacío en vez del mapa satelital real.
+        { maxZoom: 19, crossOrigin: "anonymous" },
       ).addTo(map);
       basesRef.current.topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
         maxZoom: 17,
+        crossOrigin: "anonymous",
       });
 
       // --- Geofísica pública regional REAL (WMS): EMAG2 v3 (NOAA, magnetometría),

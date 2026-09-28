@@ -15,6 +15,7 @@ import {
 } from "@/features/franco/data/cholqui";
 import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
+import { CHOLQUI_STRUCTURES_GEOJSON } from "@/features/franco/data/cholquiStructures";
 import type { ProjectDoc } from "../model";
 import type { MapPolygon } from "../brand/kit";
 import catastroRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
@@ -111,7 +112,7 @@ export function tenureAt(
 
 export type AgentNote = { label: string; note: string };
 
-export const CHOLQUI_TARGETS_DOC_VERSION = "v1.0";
+export const CHOLQUI_TARGETS_DOC_VERSION = "v1.1";
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
@@ -411,7 +412,9 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body: "Tenencia: la bandera dentro/fuera se calculó contra las pertenencias conocidas (TOKI, PALLOCABE, DOS MARIAS). Las anomalías marcadas como \u0022Verificar\u0022 quedan como contexto regional y no generan plataforma propuesta hasta confirmar la tenencia (ESPERANZA / EUROPA u otras).",
+            body: data.coverage.tenureNote
+              ? `Tenencia: ${data.coverage.tenureNote}`
+              : "Tenencia: la bandera dentro/fuera se calculó contra el catastro SERNAGEOMIN vigente del titular. Las anomalías marcadas como \u0022Verificar\u0022 quedan como contexto regional y no generan plataforma propuesta hasta confirmar la tenencia.",
           },
         ],
       },
@@ -473,6 +476,38 @@ export function buildCholquiTargetsDoc(
             head: ["Sondaje", "Índice que la origina", "Objetivo geológico"],
             widths: [0.15, 0.33, 0.52],
             rows: collars.map((c) => [c.code, indexLabel(c.indexCode), c.objective]),
+          },
+        ],
+      },
+      {
+        eyebrow: "Contexto estructural",
+        title: "Vetas con rumbo/manteo de terreno",
+        lead: "El azimut de perforación (290°/110°) es perpendicular al rumbo dominante N20E de estas vetas — no una hipótesis derivada de la anomalía satelital.",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Punto", "Descripción", "Rumbo", "Manteo", "Potencia"],
+            widths: [0.1, 0.5, 0.13, 0.13, 0.14],
+            rows: CHOLQUI_STRUCTURES_GEOJSON.features.map((f) => {
+              const p = f.properties as {
+                code: string;
+                name: string;
+                strikeDeg: number;
+                dipText: string | null;
+                potenciaM: string | null;
+              };
+              return [
+                p.code,
+                p.name,
+                `N${p.strikeDeg}°`,
+                p.dipText ?? "s/d",
+                p.potenciaM ? `${p.potenciaM} m` : "s/d",
+              ];
+            }),
+          },
+          {
+            kind: "text",
+            body: "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
           },
         ],
       },
