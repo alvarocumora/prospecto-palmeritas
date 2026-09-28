@@ -11,6 +11,7 @@
   - [x] Mantener Franco y Tilama únicamente como alias con redirección permanente.
   - [x] Consolidar el índice público en tres proyectos sin duplicar Los Verdes–Tilama.
   - [x] Añadir registro único y pruebas automáticas para enlaces públicos.
-  - [ ] Migrar los antecedentes de Cholqui a las tablas canónicas.
+  - [x] Migrar los antecedentes de Cholqui a las tablas canónicas (código `CHOLQUI`, 7 ensayes certificados, coordenadas PSAD'56 declaradas, concesiones `CHQ-CONC-*`).
+  - [ ] Unificar la plataforma en un solo terminal de inversión con pestañas (mapa, tesis, simulador, data room).
   - [ ] Unificar el expediente técnico y el generador PDF de ambos proyectos.
   - [ ] Incorporar estados editoriales, trazabilidad y control previo a publicación.
