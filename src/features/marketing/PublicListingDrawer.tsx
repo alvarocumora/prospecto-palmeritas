@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
+import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
 
 export function PublicListingDrawer({
   listing,
@@ -33,6 +34,7 @@ export function PublicListingDrawer({
 }
 
 function Body({ listing }: { listing: PublicListing }) {
+  const terminalSlug = terminalSlugForListing(listing);
   return (
     <div className="flex flex-col">
       <div className="relative aspect-[16/9] bg-accent-brand-subtle overflow-hidden">
