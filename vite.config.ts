@@ -30,22 +30,26 @@ export default defineConfig({
         output: {
           manualChunks(id: string) {
             if (!id.includes("node_modules")) return;
-            if (id.includes("three") || id.includes("@react-three")) return "three";
-            if (id.includes("maplibre-gl")) return "maplibre";
-            if (id.includes("@deck.gl") || id.includes("deck.gl")) return "deckgl";
-            if (id.includes("leaflet")) return "leaflet";
-            if (id.includes("recharts") || id.includes("d3-")) return "charts";
-            if (id.includes("jspdf") || id.includes("html2canvas")) return "pdf";
-            if (id.includes("@turf") || id.includes("turf")) return "turf";
-            if (id.includes("geotiff")) return "geotiff";
-            if (id.includes("@radix-ui")) return "radix";
-            if (id.includes("@supabase")) return "supabase";
+            // Match on the package directory boundary, not a loose substring:
+            // `id.includes("three")` also matched unrelated paths and produced
+            // circular manual chunks (three <-> radix) that blew up Rollup.
+            const has = (pkg: string) => id.includes(`node_modules/${pkg}/`);
+            if (has("three") || id.includes("node_modules/@react-three/")) return "three";
+            if (has("maplibre-gl")) return "maplibre";
+            if (id.includes("node_modules/@deck.gl/")) return "deckgl";
+            if (has("leaflet")) return "leaflet";
+            if (has("recharts")) return "charts";
+            if (has("jspdf") || has("html2canvas")) return "pdf";
+            if (id.includes("node_modules/@turf/")) return "turf";
+            if (has("geotiff")) return "geotiff";
+            if (has("proj4")) return "geo";
             // Do NOT split @tanstack — breaks SSR bundle (createRequestHandler ReferenceError)
-            if (id.includes("lucide-react")) return "icons";
-            if (id.includes("proj4") || id.includes("martini")) return "geo";
+            // Do NOT split @radix-ui / @supabase / lucide-react — shared by nearly
+            // every chunk, which is what created the circular-chunk failure.
           },
         },
       },
     },
+
   },
 });
