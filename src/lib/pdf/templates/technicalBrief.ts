@@ -310,7 +310,9 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     n += 1;
   }
 
-  need(160);
+  // El recuadro de advertencias y el bloque de contacto deben caber juntos.
+  const noticeH = 46 + model.disclaimers.length * 26;
+  need(60 + noticeH + 70);
   eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Advertencias`);
   y += 16;
   y += title(doc, M, y, "Base de información y limitaciones", 17, CW) + 12;
@@ -318,7 +320,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y += boxH + 18;
 
   // El bloque de contacto se ancla al pie de la última página con contenido.
-  y = Math.min(Math.max(y, BOTTOM - 30), BOTTOM - 30);
+  if (y > BOTTOM - 40) nextPage();
+  y = BOTTOM - 30;
 
   stroke(doc, GC_COLOR.hairline);
   doc.setLineWidth(0.6);
