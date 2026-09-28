@@ -168,29 +168,34 @@ export function buildCholquiFieldMemoDoc(
       },
       {
         eyebrow: "Targets",
-        title: "Prioridad y acciones por target",
+        title: "Prioridad, concesion y acciones por target",
         deck: true,
-        lead: "Sólo se programan trabajos sobre anomalías dentro de la tenencia conocida. Las de fuera quedan como contexto regional.",
+        lead: "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas ultimas no se ejecuta trabajo sin acuerdo previo.",
         blocks: [
           {
             kind: "table",
-            head: ["Target", "Concesión", "Firma espectral", "Puntaje", "Prioridad", "Canaletas"],
-            widths: [0.11, 0.2, 0.3, 0.12, 0.14, 0.13],
+            head: ["Target", "Concesion (catastro)", "Titularidad", "Firma espectral", "Puntaje", "Prioridad"],
+            widths: [0.09, 0.26, 0.17, 0.24, 0.11, 0.13],
             rows: targets.map((t) => [
               t.label,
-              t.concession ?? "Por confirmar",
+              t.concession ?? "Sin concesion en el catastro cargado",
+              t.tenureLabel,
               t.indexName,
               t.score != null ? t.score.toFixed(2).replace(".", ",") : "s/d",
               t.priority,
-              String(t.channelSites),
             ]),
           },
           {
             kind: "text",
-            body: "El puntaje es un realce relativo al fondo del área de interés. No es ley, no es concentración y no ordena por valor económico: ordena por intensidad de la anomalía.",
+            body: "El puntaje es un realce relativo al fondo del area de interes. No es ley, no es concentracion y no ordena por valor economico: ordena por intensidad de la anomalia.",
+          },
+          {
+            kind: "text",
+            body: `Titularidad verificada sobre el catastro cargado: ${ownCount} de ${targets.length} targets caen dentro de la tenencia analizada (TOKI 2 / PALLOCABE 8 / DOS MARIAS) y ${targets.length - ownCount} caen en concesiones inscritas a terceros. Antes de cualquier trabajo en estas ultimas se requiere verificar vigencia y titular en el registro, y obtener acuerdo escrito o servidumbre.`,
           },
         ],
       },
+
       {
         eyebrow: "Instrucción de terreno",
         title: "Acciones concretas por target de prioridad alta",
