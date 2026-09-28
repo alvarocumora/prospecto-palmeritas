@@ -29,7 +29,10 @@ export function TerminalShell() {
       <div className="flex-1 flex min-h-0">
         <TerminalSidebar />
         <main className="flex-1 grid grid-cols-1 lg:grid-cols-[2fr_1fr] min-h-0">
-          <section data-surface="canvas" className="border-b lg:border-b-0 lg:border-r border-hairline min-h-[50vh] lg:min-h-0">
+          <section
+            data-surface="canvas"
+            className="border-b lg:border-b-0 lg:border-r border-hairline min-h-[50vh] lg:min-h-0"
+          >
             <GeologicalMapPanel
               projects={projects}
               selectedId={selectedId}
