@@ -72,7 +72,8 @@ export async function fetchPatentePago(
   rol: string,
   tipo: PatenteTipo,
 ): Promise<PatentePagoConsulta | null> {
-  const rolDigits = rol.replace(/\D/g, "");
+  const rolBase = rol.split("-")[0] ?? "";
+  const rolDigits = rolBase.replace(/\D/g, "");
   if (!rolDigits) return null;
   const tipoParam = tipo === "exploracion" ? "1" : "2";
   const consultadoEn = new Date().toISOString();
