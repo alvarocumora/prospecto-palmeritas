@@ -26,23 +26,23 @@ export const Route = createFileRoute("/proyectos")({
   component: ProyectosPage,
 });
 
-// Las cards aterrizan en la FICHA DE INVERSIÓN (visión inversionista); el
-// live map técnico se abre desde dentro de la ficha.
+// Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
+// simulador y data room en una sola pantalla, sin saltos intermedios).
 const SHOWCASE = [
   {
     code: "PALMERAS",
+    slug: "palmeras" as const,
     name: "Prospecto Las Palmeras",
     region: "Illapel · Coquimbo",
     commodity: "Au-Ag",
-    to: "/proyectos/ficha/palmeras",
     bullets: ["74 concesiones · 12.807 ha", "16 sondajes · 4.426 m", "12 anomalías satelitales"],
   },
   {
     code: "LOSVERDES",
+    slug: "losverdes" as const,
     name: "Los Verdes",
     region: "Petorca · Valparaíso",
     commodity: "Cu-Mo",
-    to: "/proyectos/ficha/losverdes",
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
@@ -51,10 +51,10 @@ const SHOWCASE = [
   },
   {
     code: "CHOLQUI",
+    slug: "cholqui" as const,
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    to: "/proyectos/ficha/cholqui",
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",

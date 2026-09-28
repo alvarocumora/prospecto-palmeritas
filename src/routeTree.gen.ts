@@ -38,6 +38,7 @@ import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
+import { Route as TerminalSlugRouteImport } from './routes/terminal.$slug'
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
 import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
 import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
@@ -322,6 +323,11 @@ const TerminalMarketRoute = TerminalMarketRouteImport.update({
 const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
   id: '/capital-raise',
   path: '/capital-raise',
+  getParentRoute: () => TerminalRoute,
+} as any)
+const TerminalSlugRoute = TerminalSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
   getParentRoute: () => TerminalRoute,
 } as any)
 const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
@@ -1174,6 +1180,7 @@ export interface FileRoutesByFullPath {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/terminal/$slug': typeof TerminalSlugRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1345,6 +1352,7 @@ export interface FileRoutesByTo {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/terminal/$slug': typeof TerminalSlugRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1518,6 +1526,7 @@ export interface FileRoutesById {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/terminal/$slug': typeof TerminalSlugRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1691,6 +1700,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/terminal/$slug'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -1862,6 +1872,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/terminal/$slug'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -2034,6 +2045,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/terminal/$slug'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -2446,6 +2458,13 @@ declare module '@tanstack/react-router' {
       path: '/capital-raise'
       fullPath: '/terminal/capital-raise'
       preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
+      parentRoute: typeof TerminalRoute
+    }
+    '/terminal/$slug': {
+      id: '/terminal/$slug'
+      path: '/$slug'
+      fullPath: '/terminal/$slug'
+      preLoaderRoute: typeof TerminalSlugRouteImport
       parentRoute: typeof TerminalRoute
     }
     '/proyectos/$listingId': {
@@ -3735,12 +3754,14 @@ const ProyectosRouteWithChildren = ProyectosRoute._addFileChildren(
 )
 
 interface TerminalRouteChildren {
+  TerminalSlugRoute: typeof TerminalSlugRoute
   TerminalCapitalRaiseRoute: typeof TerminalCapitalRaiseRoute
   TerminalMarketRoute: typeof TerminalMarketRoute
   TerminalTokenizeRoute: typeof TerminalTokenizeRoute
 }
 
 const TerminalRouteChildren: TerminalRouteChildren = {
+  TerminalSlugRoute: TerminalSlugRoute,
   TerminalCapitalRaiseRoute: TerminalCapitalRaiseRoute,
   TerminalMarketRoute: TerminalMarketRoute,
   TerminalTokenizeRoute: TerminalTokenizeRoute,
