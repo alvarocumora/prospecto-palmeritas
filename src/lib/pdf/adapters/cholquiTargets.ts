@@ -54,9 +54,32 @@ function inRing(lng: number, lat: number, ring: Array<[number, number]>): boolea
   return inside;
 }
 
-export function concessionAt(lat: number, lng: number): string | null {
-  return cholquiTenurePolygons().find((p) => inRing(lng, lat, p.ring))?.label ?? null;
+/** Todas las concesiones del catastro oficial cargado (no sólo la tenencia analizada). */
+function allCatastroPolygons(): Array<{ label: string; rol: string; ring: Array<[number, number]> }> {
+  try {
+    const fc = JSON.parse(catastroRaw) as { features: CatFeature[] };
+    return fc.features
+      .filter((f) => f.geometry?.type === "Polygon")
+      .map((f) => ({
+        label: f.properties.nombre,
+        rol: f.properties.rol,
+        ring: f.geometry.coordinates[0].map((c) => [c[0], c[1]] as [number, number]),
+      }));
+  } catch {
+    return [];
+  }
 }
+
+/**
+ * Concesión que contiene el punto, según el catastro SERNAGEOMIN cargado.
+ * Devuelve nombre y rol para que el documento sea verificable contra el registro.
+ */
+export function concessionAt(lat: number, lng: number): string | null {
+  const hit = allCatastroPolygons().find((p) => inRing(lng, lat, p.ring));
+  if (!hit) return null;
+  return hit.rol ? `${hit.label} (rol ${hit.rol})` : hit.label;
+}
+
 
 export type AgentNote = { label: string; note: string };
 
