@@ -651,7 +651,7 @@ export function ProjectMasterViewer({
         <div ref={mapEl} className="h-full flex-1" />
 
         {/* Panel de capas (izquierda-flotante) — colapsable; solo secciones con datos */}
-        <div className="pointer-events-auto absolute left-3 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
+        <div className="pointer-events-auto absolute left-12 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
