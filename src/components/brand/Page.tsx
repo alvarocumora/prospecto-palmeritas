@@ -61,7 +61,9 @@ export function PageHeader({
           ) : null}
           {meta ? <div className="mt-3 text-xs text-content-subtle">{meta}</div> : null}
         </div>
-        {actions ? <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div> : null}
+        {actions ? (
+          <div className="flex shrink-0 flex-wrap items-center gap-2">{actions}</div>
+        ) : null}
       </div>
     </header>
   );
@@ -135,15 +137,18 @@ export function Surface({
 export function SectionNav({
   items,
   className,
+  stickyOffset = "page",
 }: {
   items: Array<{ href: string; label: string }>;
   className?: string;
+  stickyOffset?: "page" | "workspace";
 }) {
   return (
     <nav
       aria-label="Secciones"
       className={cn(
-        "sticky top-0 z-30 -mx-4 overflow-x-auto border-b border-hairline bg-surface/95 px-4 backdrop-blur md:-mx-6 md:px-6",
+        "sticky z-30 -mx-4 overflow-x-auto border-b border-hairline bg-surface/95 px-4 backdrop-blur md:-mx-6 md:px-6",
+        stickyOffset === "workspace" ? "top-[72px]" : "top-0",
         className,
       )}
     >
