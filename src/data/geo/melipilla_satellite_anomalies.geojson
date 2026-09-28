@@ -1,0 +1,625 @@
+{
+  "type": "FeatureCollection",
+  "name": "melipilla_satellite_anomalies",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "project": "melipilla",
+    "sensor": "Sentinel-2 L2A",
+    "provenance": "DERIVADO / INTERPRETADO",
+    "coverage": {
+      "typical_pct": 40.7,
+      "bestcase_pct": 83.3,
+      "spectral_conclusive": true
+    },
+    "config_sha256": "0e853a65798865d7b2b5efc2decd86d311a5080d93e5be3c2a0167994a6720a3",
+    "n": 15,
+    "nota": "dentro_concesion/concesion_demartino evaluado contra el paquete completo de concesiones De Martino en Melipilla (15), no solo las 4 elegidas para el AOI."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02181808176633,
+              -33.87928554054054
+            ],
+            [
+              -71.02051591823368,
+              -33.87928554054054
+            ],
+            [
+              -71.02051591823368,
+              -33.87820445945946
+            ],
+            [
+              -71.02181808176633,
+              -33.87820445945946
+            ],
+            [
+              -71.02181808176633,
+              -33.87928554054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "alta",
+        "score": 0.898,
+        "z_score": 8.08,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=8.08 (gossan 3.5). DERIVADO Sentinel-2.",
+        "concesion_demartino": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02948804503295,
+              -33.87447054054054
+            ],
+            [
+              -71.02818595496704,
+              -33.87447054054054
+            ],
+            [
+              -71.02818595496704,
+              -33.87338945945946
+            ],
+            [
+              -71.02948804503295,
+              -33.87338945945946
+            ],
+            [
+              -71.02948804503295,
+              -33.87447054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "alta",
+        "score": 0.827,
+        "z_score": 7.44,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=7.44 (gossan 4.36). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02683209489784,
+              -33.88100654054054
+            ],
+            [
+              -71.02552990510215,
+              -33.88100654054054
+            ],
+            [
+              -71.02552990510215,
+              -33.87992545945946
+            ],
+            [
+              -71.02683209489784,
+              -33.87992545945946
+            ],
+            [
+              -71.02683209489784,
+              -33.88100654054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "alta",
+        "score": 0.718,
+        "z_score": 6.46,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=6.46 (gossan 3.95). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0402349556659,
+              -33.86275154054054
+            ],
+            [
+              -71.03893304433412,
+              -33.86275154054054
+            ],
+            [
+              -71.03893304433412,
+              -33.86167045945946
+            ],
+            [
+              -71.0402349556659,
+              -33.86167045945946
+            ],
+            [
+              -71.0402349556659,
+              -33.86275154054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.642,
+        "z_score": 5.78,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.78 (gossan 2.94). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 5"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.02355208292606,
+              -33.87943754054054
+            ],
+            [
+              -71.02224991707395,
+              -33.87943754054054
+            ],
+            [
+              -71.02224991707395,
+              -33.87835645945946
+            ],
+            [
+              -71.02355208292606,
+              -33.87835645945946
+            ],
+            [
+              -71.02355208292606,
+              -33.87943754054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.641,
+        "z_score": 5.77,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.77 (gossan 3.24). DERIVADO Sentinel-2.",
+        "concesion_demartino": null
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03249703915185,
+              -33.87369954054054
+            ],
+            [
+              -71.03119496084815,
+              -33.87369954054054
+            ],
+            [
+              -71.03119496084815,
+              -33.87261845945946
+            ],
+            [
+              -71.03249703915185,
+              -33.87261845945946
+            ],
+            [
+              -71.03249703915185,
+              -33.87369954054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.627,
+        "z_score": 5.64,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.64 (gossan 3.11). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03516099205771,
+              -33.86752454054054
+            ],
+            [
+              -71.03385900794228,
+              -33.86752454054054
+            ],
+            [
+              -71.03385900794228,
+              -33.86644345945946
+            ],
+            [
+              -71.03516099205771,
+              -33.86644345945946
+            ],
+            [
+              -71.03516099205771,
+              -33.86752454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.624,
+        "z_score": 5.62,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.62 (gossan 4.51). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 5"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0482219519075,
+              -33.862258540540545
+            ],
+            [
+              -71.04692004809252,
+              -33.862258540540545
+            ],
+            [
+              -71.04692004809252,
+              -33.86117745945946
+            ],
+            [
+              -71.0482219519075,
+              -33.86117745945946
+            ],
+            [
+              -71.0482219519075,
+              -33.862258540540545
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.598,
+        "z_score": 5.38,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.38 (gossan 3.2). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 1"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03559506215122,
+              -33.87671454054054
+            ],
+            [
+              -71.03429293784878,
+              -33.87671454054054
+            ],
+            [
+              -71.03429293784878,
+              -33.87563345945946
+            ],
+            [
+              -71.03559506215122,
+              -33.87563345945946
+            ],
+            [
+              -71.03559506215122,
+              -33.87671454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.597,
+        "z_score": 5.37,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.37 (gossan 2.98). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.04366694698282,
+              -33.86161254054054
+            ],
+            [
+              -71.04236505301716,
+              -33.86161254054054
+            ],
+            [
+              -71.04236505301716,
+              -33.86053145945946
+            ],
+            [
+              -71.04366694698282,
+              -33.86053145945946
+            ],
+            [
+              -71.04366694698282,
+              -33.86161254054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.591,
+        "z_score": 5.32,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.32 (gossan 2.94). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA DOS DEL 1 AL 20"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.03320905970236,
+              -33.87639354054054
+            ],
+            [
+              -71.03190694029763,
+              -33.87639354054054
+            ],
+            [
+              -71.03190694029763,
+              -33.87531245945946
+            ],
+            [
+              -71.03320905970236,
+              -33.87531245945946
+            ],
+            [
+              -71.03320905970236,
+              -33.87639354054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.578,
+        "z_score": 5.2,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=5.2 (gossan 3.16). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 7"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.04351996900017,
+              -33.86450054054054
+            ],
+            [
+              -71.04221803099982,
+              -33.86450054054054
+            ],
+            [
+              -71.04221803099982,
+              -33.86341945945946
+            ],
+            [
+              -71.04351996900017,
+              -33.86341945945946
+            ],
+            [
+              -71.04351996900017,
+              -33.86450054054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.549,
+        "z_score": 4.94,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.94 (gossan 2.95). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 5"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.04054998725378,
+              -33.86689454054054
+            ],
+            [
+              -71.03924801274623,
+              -33.86689454054054
+            ],
+            [
+              -71.03924801274623,
+              -33.86581345945946
+            ],
+            [
+              -71.04054998725378,
+              -33.86581345945946
+            ],
+            [
+              -71.04054998725378,
+              -33.86689454054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.543,
+        "z_score": 4.89,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.89 (gossan 3.16). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 5"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.04045402577337,
+              -33.871945540540544
+            ],
+            [
+              -71.03915197422664,
+              -33.871945540540544
+            ],
+            [
+              -71.03915197422664,
+              -33.87086445945946
+            ],
+            [
+              -71.04045402577337,
+              -33.87086445945946
+            ],
+            [
+              -71.04045402577337,
+              -33.871945540540544
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "severity": "media",
+        "score": 0.543,
+        "z_score": 4.89,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.89 (gossan 3.02). DERIVADO Sentinel-2.",
+        "concesion_demartino": "ESPERANZA 5"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.09395678803746,
+              -33.84075154054054
+            ],
+            [
+              -71.09265521196254,
+              -33.84075154054054
+            ],
+            [
+              -71.09265521196254,
+              -33.839670459459455
+            ],
+            [
+              -71.09395678803746,
+              -33.839670459459455
+            ],
+            [
+              -71.09395678803746,
+              -33.84075154054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "media",
+        "score": 0.532,
+        "z_score": 4.79,
+        "dentro_concesion": false,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=4.79 (gossan 2.29). DERIVADO Sentinel-2.",
+        "concesion_demartino": null
+      }
+    }
+  ]
+}
