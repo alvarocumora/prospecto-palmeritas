@@ -64,6 +64,26 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     if (y + space > BOTTOM) nextPage();
   };
 
+  /** Dibuja una tabla cortándola entre páginas; devuelve el alto del último tramo. */
+  const pagedTable = (head: string[], rows: string[][], widths?: number[]): number => {
+    let rest = rows;
+    let lastH = 0;
+    let guard = 0;
+    while (rest.length && guard++ < 60) {
+      const fit = fitTableRows(doc, { head, rows: rest, widths, w: CW }, BOTTOM - y);
+      if (fit === 0) {
+        nextPage();
+        continue;
+      }
+      lastH = editorialTable(doc, { x: M, y, w: CW, head, rows: rest.slice(0, fit), widths });
+      y += lastH;
+      rest = rest.slice(fit);
+      if (rest.length) nextPage();
+    }
+    return 0;
+  };
+
+
   /* ---------- Portada ---------- */
   fill(doc, GC_COLOR.paper);
   doc.rect(0, 0, W, H, "F");
