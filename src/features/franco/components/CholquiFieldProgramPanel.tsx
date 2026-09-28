@@ -107,14 +107,15 @@ export function CholquiFieldProgramPanel() {
           {/* Targets */}
           <div className="px-6 py-6 border-b border-hairline">
             <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
-              Targets dentro de la tenencia · prioridad y trabajo asignado
+              Targets · concesión de catastro, titularidad y trabajo asignado
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-content-subtle border-b border-hairline">
                     <th className="py-2 pr-3 font-mono font-normal">Target</th>
-                    <th className="py-2 pr-3 font-mono font-normal">Concesión</th>
+                    <th className="py-2 pr-3 font-mono font-normal">Concesión (catastro)</th>
+                    <th className="py-2 pr-3 font-mono font-normal">Titularidad</th>
                     <th className="py-2 pr-3 font-mono font-normal">Firma espectral</th>
                     <th className="py-2 pr-3 font-mono font-normal text-right">Puntaje</th>
                     <th className="py-2 pr-3 font-mono font-normal">Prioridad</th>
@@ -122,29 +123,52 @@ export function CholquiFieldProgramPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {program.targets.map((t) => (
-                    <tr key={t.label} className="border-b border-hairline/60">
-                      <td className="py-2 pr-3 font-mono text-content">{t.label}</td>
-                      <td className="py-2 pr-3 text-content-subtle">
-                        {concessionAt(t.lat, t.lng) ?? "Por confirmar"}
-                      </td>
-                      <td className="py-2 pr-3 text-content">{t.indexName}</td>
-                      <td className="py-2 pr-3 text-right font-mono text-content">
-                        {t.score != null ? t.score.toFixed(2).replace(".", ",") : "s/d"}
-                      </td>
-                      <td className="py-2 pr-3">
-                        <span
-                          className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${
-                            PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE.Baja
-                          }`}
-                        >
-                          {t.priority}
-                        </span>
-                      </td>
-                      <td className="py-2 text-right font-mono text-content">{t.channelSites}</td>
-                    </tr>
-                  ))}
+                  {program.targets.map((t) => {
+                    const tenure = tenureAt(t.lat, t.lng);
+                    return (
+                      <tr key={t.label} className="border-b border-hairline/60">
+                        <td className="py-2 pr-3 font-mono text-content">{t.label}</td>
+                        <td className="py-2 pr-3 text-content-subtle">
+                          {tenure.concession ?? "Sin concesión en el catastro cargado"}
+                        </td>
+                        <td className="py-2 pr-3">
+                          <span
+                            className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${
+                              tenure.own
+                                ? "bg-accent-brand/10 text-accent-brand"
+                                : "bg-amber-500/10 text-amber-700"
+                            }`}
+                          >
+                            {tenure.own ? "Tenencia analizada" : "Tercero"}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-3 text-content">{t.indexName}</td>
+                        <td className="py-2 pr-3 text-right font-mono text-content">
+                          {t.score != null ? t.score.toFixed(2).replace(".", ",") : "s/d"}
+                        </td>
+                        <td className="py-2 pr-3">
+                          <span
+                            className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-mono uppercase tracking-wider ${
+                              PRIORITY_STYLE[t.priority] ?? PRIORITY_STYLE.Baja
+                            }`}
+                          >
+                            {t.priority}
+                          </span>
+                        </td>
+                        <td className="py-2 text-right font-mono text-content">{t.channelSites}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
+              </table>
+            </div>
+            <p className="mt-3 text-[11px] text-content-subtle">
+              La titularidad se resuelve contra el catastro SERNAGEOMIN cargado. Los targets marcados
+              como &ldquo;Tercero&rdquo; caen en concesiones inscritas a nombre de otro titular: no se
+              ejecuta trabajo sobre ellos sin verificación registral y acuerdo escrito.
+            </p>
+          </div>
+
               </table>
             </div>
           </div>
