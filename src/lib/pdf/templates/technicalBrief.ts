@@ -248,6 +248,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     if (section.lead) y += paragraph(doc, M, y, section.lead, CW, 9) + 12;
     for (const block of section.blocks) {
       if (block.kind === "text") {
+        console.log("DBG text y=", y, "page=", page, block.body.slice(0, 30));
         need(50);
         y += paragraph(doc, M, y, block.body, CW, 9) + 12;
       }
