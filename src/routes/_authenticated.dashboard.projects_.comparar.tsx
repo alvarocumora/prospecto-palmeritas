@@ -56,8 +56,8 @@ function Row({
 function CompararPage() {
   const fn = useServerFn(compareProjects);
   const { data, isLoading, error } = useQuery({
-    queryKey: ["project-compare", "GF-001", "LV-TIL-001"],
-    queryFn: () => fn({ data: { codes: ["GF-001", "LV-TIL-001"] } }),
+    queryKey: ["project-compare", "CHOLQUI", "LV-TIL-001"],
+    queryFn: () => fn({ data: { codes: ["CHOLQUI", "LV-TIL-001"] } }),
   });
 
   const items = data ?? [];

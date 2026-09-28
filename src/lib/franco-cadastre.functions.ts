@@ -43,11 +43,11 @@ export const getFrancoCadastreCross = createServerFn({ method: "POST" })
     const supabase = supabaseAdmin;
     const fc = JSON.parse(francoPertenencias) as GeoJsonFC;
 
-    // Locate the Gianfranco project (concessions GF-CONC-*)
+    // Locate the Cholqui project by canonical code (concessions CHQ-CONC-*)
     const { data: projRows } = await supabase
       .from("projects")
       .select("id, name")
-      .ilike("name", "%Gianfranco%")
+      .eq("code", "CHOLQUI")
       .limit(1);
     const project = projRows?.[0] ?? null;
 
