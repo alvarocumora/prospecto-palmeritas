@@ -373,7 +373,10 @@ export function AppShell({
   }
   if (variant === "terminal") {
     return (
-      <div data-theme="im-light" className="h-screen w-full flex flex-col bg-surface text-content overflow-hidden">
+      <div
+        data-theme="im-light"
+        className="h-screen w-full flex flex-col bg-surface text-content overflow-hidden"
+      >
         {topBar ?? <TerminalTopBar />}
         {children}
       </div>
