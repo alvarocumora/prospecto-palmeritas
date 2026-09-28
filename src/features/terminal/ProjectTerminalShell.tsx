@@ -65,7 +65,7 @@ function Loading({ label }: { label: string }) {
   );
 }
 
-export function TerminalShell({
+export function ProjectTerminalShell({
   project,
   tab,
 }: {
