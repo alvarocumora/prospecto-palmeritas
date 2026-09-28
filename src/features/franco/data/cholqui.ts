@@ -105,8 +105,11 @@ export const LAS_MINITAS = {
   holder: "Sociedad Servicios RG Minerals SpA · RUT 77.066.786-0",
   throughputTMonth: 15000,
   areaHa: 40,
-  lat: -33.83408,
-  lng: -71.02465,
+  // PSAD'56 19H N 6.254.650 / E 311.970 — confirmado por dos fuentes independientes
+  // (presentación del proyecto y Tabla 3 "Principales minas y ocurrencias", rol 552).
+  // El valor anterior (-33.83408, -71.02465) estaba ~800 m al este del punto real.
+  lat: -33.83501,
+  lng: -71.034,
   note: "Operación de un tercero sobre la misma estructura geológica; el proyecto la rodea.",
 } as const;
 

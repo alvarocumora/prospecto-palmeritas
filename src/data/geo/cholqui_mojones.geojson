@@ -1,0 +1,267 @@
+{
+  "type": "FeatureCollection",
+  "name": "cholqui_mojones",
+  "metadata": {
+    "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+    "n": 16,
+    "nota": "Hitos de mensura (HM) reportados por el titular para cada concesion."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.05972740780042,
+          -33.82422151445751
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 6",
+        "concesion": "TOKI 6",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.05031196691088,
+          -33.82490145789634
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 4",
+        "concesion": "TOKI 4",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06183009117866,
+          -33.84114720747591
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 8",
+        "concesion": "TOKI 8",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06220960414079,
+          -33.84030228434846
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 7",
+        "concesion": "TOKI 7",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.03361618203027,
+          -33.82975865139608
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 2",
+        "concesion": "PALLOCABE 2",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04464562802958,
+          -33.82650140704276
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 1",
+        "concesion": "PALLOCABE 1",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04643135447535,
+          -33.83252215931351
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 3",
+        "concesion": "PALLOCABE 3",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.05211440528427,
+          -33.8474228474354
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 5",
+        "concesion": "PALLOCABE 5",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04176822136105,
+          -33.85042602379048
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 6",
+        "concesion": "PALLOCABE 6",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06368835152804,
+          -33.84337935041274
+        ]
+      },
+      "properties": {
+        "nombre": "HM DOS MARIAS 2",
+        "concesion": "DOS MARIAS 2",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06374709252168,
+          -33.8431258932345
+        ]
+      },
+      "properties": {
+        "nombre": "HM DOS MARIAS 1",
+        "concesion": "DOS MARIAS 1",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06180688871622,
+          -33.82308668483376
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 3",
+        "concesion": "TOKI 3",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.05153980085235,
+          -33.82293336606465
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 1",
+        "concesion": "TOKI 1",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04733923870201,
+          -33.82347208220795
+        ]
+      },
+      "properties": {
+        "nombre": "HM TOKI 2",
+        "concesion": "TOKI 2",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.0272759319704,
+          -33.83304609216624
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 4",
+        "concesion": "PALLOCABE 4",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.01923085492642,
+          -33.84105000284264
+        ]
+      },
+      "properties": {
+        "nombre": "HM PALLOCABE 7",
+        "concesion": "PALLOCABE 7",
+        "tipo": "Hito/mojon de mensura",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)"
+      }
+    }
+  ]
+}

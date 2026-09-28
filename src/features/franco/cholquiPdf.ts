@@ -40,6 +40,25 @@ import {
   projectCashflow,
   unitCosts,
 } from "./data/minePlan";
+import { CHOLQUI_STRUCTURES_GEOJSON } from "./data/cholquiStructures";
+import satelliteRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
+import drillGridRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
+import franjasRaw from "@/data/geo/cholqui_franjas.geojson?raw";
+import yacimientosRaw from "@/data/geo/cholqui_yacimientos.geojson?raw";
+
+type GeoMeta = Record<string, unknown>;
+type GeoFC = { features: { properties?: GeoMeta }[]; metadata?: GeoMeta };
+function parseFC(raw: string): GeoFC | null {
+  try {
+    return JSON.parse(raw) as GeoFC;
+  } catch {
+    return null;
+  }
+}
+const CHOLQUI_SATELLITE = parseFC(satelliteRaw);
+const CHOLQUI_DRILL_GRID = parseFC(drillGridRaw);
+const CHOLQUI_FRANJAS = parseFC(franjasRaw);
+const CHOLQUI_YACIMIENTOS = parseFC(yacimientosRaw);
 
 const INK: [number, number, number] = [18, 22, 26];
 const PAPER: [number, number, number] = [245, 242, 236];
@@ -51,7 +70,7 @@ const COPPER: [number, number, number] = [192, 112, 58];
 export const CHOLQUI_LIVE_URL = publicUrl(CHOLQUI.liveUrl);
 
 /** Versión del documento: cambia con el contenido, se imprime en el pie. */
-export const CHOLQUI_DOC_VERSION = "v3.0";
+export const CHOLQUI_DOC_VERSION = "v3.1";
 export const CHOLQUI_TEASER_VERSION = "v2.0";
 
 type CholquiPdfKind = "brief" | "teaser";
@@ -461,6 +480,39 @@ export async function downloadCholquiInvestmentPdf(kind: CholquiPdfKind = "brief
       p.lng.toFixed(5),
     ]),
     true,
+  );
+
+  // ── Teledetección y estructura ───────────────────────────────────────────
+  newPage();
+  h1(
+    "05a · Teledetección y estructura",
+    "Screening satelital, rumbo/manteo y contexto de distrito",
+  );
+  const satMeta = (CHOLQUI_SATELLITE?.metadata ?? {}) as Record<string, unknown>;
+  const cov = (satMeta.coverage ?? {}) as Record<string, unknown>;
+  const anomFeatures = CHOLQUI_SATELLITE?.features ?? [];
+  const dentro = anomFeatures.filter((f) => f.properties?.dentro_concesion).length;
+  table(
+    ["Dimensión", "Dato"],
+    [
+      ["Sensor", "Sentinel-2 L2A (Copernicus)"],
+      [
+        "Cobertura interpretable",
+        `${cov.typical_pct ?? "—"}% típica · ${cov.bestcase_pct ?? "—"}% mejor caso`,
+      ],
+      ["Anomalías Al-OH / hidrotermales detectadas", `${anomFeatures.length}`],
+      ["Anomalías dentro de tenencia propia", `${dentro} de ${anomFeatures.length}`],
+      ["Sondajes conceptuales propuestos", `${CHOLQUI_DRILL_GRID?.features?.length ?? 0}`],
+      [
+        "Vetas con rumbo/manteo de terreno",
+        `${CHOLQUI_STRUCTURES_GEOJSON.features.length} de ${CHOLQUI_POINTS.length} puntos documentados`,
+      ],
+      ["Franja metalogénica de contexto", `${CHOLQUI_FRANJAS?.features?.length ?? 0} polígono(s)`],
+      ["Yacimientos/depósitos conocidos cercanos", `${CHOLQUI_YACIMIENTOS?.features?.length ?? 0}`],
+    ],
+  );
+  disclaimer(
+    "Las anomalías satelitales son firma espectral (DERIVADO/INTERPRETADO), no identificación mineral ni extensión medida. El grid de sondaje es propuesta conceptual, sin perforar: no estima recursos ni reservas (NI 43-101). Rumbo/manteo de vetas es dato de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Franjas y yacimientos son contexto oficial SERNAGEOMIN a escala regional/distrital, no implican continuidad al predio. Detalle interactivo en el Live Map.",
   );
 
   // ── Economía preliminar ──────────────────────────────────────────────────

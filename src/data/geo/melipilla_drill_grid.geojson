@@ -1,0 +1,212 @@
+{
+  "type": "FeatureCollection",
+  "name": "melipilla_drill_grid_propuesta",
+  "crs": {
+    "type": "name",
+    "properties": {
+      "name": "urn:ogc:def:crs:OGC:1.3:CRS84"
+    }
+  },
+  "metadata": {
+    "tipo": "PROPUESTA CONCEPTUAL",
+    "rumbo_dominante_deg": 20.0,
+    "n_collares": 8,
+    "total_m": 1120,
+    "nota": "Evaluado contra las 15 concesiones del paquete De Martino en Melipilla (no solo las 4 del AOI original).",
+    "disclaimer": "Propuesta de exploracion. No constituye recurso ni reserva (NI 43-101)."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.028837,
+          -33.87393
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-01",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.87393,
+        "lng": -71.028837,
+        "este_utm": 312350.0,
+        "norte_utm": 6249970.0,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 170,
+        "priority": "Media",
+        "score": 0.827,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.026181,
+          -33.880466
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-02",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.880466,
+        "lng": -71.026181,
+        "este_utm": 312610.0,
+        "norte_utm": 6249250.0,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 170,
+        "priority": "Media",
+        "score": 0.718,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.039584,
+          -33.862211
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-03",
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.862211,
+        "lng": -71.039584,
+        "este_utm": 311330.0,
+        "norte_utm": 6251250.0,
+        "azimuth_deg": 110,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.642,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.031846,
+          -33.873159
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-04",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.873159,
+        "lng": -71.031846,
+        "este_utm": 312070.0,
+        "norte_utm": 6250050.1,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.627,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.03451,
+          -33.866984
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-05",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.866984,
+        "lng": -71.03451,
+        "este_utm": 311810.0,
+        "norte_utm": 6250730.0,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.624,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.047571,
+          -33.861718
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-06",
+        "index_code": "HYDROTHERMAL_ALTERATION",
+        "lat": -33.861718,
+        "lng": -71.047571,
+        "este_utm": 310590.0,
+        "norte_utm": 6251290.0,
+        "azimuth_deg": 110,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.598,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.034944,
+          -33.876174
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-07",
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.876174,
+        "lng": -71.034944,
+        "este_utm": 311790.0,
+        "norte_utm": 6249710.0,
+        "azimuth_deg": 290,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.597,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.043016,
+          -33.861072
+        ]
+      },
+      "properties": {
+        "code": "MEL-DDH-08",
+        "index_code": "CLAY_MINERALS",
+        "lat": -33.861072,
+        "lng": -71.043016,
+        "este_utm": 311010.0,
+        "norte_utm": 6251370.0,
+        "azimuth_deg": 110,
+        "dip_deg": -60,
+        "depth_m": 130,
+        "priority": "Baja",
+        "score": 0.591,
+        "procedencia": "PROPUESTO / CONCEPTUAL — no perforado, no estima recursos ni reservas"
+      }
+    }
+  ]
+}

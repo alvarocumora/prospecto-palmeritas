@@ -2,6 +2,18 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, GeoJSON as LeafletGeoJSON, TileLayer } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { Feature, FeatureCollection } from "geojson";
+import {
+  Map as MapIcon,
+  Satellite,
+  Radio,
+  Mountain,
+  FlaskConical,
+  Target,
+  Maximize,
+  ChevronDown,
+  ChevronRight,
+  type LucideIcon,
+} from "lucide-react";
 import { buildGeophysicsOverlays } from "@/components/map/geophysicsOverlays";
 import {
   buildGeophysicsLayer,
@@ -52,6 +64,9 @@ export type MasterViewerProps = {
   franjas?: FeatureCollection | null; // franjas metalogénicas (contexto de sistema mineral)
   yacimientos?: FeatureCollection | null; // depósitos conocidos / minerales críticos (Merge_RR)
   geoquimica?: FeatureCollection | null; // muestras de sedimento (multi-elemento medido)
+  estructuras?: FeatureCollection | null; // vetas con rumbo/manteo medido en terreno
+  pedimentosPendientes?: FeatureCollection | null; // pedimentos del titular no publicados aún en catastro oficial
+  mojones?: FeatureCollection | null; // hitos de mensura (HM) reportados por el titular
   height?: number;
 };
 
@@ -70,6 +85,8 @@ const ALTERATION_LABEL: Record<string, string> = {
 
 type LayerKey =
   | "tenencia"
+  | "pedimentosPendientes"
+  | "mojones"
   | "halos"
   | "magneticaRegional"
   | "gravedadRegional"
@@ -81,6 +98,7 @@ type LayerKey =
   | "franjas"
   | "yacimientos"
   | "geoquimica"
+  | "estructuras"
   | "sondajes"
   | "ensayes"
   | "pedimentos";
@@ -88,23 +106,32 @@ type Selected = { kind: LayerKey; props: Record<string, unknown> } | null;
 
 const LAYER_SECTIONS: ReadonlyArray<{
   title: string;
+  icon: LucideIcon;
   note?: string;
+  defaultOpen?: boolean;
   layers: ReadonlyArray<[LayerKey, string]>;
 }> = [
   {
     title: "Territorio",
+    icon: MapIcon,
+    defaultOpen: true,
     layers: [
       ["tenencia", "Catastro SERNAGEOMIN"],
+      ["pedimentosPendientes", "Pedimentos sin publicar (KML titular)"],
+      ["mojones", "Hitos de mensura (HM)"],
       ["relieve", "Relieve / hillshade"],
     ],
   },
   {
     title: "Teledetección",
+    icon: Satellite,
+    defaultOpen: true,
     note: "Derivado de sensores remotos; requiere validación en terreno.",
     layers: [["halos", "Halos espectrales · Sentinel-2"]],
   },
   {
     title: "Geofísica",
+    icon: Radio,
     note: "Regional = contexto. Superficies de proyecto = IDW derivado de estaciones CAMPO; no son inversión.",
     layers: [
       ["magneticaRegional", "Anomalía magnética · EMAG2 v3"],
@@ -117,6 +144,7 @@ const LAYER_SECTIONS: ReadonlyArray<{
   },
   {
     title: "Distrito / metalogenia",
+    icon: Mountain,
     note: "Contexto oficial SERNAGEOMIN: franja metalogénica y depósitos conocidos cercanos.",
     layers: [
       ["franjas", "Franjas metalogénicas"],
@@ -125,13 +153,17 @@ const LAYER_SECTIONS: ReadonlyArray<{
   },
   {
     title: "Geoquímica",
+    icon: FlaskConical,
     note: "Sedimento fluvial medido (SERNAGEOMIN). Dispersión regional, no ley in situ.",
     layers: [["geoquimica", "Geoquímica de sedimentos · Cu"]],
   },
   {
     title: "Exploración",
+    icon: Target,
+    defaultOpen: true,
     layers: [
       ["ensayes", "Ensayes certificados"],
+      ["estructuras", "Vetas · rumbo/manteo de terreno"],
       ["sondajes", "Sondajes propuestos"],
       ["pedimentos", "Pedimentos propuestos"],
     ],
@@ -151,10 +183,13 @@ const PROV: Record<ProvKind, { label: string; bg: string }> = {
 // El badge vive en el design system (@/components/ui-system).
 const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   tenencia: { evidence: "OFICIAL", scale: "catastro" },
+  pedimentosPendientes: { evidence: "CONTEXTO", scale: "KML titular" },
+  mojones: { evidence: "CONTEXTO", scale: "HM declarado" },
   relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
   franjas: { evidence: "OFICIAL", scale: "regional" },
   yacimientos: { evidence: "OFICIAL", scale: "depósito" },
   geoquimica: { evidence: "MEDIDO", scale: "sedimento" },
+  estructuras: { evidence: "MEDIDO", scale: "punto/rumbo" },
   halos: { evidence: "DERIVADO", scale: "10–20 m" },
   magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
   gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
@@ -181,6 +216,9 @@ export function ProjectMasterViewer({
   franjas = null,
   yacimientos = null,
   geoquimica = null,
+  estructuras = null,
+  pedimentosPendientes = null,
+  mojones = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
@@ -190,6 +228,8 @@ export function ProjectMasterViewer({
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     tenencia: true,
+    pedimentosPendientes: true,
+    mojones: false,
     halos: true,
     magneticaRegional: true,
     gravedadRegional: false,
@@ -201,6 +241,7 @@ export function ProjectMasterViewer({
     franjas: false,
     yacimientos: true,
     geoquimica: true,
+    estructuras: true,
     sondajes: true,
     ensayes: true,
     pedimentos: true,
@@ -208,6 +249,32 @@ export function ProjectMasterViewer({
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(LAYER_SECTIONS.map((s) => [s.title, Boolean(s.defaultOpen)])),
+  );
+  const toggleSection = (title: string) =>
+    setOpenSections((state) => ({ ...state, [title]: !state[title] }));
+  const leafletRef = useRef<typeof import("leaflet") | null>(null);
+
+  /** Reencuadra el mapa a los datos de proyecto disponibles (botón "Encuadrar"). */
+  const fitToData = () => {
+    const map = mapRef.current;
+    const L = leafletRef.current;
+    if (!map || !L) return;
+    try {
+      const bounds = L.latLngBounds([]);
+      [concessions, anomalies, drillGrid].forEach((fc) => {
+        if (fc)
+          L.geoJSON(fc as never).eachLayer((ly) =>
+            bounds.extend((ly as LeafletGeoJSON).getBounds()),
+          );
+      });
+      assays.forEach((a) => bounds.extend([a.lat, a.lng]));
+      if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+    } catch {
+      /* sin bounds válidos */
+    }
+  };
 
   // Construcción imperativa del mapa (client-only; leaflet toca window).
   useEffect(() => {
@@ -215,17 +282,23 @@ export function ProjectMasterViewer({
     void (async () => {
       const L = (await import("leaflet")).default;
       if (disposed || !mapEl.current || mapRef.current) return;
-      const map = L.map(mapEl.current, { zoomControl: true, attributionControl: false }).setView(
+      leafletRef.current = L;
+      const map = L.map(mapEl.current, { zoomControl: false, attributionControl: false }).setView(
         [center.lat, center.lng],
         13,
       );
+      // Zoom abajo-derecha: arriba-izquierda es territorio de la barra de herramientas/capas.
+      L.control.zoom({ position: "bottomright" }).addTo(map);
       mapRef.current = map;
       basesRef.current.sat = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 },
+        // crossOrigin: Esri sirve CORS abierto; sin esto, capturar el mapa a PDF
+        // (html2canvas) produce un lienzo vacío en vez del mapa satelital real.
+        { maxZoom: 19, crossOrigin: "anonymous" },
       ).addTo(map);
       basesRef.current.topo = L.tileLayer("https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png", {
         maxZoom: 17,
+        crossOrigin: "anonymous",
       });
 
       // --- Geofísica pública regional REAL (WMS): EMAG2 v3 (NOAA, magnetometría),
@@ -493,6 +566,65 @@ export function ProjectMasterViewer({
         groups.current.geoquimica = L.layerGroup(items).addTo(map);
       }
 
+      // --- Estructuras (vetas con rumbo/manteo medido en terreno; MEDIDO)
+      if (estructuras?.features?.length) {
+        const line = L.geoJSON(estructuras as never, {
+          style: { color: "#facc15", weight: 3, opacity: 0.9 },
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () =>
+              sel("estructuras", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+        });
+        groups.current.estructuras = line.addTo(map);
+      }
+
+      // --- Pedimentos sin publicar (declarados por el titular, no en catastro oficial)
+      if (pedimentosPendientes?.features?.length) {
+        const g = L.geoJSON(pedimentosPendientes as never, {
+          style: {
+            color: "#c2410c",
+            weight: 1.6,
+            dashArray: "5 4",
+            fillColor: "#c2410c",
+            fillOpacity: 0.05,
+          },
+          pointToLayer: (f, latlng) =>
+            L.circleMarker(latlng, {
+              radius: 6,
+              color: "#c2410c",
+              weight: 1.6,
+              dashArray: "3 2",
+              fillColor: "#c2410c",
+              fillOpacity: 0.4,
+            }),
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () =>
+              sel("pedimentosPendientes", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+        });
+        groups.current.pedimentosPendientes = g.addTo(map);
+      }
+
+      // --- Mojones / hitos de mensura (HM) declarados por el titular
+      if (mojones?.features?.length) {
+        const items: L.Layer[] = [];
+        for (const f of mojones.features) {
+          const gm = f.geometry;
+          if (!gm || gm.type !== "Point") continue;
+          const [lng, lat] = gm.coordinates as [number, number];
+          items.push(
+            L.circleMarker([lat, lng], {
+              radius: 3.5,
+              color: "#475569",
+              weight: 1.4,
+              fillColor: "#e2e8f0",
+              fillOpacity: 0.9,
+            }).on("click", () => sel("mojones", (f.properties ?? {}) as Record<string, unknown>)),
+          );
+        }
+        groups.current.mojones = L.layerGroup(items).addTo(map);
+      }
+
       // Encuadrar a lo que exista
       try {
         const bounds = L.latLngBounds([]);
@@ -568,6 +700,8 @@ export function ProjectMasterViewer({
   const counts = useMemo<Record<LayerKey, number>>(
     () => ({
       tenencia: concessions?.features?.length ?? 0,
+      pedimentosPendientes: pedimentosPendientes?.features?.length ?? 0,
+      mojones: mojones?.features?.length ?? 0,
       halos: anomalies?.features?.length ?? 0,
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
@@ -575,6 +709,7 @@ export function ProjectMasterViewer({
       franjas: franjas?.features?.length ?? 0,
       yacimientos: yacimientos?.features?.length ?? 0,
       geoquimica: geoquimica?.features?.length ?? 0,
+      estructuras: estructuras?.features?.length ?? 0,
       geofisicaProyecto: geophysicsStatus.field + geophysicsStatus.synthetic,
       magSurfaceProject: geophysicsStatus.magnetic >= 4 ? geophysicsStatus.magnetic : 0,
       ipChargeSurfaceProject: geophysicsStatus.ipCharge >= 4 ? geophysicsStatus.ipCharge : 0,
@@ -594,11 +729,16 @@ export function ProjectMasterViewer({
       franjas,
       yacimientos,
       geoquimica,
+      estructuras,
+      pedimentosPendientes,
+      mojones,
     ],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
   const COUNTED: ReadonlyArray<LayerKey> = [
     "tenencia",
+    "pedimentosPendientes",
+    "mojones",
     "halos",
     "sondajes",
     "ensayes",
@@ -607,6 +747,7 @@ export function ProjectMasterViewer({
     "franjas",
     "yacimientos",
     "geoquimica",
+    "estructuras",
   ];
   const visibleSections = useMemo(
     () =>
@@ -652,8 +793,35 @@ export function ProjectMasterViewer({
         {/* Mapa */}
         <div ref={mapEl} data-report-map={reportMapId} className="h-full flex-1" />
 
-        {/* Panel de capas (izquierda-flotante) — colapsable; solo secciones con datos */}
-        <div className="pointer-events-auto absolute left-12 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
+        {/* Barra de herramientas (fija, nunca se pierde en el scroll de capas) */}
+        <div className="pointer-events-auto absolute left-3 top-3 z-[510] flex items-center gap-1 rounded-lg border border-hairline bg-surface/95 p-1 text-[11px] shadow">
+          <div className="flex overflow-hidden rounded border border-hairline">
+            {(["sat", "topo"] as const).map((b) => (
+              <button
+                key={b}
+                type="button"
+                onClick={() => setBase(b)}
+                title={b === "sat" ? "Base satelital" : "Base topográfica"}
+                className={`px-2 py-1 ${
+                  base === b ? "bg-accent-brand text-accent-brand-contrast" : "hover:bg-surface-2"
+                }`}
+              >
+                {b === "sat" ? "Satélite" : "Topo"}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={fitToData}
+            title="Encuadrar a los datos del proyecto"
+            className="flex items-center gap-1 rounded border border-hairline px-2 py-1 hover:bg-surface-2"
+          >
+            <Maximize className="h-3 w-3" /> Encuadrar
+          </button>
+        </div>
+
+        {/* Panel de capas (izquierda-flotante) — colapsable; secciones colapsables; solo con datos */}
+        <div className="pointer-events-auto absolute bottom-3 left-3 top-11 z-[500] flex w-60 flex-col rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
@@ -663,95 +831,102 @@ export function ProjectMasterViewer({
             <span className="text-content-subtle">{collapsed ? "▸" : "▾"}</span>
           </button>
           {!collapsed && (
-            <div className="max-h-[70%] overflow-auto px-2 pb-2">
-              {visibleSections.map((section, index) => (
-                <div
-                  key={section.title}
-                  className={index > 0 ? "mt-2 border-t border-hairline pt-2" : ""}
-                >
-                  <div className="px-1 text-[10px] font-semibold uppercase tracking-wider text-content">
-                    {section.title}
-                  </div>
-                  {section.note && (
-                    <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
-                      {section.note}
-                    </div>
-                  )}
-                  {section.title === "Geofísica" && geophysicsStatus.field > 0 && (
-                    <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
-                      CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic}. Halo
-                      requiere ≥4 puntos CAMPO por variable.
-                    </div>
-                  )}
-                  {section.layers.map(([k, label]) => (
-                    <label key={k} className="flex cursor-pointer items-start gap-2 px-1 py-0.5">
-                      <input
-                        className="mt-0.5"
-                        type="checkbox"
-                        checked={visible[k]}
-                        onChange={(e) =>
-                          setVisible((state) => ({ ...state, [k]: e.target.checked }))
-                        }
-                      />
-                      <span className="min-w-0 flex-1 text-content-muted">
-                        <span className="flex items-center gap-1">
-                          <span className="truncate">{label}</span>
-                          {COUNTED.includes(k) && (
-                            <span className="shrink-0 text-content-subtle">· {counts[k]}</span>
-                          )}
-                        </span>
-                        <EvidenceBadge
-                          kind={LAYER_META[k].evidence}
-                          scale={LAYER_META[k].scale}
-                          size="xs"
-                          className="mt-0.5"
-                        />
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              ))}
-              <div className="my-2 border-t border-hairline" />
-              <div className="mb-1 px-1 font-semibold text-content">Base</div>
-              <div className="flex gap-1 px-1">
-                {(["sat", "topo"] as const).map((b) => (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => setBase(b)}
-                    className={`rounded px-2 py-0.5 text-[11px] ${
-                      base === b
-                        ? "bg-accent-brand text-accent-brand-contrast"
-                        : "border border-hairline"
-                    }`}
+            <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
+              {visibleSections.map((section, index) => {
+                const open = openSections[section.title] ?? false;
+                const Icon = section.icon;
+                const visibleCount = section.layers.filter(([k]) => visible[k]).length;
+                return (
+                  <div
+                    key={section.title}
+                    className={index > 0 ? "mt-1 border-t border-hairline pt-1" : ""}
                   >
-                    {b === "sat" ? "Satélite" : "Topo"}
-                  </button>
-                ))}
-              </div>
-              {counts.halos > 0 && (
-                <>
-                  <div className="my-2 border-t border-hairline" />
-                  <div className="mb-1 px-1 font-semibold text-content">
-                    Firma espectral · Sentinel-2
-                  </div>
-                  {legend.map((l) => (
-                    <div
-                      key={l.label}
-                      className="flex items-center gap-2 px-1 py-0.5 text-[11px] text-content-muted"
+                    <button
+                      type="button"
+                      onClick={() => toggleSection(section.title)}
+                      className="flex w-full items-center gap-1.5 rounded px-1 py-1 text-left hover:bg-surface-2"
                     >
-                      <span
-                        className="inline-block h-2.5 w-2.5 rounded-full"
-                        style={{ background: l.color }}
-                      />
-                      {l.label}
-                    </div>
-                  ))}
-                </>
-              )}
+                      {open ? (
+                        <ChevronDown className="h-3 w-3 shrink-0 text-content-subtle" />
+                      ) : (
+                        <ChevronRight className="h-3 w-3 shrink-0 text-content-subtle" />
+                      )}
+                      <Icon className="h-3.5 w-3.5 shrink-0 text-content-subtle" />
+                      <span className="flex-1 truncate text-[10px] font-semibold uppercase tracking-wider text-content">
+                        {section.title}
+                      </span>
+                      <span className="shrink-0 text-[10px] text-content-subtle">
+                        {visibleCount}/{section.layers.length}
+                      </span>
+                    </button>
+                    {open && (
+                      <div className="pb-1 pl-1">
+                        {section.note && (
+                          <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                            {section.note}
+                          </div>
+                        )}
+                        {section.title === "Geofísica" && geophysicsStatus.field > 0 && (
+                          <div className="mb-1 px-1 text-[9px] leading-tight text-content-subtle">
+                            CAMPO: {geophysicsStatus.field} · SIMULADO: {geophysicsStatus.synthetic}
+                            . Halo requiere ≥4 puntos CAMPO por variable.
+                          </div>
+                        )}
+                        {section.layers.map(([k, label]) => (
+                          <label
+                            key={k}
+                            className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 hover:bg-surface-2"
+                          >
+                            <input
+                              className="mt-0.5"
+                              type="checkbox"
+                              checked={visible[k]}
+                              onChange={(e) =>
+                                setVisible((state) => ({ ...state, [k]: e.target.checked }))
+                              }
+                            />
+                            <span className="min-w-0 flex-1 text-content-muted">
+                              <span className="flex items-center gap-1">
+                                <span className="truncate">{label}</span>
+                                {COUNTED.includes(k) && (
+                                  <span className="shrink-0 text-content-subtle">
+                                    · {counts[k]}
+                                  </span>
+                                )}
+                              </span>
+                              <EvidenceBadge
+                                kind={LAYER_META[k].evidence}
+                                scale={LAYER_META[k].scale}
+                                size="xs"
+                                className="mt-0.5"
+                              />
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
+
+        {/* Leyenda de firma espectral — chip propio, no compite con la lista de capas */}
+        {visible.halos && counts.halos > 0 && (
+          <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-lg border border-hairline bg-surface/95 px-2 py-1.5 text-[11px] shadow">
+            <div className="mb-1 font-semibold text-content">Firma espectral · Sentinel-2</div>
+            {legend.map((l) => (
+              <div key={l.label} className="flex items-center gap-2 py-0.5 text-content-muted">
+                <span
+                  className="inline-block h-2.5 w-2.5 rounded-full"
+                  style={{ background: l.color }}
+                />
+                {l.label}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Inspector lateral (docked) */}
         {selected && (
@@ -868,6 +1043,32 @@ function Inspector({
       ["Mo (ppm)", num(p.Mo, 1)],
       ["La/Ce/Nd (ppm)", `${num(p.La, 0)} / ${num(p.Ce, 0)} / ${num(p.Nd, 0)}`],
     ];
+  } else if (selected.kind === "estructuras") {
+    title = `Veta ${p.code ?? ""}`;
+    prov = "certificado";
+    rows = [
+      ["Descripción", p.name],
+      ["Rumbo", `N${p.strikeDeg}°`],
+      ["Manteo", p.dipText ?? "No informado"],
+      ["Potencia", p.potenciaM ? `${p.potenciaM} m` : "No informado"],
+    ];
+  } else if (selected.kind === "pedimentosPendientes") {
+    title = `${p.nombre ?? "Pedimento"}`;
+    prov = "contexto";
+    rows = [
+      ["Titular", p.titular],
+      ["Estado", p.estado],
+      ["Fuente", p.fuente],
+      ["Verificado en SERNAGEOMIN", p.verificado_sernageomin ? "Sí" : "No"],
+    ];
+  } else if (selected.kind === "mojones") {
+    title = `${p.nombre ?? "Hito de mensura"}`;
+    prov = "contexto";
+    rows = [
+      ["Concesión", p.concesion],
+      ["Tipo", p.tipo],
+      ["Fuente", p.fuente],
+    ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
     prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
@@ -900,7 +1101,9 @@ function Inspector({
         selected.kind === "sondajes" ||
         selected.kind === "pedimentos" ||
         selected.kind === "geoquimica" ||
-        selected.kind === "yacimientos") && (
+        selected.kind === "yacimientos" ||
+        selected.kind === "pedimentosPendientes" ||
+        selected.kind === "mojones") && (
         <div className="mt-3 rounded bg-surface-2 p-2 text-[10px] text-content-subtle">
           {selected.kind === "halos"
             ? "Detección satelital (Sentinel-2). Anomalía espectral, no identificación mineral ni extensión medida. Requiere verificación de terreno."
@@ -910,7 +1113,11 @@ function Inspector({
                 ? "Geoquímica de sedimento fluvial (SERNAGEOMIN). Dispersión regional en la cuenca, NO ley in situ. Orienta, no prueba mineralización."
                 : selected.kind === "yacimientos"
                   ? "Depósito conocido (SERNAGEOMIN, Minerales Críticos). Contexto de distrito; verificar distancia y sistema mineral. No implica continuidad al predio."
-                  : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
+                  : selected.kind === "pedimentosPendientes"
+                    ? "Declarado por el titular (KML propio), sin confirmar contra catastro oficial SERNAGEOMIN. La geometría puede ser un punto de referencia, no vértices de mensura. Verificar antes de asumir tenencia."
+                    : selected.kind === "mojones"
+                      ? "Hito de mensura (HM) declarado por el titular. No verificado independientemente por GeoCapitals; usar como referencia, no como control geodésico certificado."
+                      : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
         </div>
       )}
     </div>

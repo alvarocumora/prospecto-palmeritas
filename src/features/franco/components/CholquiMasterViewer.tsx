@@ -10,7 +10,12 @@ import pedimentosRaw from "@/data/geo/cholqui_pedimentos.geojson?raw";
 // Inteligencia de catastro (data oficial SERNAGEOMIN vía ArcGIS Online):
 import franjasRaw from "@/data/geo/cholqui_franjas.geojson?raw";
 import yacimientosRaw from "@/data/geo/cholqui_yacimientos.geojson?raw";
+// Pedimentos declarados por el titular (KML propio) que aún no aparecen en el
+// catastro oficial SERNAGEOMIN, y sus hitos de mensura declarados:
+import pedimentosPendientesRaw from "@/data/geo/cholqui_pedimentos_pendientes.geojson?raw";
+import mojonesRaw from "@/data/geo/cholqui_mojones.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
+import { CHOLQUI_STRUCTURES_GEOJSON } from "../data/cholquiStructures";
 
 /** Visor maestro unificado de Cholqui: reemplaza los 3 mapas apilados por uno solo. */
 function parse(raw: string): (FeatureCollection & { metadata?: Record<string, unknown> }) | null {
@@ -27,6 +32,8 @@ const drillGrid = parse(drillRaw);
 const pedimentos = parse(pedimentosRaw);
 const franjas = parse(franjasRaw);
 const yacimientos = parse(yacimientosRaw);
+const pedimentosPendientes = parse(pedimentosPendientesRaw);
+const mojones = parse(mojonesRaw);
 
 const norm = (s: string) => s.replace(/[-\s]/g, "").toUpperCase();
 const assayBy = new Map(CHOLQUI_ASSAYS.map((a) => [norm(a.sample), a]));
@@ -76,6 +83,11 @@ export function CholquiMasterViewer() {
       geophysics={geophysics}
       franjas={franjas}
       yacimientos={yacimientos}
+      estructuras={CHOLQUI_STRUCTURES_GEOJSON}
+      pedimentosPendientes={pedimentosPendientes}
+      mojones={mojones}
+      // geoquimica: sin dato — la geoquímica de sedimentos SERNAGEOMIN no cubre
+      // Melipilla (-33.85); no se cablea para no fabricar evidencia.
     />
   );
 }
