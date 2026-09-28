@@ -68,7 +68,6 @@ export function FrancoDashboard() {
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
 
-
         <footer className="text-[11px] text-content-subtle pb-8">
           {CHOLQUI.name} ({CHOLQUI.code}) · Operado por Geocapitals · Antes conocido como{" "}
           {CHOLQUI.formerName}. Documento informativo: no constituye oferta pública de valores.

@@ -31,7 +31,10 @@ export function cholquiTenurePolygons(): Array<MapPolygon & { rol: string; situa
   try {
     const fc = JSON.parse(catastroRaw) as { features: CatFeature[] };
     return fc.features
-      .filter((f) => f.geometry?.type === "Polygon" && TENURE_MATCH.some((r) => r.test(f.properties.nombre)))
+      .filter(
+        (f) =>
+          f.geometry?.type === "Polygon" && TENURE_MATCH.some((r) => r.test(f.properties.nombre)),
+      )
       .map((f) => ({
         label: f.properties.nombre.replace(/ DEL 1 AL \d+| \d+\/\d+/g, ""),
         ring: f.geometry.coordinates[0].map((c) => [c[0], c[1]] as [number, number]),
@@ -55,7 +58,11 @@ function inRing(lng: number, lat: number, ring: Array<[number, number]>): boolea
 }
 
 /** Todas las concesiones del catastro oficial cargado (no sólo la tenencia analizada). */
-function allCatastroPolygons(): Array<{ label: string; rol: string; ring: Array<[number, number]> }> {
+function allCatastroPolygons(): Array<{
+  label: string;
+  rol: string;
+  ring: Array<[number, number]>;
+}> {
   try {
     const fc = JSON.parse(catastroRaw) as { features: CatFeature[] };
     return fc.features
@@ -101,8 +108,6 @@ export function tenureAt(
   }
   return { concession: null, own: false, label: "Sin concesión en el catastro cargado" };
 }
-
-
 
 export type AgentNote = { label: string; note: string };
 

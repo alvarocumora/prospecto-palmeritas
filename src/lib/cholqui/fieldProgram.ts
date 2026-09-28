@@ -247,7 +247,8 @@ export function buildFieldProgram(data: CholquiSatelliteTargets): FieldProgram {
       objective:
         "Definir continuidad estructural bajo cubierta y separar rasgos topográficos de estructuras reales.",
       method: `${magLineKm} km de línea con separación de ${MAG_LINE_SPACING_M} m, estación base para corrección diurna y amarre topográfico.`,
-      deliverable: "Grilla de campo magnético reducido al polo y mapa de primera derivada vertical.",
+      deliverable:
+        "Grilla de campo magnético reducido al polo y mapa de primera derivada vertical.",
       days: magDays,
     },
     {
@@ -279,10 +280,16 @@ export function buildFieldProgram(data: CholquiSatelliteTargets): FieldProgram {
 
   const schedule: Array<{ week: string; activity: string }> = [
     { week: "Semana 1", activity: "Tenencia, accesos, servidumbres y control topográfico." },
-    { week: "Semanas 2-3", activity: `Mapeo geológico-estructural ${MAPPING_SCALE} de los targets.` },
+    {
+      week: "Semanas 2-3",
+      activity: `Mapeo geológico-estructural ${MAPPING_SCALE} de los targets.`,
+    },
     { week: "Semanas 3-4", activity: "Canaletas, QA/QC y despacho a laboratorio acreditado." },
     { week: "Semanas 4-5", activity: "Magnetometría terrestre y líneas de polarización inducida." },
-    { week: "Semana 6", activity: "Integración, reinterpretación y ajuste de la malla de sondajes." },
+    {
+      week: "Semana 6",
+      activity: "Integración, reinterpretación y ajuste de la malla de sondajes.",
+    },
   ];
 
   const permits: Array<{ item: string; responsible: string; status: string }> = [

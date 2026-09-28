@@ -88,17 +88,22 @@ export function CholquiTargetsSummary() {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
-        <Button variant="outline" className="h-10" disabled={!data || notesBusy} onClick={runAgent}>
-          {notesBusy ? <Loader2 className="animate-spin" /> : <Bot />}
-          {notes.length ? "Regenerar notas IA" : "Notas del agente IA"}
-        </Button>
-        <ProjectDocsMenu
-          className="h-10 shrink-0"
-          variant="outline"
-          label="Descargar informe de targets"
-          disabled={!data}
-          build={() => (data ? buildCholquiTargetsDoc(data, notes) : null)}
-        />
+          <Button
+            variant="outline"
+            className="h-10"
+            disabled={!data || notesBusy}
+            onClick={runAgent}
+          >
+            {notesBusy ? <Loader2 className="animate-spin" /> : <Bot />}
+            {notes.length ? "Regenerar notas IA" : "Notas del agente IA"}
+          </Button>
+          <ProjectDocsMenu
+            className="h-10 shrink-0"
+            variant="outline"
+            label="Descargar informe de targets"
+            disabled={!data}
+            build={() => (data ? buildCholquiTargetsDoc(data, notes) : null)}
+          />
         </div>
       </header>
 
@@ -109,7 +114,10 @@ export function CholquiTargetsSummary() {
           </div>
           <ul className="grid md:grid-cols-2 gap-3">
             {notes.map((n) => (
-              <li key={n.label} className="text-xs text-content border border-hairline rounded-lg p-3 bg-surface">
+              <li
+                key={n.label}
+                className="text-xs text-content border border-hairline rounded-lg p-3 bg-surface"
+              >
                 <b className="font-mono">{n.label}</b> — {n.note}
               </li>
             ))}

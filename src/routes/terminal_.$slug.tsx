@@ -1,6 +1,10 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { canonicalProjectSlug } from "@/lib/projects/catalog";
-import { getTerminalProject, isTerminalTab, type TerminalTabKey } from "@/features/terminal/terminalProjects";
+import {
+  getTerminalProject,
+  isTerminalTab,
+  type TerminalTabKey,
+} from "@/features/terminal/terminalProjects";
 import { ProjectTerminalShell } from "@/features/terminal/ProjectTerminalShell";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 
@@ -53,7 +57,10 @@ function TerminalPage() {
         <p className="text-content-subtle text-sm">
           Este proyecto no tiene un terminal de inversión publicado.
         </p>
-        <Link to="/proyectos" className="mt-4 inline-block text-accent-brand text-sm hover:underline">
+        <Link
+          to="/proyectos"
+          className="mt-4 inline-block text-accent-brand text-sm hover:underline"
+        >
           Ver todos los proyectos
         </Link>
       </MarketingPage>

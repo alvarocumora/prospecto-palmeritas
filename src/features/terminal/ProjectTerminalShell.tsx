@@ -3,7 +3,15 @@ import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getTilamaReport } from "@/lib/tilama.functions";
-import { Box, FileText, Landmark, Loader2, Map as MapIcon, MapPin, ShieldCheck } from "lucide-react";
+import {
+  Box,
+  FileText,
+  Landmark,
+  Loader2,
+  Map as MapIcon,
+  MapPin,
+  ShieldCheck,
+} from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
@@ -96,7 +104,10 @@ export function ProjectTerminalShell({
       <header className="sticky top-0 z-30 bg-surface-inverse text-white border-b border-white/10">
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
-            <Link to="/" className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white">
+            <Link
+              to="/"
+              className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white"
+            >
               Geocapitals · Terminal
             </Link>
 
@@ -310,7 +321,6 @@ function SimuladorTab({ project }: { project: TerminalProject }) {
 function DataRoomTab({ project }: { project: TerminalProject }) {
   const { ficha } = project;
   return (
-
     <>
       <section className="rounded-2xl border border-hairline bg-white p-6">
         <div className="flex items-center gap-2 mb-4">

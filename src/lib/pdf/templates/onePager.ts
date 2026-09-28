@@ -102,8 +102,15 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   } else if (model.map) {
     eyebrow(doc, M, y, "Ubicación");
     y += 12;
-    scatterMap(doc, { x: M, y, w: CW * 0.6, h: figH, points: model.map.points,
-        polygons: model.map.polygons, labelTop: 3 });
+    scatterMap(doc, {
+      x: M,
+      y,
+      w: CW * 0.6,
+      h: figH,
+      points: model.map.points,
+      polygons: model.map.polygons,
+      labelTop: 3,
+    });
   } else {
     y += 12;
   }

@@ -30,7 +30,10 @@ const publicEnv: Record<string, string | undefined> = {
     "VITE_SUPABASE_PUBLISHABLE_KEY",
     "SUPABASE_PUBLISHABLE_KEY",
   ),
-  "import.meta.env.VITE_SUPABASE_PROJECT_ID": pick("VITE_SUPABASE_PROJECT_ID", "SUPABASE_PROJECT_ID"),
+  "import.meta.env.VITE_SUPABASE_PROJECT_ID": pick(
+    "VITE_SUPABASE_PROJECT_ID",
+    "SUPABASE_PROJECT_ID",
+  ),
 };
 
 const define = Object.fromEntries(
@@ -49,7 +52,6 @@ export default defineConfig({
     // lanzaba "Missing Supabase environment variables", rompiendo la hidratacion.
     // Fijamos los valores publicos como literales para que siempre viajen al cliente.
     define,
-
 
     // Nota: NO aliasear `entities`. El árbol resuelve naturalmente v4 (cadena
     // html-to-text, usa lib/decode.js) y v7 anidado bajo htmlparser2@10 de
@@ -81,6 +83,5 @@ export default defineConfig({
         },
       },
     },
-
   },
 });
