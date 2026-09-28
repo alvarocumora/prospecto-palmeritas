@@ -70,7 +70,7 @@ base de datos.</p>
   <span class="kpi">Superficie: <b>${d.totalAreaHa.toLocaleString("es-CL")} ha</b></span>
 </div>
 <p><b>Estado de titulación.</b> Las pertenencias confirmadas figuran en el rol catastral con código
-<code>GF-CONC-*</code> y status SERNAGEOMIN reportado en la tabla del Anexo A. Las geometrías sin
+<code>CHQ-CONC-*</code> y status SERNAGEOMIN reportado en la tabla del Anexo A. Las geometrías sin
 match (${d.rows.filter((r) => r.matchKind === "NONE").length}) corresponden a polígonos auxiliares
 del KMZ y deben revisarse en QGIS antes de la auditoría QP.</p>
 
@@ -194,7 +194,7 @@ export function FrancoNI43101DraftPanel() {
           </div>
           <p className="mt-3">
             <b>Estado de titulación.</b> Las pertenencias confirmadas figuran en el rol catastral
-            con código <code>GF-CONC-*</code> y status SERNAGEOMIN reportado en el Anexo A. Las{" "}
+            con código <code>CHQ-CONC-*</code> y status SERNAGEOMIN reportado en el Anexo A. Las{" "}
             <b>{noMatch.length}</b> geometrías sin match corresponden a polígonos auxiliares del KMZ
             y deben revisarse en QGIS antes de la auditoría QP.
           </p>
