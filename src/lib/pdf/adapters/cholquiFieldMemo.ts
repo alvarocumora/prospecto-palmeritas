@@ -31,10 +31,14 @@ export function buildCholquiFieldMemoDoc(
   const tenure = cholquiTenurePolygons();
   const targets = p.targets.map((t) => {
     const tenure = tenureAt(t.lat, t.lng);
-    return { ...t, concession: tenure.concession, tenureLabel: tenure.label, ownTenure: tenure.own };
+    return {
+      ...t,
+      concession: tenure.concession,
+      tenureLabel: tenure.label,
+      ownTenure: tenure.own,
+    };
   });
   const ownCount = targets.filter((t) => t.ownTenure).length;
-
 
   return {
     reportProfile: "targeting",
@@ -179,7 +183,14 @@ export function buildCholquiFieldMemoDoc(
         blocks: [
           {
             kind: "table",
-            head: ["Target", "Concesión (catastro)", "Titularidad", "Firma espectral", "Puntaje", "Prioridad"],
+            head: [
+              "Target",
+              "Concesión (catastro)",
+              "Titularidad",
+              "Firma espectral",
+              "Puntaje",
+              "Prioridad",
+            ],
             widths: [0.09, 0.26, 0.17, 0.24, 0.11, 0.13],
             rows: targets.map((t) => [
               t.label,
@@ -236,10 +247,7 @@ export function buildCholquiFieldMemoDoc(
             kind: "kv",
             items: [
               ["Sitios de canaleta", String(p.channel.sites)],
-              [
-                "Largo de cada canaleta",
-                `${num(12)} m, perpendicular al rumbo de la estructura`,
-              ],
+              ["Largo de cada canaleta", `${num(12)} m, perpendicular al rumbo de la estructura`],
               [
                 "Tramo de muestra",
                 `${String(p.channel.sampleLengthM).replace(".", ",")} m continuos`,
@@ -269,7 +277,10 @@ export function buildCholquiFieldMemoDoc(
               ["Magnetometría terrestre", `${num(p.geophysics.magLineKm, 1)} km de línea`],
               ["Separación entre líneas", `${p.geophysics.magSpacingM} m`],
               ["Control diurno", "Estación base fija y corrección por variación diurna"],
-              ["Polarización inducida", `${p.geophysics.ipLines} líneas, ${num(p.geophysics.ipLineKm, 1)} km`],
+              [
+                "Polarización inducida",
+                `${p.geophysics.ipLines} líneas, ${num(p.geophysics.ipLineKm, 1)} km`,
+              ],
               ["Arreglo IP", p.geophysics.ipArray],
               ["Orientación", "Transversal al rumbo estructural dominante N20E"],
               ["Producto", "Inversión 2D de cargabilidad y resistividad por línea"],

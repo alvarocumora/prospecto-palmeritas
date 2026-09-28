@@ -15,8 +15,8 @@ export function TerminalSimulator({ ficha }: { ficha: ProjectFicha }) {
         <Eyebrow>Simulador de inversión</Eyebrow>
       </div>
       <p className="text-sm text-content-subtle mb-5">
-        Mueve el monto y mira participación estimada y retorno por escenario a{" "}
-        {ficha.horizonYears} años.
+        Mueve el monto y mira participación estimada y retorno por escenario a {ficha.horizonYears}{" "}
+        años.
       </p>
 
       <div className="grid md:grid-cols-[280px_1fr] gap-8 items-start">

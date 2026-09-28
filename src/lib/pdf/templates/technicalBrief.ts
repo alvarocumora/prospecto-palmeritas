@@ -81,7 +81,6 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     }
   };
 
-
   /* ---------- Portada ---------- */
   fill(doc, GC_COLOR.paper);
   doc.rect(0, 0, W, H, "F");
@@ -266,10 +265,13 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       }
       if (block.kind === "table") {
         need(80);
-        pagedTable(block.head, block.rows, block.widths?.map((p) => CW * p));
+        pagedTable(
+          block.head,
+          block.rows,
+          block.widths?.map((p) => CW * p),
+        );
         y += 16;
       }
-
     }
     n += 1;
   }

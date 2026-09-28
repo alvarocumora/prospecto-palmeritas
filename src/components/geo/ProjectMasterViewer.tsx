@@ -366,7 +366,6 @@ export function ProjectMasterViewer({
         groups.current.halos = L.layerGroup(layers).addTo(map);
       }
 
-
       // --- Sondajes propuestos (marcador + proyección de azimut)
       if (drillGrid?.features?.length) {
         const items: L.Layer[] = [];

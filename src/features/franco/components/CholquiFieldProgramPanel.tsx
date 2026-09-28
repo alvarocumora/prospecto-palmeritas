@@ -88,7 +88,10 @@ export function CholquiFieldProgramPanel() {
           <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-hairline border-b border-hairline bg-surface-2">
             {[
               ["Targets a validar", String(program.targets.length)],
-              ["Superficie a mapear", `${num(program.mapping.areaHa)} ha · ${program.mapping.scale}`],
+              [
+                "Superficie a mapear",
+                `${num(program.mapping.areaHa)} ha · ${program.mapping.scale}`,
+              ],
               [
                 "Muestras a laboratorio",
                 `${num(program.channel.submittedTotal)} (${num(program.channel.controlTotal)} de control)`,
@@ -163,9 +166,10 @@ export function CholquiFieldProgramPanel() {
               </table>
             </div>
             <p className="mt-3 text-[11px] text-content-subtle">
-              La titularidad se resuelve contra el catastro SERNAGEOMIN cargado. Los targets marcados
-              como &ldquo;Tercero&rdquo; caen en concesiones inscritas a nombre de otro titular: no se
-              ejecuta trabajo sobre ellos sin verificación registral y acuerdo escrito.
+              La titularidad se resuelve contra el catastro SERNAGEOMIN cargado. Los targets
+              marcados como &ldquo;Tercero&rdquo; caen en concesiones inscritas a nombre de otro
+              titular: no se ejecuta trabajo sobre ellos sin verificación registral y acuerdo
+              escrito.
             </p>
           </div>
 
@@ -231,7 +235,10 @@ export function CholquiFieldProgramPanel() {
               </div>
               <dl className="space-y-1.5 text-xs">
                 {[
-                  ["Magnetometría terrestre", `${num(program.geophysics.magLineKm, 1)} km de línea`],
+                  [
+                    "Magnetometría terrestre",
+                    `${num(program.geophysics.magLineKm, 1)} km de línea`,
+                  ],
                   ["Separación de líneas", `${program.geophysics.magSpacingM} m`],
                   [
                     "Polarización inducida",

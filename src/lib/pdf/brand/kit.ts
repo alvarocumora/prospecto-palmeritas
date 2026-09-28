@@ -598,7 +598,9 @@ export function fitTableRows(
   if (h > avail) return 0;
   let fit = 0;
   for (const row of opts.rows) {
-    const lines = row.map((cell, i) => (doc.splitTextToSize(cell, widths[i] - 10) as string[]).length);
+    const lines = row.map(
+      (cell, i) => (doc.splitTextToSize(cell, widths[i] - 10) as string[]).length,
+    );
     const rowH = Math.max(...lines) * (size * 1.35) + 8;
     if (h + rowH > avail) break;
     h += rowH;
@@ -606,7 +608,6 @@ export function fitTableRows(
   }
   return fit;
 }
-
 
 /** Bloque QR con leyenda: puerta de entrada al live map / data room. */
 export function qrBlock(

@@ -93,7 +93,6 @@ function Terrain({ tile }: { tile: DemTile }) {
         transparent
         opacity={0.9}
       />
-
     </mesh>
   );
 }
@@ -232,7 +231,6 @@ function DrillTrace({
         <coneGeometry args={[0.9, 2.2, 14]} />
         <meshStandardMaterial color="#4d7cff" depthTest={false} />
       </mesh>
-
     </group>
   );
 }
@@ -300,7 +298,7 @@ function Scene({
         anomalies.map((a) => {
           const pos = place(a.lat, a.lng, 0.4);
           const color = colorFor(a.indexCode);
-          const radius = Math.max(1.6, Math.sqrt((a.areaHa ?? 2) * 10_000 / Math.PI) * SCALE);
+          const radius = Math.max(1.6, Math.sqrt(((a.areaHa ?? 2) * 10_000) / Math.PI) * SCALE);
           return (
             <group key={a.id}>
               <Halo
