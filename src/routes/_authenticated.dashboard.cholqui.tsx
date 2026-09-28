@@ -73,7 +73,7 @@ function CholquiLivePage() {
         ))}
       </div>
 
-      {tab === "ficha" && <FrancoDashboard />}
+      {tab === "ficha" && <FrancoDashboard authenticated />}
       {tab !== "ficha" && (
         <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8">
           {tab === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel />}
