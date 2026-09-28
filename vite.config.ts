@@ -20,6 +20,21 @@ export default defineConfig({
   },
   vite: {
     plugins: [mcpPlugin()],
+    // El bundle de produccion quedaba con `import.meta.env` vacio y el cliente
+    // lanzaba "Missing Supabase environment variables", rompiendo la hidratacion.
+    // Fijamos los valores publicos como literales para que siempre viajen al cliente.
+    define: {
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
+        env["VITE_SUPABASE_URL"] ?? env["SUPABASE_URL"] ?? "",
+      ),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
+        env["VITE_SUPABASE_PUBLISHABLE_KEY"] ?? env["SUPABASE_PUBLISHABLE_KEY"] ?? "",
+      ),
+      "import.meta.env.VITE_SUPABASE_PROJECT_ID": JSON.stringify(
+        env["VITE_SUPABASE_PROJECT_ID"] ?? env["SUPABASE_PROJECT_ID"] ?? "",
+      ),
+    },
+
     // Nota: NO aliasear `entities`. El árbol resuelve naturalmente v4 (cadena
     // html-to-text, usa lib/decode.js) y v7 anidado bajo htmlparser2@10 de
     // cheerio (usa decode.js). Un alias fijo asume una versión hoisteada
