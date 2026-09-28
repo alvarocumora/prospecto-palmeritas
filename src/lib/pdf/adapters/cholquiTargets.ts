@@ -80,6 +80,29 @@ export function concessionAt(lat: number, lng: number): string | null {
   return hit.rol ? `${hit.label} (rol ${hit.rol})` : hit.label;
 }
 
+/**
+ * Titularidad del punto respecto de la tenencia analizada del proyecto.
+ * `own` sólo es verdadero dentro de TOKI 2 / PALLOCABE 8 / DOS MARIAS.
+ * Cualquier otra concesión del catastro se declara de tercero.
+ */
+export function tenureAt(
+  lat: number,
+  lng: number,
+): { concession: string | null; own: boolean; label: string } {
+  const own = cholquiTenurePolygons().find((p) => inRing(lng, lat, p.ring));
+  if (own) return { concession: own.label, own: true, label: "Tenencia analizada" };
+  const other = allCatastroPolygons().find((p) => inRing(lng, lat, p.ring));
+  if (other) {
+    return {
+      concession: other.rol ? `${other.label} (rol ${other.rol})` : other.label,
+      own: false,
+      label: "Concesion de tercero",
+    };
+  }
+  return { concession: null, own: false, label: "Sin concesion en el catastro cargado" };
+}
+
+
 
 export type AgentNote = { label: string; note: string };
 
