@@ -8,25 +8,20 @@
     }
   },
   "metadata": {
-    "project": "Cholqui",
+    "project": "cholqui",
     "sensor": "Sentinel-2 L2A",
-    "primary_index": "aloh",
     "provenance": "DERIVADO / INTERPRETADO",
     "coverage": {
-      "interpretable_typical_pct": 40.4,
-      "interpretable_bestcase_pct": 79.3,
-      "spectral_conclusive": true,
-      "headline": "Superficie sin cubierta vegetal interpretable: 40.4% del área."
+      "typical_pct": 36.7,
+      "bestcase_pct": 72.9,
+      "spectral_conclusive": true
     },
-    "scenes_used": 14,
-    "config_sha256": "50df4da94ba2bba835b48348a19ccc17e287eb53e7326d185ecfb0a9ad112d25",
+    "config_sha256": "ea812882f68b71bd1ad396f1e8a4697956e5bffc6b973eb0cb2893b8863c6055",
     "n": 15,
-    "disclaimer": "Screening satelital Nivel 0. No constituye recurso ni identificación mineral. Las anomalías son indicios que requieren verificación de terreno.",
-    "candidatos_dentro_concesion": 3,
-    "candidatos_fuera_concesion": 12,
-    "nota_espacial": "Bandera dentro/fuera calculada SOLO contra las pertenencias de franco_pertenencias.geojson (TOKI/PALLOCABE/DOS MARIAS). Si el proyecto incluye ESPERANZA/EUROPA u otras que no están en ese archivo, recalcular contra el set completo de concesiones. 3/15 dentro de las conocidas; las de fuera son contexto regional (no se puede perforar fuera de la tenencia).",
-    "schema": "lovable-compatible (index_code/score/Polygon)",
-    "tenencia_fuente": "SERNAGEOMIN (titular De Martino/Gianfranco, 29 concesiones)"
+    "tenencia_fuente": "SERNAGEOMIN ArcGIS Online (titular De Martino/Gianfranco, 29 concesiones, comuna Melipilla)",
+    "candidatos_dentro_concesion": 7,
+    "candidatos_fuera_concesion": 8,
+    "nota_espacial": "dentro_concesion calculado contra el set COMPLETO de 29 concesiones De Martino en Melipilla (no solo TOKI/PALLOCABE/DOS MARIAS)."
   },
   "features": [
     {
@@ -65,7 +60,46 @@
         "z_score": 8.27,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=8.27 (gossan 3.5). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=8.27 (gossan 3.5). DERIVADO Sentinel-2."
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.00767526389141,
+              -33.90314154054054
+            ],
+            [
+              -71.00637273610859,
+              -33.90314154054054
+            ],
+            [
+              -71.00637273610859,
+              -33.902060459459456
+            ],
+            [
+              -71.00767526389141,
+              -33.902060459459456
+            ],
+            [
+              -71.00767526389141,
+              -33.90314154054054
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "index_code": "CLAY_MINERALS",
+        "severity": "alta",
+        "score": 0.903,
+        "z_score": 8.13,
+        "dentro_concesion": true,
+        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
+        "notes": "Anomalia Al-OH z=8.13 (gossan 2.17). DERIVADO Sentinel-2."
       }
     },
     {
@@ -104,7 +138,7 @@
         "z_score": 7.76,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=7.76 (gossan 2.21). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=7.76 (gossan 2.21). DERIVADO Sentinel-2."
       }
     },
     {
@@ -143,7 +177,7 @@
         "z_score": 7.61,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=7.61 (gossan 4.36). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=7.61 (gossan 4.36). DERIVADO Sentinel-2."
       }
     },
     {
@@ -182,7 +216,7 @@
         "z_score": 7.15,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=7.15 (gossan 2.38). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=7.15 (gossan 2.38). DERIVADO Sentinel-2."
       }
     },
     {
@@ -221,7 +255,7 @@
         "z_score": 6.8,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.8 (gossan 2.59). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.8 (gossan 2.59). DERIVADO Sentinel-2."
       }
     },
     {
@@ -260,7 +294,7 @@
         "z_score": 6.75,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.75 (gossan 5.62). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.75 (gossan 5.62). DERIVADO Sentinel-2."
       }
     },
     {
@@ -299,7 +333,7 @@
         "z_score": 6.64,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.64 (gossan 1.33). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.64 (gossan 1.33). DERIVADO Sentinel-2."
       }
     },
     {
@@ -338,7 +372,7 @@
         "z_score": 6.61,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.61 (gossan 3.95). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.61 (gossan 3.95). DERIVADO Sentinel-2."
       }
     },
     {
@@ -377,7 +411,7 @@
         "z_score": 6.52,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.52 (gossan 2.51). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.52 (gossan 2.51). DERIVADO Sentinel-2."
       }
     },
     {
@@ -416,7 +450,7 @@
         "z_score": 6.21,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=6.21 (gossan 3.85). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=6.21 (gossan 3.85). DERIVADO Sentinel-2."
       }
     },
     {
@@ -451,11 +485,11 @@
       "properties": {
         "index_code": "CLAY_MINERALS",
         "severity": "media",
-        "score": 0.657,
-        "z_score": 5.91,
+        "score": 0.656,
+        "z_score": 5.9,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=5.91 (gossan 2.94). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=5.9 (gossan 2.94). DERIVADO Sentinel-2."
       }
     },
     {
@@ -494,7 +528,7 @@
         "z_score": 5.9,
         "dentro_concesion": false,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=5.9 (gossan 3.24). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=5.9 (gossan 3.24). DERIVADO Sentinel-2."
       }
     },
     {
@@ -533,7 +567,7 @@
         "z_score": 5.77,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=5.77 (gossan 3.11). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=5.77 (gossan 3.11). DERIVADO Sentinel-2."
       }
     },
     {
@@ -568,50 +602,11 @@
       "properties": {
         "index_code": "HYDROTHERMAL_ALTERATION",
         "severity": "media",
-        "score": 0.639,
-        "z_score": 5.75,
+        "score": 0.638,
+        "z_score": 5.74,
         "dentro_concesion": true,
         "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=5.75 (gossan 4.51). DERIVADO Sentinel-2, no verificado en terreno."
-      }
-    },
-    {
-      "type": "Feature",
-      "geometry": {
-        "type": "Polygon",
-        "coordinates": [
-          [
-            [
-              -71.00893425133366,
-              -33.90149754054054
-            ],
-            [
-              -71.00763174866636,
-              -33.90149754054054
-            ],
-            [
-              -71.00763174866636,
-              -33.90041645945946
-            ],
-            [
-              -71.00893425133366,
-              -33.90041645945946
-            ],
-            [
-              -71.00893425133366,
-              -33.90149754054054
-            ]
-          ]
-        ]
-      },
-      "properties": {
-        "index_code": "CLAY_MINERALS",
-        "severity": "media",
-        "score": 0.634,
-        "z_score": 5.71,
-        "dentro_concesion": true,
-        "procedencia": "DERIVADO / INTERPRETADO — no verificado en terreno",
-        "notes": "Anomalia Al-OH z=5.71 (gossan 2.82). DERIVADO Sentinel-2, no verificado en terreno."
+        "notes": "Anomalia Al-OH z=5.74 (gossan 4.51). DERIVADO Sentinel-2."
       }
     }
   ]

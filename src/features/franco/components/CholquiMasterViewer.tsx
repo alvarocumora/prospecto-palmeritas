@@ -11,6 +11,7 @@ import pedimentosRaw from "@/data/geo/cholqui_pedimentos.geojson?raw";
 import franjasRaw from "@/data/geo/cholqui_franjas.geojson?raw";
 import yacimientosRaw from "@/data/geo/cholqui_yacimientos.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
+import { CHOLQUI_STRUCTURES_GEOJSON } from "../data/cholquiStructures";
 
 /** Visor maestro unificado de Cholqui: reemplaza los 3 mapas apilados por uno solo. */
 function parse(raw: string): (FeatureCollection & { metadata?: Record<string, unknown> }) | null {
@@ -76,6 +77,9 @@ export function CholquiMasterViewer() {
       geophysics={geophysics}
       franjas={franjas}
       yacimientos={yacimientos}
+      estructuras={CHOLQUI_STRUCTURES_GEOJSON}
+      // geoquimica: sin dato — la geoquímica de sedimentos SERNAGEOMIN no cubre
+      // Melipilla (-33.85); no se cablea para no fabricar evidencia.
     />
   );
 }

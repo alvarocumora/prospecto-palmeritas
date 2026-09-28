@@ -52,6 +52,7 @@ export type MasterViewerProps = {
   franjas?: FeatureCollection | null; // franjas metalogénicas (contexto de sistema mineral)
   yacimientos?: FeatureCollection | null; // depósitos conocidos / minerales críticos (Merge_RR)
   geoquimica?: FeatureCollection | null; // muestras de sedimento (multi-elemento medido)
+  estructuras?: FeatureCollection | null; // vetas con rumbo/manteo medido en terreno
   height?: number;
 };
 
@@ -81,6 +82,7 @@ type LayerKey =
   | "franjas"
   | "yacimientos"
   | "geoquimica"
+  | "estructuras"
   | "sondajes"
   | "ensayes"
   | "pedimentos";
@@ -132,6 +134,7 @@ const LAYER_SECTIONS: ReadonlyArray<{
     title: "Exploración",
     layers: [
       ["ensayes", "Ensayes certificados"],
+      ["estructuras", "Vetas · rumbo/manteo de terreno"],
       ["sondajes", "Sondajes propuestos"],
       ["pedimentos", "Pedimentos propuestos"],
     ],
@@ -155,6 +158,7 @@ const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   franjas: { evidence: "OFICIAL", scale: "regional" },
   yacimientos: { evidence: "OFICIAL", scale: "depósito" },
   geoquimica: { evidence: "MEDIDO", scale: "sedimento" },
+  estructuras: { evidence: "MEDIDO", scale: "punto/rumbo" },
   halos: { evidence: "DERIVADO", scale: "10–20 m" },
   magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
   gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
@@ -181,6 +185,7 @@ export function ProjectMasterViewer({
   franjas = null,
   yacimientos = null,
   geoquimica = null,
+  estructuras = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
@@ -201,6 +206,7 @@ export function ProjectMasterViewer({
     franjas: false,
     yacimientos: true,
     geoquimica: true,
+    estructuras: true,
     sondajes: true,
     ensayes: true,
     pedimentos: true,
@@ -493,6 +499,18 @@ export function ProjectMasterViewer({
         groups.current.geoquimica = L.layerGroup(items).addTo(map);
       }
 
+      // --- Estructuras (vetas con rumbo/manteo medido en terreno; MEDIDO)
+      if (estructuras?.features?.length) {
+        const line = L.geoJSON(estructuras as never, {
+          style: { color: "#facc15", weight: 3, opacity: 0.9 },
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () =>
+              sel("estructuras", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+        });
+        groups.current.estructuras = line.addTo(map);
+      }
+
       // Encuadrar a lo que exista
       try {
         const bounds = L.latLngBounds([]);
@@ -575,6 +593,7 @@ export function ProjectMasterViewer({
       franjas: franjas?.features?.length ?? 0,
       yacimientos: yacimientos?.features?.length ?? 0,
       geoquimica: geoquimica?.features?.length ?? 0,
+      estructuras: estructuras?.features?.length ?? 0,
       geofisicaProyecto: geophysicsStatus.field + geophysicsStatus.synthetic,
       magSurfaceProject: geophysicsStatus.magnetic >= 4 ? geophysicsStatus.magnetic : 0,
       ipChargeSurfaceProject: geophysicsStatus.ipCharge >= 4 ? geophysicsStatus.ipCharge : 0,
@@ -594,6 +613,7 @@ export function ProjectMasterViewer({
       franjas,
       yacimientos,
       geoquimica,
+      estructuras,
     ],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
@@ -607,6 +627,7 @@ export function ProjectMasterViewer({
     "franjas",
     "yacimientos",
     "geoquimica",
+    "estructuras",
   ];
   const visibleSections = useMemo(
     () =>
@@ -867,6 +888,15 @@ function Inspector({
       ["As (ppm)", num(p.As, 1)],
       ["Mo (ppm)", num(p.Mo, 1)],
       ["La/Ce/Nd (ppm)", `${num(p.La, 0)} / ${num(p.Ce, 0)} / ${num(p.Nd, 0)}`],
+    ];
+  } else if (selected.kind === "estructuras") {
+    title = `Veta ${p.code ?? ""}`;
+    prov = "certificado";
+    rows = [
+      ["Descripción", p.name],
+      ["Rumbo", `N${p.strikeDeg}°`],
+      ["Manteo", p.dipText ?? "No informado"],
+      ["Potencia", p.potenciaM ? `${p.potenciaM} m` : "No informado"],
     ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
