@@ -9,7 +9,7 @@ import { GeologicalMapPanel } from "./panels/GeologicalMapPanel";
 import { PortfolioPanel } from "./panels/PortfolioPanel";
 import { getTerminalPortfolio } from "@/lib/terminal.functions";
 
-export function TerminalShell() {
+export function GlobalTerminalShell() {
   const { user } = useAuth();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const fetchPortfolio = useServerFn(getTerminalPortfolio);

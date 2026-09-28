@@ -26,23 +26,23 @@ export const Route = createFileRoute("/proyectos")({
   component: ProyectosPage,
 });
 
-// Las cards aterrizan en la FICHA DE INVERSIÓN (visión inversionista); el
-// live map técnico se abre desde dentro de la ficha.
+// Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
+// simulador y data room en una sola pantalla, sin saltos intermedios).
 const SHOWCASE = [
   {
     code: "PALMERAS",
+    slug: "palmeras" as const,
     name: "Prospecto Las Palmeras",
     region: "Illapel · Coquimbo",
     commodity: "Au-Ag",
-    to: "/proyectos/ficha/palmeras",
     bullets: ["74 concesiones · 12.807 ha", "16 sondajes · 4.426 m", "12 anomalías satelitales"],
   },
   {
     code: "LOSVERDES",
+    slug: "losverdes" as const,
     name: "Los Verdes",
     region: "Petorca · Valparaíso",
     commodity: "Cu-Mo",
-    to: "/proyectos/ficha/losverdes",
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
@@ -51,10 +51,10 @@ const SHOWCASE = [
   },
   {
     code: "CHOLQUI",
+    slug: "cholqui" as const,
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    to: "/proyectos/ficha/cholqui",
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",
@@ -82,7 +82,9 @@ function ProyectosPage() {
         {SHOWCASE.map((p) => (
           <Link
             key={p.code}
-            to={p.to}
+            to="/terminal/$slug"
+            params={{ slug: p.slug }}
+            search={{ tab: "mapa" as const }}
             className="group rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
           >
             <div className="flex items-center justify-between">
@@ -103,7 +105,7 @@ function ProyectosPage() {
               ))}
             </ul>
             <div className="mt-4 pt-3 border-t border-hairline text-[11px] font-mono uppercase tracking-wider text-accent-brand">
-              Ficha de inversión · ticket, ROI y simulador
+              Terminal · mapa, ensayes, simulador y data room
             </div>
           </Link>
         ))}

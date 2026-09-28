@@ -10,6 +10,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
+import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
 
 export function PublicListingDrawer({
   listing,
@@ -33,6 +34,7 @@ export function PublicListingDrawer({
 }
 
 function Body({ listing }: { listing: PublicListing }) {
+  const terminalSlug = terminalSlugForListing(listing);
   return (
     <div className="flex flex-col">
       <div className="relative aspect-[16/9] bg-accent-brand-subtle overflow-hidden">
@@ -110,13 +112,24 @@ function Body({ listing }: { listing: PublicListing }) {
         )}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            to="/proyectos/$listingId"
-            params={{ listingId: listing.id }}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
-          >
-            Ver ficha completa & simulador <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
+          {terminalSlug ? (
+            <Link
+              to="/terminal/$slug"
+              params={{ slug: terminalSlug }}
+              search={{ tab: "mapa" as const }}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
+            >
+              Abrir terminal del activo <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <Link
+              to="/proyectos/$listingId"
+              params={{ listingId: listing.id }}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
+            >
+              Ver ficha completa & simulador <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          )}
         </div>
 
         <RequestAccess listing={listing} />
