@@ -2,12 +2,13 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
 import { CholquiMasterViewer } from "./components/CholquiMasterViewer";
+import { CholquiTargetsSummary } from "./components/CholquiTargetsSummary";
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
 import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
 import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
-import { FrancoPertenenciasPanel } from "./components/FrancoPertenenciasPanel";
+
 import { CHOLQUI } from "./data/cholqui";
 import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from "./cholquiPdf";
 
@@ -54,10 +55,12 @@ export function FrancoDashboard() {
           downloadingTeaser={downloadingTeaser}
         />
 
-        {/* Visor maestro unificado: reemplaza los 3 mapas apilados (evidencia +
-            pertenencias + targets) por una sola vista con capas conmutables e
-            inspector de procedencia. */}
+        {/* Visor maestro unificado: única vista cartográfica (territorio,
+            teledetección, geofísica y exploración) con inspector de procedencia. */}
         <CholquiMasterViewer />
+
+        {/* Tabla técnica de la malla propuesta + descarga del informe de targets. */}
+        <CholquiTargetsSummary />
 
         <CholquiScenariosPanel />
         <CholquiMinePlanPanel />
@@ -65,9 +68,6 @@ export function FrancoDashboard() {
         <CholquiEvidencePanel />
         <CholquiRoundPanel />
 
-        <div data-surface="canvas" className="rounded-2xl overflow-hidden">
-          <FrancoPertenenciasPanel />
-        </div>
 
         <footer className="text-[11px] text-content-subtle pb-8">
           {CHOLQUI.name} ({CHOLQUI.code}) · Operado por Geocapitals · Antes conocido como{" "}
