@@ -18,8 +18,10 @@ import { buildGeophysicsOverlays } from "@/components/map/geophysicsOverlays";
 import {
   buildGeophysicsLayer,
   buildGeophysicsSurfaceLayer,
+  buildAnomalySurfaceLayer,
 } from "@/components/map/geophysicsLayers";
 import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
+import { buildAnomalySurface, anomalyIntensityColor } from "@/lib/geoscience/anomalySurface";
 import type { GeophysicsData } from "@/types/geophysics";
 import { EvidenceBadge, type Evidence } from "@/components/ui-system";
 
@@ -88,6 +90,7 @@ type LayerKey =
   | "pedimentosPendientes"
   | "mojones"
   | "halos"
+  | "halosIntensidad"
   | "magneticaRegional"
   | "gravedadRegional"
   | "geofisicaProyecto"
@@ -127,7 +130,10 @@ const LAYER_SECTIONS: ReadonlyArray<{
     icon: Satellite,
     defaultOpen: true,
     note: "Derivado de sensores remotos; requiere validación en terreno.",
-    layers: [["halos", "Halos espectrales · Sentinel-2"]],
+    layers: [
+      ["halos", "Halos espectrales · Sentinel-2"],
+      ["halosIntensidad", "Mapa de intensidad · IDW (tipo kriging)"],
+    ],
   },
   {
     title: "Geofísica",
@@ -170,6 +176,16 @@ const LAYER_SECTIONS: ReadonlyArray<{
   },
 ];
 
+// Mismos stops que `anomalyIntensityColor` (blue→cyan→green→yellow→magenta),
+// expresados como CSS para la leyenda de gradiente.
+const ANOMALY_GRADIENT_STOPS: ReadonlyArray<[number, string]> = [
+  [0, anomalyIntensityColor(0)],
+  [0.3, anomalyIntensityColor(0.3)],
+  [0.55, anomalyIntensityColor(0.55)],
+  [0.75, anomalyIntensityColor(0.75)],
+  [1, anomalyIntensityColor(1)],
+];
+
 type ProvKind = "certificado" | "derivado" | "conceptual" | "contexto";
 const PROV: Record<ProvKind, { label: string; bg: string }> = {
   certificado: { label: "CERTIFICADO", bg: "#15803d" },
@@ -191,6 +207,7 @@ const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   geoquimica: { evidence: "MEDIDO", scale: "sedimento" },
   estructuras: { evidence: "MEDIDO", scale: "punto/rumbo" },
   halos: { evidence: "DERIVADO", scale: "10–20 m" },
+  halosIntensidad: { evidence: "DERIVADO", scale: "IDW · z-score" },
   magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
   gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
   geofisicaProyecto: { evidence: "MEDIDO", scale: "estaciones" },
@@ -231,6 +248,7 @@ export function ProjectMasterViewer({
     pedimentosPendientes: true,
     mojones: false,
     halos: true,
+    halosIntensidad: false,
     magneticaRegional: true,
     gravedadRegional: false,
     geofisicaProyecto: true,
@@ -437,6 +455,42 @@ export function ProjectMasterViewer({
           layers.push(core);
         }
         groups.current.halos = L.layerGroup(layers).addTo(map);
+      }
+
+      // --- Mapa de intensidad (IDW) de las mismas anomalías satelitales: en vez
+      // de polígonos discretos por firma, interpola el z-score sobre una grilla
+      // continua — mismo lenguaje visual que un mapa de kriging (azul→magenta).
+      // Es visualización derivada, no reemplaza el detalle por firma de "halos".
+      if (anomalies?.features?.length) {
+        const points: Array<{ lat: number; lng: number; value: number }> = [];
+        for (const f of anomalies.features) {
+          const p = (f.properties ?? {}) as Record<string, unknown>;
+          const value = Number(p.z_score ?? p.score);
+          if (!Number.isFinite(value)) continue;
+
+          const coords: Array<[number, number]> = [];
+          const walk = (c: unknown): void => {
+            if (!Array.isArray(c)) return;
+            if (typeof c[0] === "number" && typeof c[1] === "number") {
+              coords.push([c[0] as number, c[1] as number]);
+              return;
+            }
+            (c as unknown[]).forEach(walk);
+          };
+          walk((f.geometry as { coordinates?: unknown })?.coordinates);
+          if (!coords.length) continue;
+
+          const lngs = coords.map((c) => c[0]);
+          const lats = coords.map((c) => c[1]);
+          const cLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+          const cLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+          points.push({ lat: cLat, lng: cLng, value });
+        }
+
+        const surface = buildAnomalySurface(points, { unit: "z-score" });
+        if (surface) {
+          groups.current.halosIntensidad = buildAnomalySurfaceLayer(L, surface);
+        }
       }
 
       // --- Sondajes propuestos (marcador + proyección de azimut)
@@ -703,6 +757,8 @@ export function ProjectMasterViewer({
       pedimentosPendientes: pedimentosPendientes?.features?.length ?? 0,
       mojones: mojones?.features?.length ?? 0,
       halos: anomalies?.features?.length ?? 0,
+      halosIntensidad:
+        (anomalies?.features?.length ?? 0) >= 4 ? (anomalies?.features.length ?? 0) : 0,
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
       pedimentos: pedimentos?.features?.length ?? 0,
@@ -740,6 +796,7 @@ export function ProjectMasterViewer({
     "pedimentosPendientes",
     "mojones",
     "halos",
+    "halosIntensidad",
     "sondajes",
     "ensayes",
     "pedimentos",
@@ -820,8 +877,16 @@ export function ProjectMasterViewer({
           </button>
         </div>
 
-        {/* Panel de capas (izquierda-flotante) — colapsable; secciones colapsables; solo con datos */}
-        <div className="pointer-events-auto absolute bottom-3 left-3 top-11 z-[500] flex w-60 flex-col rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">
+        {/* Panel de capas (izquierda-flotante) — colapsable; secciones colapsables; solo con datos.
+            Colapsado: alto automático (solo la cabecera). Expandido: se estira hasta
+            `bottom-3` para que la lista scrollee dentro de la altura del mapa. Antes el
+            contenedor SIEMPRE ocupaba top-11→bottom-3 (con fondo semi-opaco), tapando el
+            mapa con un bloque en blanco aunque el panel estuviera colapsado. */}
+        <div
+          className={`pointer-events-auto absolute left-3 top-11 z-[500] flex w-60 flex-col rounded-lg border border-hairline bg-surface/95 text-[12px] shadow ${
+            collapsed ? "" : "bottom-3"
+          }`}
+        >
           <button
             type="button"
             onClick={() => setCollapsed((c) => !c)}
@@ -912,19 +977,43 @@ export function ProjectMasterViewer({
           )}
         </div>
 
-        {/* Leyenda de firma espectral — chip propio, no compite con la lista de capas */}
-        {visible.halos && counts.halos > 0 && (
-          <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-lg border border-hairline bg-surface/95 px-2 py-1.5 text-[11px] shadow">
-            <div className="mb-1 font-semibold text-content">Firma espectral · Sentinel-2</div>
-            {legend.map((l) => (
-              <div key={l.label} className="flex items-center gap-2 py-0.5 text-content-muted">
-                <span
-                  className="inline-block h-2.5 w-2.5 rounded-full"
-                  style={{ background: l.color }}
-                />
-                {l.label}
+        {/* Leyendas flotantes (firma espectral + intensidad IDW) — apiladas sin
+            hueco fijo entre ellas, cada una condicional a su propia capa. */}
+        {((visible.halos && counts.halos > 0) ||
+          (visible.halosIntensidad && counts.halosIntensidad > 0)) && (
+          <div className="pointer-events-none absolute right-3 top-3 z-[500] flex flex-col gap-2">
+            {visible.halos && counts.halos > 0 && (
+              <div className="rounded-lg border border-hairline bg-surface/95 px-2 py-1.5 text-[11px] shadow">
+                <div className="mb-1 font-semibold text-content">Firma espectral · Sentinel-2</div>
+                {legend.map((l) => (
+                  <div key={l.label} className="flex items-center gap-2 py-0.5 text-content-muted">
+                    <span
+                      className="inline-block h-2.5 w-2.5 rounded-full"
+                      style={{ background: l.color }}
+                    />
+                    {l.label}
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+
+            {visible.halosIntensidad && counts.halosIntensidad > 0 && (
+              <div className="rounded-lg border border-hairline bg-surface/95 px-2 py-1.5 text-[11px] shadow">
+                <div className="mb-1 font-semibold text-content">Intensidad · IDW (z-score)</div>
+                <div
+                  className="h-2.5 w-32 rounded-full"
+                  style={{
+                    background: `linear-gradient(to right, ${ANOMALY_GRADIENT_STOPS.map(
+                      ([t, color]) => `${color} ${t * 100}%`,
+                    ).join(", ")})`,
+                  }}
+                />
+                <div className="mt-0.5 flex justify-between text-content-muted">
+                  <span>bajo</span>
+                  <span>alto</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
