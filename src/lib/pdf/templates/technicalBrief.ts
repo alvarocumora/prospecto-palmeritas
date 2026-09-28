@@ -18,6 +18,7 @@ import {
   editorialTable,
   eyebrow,
   fill,
+  fitTableRows,
   font,
   ink,
   kpiGrid,
@@ -67,7 +68,6 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   /** Dibuja una tabla cortándola entre páginas; devuelve el alto del último tramo. */
   const pagedTable = (head: string[], rows: string[][], widths?: number[]): number => {
     let rest = rows;
-    let lastH = 0;
     let guard = 0;
     while (rest.length && guard++ < 60) {
       const fit = fitTableRows(doc, { head, rows: rest, widths, w: CW }, BOTTOM - y);
@@ -75,8 +75,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
         nextPage();
         continue;
       }
-      lastH = editorialTable(doc, { x: M, y, w: CW, head, rows: rest.slice(0, fit), widths });
-      y += lastH;
+      y += editorialTable(doc, { x: M, y, w: CW, head, rows: rest.slice(0, fit), widths });
       rest = rest.slice(fit);
       if (rest.length) nextPage();
     }
