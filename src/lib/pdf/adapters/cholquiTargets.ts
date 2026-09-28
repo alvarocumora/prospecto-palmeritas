@@ -96,10 +96,10 @@ export function tenureAt(
     return {
       concession: other.rol ? `${other.label} (rol ${other.rol})` : other.label,
       own: false,
-      label: "Concesion de tercero",
+      label: "Concesión de tercero",
     };
   }
-  return { concession: null, own: false, label: "Sin concesion en el catastro cargado" };
+  return { concession: null, own: false, label: "Sin concesión en el catastro cargado" };
 }
 
 

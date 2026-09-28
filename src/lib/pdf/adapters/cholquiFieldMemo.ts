@@ -173,13 +173,13 @@ export function buildCholquiFieldMemoDoc(
       },
       {
         eyebrow: "Targets",
-        title: "Prioridad, concesion y acciones por target",
+        title: "Prioridad, concesión y acciones por target",
         deck: true,
-        lead: "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas ultimas no se ejecuta trabajo sin acuerdo previo.",
+        lead: "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas últimas no se ejecuta trabajo sin verificación registral ni acuerdo escrito previo.",
         blocks: [
           {
             kind: "table",
-            head: ["Target", "Concesion (catastro)", "Titularidad", "Firma espectral", "Puntaje", "Prioridad"],
+            head: ["Target", "Concesión (catastro)", "Titularidad", "Firma espectral", "Puntaje", "Prioridad"],
             widths: [0.09, 0.26, 0.17, 0.24, 0.11, 0.13],
             rows: targets.map((t) => [
               t.label,
