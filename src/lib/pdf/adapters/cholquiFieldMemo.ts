@@ -56,7 +56,7 @@ export function buildCholquiFieldMemoDoc(
       {
         label: "Targets a validar",
         value: String(targets.length),
-        note: "Sólo anomalías dentro de la tenencia conocida",
+        note: "Anomalías dentro de concesión registrada en catastro",
       },
       {
         label: "Superficie a mapear",
@@ -101,7 +101,7 @@ export function buildCholquiFieldMemoDoc(
     },
     map: {
       title: "Targets de validación en terreno",
-      caption: `${targets.length} targets dentro de la tenencia conocida y ${data.collars.length} collares propuestos a replantear.`,
+      caption: `${targets.length} targets dentro de concesión registrada en el catastro cargado y ${data.collars.length} collares propuestos a replantear.`,
       valueUnit: "puntaje",
       captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
