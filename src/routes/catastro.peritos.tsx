@@ -26,6 +26,14 @@ function normalize(s: string): string {
   return s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
 }
 
+function formatDateOnly(value: string): string {
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return value;
+  return new Intl.DateTimeFormat("es-CL", { timeZone: "UTC" }).format(
+    new Date(Date.UTC(year, month - 1, day)),
+  );
+}
+
 function PeritosPage() {
   const [q, setQ] = useState("");
   const filtered = useMemo(() => {
@@ -34,7 +42,7 @@ function PeritosPage() {
     return PERITOS_MENSURADORES_2026.filter(
       (p) =>
         normalize(p.nombre).includes(term) ||
-        p.rut.replace(/\./g, "").includes(term.replace(/\./g, "")),
+        normalize(p.rut).replace(/\./g, "").includes(term.replace(/\./g, "")),
     );
   }, [q]);
 
@@ -64,7 +72,7 @@ function PeritosPage() {
             <div>
               <dt className="text-muted-foreground">Resolución</dt>
               <dd className="font-semibold">
-                {meta.resolucion} · {new Date(meta.fecha).toLocaleDateString("es-CL")}
+                {meta.resolucion} · {formatDateOnly(meta.fecha)}
               </dd>
             </div>
             <div>
