@@ -48,7 +48,7 @@ function strList(v: unknown): string[] {
 export const compareProjects = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { codes?: string[] }) => ({
-    codes: (input?.codes ?? ["GF-001", "LV-TIL-001"]).slice(0, 4),
+    codes: (input?.codes ?? ["CHOLQUI", "LV-TIL-001"]).slice(0, 4),
   }))
   .handler(async ({ context, data }): Promise<ProjectComparison[]> => {
     const sb = context.supabase;
