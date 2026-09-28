@@ -14,12 +14,43 @@ for (const [k, v] of Object.entries(env)) {
   if (!process.env[k]) process.env[k] = v;
 }
 
+// Valores publicos que el navegador necesita. Si falta alguno, no lo definimos
+// y dejamos que la inyeccion por defecto del preset haga su trabajo.
+const pick = (...keys: string[]) => {
+  for (const key of keys) {
+    const value = env[key] ?? process.env[key];
+    if (value) return value;
+  }
+  return undefined;
+};
+
+const publicEnv: Record<string, string | undefined> = {
+  "import.meta.env.VITE_SUPABASE_URL": pick("VITE_SUPABASE_URL", "SUPABASE_URL"),
+  "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": pick(
+    "VITE_SUPABASE_PUBLISHABLE_KEY",
+    "SUPABASE_PUBLISHABLE_KEY",
+  ),
+  "import.meta.env.VITE_SUPABASE_PROJECT_ID": pick("VITE_SUPABASE_PROJECT_ID", "SUPABASE_PROJECT_ID"),
+};
+
+const define = Object.fromEntries(
+  Object.entries(publicEnv)
+    .filter(([, value]) => Boolean(value))
+    .map(([key, value]) => [key, JSON.stringify(value)]),
+);
+
 export default defineConfig({
   tanstackStart: {
     server: { entry: "server" },
   },
   vite: {
     plugins: [mcpPlugin()],
+    // El bundle de produccion quedaba con `import.meta.env` vacio y el cliente
+    // lanzaba "Missing Supabase environment variables", rompiendo la hidratacion.
+    // Fijamos los valores publicos como literales para que siempre viajen al cliente.
+    define,
+
+
     // Nota: NO aliasear `entities`. El árbol resuelve naturalmente v4 (cadena
     // html-to-text, usa lib/decode.js) y v7 anidado bajo htmlparser2@10 de
     // cheerio (usa decode.js). Un alias fijo asume una versión hoisteada
