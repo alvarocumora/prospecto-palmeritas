@@ -110,13 +110,24 @@ function Body({ listing }: { listing: PublicListing }) {
         )}
 
         <div className="mt-6 flex flex-wrap gap-3">
-          <Link
-            to="/proyectos/$listingId"
-            params={{ listingId: listing.id }}
-            className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
-          >
-            Ver ficha completa & simulador <ExternalLink className="w-3.5 h-3.5" />
-          </Link>
+          {terminalSlug ? (
+            <Link
+              to="/terminal/$slug"
+              params={{ slug: terminalSlug }}
+              search={{ tab: "mapa" as const }}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
+            >
+              Abrir terminal del activo <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          ) : (
+            <Link
+              to="/proyectos/$listingId"
+              params={{ listingId: listing.id }}
+              className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-md border border-accent-brand text-accent-brand text-sm font-medium hover:bg-accent-brand-subtle transition-colors"
+            >
+              Ver ficha completa & simulador <ExternalLink className="w-3.5 h-3.5" />
+            </Link>
+          )}
         </div>
 
         <RequestAccess listing={listing} />
