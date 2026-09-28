@@ -45,11 +45,11 @@ export function CholquiTargetsSummary() {
     try {
       const inTenure = data.anomalies.filter((a) => a.withinTenure);
       const targets = [
-        ...inTenure.map((a, i) => ({
+        ...inTenure.map((a) => ({
           label: `A-${String(data.anomalies.indexOf(a) + 1).padStart(2, "0")}`,
           kind: "anomalia" as const,
           concession: concessionAt(a.lat, a.lng),
-          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${a.zScore ?? "s/d"}; area ${a.areaHa ?? "s/d"} ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E. Orden ${i + 1}.`,
+          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${a.zScore ?? "s/d"}; area ${a.areaHa ?? "s/d"} ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E.`,
         })),
         ...data.collars.map((c) => ({
           label: c.code,
