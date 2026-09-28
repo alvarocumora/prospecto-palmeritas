@@ -293,29 +293,76 @@ export function ProjectMasterViewer({
         groups.current.tenencia = L.layerGroup([g]).addTo(map);
       }
 
-      // --- Halos satelitales (núcleo + halo difuso, color por firma, estilo por tenencia)
+      // --- Halos satelitales: núcleo nítido + anillos difusos concéntricos.
+      // Los anillos son REPRESENTACIÓN de la firma espectral (dispersión), no
+      // una extensión de alteración medida: el radio no es un dato.
       if (anomalies?.features?.length) {
-        const layers: LeafletGeoJSON[] = [];
+        const layers: L.Layer[] = [];
         for (const f of anomalies.features) {
           const p = (f.properties ?? {}) as Record<string, unknown>;
           const code = String(p.index_code ?? "CLAY_MINERALS");
           const color = ALTERATION_COLOR[code] ?? "#0ea5e9";
           const inside = Boolean(p.dentro_concesion);
-          const halo = L.geoJSON(f as never, {
+
+          // Centroide y radio aparente del polígono (para el halo difuso).
+          const coords: Array<[number, number]> = [];
+          const walk = (c: unknown): void => {
+            if (!Array.isArray(c)) return;
+            if (typeof c[0] === "number" && typeof c[1] === "number") {
+              coords.push([c[0] as number, c[1] as number]);
+              return;
+            }
+            (c as unknown[]).forEach(walk);
+          };
+          walk((f.geometry as { coordinates?: unknown })?.coordinates);
+
+          if (coords.length) {
+            const lngs = coords.map((c) => c[0]);
+            const lats = coords.map((c) => c[1]);
+            const cLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
+            const cLat = (Math.min(...lats) + Math.max(...lats)) / 2;
+            const spanM =
+              Math.max(
+                (Math.max(...lats) - Math.min(...lats)) * 111_320,
+                (Math.max(...lngs) - Math.min(...lngs)) *
+                  111_320 *
+                  Math.cos((cLat * Math.PI) / 180),
+              ) / 2;
+            const base = Math.max(spanM, 90);
+            // Tres anillos decrecientes en opacidad: efecto de dispersión.
+            [
+              [2.2, 0.05],
+              [1.6, 0.08],
+              [1.2, 0.12],
+            ].forEach(([mult, op]) => {
+              layers.push(
+                L.circle([cLat, cLng], {
+                  radius: base * mult,
+                  stroke: false,
+                  fillColor: color,
+                  fillOpacity: inside ? op : op * 0.55,
+                  interactive: false,
+                }),
+              );
+            });
+          }
+
+          const core = L.geoJSON(f as never, {
             style: {
               color,
-              weight: inside ? 1.5 : 1,
+              weight: inside ? 2 : 1,
               dashArray: inside ? undefined : "4 4",
-              opacity: inside ? 0.9 : 0.6,
+              opacity: inside ? 0.95 : 0.6,
               fillColor: color,
-              fillOpacity: 0.14, // halo difuso: representación, no extensión medida
+              fillOpacity: inside ? 0.38 : 0.18,
             },
             onEachFeature: (_ff: Feature, layer) => layer.on("click", () => sel("halos", p)),
           });
-          layers.push(halo);
+          layers.push(core);
         }
         groups.current.halos = L.layerGroup(layers).addTo(map);
       }
+
 
       // --- Sondajes propuestos (marcador + proyección de azimut)
       if (drillGrid?.features?.length) {
