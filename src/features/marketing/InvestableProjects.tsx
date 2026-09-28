@@ -160,13 +160,30 @@ function FeaturedProjectCard({
 }) {
   const modality = MODALITY_LABEL[p.modality ?? ""] ?? p.modality ?? "";
   const stage = STAGE_LABEL[p.stage ?? ""] ?? p.stage ?? "";
+  // Si el listado corresponde a un activo con terminal, la tarjeta aterriza
+  // directo en el terminal (sin panel intermedio).
+  const terminalSlug = terminalSlugForListing(p);
+  const cardClass =
+    "group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden h-full hover-lift hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full";
+
+  const Shell = ({ children }: { children: React.ReactNode }) =>
+    terminalSlug ? (
+      <Link
+        to="/terminal/$slug"
+        params={{ slug: terminalSlug }}
+        search={{ tab: "mapa" as const }}
+        className={cardClass}
+      >
+        {children}
+      </Link>
+    ) : (
+      <button type="button" onClick={() => onOpen(p)} className={cardClass}>
+        {children}
+      </button>
+    );
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(p)}
-      className="group rounded-xl border border-hairline bg-white flex flex-col overflow-hidden h-full hover-lift hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(43,74,203,0.25)] transition-all duration-300 text-left w-full"
-    >
+    <Shell>
       {/* Cover */}
       <div className="aspect-video relative overflow-hidden">
         <div className="cover-zoom absolute inset-0">
