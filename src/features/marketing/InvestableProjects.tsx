@@ -9,6 +9,7 @@ import { fmtUSD } from "@/modules/deals/domain/format";
 import { MODALITY_LABEL, STAGE_LABEL } from "@/modules/deals/domain/constants";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { PublicListingDrawer } from "@/features/marketing/PublicListingDrawer";
+import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
 import { ProjectCover } from "@/features/marketing/ProjectCover";
 import { Reveal } from "@/features/marketing/Reveal";
 import type { PublicListing } from "@/lib/publicListings.functions";
@@ -269,6 +270,6 @@ function FeaturedProjectCard({
           </div>
         </div>
       </div>
-    </button>
+    </Shell>
   );
 }
