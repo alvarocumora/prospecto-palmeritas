@@ -1359,6 +1359,92 @@ export type Database = {
           },
         ]
       }
+      cadastre_reconciliation_findings: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          message: string
+          run_id: string
+          severity: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          message: string
+          run_id: string
+          severity?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          message?: string
+          run_id?: string
+          severity?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cadastre_reconciliation_findings_run_id_fkey"
+            columns: ["run_id"]
+            isOneToOne: false
+            referencedRelation: "cadastre_reconciliation_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cadastre_reconciliation_runs: {
+        Row: {
+          created_at: string
+          created_by: string
+          generated_at: string
+          id: string
+          neighbor_km: number
+          note: string | null
+          official_fc: Json | null
+          official_feature_count: number
+          project_fc: Json | null
+          project_feature_count: number
+          project_id: string | null
+          result_geojson: Json | null
+          source: string
+          summary: Json
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string
+          generated_at?: string
+          id?: string
+          neighbor_km?: number
+          note?: string | null
+          official_fc?: Json | null
+          official_feature_count?: number
+          project_fc?: Json | null
+          project_feature_count?: number
+          project_id?: string | null
+          result_geojson?: Json | null
+          source?: string
+          summary?: Json
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          generated_at?: string
+          id?: string
+          neighbor_km?: number
+          note?: string | null
+          official_fc?: Json | null
+          official_feature_count?: number
+          project_fc?: Json | null
+          project_feature_count?: number
+          project_id?: string | null
+          result_geojson?: Json | null
+          source?: string
+          summary?: Json
+        }
+        Relationships: []
+      }
       cadastre_sync_runs: {
         Row: {
           archived: number
@@ -3716,6 +3802,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      data_sources: {
+        Row: {
+          access_url: string | null
+          attribution_text: string | null
+          collection: string | null
+          commercial_use_allowed: boolean
+          created_at: string
+          created_by: string | null
+          dataset_code: string
+          derived_product_rules: string | null
+          id: string
+          kind: string
+          license_id: string | null
+          license_url: string | null
+          metadata: Json
+          provider: string
+          redistribution_allowed: boolean
+          terms_checked_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          access_url?: string | null
+          attribution_text?: string | null
+          collection?: string | null
+          commercial_use_allowed?: boolean
+          created_at?: string
+          created_by?: string | null
+          dataset_code: string
+          derived_product_rules?: string | null
+          id?: string
+          kind: string
+          license_id?: string | null
+          license_url?: string | null
+          metadata?: Json
+          provider: string
+          redistribution_allowed?: boolean
+          terms_checked_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          access_url?: string | null
+          attribution_text?: string | null
+          collection?: string | null
+          commercial_use_allowed?: boolean
+          created_at?: string
+          created_by?: string | null
+          dataset_code?: string
+          derived_product_rules?: string | null
+          id?: string
+          kind?: string
+          license_id?: string | null
+          license_url?: string | null
+          metadata?: Json
+          provider?: string
+          redistribution_allowed?: boolean
+          terms_checked_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       data_subject_requests: {
         Row: {
@@ -7263,6 +7409,174 @@ export type Database = {
           },
         ]
       }
+      geoscience_compute_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          created_by: string | null
+          engine: string
+          engine_version: string | null
+          error: string | null
+          id: string
+          inputs: Json
+          job_type: string
+          metrics: Json
+          outputs: Json
+          parameters: Json
+          project_id: string
+          started_at: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          engine: string
+          engine_version?: string | null
+          error?: string | null
+          id?: string
+          inputs?: Json
+          job_type: string
+          metrics?: Json
+          outputs?: Json
+          parameters?: Json
+          project_id: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          created_by?: string | null
+          engine?: string
+          engine_version?: string | null
+          error?: string | null
+          id?: string
+          inputs?: Json
+          job_type?: string
+          metrics?: Json
+          outputs?: Json
+          parameters?: Json
+          project_id?: string
+          started_at?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geoscience_compute_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "geoscience_compute_jobs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      geoscience_datasets: {
+        Row: {
+          acquisition_end: string | null
+          acquisition_start: string | null
+          bbox_wgs84: Json | null
+          content_hash: string | null
+          created_at: string
+          created_by: string | null
+          crs: string | null
+          dataset_type: string
+          geometry_type: string | null
+          id: string
+          metadata: Json
+          method: string | null
+          name: string
+          project_id: string
+          provenance: string
+          qa_status: string
+          qa_summary: Json
+          resolution: Json
+          source_ref: string | null
+          source_system: string | null
+          units: Json
+          updated_at: string
+          version: string
+          vertical_datum: string | null
+        }
+        Insert: {
+          acquisition_end?: string | null
+          acquisition_start?: string | null
+          bbox_wgs84?: Json | null
+          content_hash?: string | null
+          created_at?: string
+          created_by?: string | null
+          crs?: string | null
+          dataset_type: string
+          geometry_type?: string | null
+          id?: string
+          metadata?: Json
+          method?: string | null
+          name: string
+          project_id: string
+          provenance: string
+          qa_status?: string
+          qa_summary?: Json
+          resolution?: Json
+          source_ref?: string | null
+          source_system?: string | null
+          units?: Json
+          updated_at?: string
+          version?: string
+          vertical_datum?: string | null
+        }
+        Update: {
+          acquisition_end?: string | null
+          acquisition_start?: string | null
+          bbox_wgs84?: Json | null
+          content_hash?: string | null
+          created_at?: string
+          created_by?: string | null
+          crs?: string | null
+          dataset_type?: string
+          geometry_type?: string | null
+          id?: string
+          metadata?: Json
+          method?: string | null
+          name?: string
+          project_id?: string
+          provenance?: string
+          qa_status?: string
+          qa_summary?: Json
+          resolution?: Json
+          source_ref?: string | null
+          source_system?: string | null
+          units?: Json
+          updated_at?: string
+          version?: string
+          vertical_datum?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "geoscience_datasets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "geoscience_datasets_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       holder_files: {
         Row: {
           description: string | null
@@ -9493,6 +9807,147 @@ export type Database = {
         }
         Relationships: []
       }
+      mineral_passports: {
+        Row: {
+          commodity: string
+          created_at: string
+          created_by: string
+          current_lot_id: string | null
+          id: string
+          material_form: string | null
+          metadata: Json
+          origin_country: string | null
+          origin_node_id: string | null
+          passport_code: string
+          project_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          commodity: string
+          created_at?: string
+          created_by: string
+          current_lot_id?: string | null
+          id?: string
+          material_form?: string | null
+          metadata?: Json
+          origin_country?: string | null
+          origin_node_id?: string | null
+          passport_code: string
+          project_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          commodity?: string
+          created_at?: string
+          created_by?: string
+          current_lot_id?: string | null
+          id?: string
+          material_form?: string | null
+          metadata?: Json
+          origin_country?: string | null
+          origin_node_id?: string | null
+          passport_code?: string
+          project_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mineral_passports_origin_node_id_fkey"
+            columns: ["origin_node_id"]
+            isOneToOne: false
+            referencedRelation: "mining_asset_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mineral_passports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mineral_passports_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mineral_traceability_events: {
+        Row: {
+          actor_name: string | null
+          country_code: string | null
+          event_type: string
+          evidence_refs: Json
+          facility_name: string | null
+          id: string
+          input_refs: Json
+          metadata: Json
+          occurred_at: string
+          output_refs: Json
+          passport_id: string
+          payload_hash: string
+          previous_hash: string | null
+          quantity: number | null
+          recorded_at: string
+          recorded_by: string
+          sequence_no: number
+          unit: string | null
+        }
+        Insert: {
+          actor_name?: string | null
+          country_code?: string | null
+          event_type: string
+          evidence_refs?: Json
+          facility_name?: string | null
+          id?: string
+          input_refs?: Json
+          metadata?: Json
+          occurred_at: string
+          output_refs?: Json
+          passport_id: string
+          payload_hash: string
+          previous_hash?: string | null
+          quantity?: number | null
+          recorded_at?: string
+          recorded_by: string
+          sequence_no: number
+          unit?: string | null
+        }
+        Update: {
+          actor_name?: string | null
+          country_code?: string | null
+          event_type?: string
+          evidence_refs?: Json
+          facility_name?: string | null
+          id?: string
+          input_refs?: Json
+          metadata?: Json
+          occurred_at?: string
+          output_refs?: Json
+          passport_id?: string
+          payload_hash?: string
+          previous_hash?: string | null
+          quantity?: number | null
+          recorded_at?: string
+          recorded_by?: string
+          sequence_no?: number
+          unit?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mineral_traceability_events_passport_id_fkey"
+            columns: ["passport_id"]
+            isOneToOne: false
+            referencedRelation: "mineral_passports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       mineralogy: {
         Row: {
           abundance: string | null
@@ -9565,6 +10020,143 @@ export type Database = {
             columns: ["reference_id"]
             isOneToOne: false
             referencedRelation: "geo_references"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mining_asset_edges: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          created_by: string | null
+          from_node_id: string
+          id: string
+          metadata: Json
+          project_id: string
+          provenance: string
+          relation: string
+          to_node_id: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          from_node_id: string
+          id?: string
+          metadata?: Json
+          project_id: string
+          provenance: string
+          relation: string
+          to_node_id: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          from_node_id?: string
+          id?: string
+          metadata?: Json
+          project_id?: string
+          provenance?: string
+          relation?: string
+          to_node_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mining_asset_edges_from_node_id_fkey"
+            columns: ["from_node_id"]
+            isOneToOne: false
+            referencedRelation: "mining_asset_nodes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mining_asset_edges_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mining_asset_edges_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mining_asset_edges_to_node_id_fkey"
+            columns: ["to_node_id"]
+            isOneToOne: false
+            referencedRelation: "mining_asset_nodes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      mining_asset_nodes: {
+        Row: {
+          canonical_key: string
+          commodity: string | null
+          confidence: number | null
+          created_at: string
+          created_by: string | null
+          entity_id: string | null
+          id: string
+          label: string
+          metadata: Json
+          node_type: string
+          project_id: string
+          provenance: string
+          source_ref: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          canonical_key: string
+          commodity?: string | null
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          id?: string
+          label: string
+          metadata?: Json
+          node_type: string
+          project_id: string
+          provenance: string
+          source_ref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          canonical_key?: string
+          commodity?: string | null
+          confidence?: number | null
+          created_at?: string
+          created_by?: string | null
+          entity_id?: string | null
+          id?: string
+          label?: string
+          metadata?: Json
+          node_type?: string
+          project_id?: string
+          provenance?: string
+          source_ref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "mining_asset_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "mining_asset_nodes_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -14333,49 +14925,82 @@ export type Database = {
         Row: {
           area_ha: number | null
           bbox: number[] | null
+          confidence: number | null
           created_at: string
           created_by: string
           detected_at: string
+          feature_values: Json
           geometry: Json
           id: string
           index_code: string
+          method: string | null
+          method_version: string | null
           notes: string | null
+          processing_parameters: Json
           project_id: string
+          raster_asset_id: string | null
           run_id: string
+          scene_id: string | null
           score: number
+          sensor: string | null
           severity: string
+          source_id: string | null
+          strength: number | null
+          target_id: string | null
           updated_at: string
         }
         Insert: {
           area_ha?: number | null
           bbox?: number[] | null
+          confidence?: number | null
           created_at?: string
           created_by: string
           detected_at?: string
+          feature_values?: Json
           geometry: Json
           id?: string
           index_code: string
+          method?: string | null
+          method_version?: string | null
           notes?: string | null
+          processing_parameters?: Json
           project_id: string
+          raster_asset_id?: string | null
           run_id: string
+          scene_id?: string | null
           score: number
+          sensor?: string | null
           severity?: string
+          source_id?: string | null
+          strength?: number | null
+          target_id?: string | null
           updated_at?: string
         }
         Update: {
           area_ha?: number | null
           bbox?: number[] | null
+          confidence?: number | null
           created_at?: string
           created_by?: string
           detected_at?: string
+          feature_values?: Json
           geometry?: Json
           id?: string
           index_code?: string
+          method?: string | null
+          method_version?: string | null
           notes?: string | null
+          processing_parameters?: Json
           project_id?: string
+          raster_asset_id?: string | null
           run_id?: string
+          scene_id?: string | null
           score?: number
+          sensor?: string | null
           severity?: string
+          source_id?: string | null
+          strength?: number | null
+          target_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -14407,6 +15032,20 @@ export type Database = {
             referencedRelation: "v_satellite_run_traceability"
             referencedColumns: ["run_id"]
           },
+          {
+            foreignKeyName: "satellite_anomalies_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_anomalies_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
+            referencedColumns: ["id"]
+          },
         ]
       }
       satellite_evidence: {
@@ -14417,6 +15056,7 @@ export type Database = {
           created_at: string
           created_by: string
           disclaimer: string
+          exploration_target_id: string | null
           geometry: Json | null
           id: string
           index_code: string | null
@@ -14442,6 +15082,7 @@ export type Database = {
           created_at?: string
           created_by: string
           disclaimer?: string
+          exploration_target_id?: string | null
           geometry?: Json | null
           id?: string
           index_code?: string | null
@@ -14467,6 +15108,7 @@ export type Database = {
           created_at?: string
           created_by?: string
           disclaimer?: string
+          exploration_target_id?: string | null
           geometry?: Json | null
           id?: string
           index_code?: string | null
@@ -14491,6 +15133,13 @@ export type Database = {
             columns: ["anomaly_id"]
             isOneToOne: false
             referencedRelation: "satellite_anomalies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "satellite_evidence_exploration_target_id_fkey"
+            columns: ["exploration_target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
             referencedColumns: ["id"]
           },
           {
@@ -16330,6 +16979,130 @@ export type Database = {
           value?: string
         }
         Relationships: []
+      }
+      target_score_sources: {
+        Row: {
+          confidence: number | null
+          data_source_id: string | null
+          id: string
+          role: string
+          target_score_id: string
+          weight: number
+        }
+        Insert: {
+          confidence?: number | null
+          data_source_id?: string | null
+          id?: string
+          role: string
+          target_score_id: string
+          weight: number
+        }
+        Update: {
+          confidence?: number | null
+          data_source_id?: string | null
+          id?: string
+          role?: string
+          target_score_id?: string
+          weight?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "target_score_sources_data_source_id_fkey"
+            columns: ["data_source_id"]
+            isOneToOne: false
+            referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "target_score_sources_target_score_id_fkey"
+            columns: ["target_score_id"]
+            isOneToOne: false
+            referencedRelation: "target_scores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      target_scores: {
+        Row: {
+          code_commit_sha: string | null
+          completeness: number
+          computed_at: string
+          confidence: number
+          created_by: string | null
+          feature_snapshot: Json
+          id: string
+          model_name: string
+          model_version: string
+          parameters: Json
+          project_id: string
+          score_geochemistry: number | null
+          score_magnetic: number | null
+          score_satellite: number | null
+          score_structural: number | null
+          score_total: number
+          target_id: string
+        }
+        Insert: {
+          code_commit_sha?: string | null
+          completeness: number
+          computed_at?: string
+          confidence: number
+          created_by?: string | null
+          feature_snapshot?: Json
+          id?: string
+          model_name: string
+          model_version: string
+          parameters?: Json
+          project_id: string
+          score_geochemistry?: number | null
+          score_magnetic?: number | null
+          score_satellite?: number | null
+          score_structural?: number | null
+          score_total: number
+          target_id: string
+        }
+        Update: {
+          code_commit_sha?: string | null
+          completeness?: number
+          computed_at?: string
+          confidence?: number
+          created_by?: string | null
+          feature_snapshot?: Json
+          id?: string
+          model_name?: string
+          model_version?: string
+          parameters?: Json
+          project_id?: string
+          score_geochemistry?: number | null
+          score_magnetic?: number | null
+          score_satellite?: number | null
+          score_structural?: number | null
+          score_total?: number
+          target_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "target_scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "npv_por_proyecto"
+            referencedColumns: ["project_id"]
+          },
+          {
+            foreignKeyName: "target_scores_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "target_scores_target_id_fkey"
+            columns: ["target_id"]
+            isOneToOne: false
+            referencedRelation: "exploration_targets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       technical_report_sections: {
         Row: {
@@ -18571,6 +19344,7 @@ export type Database = {
         }[]
       }
       geojson_to_geom: { Args: { _geo: Json }; Returns: unknown }
+      get_cadastre_reconciliation: { Args: { p_run_id: string }; Returns: Json }
       get_concession_change_history: {
         Args: { _concession_id: string; _limit?: number }
         Returns: {
@@ -18843,6 +19617,10 @@ export type Database = {
         Returns: boolean
       }
       is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      list_cadastre_reconciliations: {
+        Args: { p_limit?: number; p_project_id?: string }
+        Returns: Json
+      }
       list_qualified_persons_directory: {
         Args: never
         Returns: {
@@ -19012,6 +19790,20 @@ export type Database = {
       sample_intake: {
         Args: { p_limit?: number; p_project_id: string }
         Returns: Json
+      }
+      save_cadastre_reconciliation: {
+        Args: {
+          p_findings?: Json
+          p_neighbor_km?: number
+          p_note?: string
+          p_official_fc?: Json
+          p_project_fc?: Json
+          p_project_id?: string
+          p_result_geojson?: Json
+          p_source?: string
+          p_summary: Json
+        }
+        Returns: string
       }
       schedule_compliance_evaluations: { Args: never; Returns: number }
       schedule_gold_spot_fetch: { Args: never; Returns: string }
