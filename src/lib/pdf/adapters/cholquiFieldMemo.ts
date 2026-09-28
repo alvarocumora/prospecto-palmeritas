@@ -314,6 +314,8 @@ export function buildCholquiFieldMemoDoc(
       "Los targets provienen de un screening satelital Nivel 0 y no han sido verificados en terreno a la fecha de este documento.",
       "Las cantidades de mapeo, muestreo y geofísica son de planificación: derivan de la geometría de los targets y de reglas de productividad declaradas en el programa.",
       "La ejecución está sujeta a tenencia vigente, servidumbres, permisos sectoriales y contratación de laboratorio acreditado.",
+      `Titularidad: ${ownCount} de ${targets.length} targets caen dentro de la tenencia analizada del proyecto; el resto cae en concesiones inscritas a terceros según el catastro cargado. Sobre esas concesiones no se ejecuta trabajo sin verificación registral y acuerdo escrito.`,
+
       "La malla de sondajes referida es conceptual y debe ser revisada por persona competente antes de ejecutarse.",
       "Documento informativo: no constituye oferta pública de valores ni recomendación de inversión.",
     ],
