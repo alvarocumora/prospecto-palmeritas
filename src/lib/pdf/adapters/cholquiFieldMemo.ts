@@ -29,7 +29,12 @@ export function buildCholquiFieldMemoDoc(
 ): ProjectDoc {
   const p = program ?? buildFieldProgram(data);
   const tenure = cholquiTenurePolygons();
-  const targets = p.targets.map((t) => ({ ...t, concession: concessionAt(t.lat, t.lng) }));
+  const targets = p.targets.map((t) => {
+    const tenure = tenureAt(t.lat, t.lng);
+    return { ...t, concession: tenure.concession, tenureLabel: tenure.label, ownTenure: tenure.own };
+  });
+  const ownCount = targets.filter((t) => t.ownTenure).length;
+
 
   return {
     reportProfile: "targeting",
