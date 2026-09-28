@@ -65,6 +65,8 @@ export type MasterViewerProps = {
   yacimientos?: FeatureCollection | null; // depósitos conocidos / minerales críticos (Merge_RR)
   geoquimica?: FeatureCollection | null; // muestras de sedimento (multi-elemento medido)
   estructuras?: FeatureCollection | null; // vetas con rumbo/manteo medido en terreno
+  pedimentosPendientes?: FeatureCollection | null; // pedimentos del titular no publicados aún en catastro oficial
+  mojones?: FeatureCollection | null; // hitos de mensura (HM) reportados por el titular
   height?: number;
 };
 
@@ -83,6 +85,8 @@ const ALTERATION_LABEL: Record<string, string> = {
 
 type LayerKey =
   | "tenencia"
+  | "pedimentosPendientes"
+  | "mojones"
   | "halos"
   | "magneticaRegional"
   | "gravedadRegional"
@@ -113,6 +117,8 @@ const LAYER_SECTIONS: ReadonlyArray<{
     defaultOpen: true,
     layers: [
       ["tenencia", "Catastro SERNAGEOMIN"],
+      ["pedimentosPendientes", "Pedimentos sin publicar (KML titular)"],
+      ["mojones", "Hitos de mensura (HM)"],
       ["relieve", "Relieve / hillshade"],
     ],
   },
@@ -177,6 +183,8 @@ const PROV: Record<ProvKind, { label: string; bg: string }> = {
 // El badge vive en el design system (@/components/ui-system).
 const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
   tenencia: { evidence: "OFICIAL", scale: "catastro" },
+  pedimentosPendientes: { evidence: "CONTEXTO", scale: "KML titular" },
+  mojones: { evidence: "CONTEXTO", scale: "HM declarado" },
   relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
   franjas: { evidence: "OFICIAL", scale: "regional" },
   yacimientos: { evidence: "OFICIAL", scale: "depósito" },
@@ -209,6 +217,8 @@ export function ProjectMasterViewer({
   yacimientos = null,
   geoquimica = null,
   estructuras = null,
+  pedimentosPendientes = null,
+  mojones = null,
   height = 620,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
@@ -218,6 +228,8 @@ export function ProjectMasterViewer({
   const [ready, setReady] = useState(false);
   const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
     tenencia: true,
+    pedimentosPendientes: true,
+    mojones: false,
     halos: true,
     magneticaRegional: true,
     gravedadRegional: false,
@@ -566,6 +578,53 @@ export function ProjectMasterViewer({
         groups.current.estructuras = line.addTo(map);
       }
 
+      // --- Pedimentos sin publicar (declarados por el titular, no en catastro oficial)
+      if (pedimentosPendientes?.features?.length) {
+        const g = L.geoJSON(pedimentosPendientes as never, {
+          style: {
+            color: "#c2410c",
+            weight: 1.6,
+            dashArray: "5 4",
+            fillColor: "#c2410c",
+            fillOpacity: 0.05,
+          },
+          pointToLayer: (f, latlng) =>
+            L.circleMarker(latlng, {
+              radius: 6,
+              color: "#c2410c",
+              weight: 1.6,
+              dashArray: "3 2",
+              fillColor: "#c2410c",
+              fillOpacity: 0.4,
+            }),
+          onEachFeature: (f: Feature, layer) =>
+            layer.on("click", () =>
+              sel("pedimentosPendientes", (f.properties ?? {}) as Record<string, unknown>),
+            ),
+        });
+        groups.current.pedimentosPendientes = g.addTo(map);
+      }
+
+      // --- Mojones / hitos de mensura (HM) declarados por el titular
+      if (mojones?.features?.length) {
+        const items: L.Layer[] = [];
+        for (const f of mojones.features) {
+          const gm = f.geometry;
+          if (!gm || gm.type !== "Point") continue;
+          const [lng, lat] = gm.coordinates as [number, number];
+          items.push(
+            L.circleMarker([lat, lng], {
+              radius: 3.5,
+              color: "#475569",
+              weight: 1.4,
+              fillColor: "#e2e8f0",
+              fillOpacity: 0.9,
+            }).on("click", () => sel("mojones", (f.properties ?? {}) as Record<string, unknown>)),
+          );
+        }
+        groups.current.mojones = L.layerGroup(items).addTo(map);
+      }
+
       // Encuadrar a lo que exista
       try {
         const bounds = L.latLngBounds([]);
@@ -641,6 +700,8 @@ export function ProjectMasterViewer({
   const counts = useMemo<Record<LayerKey, number>>(
     () => ({
       tenencia: concessions?.features?.length ?? 0,
+      pedimentosPendientes: pedimentosPendientes?.features?.length ?? 0,
+      mojones: mojones?.features?.length ?? 0,
       halos: anomalies?.features?.length ?? 0,
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
@@ -669,11 +730,15 @@ export function ProjectMasterViewer({
       yacimientos,
       geoquimica,
       estructuras,
+      pedimentosPendientes,
+      mojones,
     ],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
   const COUNTED: ReadonlyArray<LayerKey> = [
     "tenencia",
+    "pedimentosPendientes",
+    "mojones",
     "halos",
     "sondajes",
     "ensayes",
@@ -987,6 +1052,23 @@ function Inspector({
       ["Manteo", p.dipText ?? "No informado"],
       ["Potencia", p.potenciaM ? `${p.potenciaM} m` : "No informado"],
     ];
+  } else if (selected.kind === "pedimentosPendientes") {
+    title = `${p.nombre ?? "Pedimento"}`;
+    prov = "contexto";
+    rows = [
+      ["Titular", p.titular],
+      ["Estado", p.estado],
+      ["Fuente", p.fuente],
+      ["Verificado en SERNAGEOMIN", p.verificado_sernageomin ? "Sí" : "No"],
+    ];
+  } else if (selected.kind === "mojones") {
+    title = `${p.nombre ?? "Hito de mensura"}`;
+    prov = "contexto";
+    rows = [
+      ["Concesión", p.concesion],
+      ["Tipo", p.tipo],
+      ["Fuente", p.fuente],
+    ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
     prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
@@ -1019,7 +1101,9 @@ function Inspector({
         selected.kind === "sondajes" ||
         selected.kind === "pedimentos" ||
         selected.kind === "geoquimica" ||
-        selected.kind === "yacimientos") && (
+        selected.kind === "yacimientos" ||
+        selected.kind === "pedimentosPendientes" ||
+        selected.kind === "mojones") && (
         <div className="mt-3 rounded bg-surface-2 p-2 text-[10px] text-content-subtle">
           {selected.kind === "halos"
             ? "Detección satelital (Sentinel-2). Anomalía espectral, no identificación mineral ni extensión medida. Requiere verificación de terreno."
@@ -1029,7 +1113,11 @@ function Inspector({
                 ? "Geoquímica de sedimento fluvial (SERNAGEOMIN). Dispersión regional en la cuenca, NO ley in situ. Orienta, no prueba mineralización."
                 : selected.kind === "yacimientos"
                   ? "Depósito conocido (SERNAGEOMIN, Minerales Críticos). Contexto de distrito; verificar distancia y sistema mineral. No implica continuidad al predio."
-                  : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
+                  : selected.kind === "pedimentosPendientes"
+                    ? "Declarado por el titular (KML propio), sin confirmar contra catastro oficial SERNAGEOMIN. La geometría puede ser un punto de referencia, no vértices de mensura. Verificar antes de asumir tenencia."
+                    : selected.kind === "mojones"
+                      ? "Hito de mensura (HM) declarado por el titular. No verificado independientemente por GeoCapitals; usar como referencia, no como control geodésico certificado."
+                      : "Propuesta de pedimento (borrador). Vacancia indicativa del catastro SERNAGEOMIN; requiere verificación legal y estudio de títulos antes de constituir. No es la solicitud oficial."}
         </div>
       )}
     </div>

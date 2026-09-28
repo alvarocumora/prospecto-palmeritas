@@ -1,0 +1,151 @@
+{
+  "type": "FeatureCollection",
+  "name": "cholqui_pedimentos_pendientes",
+  "metadata": {
+    "fuente": "KML del titular, cruzado contra SERNAGEOMIN ArcGIS (0 resultados oficiales para Pallocabe 3/4/5/7 y Europa 11)",
+    "n": 7,
+    "nota": "Geometria = punto o poligono de referencia del titular, no necesariamente vertices oficiales de mensura. No mojonar sin verificar contra plano/expediente.",
+    "excluidos": "POPETA (lon -71.290, lat -33.814) excluido: a ~19 km del distrito, propiedad no relacionada."
+  },
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -71.0494839496,
+              -33.831933751
+            ],
+            [
+              -71.0496991592,
+              -33.840946824
+            ],
+            [
+              -71.0432184056,
+              -33.8410544266
+            ],
+            [
+              -71.0430038753,
+              -33.8320413172
+            ],
+            [
+              -71.0494839496,
+              -33.831933751
+            ]
+          ]
+        ]
+      },
+      "properties": {
+        "nombre": "PALLOCABE 3 1/10",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Pedimento del titular, NO publicado aun en catastro oficial SERNAGEOMIN",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.02471274953794,
+          -33.83523427045457
+        ]
+      },
+      "properties": {
+        "nombre": "PALLOCABE 4 1/20",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Pedimento del titular, NO publicado aun en catastro oficial SERNAGEOMIN",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04546017836135,
+          -33.84209625576807
+        ]
+      },
+      "properties": {
+        "nombre": "PALLOCABE 5 1/20",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Pedimento del titular, NO publicado aun en catastro oficial SERNAGEOMIN",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.01929124174092,
+          -33.84177939121818
+        ]
+      },
+      "properties": {
+        "nombre": "PALLOCABE 7 1/9",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Pedimento del titular, NO publicado aun en catastro oficial SERNAGEOMIN",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.04459842330913,
+          -33.89161346112705
+        ]
+      },
+      "properties": {
+        "nombre": "EUROPA 11 1/20",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Pedimento del titular, NO publicado aun en catastro oficial SERNAGEOMIN",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.06770630614996,
+          -33.82311411137417
+        ]
+      },
+      "properties": {
+        "nombre": "CHOLQUI",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Punto de referencia del titular — naturaleza legal sin confirmar (posible base/acceso, no pedimento nombrado).",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -71.03912523938591,
+          -33.79102074911028
+        ]
+      },
+      "properties": {
+        "nombre": "LA VILUMA",
+        "titular": "Gianfranco De Martino González",
+        "estado": "Punto de referencia del titular — no calza con ninguna concesion en catastro oficial SERNAGEOMIN; naturaleza sin confirmar.",
+        "fuente": "KML del titular (FINAL_GIANFRANCO.kml)",
+        "verificado_sernageomin": false
+      }
+    }
+  ]
+}
