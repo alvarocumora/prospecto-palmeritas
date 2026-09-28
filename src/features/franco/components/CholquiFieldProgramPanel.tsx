@@ -13,7 +13,7 @@ import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { getCholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import { buildFieldProgram } from "@/lib/cholqui/fieldProgram";
 import { buildCholquiFieldMemoDoc } from "@/lib/pdf/adapters/cholquiFieldMemo";
-import { concessionAt } from "@/lib/pdf/adapters/cholquiTargets";
+import { tenureAt } from "@/lib/pdf/adapters/cholquiTargets";
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
