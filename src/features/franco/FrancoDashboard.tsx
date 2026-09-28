@@ -17,7 +17,7 @@ import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from
  * `data/cholqui.ts`, la misma fuente que alimenta el PDF de inversión y la
  * ficha /proyectos/ficha/cholqui.
  */
-export function FrancoDashboard() {
+export function FrancoDashboard({ authenticated = false }: { authenticated?: boolean }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadingTeaser, setDownloadingTeaser] = useState(false);
 
@@ -58,6 +58,7 @@ export function FrancoDashboard() {
         </div>
 
         <SectionNav
+          stickyOffset={authenticated ? "workspace" : "page"}
           items={[
             { href: "#resumen", label: "Resumen" },
             { href: "#inteligencia", label: "Inteligencia" },
