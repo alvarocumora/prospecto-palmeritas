@@ -583,6 +583,31 @@ export function editorialTable(
   return cy - y;
 }
 
+/**
+ * Cuántas filas de la tabla caben en `avail` puntos de alto, cabecera incluida.
+ * Permite cortar una tabla entre páginas sin que se salga del área de texto.
+ */
+export function fitTableRows(
+  doc: jsPDF,
+  opts: { head: string[]; rows: string[][]; widths?: number[]; w: number; size?: number },
+  avail: number,
+): number {
+  const size = opts.size ?? 7.8;
+  const widths = opts.widths ?? opts.head.map(() => opts.w / opts.head.length);
+  let h = 18;
+  if (h > avail) return 0;
+  let fit = 0;
+  for (const row of opts.rows) {
+    const lines = row.map((cell, i) => (doc.splitTextToSize(cell, widths[i] - 10) as string[]).length);
+    const rowH = Math.max(...lines) * (size * 1.35) + 8;
+    if (h + rowH > avail) break;
+    h += rowH;
+    fit += 1;
+  }
+  return fit;
+}
+
+
 /** Bloque QR con leyenda: puerta de entrada al live map / data room. */
 export function qrBlock(
   doc: jsPDF,
