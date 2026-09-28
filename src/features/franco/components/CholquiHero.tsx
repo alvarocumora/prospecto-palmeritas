@@ -50,7 +50,11 @@ export function CholquiHero({ onDownload, downloading }: Props) {
           <div className="flex max-w-xl flex-wrap gap-2">
             <ProjectDocsMenu className="h-9 px-4" build={buildCholquiDoc} label="Documentos" />
             <Button type="button" onClick={onDownload} disabled={downloading} variant="outline">
-              {downloading ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+              {downloading ? (
+                <Loader2 className="size-4 animate-spin" />
+              ) : (
+                <Download className="size-4" />
+              )}
               Informe
             </Button>
             <Button asChild>
