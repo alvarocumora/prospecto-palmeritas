@@ -96,7 +96,7 @@ function AuthenticatedLayout() {
   });
 
   return (
-    <div className="min-h-[100dvh] bg-background text-foreground ops-grid">
+    <div data-theme="im-light" className="min-h-[100dvh] bg-surface text-content">
       <TopBar onMenuClick={() => setDrawerOpen(true)} />
       <CommandRail
         items={allowedItems}

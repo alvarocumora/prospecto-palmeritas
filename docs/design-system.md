@@ -1,6 +1,6 @@
 # Geocapitals — Design System (RFC)
 
-> Estado: **Borrador / Fase 0–1** · Owner: equipo plataforma · Última actualización: 2026-06
+> Estado: **Implementación global / Fase 3** · Owner: equipo plataforma · Última actualización: 2026-09
 
 Este documento define el sistema de diseño de Geocapitals: una sola fuente de
 verdad de **tokens** y **primitivas**. La dirección acordada es un **rediseño
@@ -175,3 +175,63 @@ Se rastrea en cada PR de Fase 2–3:
 
 _Las decisiones de este documento son el contrato. Cambios a la paleta, la
 tipografía o la capa semántica requieren actualizar este RFC._
+
+
+## 8. Contrato UX global — Platform UI v2
+
+La plataforma deja de tratar cada módulo como una mini-aplicación independiente. Dashboard,
+terminal, proyectos, inversión, catastro y reportes comparten la misma jerarquía visual.
+
+### Chrome
+
+1. **Una sola superficie institucional clara** para navegación, páginas, tarjetas y tablas.
+2. **Canvas oscuro sólo por necesidad de lectura**: mapa, 3D, raster o visualización científica.
+3. El canvas no cambia la identidad del producto: toolbar, inspector, tabs y acciones siguen la
+   gramática institucional.
+4. El usuario debe reconocer siempre dónde está: producto → proyecto/módulo → sección.
+
+### Jerarquía de página
+
+```
+Global chrome
+└─ Page header
+   ├─ identidad / título
+   ├─ contexto breve
+   └─ 1 acción primaria + acciones secundarias
+└─ Section navigation
+└─ Primary workspace
+└─ Supporting evidence
+└─ Detail / appendices
+```
+
+Las páginas nuevas usan `PlatformPage`, `PageHeader`, `PageSection`, `Surface` y
+`SectionNav`. No deben inventar contenedores, radios, fondos o escalas tipográficas locales si
+una primitiva ya resuelve el caso.
+
+### Densidad
+
+- **Calm**: landing, proyecto, inversión, executive dashboard.
+- **Compact**: tablas, data rooms, listas operativas.
+- **Dense**: terminales y matrices técnicas.
+- La densidad cambia el espaciado, no el theme ni la identidad.
+
+### Progressive disclosure
+
+Los mapas y herramientas complejas muestran por defecto sólo la evidencia necesaria para la tarea.
+Capas regionales, propuestas, modelos derivados y controles avanzados quedan disponibles bajo
+`Capas`, `Filtros` o `Detalle`, con un máximo de dos niveles de disclosure.
+
+### Proyecto como objeto común
+
+Todas las vistas de proyecto convergen a la misma navegación conceptual:
+
+`Resumen → Inteligencia → Economía → Operación → Evidencia → Inversión`.
+
+El contenido puede variar por etapa y permisos, pero el orden mental se mantiene. Esto evita que
+Live Map, ficha de inversión, dashboard técnico y data room parezcan productos distintos.
+
+### Regla de tarjetas
+
+Una tarjeta debe representar **una decisión, una entidad o un bloque de evidencia**. No se usa una
+tarjeta únicamente para crear separación visual. Se priorizan hairlines, whitespace y secciones
+antes de anidar tarjetas dentro de tarjetas.

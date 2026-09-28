@@ -8,7 +8,7 @@ import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
 import { CholquiEvidencePanel } from "./components/CholquiEvidencePanel";
 import { CholquiRoundPanel } from "./components/CholquiRoundPanel";
-
+import { PlatformPage, SectionNav } from "@/components/brand";
 import { CHOLQUI } from "./data/cholqui";
 import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from "./cholquiPdf";
 
@@ -17,7 +17,7 @@ import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from
  * `data/cholqui.ts`, la misma fuente que alimenta el PDF de inversión y la
  * ficha /proyectos/ficha/cholqui.
  */
-export function FrancoDashboard() {
+export function FrancoDashboard({ authenticated = false }: { authenticated?: boolean }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadingTeaser, setDownloadingTeaser] = useState(false);
 
@@ -46,33 +46,55 @@ export function FrancoDashboard() {
   }, []);
 
   return (
-    <div data-theme="im-light" className="min-h-screen bg-surface text-content">
-      <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8 space-y-6">
-        <CholquiHero
-          onDownload={handleDownload}
-          downloading={downloading}
-          onDownloadTeaser={handleDownloadTeaser}
-          downloadingTeaser={downloadingTeaser}
+    <PlatformPage width="content" className="bg-surface">
+      <div className="space-y-8">
+        <div id="resumen" className="scroll-mt-24">
+          <CholquiHero
+            onDownload={handleDownload}
+            downloading={downloading}
+            onDownloadTeaser={handleDownloadTeaser}
+            downloadingTeaser={downloadingTeaser}
+          />
+        </div>
+
+        <SectionNav
+          stickyOffset={authenticated ? "workspace" : "page"}
+          items={[
+            { href: "#resumen", label: "Resumen" },
+            { href: "#inteligencia", label: "Inteligencia" },
+            { href: "#economia", label: "Economía" },
+            { href: "#operacion", label: "Operación" },
+            { href: "#evidencia", label: "Evidencia" },
+            { href: "#inversion", label: "Inversión" },
+          ]}
         />
 
-        {/* Visor maestro unificado: única vista cartográfica (territorio,
-            teledetección, geofísica y exploración) con inspector de procedencia. */}
-        <CholquiMasterViewer />
+        <div id="inteligencia" className="scroll-mt-24 space-y-4">
+          <CholquiMasterViewer />
+          <CholquiTargetsSummary />
+        </div>
 
-        {/* Tabla técnica de la malla propuesta + descarga del informe de targets. */}
-        <CholquiTargetsSummary />
+        <div id="economia" className="scroll-mt-24">
+          <CholquiScenariosPanel />
+        </div>
 
-        <CholquiScenariosPanel />
-        <CholquiMinePlanPanel />
+        <div id="operacion" className="scroll-mt-24">
+          <CholquiMinePlanPanel />
+        </div>
 
-        <CholquiEvidencePanel />
-        <CholquiRoundPanel />
+        <div id="evidencia" className="scroll-mt-24">
+          <CholquiEvidencePanel />
+        </div>
 
-        <footer className="text-[11px] text-content-subtle pb-8">
+        <div id="inversion" className="scroll-mt-24">
+          <CholquiRoundPanel />
+        </div>
+
+        <footer className="border-t border-hairline pb-4 pt-5 text-[11px] text-content-subtle">
           {CHOLQUI.name} ({CHOLQUI.code}) · Operado por Geocapitals · Antes conocido como{" "}
           {CHOLQUI.formerName}. Documento informativo: no constituye oferta pública de valores.
         </footer>
-      </main>
-    </div>
+      </div>
+    </PlatformPage>
   );
 }

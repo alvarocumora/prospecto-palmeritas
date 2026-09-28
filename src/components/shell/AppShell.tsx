@@ -316,15 +316,15 @@ export function TerminalTopBar({
 }) {
   const { user } = useAuth();
   return (
-    <div className="h-10 border-b border-border flex items-center px-3 gap-4 bg-card/40">
+    <div className="h-11 border-b border-hairline flex items-center px-4 gap-4 bg-surface/95 text-content backdrop-blur">
       <Link to="/" className="inline-flex items-center gap-2">
         <BrandMark size={18} showText={false} />
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">
+        <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-accent-brand">
           {eyebrow}
         </span>
       </Link>
       {subtitle && (
-        <span className="text-[10px] font-mono text-muted-foreground hidden sm:inline">
+        <span className="text-[10px] font-mono text-content-subtle hidden sm:inline">
           {subtitle}
         </span>
       )}
@@ -333,14 +333,14 @@ export function TerminalTopBar({
         (user ? (
           <Link
             to="/dashboard"
-            className="text-[11px] font-mono text-muted-foreground hover:text-foreground"
+            className="text-[11px] font-mono text-content-muted hover:text-content"
           >
             Workspace →
           </Link>
         ) : (
           <Link
             to="/auth"
-            className="text-[11px] font-mono px-2 py-1 rounded bg-gold text-background hover:opacity-90"
+            className="text-[11px] font-mono px-2.5 py-1.5 rounded-brand-sm bg-accent-brand text-accent-brand-contrast hover:bg-im-cobalt-deep"
           >
             Sign in
           </Link>
@@ -373,7 +373,10 @@ export function AppShell({
   }
   if (variant === "terminal") {
     return (
-      <div className="h-screen w-full flex flex-col bg-background text-foreground overflow-hidden">
+      <div
+        data-theme="im-light"
+        className="h-screen w-full flex flex-col bg-surface text-content overflow-hidden"
+      >
         {topBar ?? <TerminalTopBar />}
         {children}
       </div>
@@ -381,7 +384,7 @@ export function AppShell({
   }
   // workspace
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div data-theme="im-light" className="min-h-screen flex flex-col bg-surface text-content">
       {topBar}
       <main className="flex-1 min-h-0">{children}</main>
     </div>
