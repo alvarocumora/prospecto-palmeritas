@@ -1,5 +1,8 @@
 import { lazy, Suspense } from "react";
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { getTilamaReport } from "@/lib/tilama.functions";
 import { FileText, Landmark, Loader2, MapPin, ShieldCheck } from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
@@ -339,4 +342,15 @@ function Term({ label, children }: { label: string; children: React.ReactNode })
       <dd className="mt-0.5 font-medium text-content">{children}</dd>
     </div>
   );
+}
+
+/** Documentos de marca de Los Verdes: requieren el reporte del proyecto. */
+function LosVerdesDocsMenu() {
+  const fetchReport = useServerFn(getTilamaReport);
+  const { data } = useQuery({
+    queryKey: ["tilama-report"],
+    queryFn: () => fetchReport(),
+    staleTime: 5 * 60 * 1000,
+  });
+  return <ProjectDocsMenu build={() => (data ? buildLosVerdesDoc(data) : null)} />;
 }
