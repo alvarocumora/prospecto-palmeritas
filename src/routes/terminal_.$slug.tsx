@@ -1,10 +1,10 @@
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { canonicalProjectSlug } from "@/lib/projects/catalog";
 import { getTerminalProject, isTerminalTab, type TerminalTabKey } from "@/features/terminal/terminalProjects";
-import { TerminalShell } from "@/features/terminal/TerminalShell";
+import { ProjectTerminalShell } from "@/features/terminal/ProjectTerminalShell";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 
-export const Route = createFileRoute("/terminal/$slug")({
+export const Route = createFileRoute("/terminal_/$slug")({
   validateSearch: (search: Record<string, unknown>): { tab: TerminalTabKey } => ({
     tab: isTerminalTab(search.tab) ? search.tab : "mapa",
   }),
@@ -60,5 +60,5 @@ function TerminalPage() {
     );
   }
 
-  return <TerminalShell key={project.slug} project={project} tab={tab} />;
+  return <ProjectTerminalShell key={project.slug} project={project} tab={tab} />;
 }
