@@ -187,6 +187,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
         w: CW,
         h: 220,
         points: model.map.points,
+        polygons: model.map.polygons,
         caption: model.map.caption,
         labelTop: 6,
       });

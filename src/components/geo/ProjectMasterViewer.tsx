@@ -38,6 +38,8 @@ export type AssayPoint = {
 
 export type MasterViewerProps = {
   projectName: string;
+  /** Selector estable para capturar el mapa real en los PDF (data-report-map). */
+  reportMapId?: string;
   center: { lat: number; lng: number };
   concessions?: FeatureCollection | null;
   anomalies?: FeatureCollection | null;
@@ -167,6 +169,7 @@ const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
 
 export function ProjectMasterViewer({
   projectName,
+  reportMapId,
   center,
   concessions,
   anomalies,
@@ -648,7 +651,7 @@ export function ProjectMasterViewer({
 
       <div className="relative flex" style={{ height }}>
         {/* Mapa */}
-        <div ref={mapEl} className="h-full flex-1" />
+        <div ref={mapEl} data-report-map={reportMapId} className="h-full flex-1" />
 
         {/* Panel de capas (izquierda-flotante) — colapsable; solo secciones con datos */}
         <div className="pointer-events-auto absolute left-12 top-3 z-[500] w-56 rounded-lg border border-hairline bg-surface/95 text-[12px] shadow">

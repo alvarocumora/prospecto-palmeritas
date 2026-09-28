@@ -377,6 +377,9 @@ export type MapPoint = {
   highlight?: boolean;
 };
 
+/** Polígono de tenencia/concesión dibujado bajo los puntos (anillo [lng, lat]). */
+export type MapPolygon = { label: string; ring: Array<[number, number]>; emphasis?: boolean };
+
 /**
  * Mini-mapa cartográfico vectorial: dispersión georreferenciada de puntos
  * con marco, retícula y escala aproximada. No requiere teselas ni red.
@@ -391,17 +394,19 @@ export function scatterMap(
     points: MapPoint[];
     caption?: string;
     labelTop?: number;
+    polygons?: MapPolygon[];
   },
 ) {
   const { x, y, w, h, points } = opts;
+  const polygons = opts.polygons ?? [];
   fill(doc, GC_COLOR.white);
   stroke(doc, GC_COLOR.hairline);
   doc.setLineWidth(0.7);
   doc.rect(x, y, w, h, "FD");
   if (!points.length) return;
 
-  const lats = points.map((p) => p.lat);
-  const lngs = points.map((p) => p.lng);
+  const lats = [...points.map((p) => p.lat), ...polygons.flatMap((g) => g.ring.map((c) => c[1]))];
+  const lngs = [...points.map((p) => p.lng), ...polygons.flatMap((g) => g.ring.map((c) => c[0]))];
   const padLat = Math.max((Math.max(...lats) - Math.min(...lats)) * 0.15, 0.004);
   const padLng = Math.max((Math.max(...lngs) - Math.min(...lngs)) * 0.15, 0.004);
   const minLat = Math.min(...lats) - padLat;
@@ -419,6 +424,24 @@ export function scatterMap(
 
   const px = (lng: number) => x + ((lng - minLng) / (maxLng - minLng)) * w;
   const py = (lat: number) => y + h - ((lat - minLat) / (maxLat - minLat)) * h;
+
+  // Concesiones (bajo los puntos): contorno + relleno suave + rótulo
+  polygons.forEach((g) => {
+    if (g.ring.length < 3) return;
+    const pts = g.ring.map(([lng, lat]) => [px(lng), py(lat)] as [number, number]);
+    const deltas = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]]);
+    fill(doc, g.emphasis ? GC_COLOR.paperDeep : GC_COLOR.paper);
+    stroke(doc, g.emphasis ? GC_COLOR.green : GC_COLOR.slate);
+    doc.setLineWidth(g.emphasis ? 1.1 : 0.5);
+    doc.lines(deltas, pts[0][0], pts[0][1], [1, 1], "FD", true);
+    const cx = pts.reduce((a, p) => a + p[0], 0) / pts.length;
+    const cy = pts.reduce((a, p) => a + p[1], 0) / pts.length;
+    if (g.emphasis) {
+      font(doc, "body", "bold", 5.8);
+      ink(doc, GC_COLOR.green);
+      doc.text(g.label, cx, cy, { align: "center" });
+    }
+  });
 
   const values = points.map((p) => p.value ?? 0);
   const vMax = Math.max(...values, 0.0001);

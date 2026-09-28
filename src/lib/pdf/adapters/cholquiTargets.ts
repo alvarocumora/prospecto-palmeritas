@@ -16,6 +16,49 @@ import {
 import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import type { ProjectDoc } from "../model";
+import type { MapPolygon } from "../brand/kit";
+import catastroRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
+
+/** Concesiones de la tenencia analizada (catastro oficial SERNAGEOMIN). */
+const TENURE_MATCH = [/^TOKI 2 /, /^PALLOCABE 8 /, /^DOS MARIAS/];
+
+type CatFeature = {
+  properties: { nombre: string; rol: string; situacion: string };
+  geometry: { type: string; coordinates: number[][][] };
+};
+
+export function cholquiTenurePolygons(): Array<MapPolygon & { rol: string; situacion: string }> {
+  try {
+    const fc = JSON.parse(catastroRaw) as { features: CatFeature[] };
+    return fc.features
+      .filter((f) => f.geometry?.type === "Polygon" && TENURE_MATCH.some((r) => r.test(f.properties.nombre)))
+      .map((f) => ({
+        label: f.properties.nombre.replace(/ DEL 1 AL \d+| \d+\/\d+/g, ""),
+        ring: f.geometry.coordinates[0].map((c) => [c[0], c[1]] as [number, number]),
+        emphasis: true,
+        rol: f.properties.rol,
+        situacion: f.properties.situacion,
+      }));
+  } catch {
+    return [];
+  }
+}
+
+function inRing(lng: number, lat: number, ring: Array<[number, number]>): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    if (yi > lat !== yj > lat && lng < ((xj - xi) * (lat - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+export function concessionAt(lat: number, lng: number): string | null {
+  return cholquiTenurePolygons().find((p) => inRing(lng, lat, p.ring))?.label ?? null;
+}
+
+export type AgentNote = { label: string; note: string };
 
 export const CHOLQUI_TARGETS_DOC_VERSION = "v1.0";
 
@@ -48,8 +91,12 @@ function collarRows(collars: ProposedCollar[]): string[][] {
   ]);
 }
 
-export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDoc {
+export function buildCholquiTargetsDoc(
+  data: CholquiSatelliteTargets,
+  agentNotes: AgentNote[] = [],
+): ProjectDoc {
   const { anomalies, collars, summary } = data;
+  const tenure = cholquiTenurePolygons();
   const top = anomalies.slice(0, 12);
 
   return {
@@ -128,10 +175,11 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
       title: "Anomalías y plataformas de sondaje propuestas",
       caption: `${anomalies.length} centroides de anomalía y ${collars.length} collares propuestos sobre el AOI. El tamaño del círculo representa el puntaje de la anomalía.`,
       valueUnit: "puntaje",
-      captureSelector: '[data-report-map="cholqui-targets"]',
+      captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
       crs: "WGS84",
       imagery: "Sentinel-2 L2A",
+      polygons: tenure,
       points: [
         ...anomalies.map((a, i) => ({
           label: `A-${String(i + 1).padStart(2, "0")}`,
@@ -183,6 +231,38 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
       },
     ],
     sections: [
+      ...(agentNotes.length
+        ? [
+            {
+              eyebrow: "Interpretación IA",
+              title: "Notas del agente geológico-geofísico",
+              lead: "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
+              blocks: [
+                {
+                  kind: "table" as const,
+                  head: ["Objetivo", "Nota del agente (IA)"],
+                  rows: agentNotes.map((n) => [n.label, n.note]),
+                  widths: [0.18, 0.82],
+                },
+              ],
+            },
+          ]
+        : []),
+      ...(tenure.length
+        ? [
+            {
+              eyebrow: "Tenencia",
+              title: "Concesiones analizadas",
+              blocks: [
+                {
+                  kind: "table" as const,
+                  head: ["Concesión", "Rol", "Situación"],
+                  rows: tenure.map((t) => [t.label, t.rol, t.situacion]),
+                },
+              ],
+            },
+          ]
+        : []),
       {
         eyebrow: "Datos de entrada",
         title: "Datasets, procedencia y cobertura",

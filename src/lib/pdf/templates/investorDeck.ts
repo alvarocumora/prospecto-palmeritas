@@ -166,6 +166,7 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
         w: mapW,
         h: mapH,
         points: model.map.points,
+        polygons: model.map.polygons,
         labelTop: 6,
       });
     }
