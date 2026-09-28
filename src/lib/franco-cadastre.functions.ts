@@ -57,7 +57,7 @@ export const getFrancoCadastreCross = createServerFn({ method: "POST" })
 
     for (const feat of fc.features) {
       const kmlName = (feat.properties?.name ?? "(sin nombre)").trim();
-      const { data, error } = await supabase.rpc("match_concessions_by_geometry", {
+      const { data, error } = await supabase.rpc("franco_match_pertenencia", {
         p_geom: feat.geometry as never,
         p_name: kmlName,
       });
