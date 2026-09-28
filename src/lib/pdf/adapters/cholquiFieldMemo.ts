@@ -183,7 +183,7 @@ export function buildCholquiFieldMemoDoc(
             widths: [0.09, 0.26, 0.17, 0.24, 0.11, 0.13],
             rows: targets.map((t) => [
               t.label,
-              t.concession ?? "Sin concesion en el catastro cargado",
+              t.concession ?? "Sin concesión en el catastro cargado",
               t.tenureLabel,
               t.indexName,
               t.score != null ? t.score.toFixed(2).replace(".", ",") : "s/d",
@@ -196,7 +196,7 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body: `Titularidad verificada sobre el catastro cargado: ${ownCount} de ${targets.length} targets caen dentro de la tenencia analizada (TOKI 2 / PALLOCABE 8 / DOS MARIAS) y ${targets.length - ownCount} caen en concesiones inscritas a terceros. Antes de cualquier trabajo en estas ultimas se requiere verificar vigencia y titular en el registro, y obtener acuerdo escrito o servidumbre.`,
+            body: `Titularidad verificada sobre el catastro cargado: ${ownCount} de ${targets.length} targets caen dentro de la tenencia analizada (TOKI 2 / PALLOCABE 8 / DOS MARÍAS) y ${targets.length - ownCount} caen en concesiones inscritas a terceros. Antes de cualquier trabajo en estas últimas se requiere verificar vigencia y titular en el registro, y obtener acuerdo escrito o servidumbre.`,
           },
         ],
       },
