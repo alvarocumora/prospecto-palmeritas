@@ -66,7 +66,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   };
 
   /** Dibuja una tabla cortándola entre páginas; devuelve el alto del último tramo. */
-  const pagedTable = (head: string[], rows: string[][], widths?: number[]): number => {
+  const pagedTable = (head: string[], rows: string[][], widths?: number[]): void => {
     let rest = rows;
     let guard = 0;
     while (rest.length && guard++ < 60) {
@@ -79,7 +79,6 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       rest = rest.slice(fit);
       if (rest.length) nextPage();
     }
-    return 0;
   };
 
 
@@ -258,16 +257,17 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       }
       if (block.kind === "kv") {
         need(70);
-        y +=
-          pagedTable(
-            ["Concepto", "Detalle"],
-            block.items.map(([k, v]) => [k, v]),
-            [CW * 0.34, CW * 0.66],
-          ) + 16;
+        pagedTable(
+          ["Concepto", "Detalle"],
+          block.items.map(([k, v]) => [k, v]),
+          [CW * 0.34, CW * 0.66],
+        );
+        y += 16;
       }
       if (block.kind === "table") {
         need(80);
-        y += pagedTable(block.head, block.rows, block.widths?.map((p) => CW * p)) + 16;
+        pagedTable(block.head, block.rows, block.widths?.map((p) => CW * p));
+        y += 16;
       }
 
     }
