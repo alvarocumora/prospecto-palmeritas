@@ -105,7 +105,7 @@ function ProyectosPage() {
               ))}
             </ul>
             <div className="mt-4 pt-3 border-t border-hairline text-[11px] font-mono uppercase tracking-wider text-accent-brand">
-              Ficha de inversión · ticket, ROI y simulador
+              Terminal · mapa, ensayes, simulador y data room
             </div>
           </Link>
         ))}
