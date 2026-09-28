@@ -5,12 +5,21 @@
  *
  * Anomalías = DERIVADO. Malla = PROPUESTA CONCEPTUAL. Nunca mineralización.
  */
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Crosshair, Loader2 } from "lucide-react";
+import { Bot, Crosshair, Loader2 } from "lucide-react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { generateCholquiTargetNotes } from "@/lib/cholqui/targetNotes.functions";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { getCholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
-import { buildCholquiTargetsDoc } from "@/lib/pdf/adapters/cholquiTargets";
+import {
+  buildCholquiTargetsDoc,
+  concessionAt,
+  type AgentNote,
+} from "@/lib/pdf/adapters/cholquiTargets";
+import { indexLabel } from "@/lib/cholqui/drillGrid";
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
@@ -26,6 +35,40 @@ export function CholquiTargetsSummary() {
     queryFn: () => fn(),
     staleTime: 5 * 60_000,
   });
+  const notesFn = useServerFn(generateCholquiTargetNotes);
+  const [notes, setNotes] = useState<AgentNote[]>([]);
+  const [notesBusy, setNotesBusy] = useState(false);
+
+  const runAgent = async () => {
+    if (!data) return;
+    setNotesBusy(true);
+    try {
+      const inTenure = data.anomalies.filter((a) => a.withinTenure);
+      const targets = [
+        ...inTenure.map((a, i) => ({
+          label: `A-${String(data.anomalies.indexOf(a) + 1).padStart(2, "0")}`,
+          kind: "anomalia" as const,
+          concession: concessionAt(a.lat, a.lng),
+          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${a.zScore ?? "s/d"}; area ${a.areaHa ?? "s/d"} ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E. Orden ${i + 1}.`,
+        })),
+        ...data.collars.map((c) => ({
+          label: c.code,
+          kind: "collar" as const,
+          concession: concessionAt(c.lat, c.lng),
+          facts: `Collar propuesto conceptual; azimut ${c.azimuthDeg}; inclinacion ${c.dipDeg}; profundidad ${c.depthM} m; prioridad ${c.priority}; objetivo: ${c.objective}.`,
+        })),
+      ].slice(0, 20);
+      const res = await notesFn({ data: { targets } });
+      if (res.error || !res.notes.length) {
+        toast.error(res.error ?? "El agente no devolvió notas");
+      } else {
+        setNotes(res.notes);
+        toast.success(`${res.notes.length} notas generadas por el agente IA`);
+      }
+    } finally {
+      setNotesBusy(false);
+    }
+  };
 
   return (
     <section className="border border-hairline bg-white rounded-2xl overflow-hidden">
@@ -44,14 +87,35 @@ export function CholquiTargetsSummary() {
             contexto regional hasta verificar la tenencia.
           </p>
         </div>
+        <div className="flex flex-wrap gap-2 shrink-0">
+        <Button variant="outline" className="h-10" disabled={!data || notesBusy} onClick={runAgent}>
+          {notesBusy ? <Loader2 className="animate-spin" /> : <Bot />}
+          {notes.length ? "Regenerar notas IA" : "Notas del agente IA"}
+        </Button>
         <ProjectDocsMenu
           className="h-10 shrink-0"
           variant="outline"
           label="Descargar informe de targets"
           disabled={!data}
-          build={() => (data ? buildCholquiTargetsDoc(data) : null)}
+          build={() => (data ? buildCholquiTargetsDoc(data, notes) : null)}
         />
+        </div>
       </header>
+
+      {notes.length > 0 && (
+        <div className="px-6 py-5 border-b border-hairline bg-surface-2">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
+            Notas del agente geológico-geofísico · interpretación IA, no verificada
+          </div>
+          <ul className="grid md:grid-cols-2 gap-3">
+            {notes.map((n) => (
+              <li key={n.label} className="text-xs text-content border border-hairline rounded-lg p-3 bg-surface">
+                <b className="font-mono">{n.label}</b> — {n.note}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {isLoading && (
         <div className="px-6 py-10 flex items-center gap-2 text-sm text-content-subtle">
