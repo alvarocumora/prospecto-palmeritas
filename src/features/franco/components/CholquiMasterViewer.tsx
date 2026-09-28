@@ -65,6 +65,7 @@ export function CholquiMasterViewer() {
   return (
     <ProjectMasterViewer
       projectName={CHOLQUI.name}
+      reportMapId="cholqui"
       center={CHOLQUI.center}
       concessions={concessions}
       anomalies={anomalies}

@@ -128,7 +128,7 @@ export function buildCholquiTargetsDoc(data: CholquiSatelliteTargets): ProjectDo
       title: "Anomalías y plataformas de sondaje propuestas",
       caption: `${anomalies.length} centroides de anomalía y ${collars.length} collares propuestos sobre el AOI. El tamaño del círculo representa el puntaje de la anomalía.`,
       valueUnit: "puntaje",
-      captureSelector: '[data-report-map="cholqui-targets"]',
+      captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
       crs: "WGS84",
       imagery: "Sentinel-2 L2A",

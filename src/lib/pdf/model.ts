@@ -3,7 +3,7 @@
  * Un proyecto se describe una sola vez y las tres plantillas globales
  * (deck de inversión 16:9, one-pager y dossier técnico) leen de aquí.
  */
-import type { BarDatum, MapPoint, Slice } from "./brand/kit";
+import type { BarDatum, MapPoint, MapPolygon, Slice } from "./brand/kit";
 import type { EvidenceClass, ReportProfile } from "./architecture";
 
 export type DocKpi = { label: string; value: string; note?: string };
@@ -78,6 +78,7 @@ export type ProjectDoc = {
     title: string;
     caption?: string;
     points: MapPoint[];
+    polygons?: MapPolygon[];
     valueUnit?: string;
     captureSelector?: string;
     imageDataUrl?: string;
