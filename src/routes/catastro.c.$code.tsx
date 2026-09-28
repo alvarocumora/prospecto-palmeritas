@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { WatchlistButton } from "@/features/catastro-public/WatchlistButton";
 import { getConcessionByCode, getConcessionLegalStatus } from "@/lib/catastroPublic.functions";
+import { getConcessionPatentePago } from "@/lib/sngmPatentePago.functions";
 import {
   Building2,
   MapPin,
@@ -18,6 +19,8 @@ import {
   ScanSearch,
   GitCompareArrows,
   ShieldCheck,
+  Receipt,
+  CircleAlert,
 } from "lucide-react";
 
 export const Route = createFileRoute("/catastro/c/$code")({
@@ -167,6 +170,8 @@ function ConcessionPage() {
 
         <LegalPanel code={c.code} />
 
+        <PatentePagoPanel rol={c.code} />
+
         <div className="mt-6 flex flex-wrap items-center gap-3">
           <WatchlistButton code={c.code} />
           <Link
@@ -298,6 +303,110 @@ function LegalPanel({ code }: { code: string }) {
               </p>
             )}
           </div>
+        </>
+      )}
+    </section>
+  );
+}
+
+/** Historial real de pago de patente — consulta pública en vivo a SERNAGEOMIN. */
+function PatentePagoPanel({ rol }: { rol: string }) {
+  const fn = useServerFn(getConcessionPatentePago);
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["concession-patente-pago", rol],
+    queryFn: () => fn({ data: { rol } }),
+    staleTime: 15 * 60_000,
+    retry: 1,
+  });
+
+  return (
+    <section className="mt-6 border border-border rounded-md bg-bg-secondary/20 p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Receipt className="w-4 h-4 text-primary" />
+        <h2 className="text-sm font-mono uppercase tracking-wider">Pago de patente</h2>
+        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-500">
+          Consulta en vivo · SERNAGEOMIN
+        </span>
+      </div>
+
+      {isLoading ? (
+        <div className="h-16 rounded bg-muted/20 animate-pulse" />
+      ) : isError || !data ? (
+        <div className="flex items-start gap-2 text-xs text-muted-foreground">
+          <CircleAlert className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+          No se pudo consultar el estado de pago en este momento. Reintenta más tarde o revisa
+          directamente en{" "}
+          <a
+            href="https://portalsdnmext.sernageomin.cl/propiedadminera/consulta-pago-concesion"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline inline-flex items-center gap-0.5"
+          >
+            SERNAGEOMIN <ExternalLink className="w-3 h-3" />
+          </a>
+          .
+        </div>
+      ) : !data.found ? (
+        <p className="text-xs text-muted-foreground">
+          Sin registro de pagos para este rol en el sistema público de SERNAGEOMIN (puede ser una
+          concesión muy reciente o el rol no coincide exactamente).
+        </p>
+      ) : (
+        <>
+          <div className="grid sm:grid-cols-2 gap-2 mb-4 text-xs">
+            <div className="text-muted-foreground">
+              Titular: <span className="text-foreground">{data.titular ?? "—"}</span>
+            </div>
+            <div className="text-muted-foreground">
+              RUT titular:{" "}
+              <span className="text-foreground font-mono">{data.rutTitular ?? "—"}</span>
+            </div>
+          </div>
+          {data.pagos.length === 0 ? (
+            <p className="text-xs text-muted-foreground">
+              La concesión existe en el padrón, pero no registra pagos de patente todavía.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-muted-foreground border-b border-border">
+                    <th className="py-1.5 pr-3 font-mono font-normal">Período</th>
+                    <th className="py-1.5 pr-3 font-mono font-normal">Fecha pago</th>
+                    <th className="py-1.5 pr-3 font-mono font-normal">Folio</th>
+                    <th className="py-1.5 pr-3 font-mono font-normal text-right">Valor pagado</th>
+                    <th className="py-1.5 font-mono font-normal text-right">Hectáreas</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.pagos.map((p, i) => (
+                    <tr key={`${p.periodo}-${i}`} className="border-b border-border/60">
+                      <td className="py-1.5 pr-3 font-mono">{p.periodo}</td>
+                      <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                        {p.fechaPago ?? "—"}
+                      </td>
+                      <td className="py-1.5 pr-3 font-mono text-muted-foreground">
+                        {p.folio ?? "—"}
+                      </td>
+                      <td className="py-1.5 pr-3 font-mono text-right">
+                        {p.valorPagadoClp != null
+                          ? `$${p.valorPagadoClp.toLocaleString("es-CL")}`
+                          : "—"}
+                      </td>
+                      <td className="py-1.5 font-mono text-right text-muted-foreground">
+                        {p.hectareas ?? "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <p className="mt-3 text-[10px] font-mono text-muted-foreground">
+            Fuente: consulta pública en vivo, portalsdnmext.sernageomin.cl. Refleja los pagos
+            registrados por SERNAGEOMIN al momento de la consulta; no reemplaza el certificado
+            oficial de vigencia ni el rol de la Tesorería General de la República.
+          </p>
         </>
       )}
     </section>

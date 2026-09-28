@@ -62,6 +62,7 @@ import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedo
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto'
 import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
+import { Route as CatastroPeritosRouteImport } from './routes/catastro.peritos'
 import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
 import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
 import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated.panel'
@@ -443,6 +444,11 @@ const CatastroProyectoRoute = CatastroProyectoRouteImport.update({
 const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
   id: '/catastro/precios',
   path: '/catastro/precios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPeritosRoute = CatastroPeritosRouteImport.update({
+  id: '/catastro/peritos',
+  path: '/catastro/peritos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CatastroMapaRoute = CatastroMapaRouteImport.update({
@@ -1157,6 +1163,7 @@ export interface FileRoutesByFullPath {
   '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/peritos': typeof CatastroPeritosRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -1329,6 +1336,7 @@ export interface FileRoutesByTo {
   '/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/peritos': typeof CatastroPeritosRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -1503,6 +1511,7 @@ export interface FileRoutesById {
   '/_authenticated/panel': typeof AuthenticatedPanelRouteWithChildren
   '/catastro/global': typeof CatastroGlobalRoute
   '/catastro/mapa': typeof CatastroMapaRoute
+  '/catastro/peritos': typeof CatastroPeritosRoute
   '/catastro/precios': typeof CatastroPreciosRoute
   '/catastro/proyecto': typeof CatastroProyectoRouteWithChildren
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -1677,6 +1686,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/catastro/global'
     | '/catastro/mapa'
+    | '/catastro/peritos'
     | '/catastro/precios'
     | '/catastro/proyecto'
     | '/email/unsubscribe'
@@ -1849,6 +1859,7 @@ export interface FileRouteTypes {
     | '/panel'
     | '/catastro/global'
     | '/catastro/mapa'
+    | '/catastro/peritos'
     | '/catastro/precios'
     | '/catastro/proyecto'
     | '/email/unsubscribe'
@@ -2022,6 +2033,7 @@ export interface FileRouteTypes {
     | '/_authenticated/panel'
     | '/catastro/global'
     | '/catastro/mapa'
+    | '/catastro/peritos'
     | '/catastro/precios'
     | '/catastro/proyecto'
     | '/email/unsubscribe'
@@ -2195,6 +2207,7 @@ export interface RootRouteChildren {
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   CatastroGlobalRoute: typeof CatastroGlobalRoute
   CatastroMapaRoute: typeof CatastroMapaRoute
+  CatastroPeritosRoute: typeof CatastroPeritosRoute
   CatastroPreciosRoute: typeof CatastroPreciosRoute
   CatastroProyectoRoute: typeof CatastroProyectoRouteWithChildren
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -2627,6 +2640,13 @@ declare module '@tanstack/react-router' {
       path: '/catastro/precios'
       fullPath: '/catastro/precios'
       preLoaderRoute: typeof CatastroPreciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/peritos': {
+      id: '/catastro/peritos'
+      path: '/catastro/peritos'
+      fullPath: '/catastro/peritos'
+      preLoaderRoute: typeof CatastroPeritosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/catastro/mapa': {
@@ -3807,6 +3827,7 @@ const rootRouteChildren: RootRouteChildren = {
     Char91DotwellKnownChar93OauthProtectedResourceRoute,
   CatastroGlobalRoute: CatastroGlobalRoute,
   CatastroMapaRoute: CatastroMapaRoute,
+  CatastroPeritosRoute: CatastroPeritosRoute,
   CatastroPreciosRoute: CatastroPreciosRoute,
   CatastroProyectoRoute: CatastroProyectoRouteWithChildren,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
