@@ -261,6 +261,7 @@ function SimuladorTab({ project }: { project: TerminalProject }) {
 function DataRoomTab({ project }: { project: TerminalProject }) {
   const { ficha } = project;
   return (
+
     <>
       <section className="rounded-2xl border border-hairline bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
