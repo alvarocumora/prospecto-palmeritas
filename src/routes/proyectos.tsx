@@ -82,7 +82,9 @@ function ProyectosPage() {
         {SHOWCASE.map((p) => (
           <Link
             key={p.code}
-            to={p.to}
+            to="/terminal/$slug"
+            params={{ slug: p.slug }}
+            search={{ tab: "mapa" as const }}
             className="group rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
           >
             <div className="flex items-center justify-between">
