@@ -1,0 +1,20 @@
+{
+  "id": "S2A_MSIL2A_20260703T143801_R096_T19HCC_20260704T021117",
+  "collection": "sentinel-2-l2a",
+  "bbox": [-71.135, -33.94, -70.953, -33.762],
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [[[-71.135, -33.94], [-70.953, -33.94], [-70.953, -33.762], [-71.135, -33.762], [-71.135, -33.94]]]
+  },
+  "properties": {
+    "datetime": "2026-07-03T14:38:01.024000Z",
+    "gsd": 20,
+    "platform": "Sentinel-2A",
+    "instruments": ["msi"],
+    "eo:cloud_cover": 0.008975
+  },
+  "assets": {
+    "B11": { "href": "https://example.invalid/B11.tif", "type": "image/tiff; application=geotiff", "title": "SWIR 1.6um" },
+    "B12": { "href": "https://example.invalid/B12.tif", "type": "image/tiff; application=geotiff", "title": "SWIR 2.2um" }
+  }
+}
