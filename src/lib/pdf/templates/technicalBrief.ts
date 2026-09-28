@@ -18,6 +18,7 @@ import {
   editorialTable,
   eyebrow,
   fill,
+  fitTableRows,
   font,
   ink,
   kpiGrid,
@@ -63,6 +64,23 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   const need = (space: number) => {
     if (y + space > BOTTOM) nextPage();
   };
+
+  /** Dibuja una tabla cortándola entre páginas; devuelve el alto del último tramo. */
+  const pagedTable = (head: string[], rows: string[][], widths?: number[]): void => {
+    let rest = rows;
+    let guard = 0;
+    while (rest.length && guard++ < 60) {
+      const fit = fitTableRows(doc, { head, rows: rest, widths, w: CW }, BOTTOM - y);
+      if (fit === 0) {
+        nextPage();
+        continue;
+      }
+      y += editorialTable(doc, { x: M, y, w: CW, head, rows: rest.slice(0, fit), widths });
+      rest = rest.slice(fit);
+      if (rest.length) nextPage();
+    }
+  };
+
 
   /* ---------- Portada ---------- */
   fill(doc, GC_COLOR.paper);
@@ -239,28 +257,19 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       }
       if (block.kind === "kv") {
         need(70);
-        y +=
-          editorialTable(doc, {
-            x: M,
-            y,
-            w: CW,
-            head: ["Concepto", "Detalle"],
-            rows: block.items.map(([k, v]) => [k, v]),
-            widths: [CW * 0.34, CW * 0.66],
-          }) + 16;
+        pagedTable(
+          ["Concepto", "Detalle"],
+          block.items.map(([k, v]) => [k, v]),
+          [CW * 0.34, CW * 0.66],
+        );
+        y += 16;
       }
       if (block.kind === "table") {
         need(80);
-        y +=
-          editorialTable(doc, {
-            x: M,
-            y,
-            w: CW,
-            head: block.head,
-            rows: block.rows,
-            widths: block.widths?.map((p) => CW * p),
-          }) + 16;
+        pagedTable(block.head, block.rows, block.widths?.map((p) => CW * p));
+        y += 16;
       }
+
     }
     n += 1;
   }
@@ -301,7 +310,9 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     n += 1;
   }
 
-  need(160);
+  // El recuadro de advertencias y el bloque de contacto deben caber juntos.
+  const noticeH = 46 + model.disclaimers.length * 26;
+  need(60 + noticeH + 70);
   eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Advertencias`);
   y += 16;
   y += title(doc, M, y, "Base de información y limitaciones", 17, CW) + 12;
@@ -309,7 +320,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y += boxH + 18;
 
   // El bloque de contacto se ancla al pie de la última página con contenido.
-  y = Math.min(Math.max(y, BOTTOM - 30), BOTTOM - 30);
+  if (y > BOTTOM - 40) nextPage();
+  y = BOTTOM - 30;
 
   stroke(doc, GC_COLOR.hairline);
   doc.setLineWidth(0.6);

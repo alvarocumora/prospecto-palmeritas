@@ -1,15 +1,16 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getTilamaReport } from "@/lib/tilama.functions";
-import { FileText, Landmark, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Box, FileText, Landmark, Loader2, Map as MapIcon, MapPin, ShieldCheck } from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
 import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import { TerminalSimulator } from "./TerminalSimulator";
+
 import {
   TERMINAL_TABS,
   listTerminalProjects,
@@ -28,6 +29,17 @@ const CholquiTargetsSummary = lazy(() =>
     default: m.CholquiTargetsSummary,
   })),
 );
+const CholquiTerrain3D = lazy(() =>
+  import("@/features/franco/components/CholquiTerrain3D").then((m) => ({
+    default: m.CholquiTerrain3D,
+  })),
+);
+const CholquiFieldProgramPanel = lazy(() =>
+  import("@/features/franco/components/CholquiFieldProgramPanel").then((m) => ({
+    default: m.CholquiFieldProgramPanel,
+  })),
+);
+
 const CholquiEvidencePanel = lazy(() =>
   import("@/features/franco/components/CholquiEvidencePanel").then((m) => ({
     default: m.CholquiEvidencePanel,
@@ -160,16 +172,50 @@ export function ProjectTerminalShell({
 }
 
 function MapaTab({ project }: { project: TerminalProject }) {
+  const [view, setView] = useState<"2d" | "3d">("2d");
+
   if (project.slug === "cholqui") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
-        <CholquiMasterViewer />
-        <div className="mt-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <p className="text-[11px] text-content-subtle max-w-xl">
+            Misma evidencia en dos lecturas: planimétrica para tenencia y catastro, y relieve real
+            para leer los halos y las trazas de sondaje en profundidad.
+          </p>
+          <div className="inline-flex rounded-full border border-hairline bg-white p-1">
+            {(
+              [
+                ["2d", "Planimétrico", MapIcon],
+                ["3d", "Terreno y evidencia 3D", Box],
+              ] as Array<["2d" | "3d", string, typeof MapIcon]>
+            ).map(([key, label, Icon]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setView(key)}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+                  view === key
+                    ? "bg-accent-brand text-white"
+                    : "text-content-subtle hover:text-content"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {view === "2d" ? <CholquiMasterViewer /> : <CholquiTerrain3D />}
+
+        <div className="mt-6 space-y-6">
           <CholquiTargetsSummary />
+          <CholquiFieldProgramPanel />
         </div>
       </Suspense>
     );
   }
+
   if (project.slug === "losverdes") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>

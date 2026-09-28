@@ -54,9 +54,55 @@ function inRing(lng: number, lat: number, ring: Array<[number, number]>): boolea
   return inside;
 }
 
-export function concessionAt(lat: number, lng: number): string | null {
-  return cholquiTenurePolygons().find((p) => inRing(lng, lat, p.ring))?.label ?? null;
+/** Todas las concesiones del catastro oficial cargado (no sólo la tenencia analizada). */
+function allCatastroPolygons(): Array<{ label: string; rol: string; ring: Array<[number, number]> }> {
+  try {
+    const fc = JSON.parse(catastroRaw) as { features: CatFeature[] };
+    return fc.features
+      .filter((f) => f.geometry?.type === "Polygon")
+      .map((f) => ({
+        label: f.properties.nombre,
+        rol: f.properties.rol,
+        ring: f.geometry.coordinates[0].map((c) => [c[0], c[1]] as [number, number]),
+      }));
+  } catch {
+    return [];
+  }
 }
+
+/**
+ * Concesión que contiene el punto, según el catastro SERNAGEOMIN cargado.
+ * Devuelve nombre y rol para que el documento sea verificable contra el registro.
+ */
+export function concessionAt(lat: number, lng: number): string | null {
+  const hit = allCatastroPolygons().find((p) => inRing(lng, lat, p.ring));
+  if (!hit) return null;
+  return hit.rol ? `${hit.label} (rol ${hit.rol})` : hit.label;
+}
+
+/**
+ * Titularidad del punto respecto de la tenencia analizada del proyecto.
+ * `own` sólo es verdadero dentro de TOKI 2 / PALLOCABE 8 / DOS MARIAS.
+ * Cualquier otra concesión del catastro se declara de tercero.
+ */
+export function tenureAt(
+  lat: number,
+  lng: number,
+): { concession: string | null; own: boolean; label: string } {
+  const own = cholquiTenurePolygons().find((p) => inRing(lng, lat, p.ring));
+  if (own) return { concession: own.label, own: true, label: "Tenencia analizada" };
+  const other = allCatastroPolygons().find((p) => inRing(lng, lat, p.ring));
+  if (other) {
+    return {
+      concession: other.rol ? `${other.label} (rol ${other.rol})` : other.label,
+      own: false,
+      label: "Concesión de tercero",
+    };
+  }
+  return { concession: null, own: false, label: "Sin concesión en el catastro cargado" };
+}
+
+
 
 export type AgentNote = { label: string; note: string };
 
