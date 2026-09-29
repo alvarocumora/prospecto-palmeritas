@@ -51,6 +51,9 @@ export type ReportSection = {
   qp_id: string | null;
   signed_at: string | null;
   signature_hash: string | null;
+  requires_qp_review: boolean;
+  confidence_level: string;
+  gap_notes: string | null;
   word_count: number | null;
   updated_at: string;
 };
