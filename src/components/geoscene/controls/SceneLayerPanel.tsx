@@ -1,0 +1,112 @@
+import { Layers3, X } from "lucide-react";
+import { EvidenceBadge } from "@/components/ui-system";
+import type { CanonicalGeoLayerId, GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
+import { sceneDefinitionsForMode } from "../layerPolicy";
+import type { GeoSceneMode } from "../types";
+
+const DOMAIN_LABEL: Partial<Record<GeoLayerDomain, string>> = {
+  territory: "Territorio",
+  remote_sensing: "Satélite",
+  geology: "Geología",
+  geophysics: "Geofísica",
+  sampling: "Muestreo",
+  targets: "Targets",
+  drilling: "Sondajes",
+  models: "Modelos",
+};
+
+export function SceneLayerPanel({
+  mode,
+  enabled,
+  open,
+  onClose,
+  onToggle,
+}: {
+  mode: GeoSceneMode;
+  enabled: ReadonlySet<string>;
+  open: boolean;
+  onClose: () => void;
+  onToggle: (id: CanonicalGeoLayerId) => void;
+}) {
+  if (!open) return null;
+
+  const definitions = sceneDefinitionsForMode(mode);
+  const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
+
+  return (
+    <div className="absolute left-3 top-14 z-30 max-h-[75vh] w-[21rem] overflow-y-auto rounded border border-border bg-bg-secondary/95 p-3 font-mono text-xs shadow-xl backdrop-blur">
+      <div className="mb-3 flex items-start justify-between gap-2 border-b border-border pb-2">
+        <div>
+          <div className="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide text-foreground">
+            <Layers3 className="h-3.5 w-3.5" />
+            Capas 3D canónicas
+          </div>
+          <div className="mt-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+            GeoScene3D · {mode}
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="text-muted-foreground hover:text-foreground"
+          aria-label="Cerrar capas 3D"
+        >
+          <X className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {domains.map((domain) => (
+        <div key={domain} className="mb-4">
+          <div className="mb-1.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+            {DOMAIN_LABEL[domain] ?? domain}
+          </div>
+          <div className="space-y-2">
+            {definitions
+              .filter((definition) => definition.domain === domain)
+              .map((definition) => {
+                const active = enabled.has(definition.id);
+                return (
+                  <button
+                    type="button"
+                    key={definition.id}
+                    onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
+                    className={`w-full rounded border p-2 text-left transition-colors ${
+                      active
+                        ? "border-gold/60 bg-gold/5"
+                        : "border-border bg-background/30 hover:border-foreground/30"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="text-[11px] font-medium leading-tight text-foreground">
+                        {definition.label}
+                      </span>
+                      <span
+                        className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
+                          active ? "bg-gold" : "bg-muted-foreground/30"
+                        }`}
+                      />
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                      <EvidenceBadge
+                        kind={definition.evidence}
+                        scale={definition.scaleLabel}
+                        size="xs"
+                      />
+                      <span className="text-[9px] text-muted-foreground">
+                        {definition.sourceSystem}
+                      </span>
+                    </div>
+                    {definition.caution && active && (
+                      <div className="mt-1.5 text-[9px] leading-snug text-amber-600">
+                        {definition.caution}
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
