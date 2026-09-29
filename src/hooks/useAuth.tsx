@@ -41,31 +41,53 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let initialResolved = false;
 
-    // Set up listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      if (newSession?.user) {
-        // defer profile load to avoid recursive lock
-        setTimeout(() => loadProfile(newSession.user.id), 0);
-      } else {
-        setProfile(null);
-      }
-      // Only flip loading off after the initial getSession() has resolved.
-      // This prevents a transient "no user" state during first render that
-      // would cause protected routes to bounce to /auth.
-      if (initialResolved) setLoading(false);
-    });
+    // `supabase` es un Proxy perezoso: tocar `.auth` recién acá crea el
+    // cliente real y, si faltan las env vars, tira. Sin este try/catch ese
+    // throw ocurre dentro de un efecto — React lo trata como error no
+    // controlado y tumba TODA la app (incluidas rutas públicas que no
+    // necesitan auth), porque AuthProvider envuelve toda la app en
+    // __root.tsx. Con env vars faltantes, degradamos a "sin sesión" en vez
+    // de romper el render.
+    try {
+      // Set up listener FIRST
+      const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        if (newSession?.user) {
+          // defer profile load to avoid recursive lock
+          setTimeout(() => loadProfile(newSession.user.id), 0);
+        } else {
+          setProfile(null);
+        }
+        // Only flip loading off after the initial getSession() has resolved.
+        // This prevents a transient "no user" state during first render that
+        // would cause protected routes to bounce to /auth.
+        if (initialResolved) setLoading(false);
+      });
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      initialResolved = true;
-      setSession(s);
-      setUser(s?.user ?? null);
-      if (s?.user) loadProfile(s.user.id);
+      supabase.auth
+        .getSession()
+        .then(({ data: { session: s } }) => {
+          initialResolved = true;
+          setSession(s);
+          setUser(s?.user ?? null);
+          if (s?.user) loadProfile(s.user.id);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("[AuthProvider] getSession falló:", err);
+          setLoading(false);
+        });
+
+      return () => sub.subscription.unsubscribe();
+    } catch (err) {
+      console.error(
+        "[AuthProvider] No se pudo inicializar el cliente de Supabase (¿faltan env vars?):",
+        err,
+      );
       setLoading(false);
-    });
-
-    return () => sub.subscription.unsubscribe();
+      return undefined;
+    }
   }, []);
 
   const signOut = async () => {
