@@ -30,6 +30,7 @@ import {
   title,
 } from "../brand/kit";
 import type { ProjectDoc } from "../model";
+import { appendixTables, blockMetaLine, mainBlocks } from "../narrative";
 
 const { w: W, h: H, m: M } = GC_PAGE.a4;
 const CW = W - M * 2;
@@ -245,10 +246,63 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     y += 16;
     y += title(doc, M, y, section.title, 17, CW) + 10;
     if (section.lead) y += paragraph(doc, M, y, section.lead, CW, 9) + 12;
-    for (const block of section.blocks) {
-      if (block.kind === "text") {
+    for (const block of mainBlocks(section)) {
+      if (block.kind === "narrative" || block.kind === "text") {
         need(50);
-        y += paragraph(doc, M, y, block.body, CW, 9) + 12;
+        y += paragraph(doc, M, y, block.body, CW, 9) + 8;
+        const meta = blockMetaLine(block);
+        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+      }
+      if (block.kind === "finding") {
+        need(80);
+        y += noticeBox(doc, M, y, CW, [block.body], `Hallazgo · ${block.title}`) + 8;
+        const meta = blockMetaLine(block);
+        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+      }
+      if (block.kind === "evidence") {
+        need(80);
+        y +=
+          noticeBox(
+            doc,
+            M,
+            y,
+            CW,
+            [block.body],
+            `Evidencia · ${block.label} · ${block.provenance}`,
+          ) + 8;
+        const meta = blockMetaLine(block);
+        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+      }
+      if (block.kind === "gap") {
+        need(80);
+        const lines = block.action ? [block.body, `Acción: ${block.action}`] : [block.body];
+        y += noticeBox(doc, M, y, CW, lines, `Data gap · ${block.title}`) + 10;
+      }
+      if (block.kind === "recommendation") {
+        need(80);
+        const heading = block.priority
+          ? `Recomendación · ${block.priority.toUpperCase()} · ${block.title}`
+          : `Recomendación · ${block.title}`;
+        y += noticeBox(doc, M, y, CW, [block.body], heading) + 10;
+      }
+      if (block.kind === "figure" || block.kind === "map") {
+        need(260);
+        y += title(doc, M, y, block.title, 13, CW) + 8;
+        const format = block.imageDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
+        doc.addImage(block.imageDataUrl, format, M, y, CW, 210, undefined, "FAST");
+        stroke(doc, GC_COLOR.hairline);
+        doc.setLineWidth(0.7);
+        doc.rect(M, y, CW, 210);
+        y += 222;
+        if (block.caption) y += paragraph(doc, M, y, block.caption, CW, 8, GC_COLOR.slate) + 6;
+        const metaParts = [
+          block.kind === "map" ? block.imagery : undefined,
+          block.kind === "map" ? block.crs : undefined,
+          blockMetaLine(block),
+        ].filter(Boolean);
+        if (metaParts.length) {
+          y += paragraph(doc, M, y, metaParts.join(" · "), CW, 6.8, GC_COLOR.slate) + 8;
+        }
       }
       if (block.kind === "bullets") {
         need(50);
@@ -310,6 +364,23 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
         widths: [CW * 0.22, CW * 0.78],
       }) + 18;
     n += 1;
+  }
+
+  const appendices = appendixTables(model);
+  for (const [index, appendix] of appendices.entries()) {
+    need(130);
+    const letter = String.fromCharCode(65 + index);
+    eyebrow(doc, M, y, `Anexo ${letter} · ${appendix.sectionTitle}`);
+    y += 16;
+    y += title(doc, M, y, appendix.block.title, 16, CW) + 10;
+    const meta = blockMetaLine(appendix.block);
+    if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 10;
+    pagedTable(
+      appendix.block.head,
+      appendix.block.rows,
+      appendix.block.widths?.map((p) => CW * p),
+    );
+    y += 18;
   }
 
   // El recuadro de advertencias y el bloque de contacto deben caber juntos.
