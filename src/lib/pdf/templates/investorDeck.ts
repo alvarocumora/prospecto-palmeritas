@@ -27,6 +27,7 @@ import {
   title,
 } from "../brand/kit";
 import type { ProjectDoc } from "../model";
+import { blockMetaLine, mainBlocks } from "../narrative";
 
 const { w: W, h: H, m: M } = GC_PAGE.deck;
 const CW = W - M * 2;
@@ -222,9 +223,48 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
     newSlide(section.eyebrow, section.title);
     let y = 150;
     if (section.lead) y += paragraph(doc, M, y, section.lead, CW * 0.78, 10) + 16;
-    for (const block of section.blocks) {
+    for (const block of mainBlocks(section)) {
       if (y > H - 110) break;
-      if (block.kind === "text") y += paragraph(doc, M, y, block.body, CW * 0.78, 9.5) + 12;
+      if (block.kind === "narrative" || block.kind === "text") {
+        y += paragraph(doc, M, y, block.body, CW * 0.78, 9.5) + 8;
+        const meta = blockMetaLine(block);
+        if (meta) y += paragraph(doc, M, y, meta, CW * 0.78, 6.8, GC_COLOR.slate) + 8;
+      }
+      if (block.kind === "finding") {
+        y += noticeBox(doc, M, y, CW * 0.78, [block.body], `Hallazgo · ${block.title}`) + 10;
+      }
+      if (block.kind === "evidence") {
+        y +=
+          noticeBox(
+            doc,
+            M,
+            y,
+            CW * 0.78,
+            [block.body],
+            `Evidencia · ${block.label} · ${block.provenance}`,
+          ) + 10;
+      }
+      if (block.kind === "gap") {
+        const lines = block.action ? [block.body, `Acción: ${block.action}`] : [block.body];
+        y += noticeBox(doc, M, y, CW * 0.78, lines, `Data gap · ${block.title}`) + 10;
+      }
+      if (block.kind === "recommendation") {
+        const heading = block.priority
+          ? `Recomendación · ${block.priority.toUpperCase()} · ${block.title}`
+          : `Recomendación · ${block.title}`;
+        y += noticeBox(doc, M, y, CW * 0.78, [block.body], heading) + 10;
+      }
+      if (block.kind === "figure" || block.kind === "map") {
+        const format = block.imageDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
+        const imageW = CW * 0.72;
+        const imageH = 210;
+        doc.addImage(block.imageDataUrl, format, M, y, imageW, imageH, undefined, "FAST");
+        stroke(doc, GC_COLOR.hairline);
+        doc.setLineWidth(0.7);
+        doc.rect(M, y, imageW, imageH);
+        y += imageH + 10;
+        if (block.caption) y += paragraph(doc, M, y, block.caption, imageW, 7.6, GC_COLOR.slate) + 8;
+      }
       if (block.kind === "bullets") y += bullets(doc, M, y, block.items, CW * 0.78, 9.5) + 8;
       if (block.kind === "kv") {
         y +=
@@ -235,7 +275,6 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
             head: ["Concepto", "Detalle"],
             rows: block.items.map(([k, v]) => [k, v]),
             widths: [CW * 0.3, CW * 0.58],
-
             size: 8.2,
           }) + 14;
       }
