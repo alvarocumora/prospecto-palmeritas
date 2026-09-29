@@ -8,7 +8,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/geology3d")({
       {
         name: "description",
         content:
-          "Visor 3D canónico (GeoScene3D · modo Surface): sondajes, intercepts Au ≥ 0.1 g/t y targets del proyecto activo.",
+          "Visor 3D canónico GeoScene3D sobre MapLibre + deck.gl, con capas gobernadas por procedencia para superficie, subsuelo y modelos.",
       },
     ],
   }),
