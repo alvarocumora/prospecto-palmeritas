@@ -74,7 +74,7 @@ export function useGeophysAnomaliesLayer(projectId: string | null, visible = tru
     () =>
       visible && points.length > 0
         ? new ColumnLayer({
-            id: "geoscene-geophys-anomalies",
+            id: "geophysics.anomalies",
             data: points,
             pickable: true,
             diskResolution: 24,
