@@ -70,6 +70,11 @@ import { useDroneFlights } from "@/hooks/useDroneFlights";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { InspectedFeature } from "./map/FeatureInspectorPanel";
+import { layerStateForPreset } from "@/lib/geospatial/projectMapPolicy";
+import {
+  getGeoViewerPreset,
+  type GeoViewerPresetId,
+} from "@/lib/geospatial/layerRegistry";
 
 interface ProjectMapProps {
   samples?: SamplingResult[];
@@ -82,6 +87,8 @@ interface ProjectMapProps {
    * Set to null/undefined to leave user selection alone.
    */
   basemapOverride?: "satellite" | "topo" | null;
+  /** Initial canonical layer preset. Runtime user choices still persist in localStorage. */
+  initialPreset?: GeoViewerPresetId;
 }
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
@@ -140,6 +147,7 @@ export function ProjectMap({
   fillHeight,
   onMapReady,
   basemapOverride,
+  initialPreset = "official_workbench",
 }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
@@ -196,7 +204,12 @@ export function ProjectMap({
   }, [drillHoles, logsByHole]);
   const concessionsLayerRef = useRef<LayerGroup | null>(null);
   const drillCollarsLayerRef = useRef<LayerGroup | null>(null);
-  const { state: layerState, setVisible, setOpacity } = useLayerState(DEFAULT_LAYER_STATE);
+  const presetLayerState = useMemo(
+    () => layerStateForPreset(DEFAULT_LAYER_STATE, initialPreset),
+    [initialPreset],
+  );
+  const presetLabel = getGeoViewerPreset(initialPreset).label;
+  const { state: layerState, setVisible, setOpacity } = useLayerState(presetLayerState);
 
   // External basemap override (used by NI 43-101 report capture).
   // Switches Esri Imagery / Esri Topo while hiding the other basemaps.
@@ -916,6 +929,8 @@ export function ProjectMap({
       <div
         ref={wrapperRef}
         className={`relative ${fillHeight ? "flex-1 min-h-0" : ""} ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
+        data-geo-workbench="official-2d"
+        data-geo-preset={initialPreset}
       >
         <div
           ref={containerRef}
@@ -1063,6 +1078,7 @@ export function ProjectMap({
           state={layerState}
           onVisible={setVisible}
           onOpacity={setOpacity}
+          presetLabel={presetLabel}
         />
 
         {mapReady && <CoordinateFooter map={mapRef.current} />}
