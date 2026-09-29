@@ -45,7 +45,7 @@ export function useTargetsLayer(projectId: string | null, visible = true) {
     () =>
       visible && points.length > 0
         ? new ScatterplotLayer({
-            id: "geoscene-targets",
+            id: "targets.exploration",
             data: points,
             pickable: true,
             stroked: true,
