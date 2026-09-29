@@ -22,9 +22,10 @@ import {
   fmtUsd,
   solubleRatioPct,
 } from "@/features/franco/data/cholqui";
+import { getToki2ReportContext } from "@/lib/cholqui/toki2ReportContext";
 import type { ProjectDoc } from "../model";
 
-export const CHOLQUI_DOC_VERSION = "v3.1";
+export const CHOLQUI_DOC_VERSION = "v4.0";
 
 export function buildCholquiDoc(): ProjectDoc {
   const cuMax = Math.max(...CHOLQUI_ASSAYS.map((a) => a.cuTotalPct));
@@ -32,6 +33,7 @@ export function buildCholquiDoc(): ProjectDoc {
   const ratios = CHOLQUI_ASSAYS.map(solubleRatioPct);
   const ratioMin = Math.min(...ratios);
   const ratioMax = Math.max(...ratios);
+  const toki2 = getToki2ReportContext();
 
   return {
     reportProfile: "technical",
@@ -154,6 +156,18 @@ export function buildCholquiDoc(): ProjectDoc {
         detail: `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_CONCEPTUAL.sector}; no es recurso ni reserva.`,
         confidence: "low",
       },
+      ...(toki2
+        ? [
+            {
+              status: "DERIVED" as const,
+              provenance: "DERIVED" as const,
+              label: "Toki 2 · planificación DEM",
+              detail: `${toki2.areaHa.toLocaleString("es-CL")} ha con ${toki2.controlPoints.length} puntos base de levantamiento. El screening topográfico usa Copernicus GLO-30 en el módulo operativo; las métricas DEM sólo entran al informe cuando existe una corrida/snapshot versionado.`,
+              confidence: "medium" as const,
+              source: "GeoCapitals · Toki 2 DEM field planning module",
+            },
+          ]
+        : []),
       {
         status: "PENDING_DD",
         provenance: "PENDING_DD",
@@ -297,6 +311,70 @@ export function buildCholquiDoc(): ProjectDoc {
           },
         ],
       },
+      ...(toki2
+        ? [
+            {
+              eyebrow: "Ground truth",
+              title: "Toki 2 · programa de levantamiento geológico",
+              blocks: [
+                {
+                  kind: "narrative" as const,
+                  body: `La concesión ${toki2.name} (rol ${toki2.rol}) cubre aproximadamente ${toki2.areaHa.toLocaleString("es-CL")} ha. El programa utiliza nueve estaciones base derivadas de la geometría canónica de la concesión: ocho controles perimetrales y una estación central. Su objetivo es levantar litología, estructuras, alteración, mineralización visible, accesibilidad y condiciones para trabajo posterior.`,
+                  provenance: "DOCUMENTARY" as const,
+                  confidence: "medium" as const,
+                  source: "Catastro SERNAGEOMIN cargado en GeoCapitals",
+                },
+                {
+                  kind: "evidence" as const,
+                  label: "Screening satelital actual",
+                  body: `El pase Sentinel-2 actualmente cargado contiene ${toki2.satelliteAnomaliesInside} anomalías cuyo centroide cae dentro de Toki 2. Este conteo es evidencia derivada de teledetección y no confirma ni descarta mineralización.`,
+                  provenance: "DERIVED" as const,
+                  confidence: "medium" as const,
+                  source: [toki2.satelliteProvider, toki2.satelliteRunId]
+                    .filter(Boolean)
+                    .join(" · ") || "GeoCapitals satellite candidates",
+                },
+                {
+                  kind: "finding" as const,
+                  title: "Lectura de terreno requerida",
+                  body:
+                    "La ausencia de una anomalía espectral interna no es evidencia de ausencia de mineralización. Cobertura vegetal, sombra topográfica, resolución de Sentinel-2 y mineralización estructural sin expresión superficial obligan a validar el sector mediante mapeo y muestreo.",
+                  provenance: "INTERPRETED" as const,
+                  confidence: "medium" as const,
+                },
+                {
+                  kind: "recommendation" as const,
+                  title: "Campaña inicial Toki 2",
+                  body:
+                    "Ejecutar control perimetral y accesos, traverse N–S, traverse E–O, seguimiento de estructuras y muestreo selectivo. En cada estación registrar GPS, fotografía, litología, alteración, mineralización visible, rumbo, manteo, potencia, acceso y pendiente local.",
+                  priority: "high" as const,
+                },
+                {
+                  kind: "gap" as const,
+                  title: "Volumen y tonelaje todavía no habilitados",
+                  body:
+                    "El DEM permite caracterizar geometría superficial, pendiente y relieve. No existe base suficiente para estimar toneladas mineralizadas hasta delimitar un cuerpo geológico, medir potencia y continuidad y disponer de una densidad sustentada.",
+                  action:
+                    "Completar ground-truth y, si se define un cuerpo, versionar la geometría 3D y la densidad antes de habilitar cualquier escenario volumétrico.",
+                },
+                {
+                  kind: "appendixTable" as const,
+                  title: "Puntos base de levantamiento Toki 2",
+                  head: ["Punto", "Objetivo", "Latitud", "Longitud"],
+                  widths: [0.14, 0.46, 0.2, 0.2],
+                  provenance: "PROPOSED" as const,
+                  source: "Geometría canónica Toki 2 · GeoCapitals",
+                  rows: toki2.controlPoints.map((point) => [
+                    point.code,
+                    point.purpose,
+                    point.lat.toFixed(6),
+                    point.lng.toFixed(6),
+                  ]),
+                },
+              ],
+            },
+          ]
+        : []),
       {
         eyebrow: "Brechas",
         title: "Materias pendientes antes de comprometer capital",

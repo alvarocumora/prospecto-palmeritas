@@ -45,8 +45,8 @@ Implementado en la capa documental: Narrative, Finding, Evidence, Figure, Map, D
 ### REPORT-03 — Readiness y revisión
 Implementado en el Hub usando infraestructura existente: `report_readiness(project_id)`, `technical_reports`, `technical_report_sections`, `qualified_persons` y `technical_report_versions`. El panel evalúa procedencia, revisor competente, secciones firmadas, umbral interno de compliance y snapshot SHA-256. El estado máximo se denomina “candidato a emisión controlada” y no implica cumplimiento regulatorio por sí mismo.
 
-### REPORT-04 — Cholqui v2
-Regenerar Cholqui como documento narrative-first: geología y evidencia medida, interpretación satelital/DEM, gaps, ground-truth, programa Toki 2 y anexos completos.
+### REPORT-04 — Cholqui v4 + Toki 2
+Implementado como primera integración de ground-truth: el informe Cholqui v4 incorpora la concesión Toki 2, nueve puntos base de levantamiento derivados de la geometría canónica, conteo del screening Sentinel-2, limitaciones explícitas del DEM y un gate que mantiene deshabilitada cualquier estimación de volumen/tonelaje hasta contar con cuerpo geológico, potencia, continuidad y densidad sustentada. Las métricas dinámicas de Copernicus GLO-30 sólo deben entrar al documento cuando exista una corrida/snapshot versionado.
 
 ## Compatibilidad
 
@@ -55,4 +55,4 @@ Las exportaciones rápidas actuales permanecen temporalmente disponibles desde P
 
 ## Estado de la migración
 
-REPORT-01 introdujo el Hub y los contratos de producto/estándar. REPORT-02 incorporó el motor narrativo. REPORT-03 conecta readiness, QP/CP, firma de secciones, compliance interno y snapshots versionados sin crear tablas paralelas. Las exportaciones contextuales permanecen como compatibilidad hasta REPORT-04, cuando Cholqui/Toki 2 migre al flujo completo de evidencia y ground-truth.
+REPORT-01 introdujo el Hub y los contratos de producto/estándar. REPORT-02 incorporó el motor narrativo. REPORT-03 conecta readiness, QP/CP, firma de secciones, compliance interno y snapshots versionados sin crear tablas paralelas. Cholqui/Toki 2 ya migra al flujo de evidencia y ground-truth en REPORT-04. Las exportaciones contextuales pueden retirarse gradualmente cuando el Reporting Hub exponga generación/versionado directo de los cuatro productos canónicos.
