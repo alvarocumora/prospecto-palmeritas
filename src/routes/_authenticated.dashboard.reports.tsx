@@ -12,6 +12,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { REPORT_PRODUCTS, REPORTING_PRINCIPLES } from "@/lib/reports/catalog";
 import { STANDARD_FRAMEWORKS } from "@/lib/reports/internationalStandards";
 import { MonthlyOperationalReportPanel } from "@/features/reports/MonthlyOperationalReportPanel";
+import { ReportingGovernancePanel } from "@/features/reports/ReportingGovernancePanel";
 
 export const Route = createFileRoute("/_authenticated/dashboard/reports")({
   component: ReportingHubPage,
@@ -60,6 +61,8 @@ function ReportingHubPage() {
           </div>
         ))}
       </section>
+
+      <ReportingGovernancePanel />
 
       <section className="rounded-brand-lg border border-hairline bg-surface-3">
         <div className="border-b border-hairline px-5 py-4">

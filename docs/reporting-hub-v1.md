@@ -43,7 +43,7 @@ La plataforma mantiene un checklist orientado a JORC Code 2012 / Table 1, preser
 Implementado en la capa documental: Narrative, Finding, Evidence, Figure, Map, DataGap, Recommendation y AppendixTable. El renderer técnico separa cuerpo principal y anexos; Cholqui v3.1 es la primera migración narrative-first.
 
 ### REPORT-03 — Readiness y revisión
-Conectar report_readiness, dataset provenance, QP/CP status, versionado, fecha de corte y checklist por sección.
+Implementado en el Hub usando infraestructura existente: `report_readiness(project_id)`, `technical_reports`, `technical_report_sections`, `qualified_persons` y `technical_report_versions`. El panel evalúa procedencia, revisor competente, secciones firmadas, umbral interno de compliance y snapshot SHA-256. El estado máximo se denomina “candidato a emisión controlada” y no implica cumplimiento regulatorio por sí mismo.
 
 ### REPORT-04 — Cholqui v2
 Regenerar Cholqui como documento narrative-first: geología y evidencia medida, interpretación satelital/DEM, gaps, ground-truth, programa Toki 2 y anexos completos.
@@ -55,4 +55,4 @@ Las exportaciones rápidas actuales permanecen temporalmente disponibles desde P
 
 ## Estado de la migración
 
-REPORT-01 introdujo el Hub y los contratos de producto/estándar. REPORT-02 incorpora el motor narrativo y permite comenzar a retirar la composición table-first. Las exportaciones contextuales permanecen como compatibilidad hasta que REPORT-03 conecte readiness/provenance y REPORT-04 migre el informe completo de Cholqui/Toki 2.
+REPORT-01 introdujo el Hub y los contratos de producto/estándar. REPORT-02 incorporó el motor narrativo. REPORT-03 conecta readiness, QP/CP, firma de secciones, compliance interno y snapshots versionados sin crear tablas paralelas. Las exportaciones contextuales permanecen como compatibilidad hasta REPORT-04, cuando Cholqui/Toki 2 migre al flujo completo de evidencia y ground-truth.
