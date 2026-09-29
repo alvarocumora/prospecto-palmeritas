@@ -71,7 +71,7 @@ export function useWireframesLayer(
       meshes.map(
         (m) =>
           new SimpleMeshLayer({
-            id: `geoscene-wireframe-${m.id}`,
+            id: `models.implicit_geology:${m.id}`,
             data: [{ position: [0, 0, 0] }],
             mesh: m.mesh as never,
             coordinateSystem: COORDINATE_SYSTEM.LNGLAT,
