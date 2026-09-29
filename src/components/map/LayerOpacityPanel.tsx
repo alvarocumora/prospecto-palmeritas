@@ -145,7 +145,7 @@ export function LayerOpacityPanel({
   };
 
   return (
-    <div className="absolute top-2 right-2 z-[1000] max-h-[84vh] w-[22rem] overflow-y-auto rounded border border-border bg-background/96 p-3 font-mono text-xs shadow-xl backdrop-blur">
+    <div className="absolute top-2 right-2 z-[1000] max-h-[84vh] w-[22rem] overflow-y-auto rounded border border-border bg-background/95 p-3 font-mono text-xs shadow-xl backdrop-blur">
       <div className="mb-3 flex items-start justify-between gap-3 border-b border-border pb-2">
         <div>
           <span className="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide text-foreground">
