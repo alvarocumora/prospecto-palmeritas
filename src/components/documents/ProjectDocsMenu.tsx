@@ -4,6 +4,7 @@
  * Se usa en cualquier vista que disponga de un `ProjectDoc`.
  */
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { ChevronDown, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -44,6 +45,7 @@ export function ProjectDocsMenu({
   label?: string;
 }) {
   const [busy, setBusy] = useState<ProjectDocKind | null>(null);
+  const navigate = useNavigate();
 
   const run = async (kind: ProjectDocKind) => {
     const model = build();
@@ -80,8 +82,23 @@ export function ProjectDocsMenu({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-80">
-        <DropdownMenuLabel>Plantillas Geocapitals</DropdownMenuLabel>
+        <DropdownMenuLabel>Reporting Geocapitals</DropdownMenuLabel>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            void navigate({ to: "/dashboard/reports" });
+          }}
+          className="flex-col items-start gap-0.5 py-2.5"
+        >
+          <span className="text-sm font-medium">Abrir Reporting Hub</span>
+          <span className="text-xs text-muted-foreground">
+            Fuente única para informes, estándares, versiones y revisión
+          </span>
+        </DropdownMenuItem>
         <DropdownMenuSeparator />
+        <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
+          Exportación rápida · compatibilidad
+        </DropdownMenuLabel>
         {OPTIONS.map((opt) => (
           <DropdownMenuItem
             key={opt.kind}
