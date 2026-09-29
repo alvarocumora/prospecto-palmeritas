@@ -28,4 +28,16 @@ describe("Cholqui narrative report", () => {
     expect(blocks.some((block) => block.kind === "gap")).toBe(true);
     expect(blocks.some((block) => block.kind === "recommendation")).toBe(true);
   });
+  it("includes Toki 2 as a ground-truth program, not a resource estimate", () => {
+    const model = buildCholquiDoc();
+    const section = model.sections.find((item) => item.title.includes("Toki 2"));
+    expect(section).toBeDefined();
+    const blocks = section?.blocks ?? [];
+    expect(blocks.some((block) => block.kind === "recommendation")).toBe(true);
+    expect(blocks.some((block) => block.kind === "gap")).toBe(true);
+    const appendix = blocks.find((block) => block.kind === "appendixTable");
+    expect(appendix && appendix.kind === "appendixTable" ? appendix.rows : []).toHaveLength(9);
+    expect(JSON.stringify(section)).toContain("no confirma ni descarta mineralización");
+  });
+
 });
