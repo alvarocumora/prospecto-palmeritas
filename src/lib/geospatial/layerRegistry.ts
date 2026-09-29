@@ -441,7 +441,7 @@ export const GEO_LAYER_REGISTRY = [
 export type CanonicalGeoLayerId = (typeof GEO_LAYER_REGISTRY)[number]["id"];
 
 const BY_ID = new Map<string, GeoLayerDefinition>(
-  GEO_LAYER_REGISTRY.map((definition) => [definition.id, definition]),
+  GEO_LAYER_REGISTRY.map((definition) => [definition.id, definition] as const),
 );
 
 const BY_ALIAS = new Map<string, GeoLayerDefinition>();
@@ -463,7 +463,9 @@ export function resolveGeoLayer(idOrAlias: string): GeoLayerDefinition | null {
 }
 
 export function layersForCapability(capability: GeoLayerCapability): GeoLayerDefinition[] {
-  return GEO_LAYER_REGISTRY.filter((definition) => definition.capabilities.includes(capability));
+  return GEO_LAYER_REGISTRY.filter((definition) =>
+    (definition.capabilities as readonly GeoLayerCapability[]).includes(capability),
+  );
 }
 
 export function layersForDomain(domain: GeoLayerDomain): GeoLayerDefinition[] {
