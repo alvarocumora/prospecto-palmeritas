@@ -1,6 +1,5 @@
 // Capa deck.gl: collares de sondajes del proyecto activo.
-// drill_holes guarda easting/northing como metros locales relativos al centro
-// del proyecto, así que convertimos a lng/lat aquí.
+// Separa ejecutados/medidos de planificados para mantener la evidencia 3D explícita.
 import { useEffect, useMemo } from "react";
 import { ColumnLayer } from "@deck.gl/layers";
 import { useDrillHoles } from "@/hooks/useDrilling";
@@ -24,11 +23,16 @@ const STATUS_COLOR: Record<string, [number, number, number]> = {
 
 const M_PER_DEG_LAT = 111320;
 
+export type DrillHoleLayerVisibility = {
+  completed: boolean;
+  proposed: boolean;
+};
+
 export function useDrillHolesLayer(
   projectId: string | null,
   centerLng: number,
   centerLat: number,
-  visible = true,
+  visibility: DrillHoleLayerVisibility,
 ) {
   const { data: holes } = useDrillHoles(projectId);
 
@@ -36,47 +40,84 @@ export function useDrillHolesLayer(
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
     const list = (holes ?? []) as unknown as LooseHole[];
     return list
-      .filter((h) => h.easting != null && h.northing != null)
-      .map((h) => ({
-        code: h.hole_id,
-        lng: centerLng + Number(h.easting) / mPerDegLng,
-        lat: centerLat + Number(h.northing) / M_PER_DEG_LAT,
-        depth: Number(h.actual_depth ?? h.planned_depth ?? 100),
-        status: (h.status ?? "planned").toLowerCase(),
+      .filter((hole) => hole.easting != null && hole.northing != null)
+      .map((hole) => ({
+        code: hole.hole_id,
+        lng: centerLng + Number(hole.easting) / mPerDegLng,
+        lat: centerLat + Number(hole.northing) / M_PER_DEG_LAT,
+        depth: Number(hole.actual_depth ?? hole.planned_depth ?? 100),
+        status: (hole.status ?? "planned").toLowerCase(),
       }));
   }, [holes, centerLng, centerLat]);
 
   useEffect(() => {
-    const entries: AnchorEntry[] = points.map((p) => ({
+    const entries: AnchorEntry[] = points.map((point) => ({
       kind: "hole",
-      code: p.code,
-      lng: p.lng,
-      lat: p.lat,
+      code: point.code,
+      lng: point.lng,
+      lat: point.lat,
     }));
     return registerAnchors(entries);
   }, [points]);
 
-  const layer = useMemo(
+  const completedPoints = useMemo(
+    () => points.filter((point) => point.status !== "planned"),
+    [points],
+  );
+  const proposedPoints = useMemo(
+    () => points.filter((point) => point.status === "planned"),
+    [points],
+  );
+
+  const completedLayer = useMemo(
     () =>
-      visible && points.length > 0
+      visibility.completed && completedPoints.length > 0
         ? new ColumnLayer({
-            id: "geoscene-holes",
-            data: points,
+            id: "drilling.completed:collars",
+            data: completedPoints,
             pickable: true,
             diskResolution: 16,
             radius: 25,
             extruded: true,
             elevationScale: 1,
-            getPosition: (d: (typeof points)[number]) => [d.lng, d.lat],
-            getElevation: (d: (typeof points)[number]) => d.depth,
-            getFillColor: (d: (typeof points)[number]) => [
-              ...(STATUS_COLOR[d.status] ?? STATUS_COLOR.planned),
-              200,
+            getPosition: (point: (typeof completedPoints)[number]) => [point.lng, point.lat],
+            getElevation: (point: (typeof completedPoints)[number]) => point.depth,
+            getFillColor: (point: (typeof completedPoints)[number]) => [
+              ...(STATUS_COLOR[point.status] ?? STATUS_COLOR.completed),
+              210,
             ],
           })
         : null,
-    [points, visible],
+    [completedPoints, visibility.completed],
   );
 
-  return { layer, points };
+  const proposedLayer = useMemo(
+    () =>
+      visibility.proposed && proposedPoints.length > 0
+        ? new ColumnLayer({
+            id: "drilling.proposed:collars",
+            data: proposedPoints,
+            pickable: true,
+            diskResolution: 12,
+            radius: 20,
+            extruded: true,
+            elevationScale: 1,
+            getPosition: (point: (typeof proposedPoints)[number]) => [point.lng, point.lat],
+            getElevation: (point: (typeof proposedPoints)[number]) => point.depth,
+            getFillColor: [148, 163, 184, 130],
+            getLineColor: [245, 158, 11, 220],
+            stroked: true,
+            lineWidthUnits: "pixels",
+            getLineWidth: 1.5,
+          })
+        : null,
+    [proposedPoints, visibility.proposed],
+  );
+
+  return {
+    layers: [completedLayer, proposedLayer].filter(Boolean),
+    completedCount: completedPoints.length,
+    proposedCount: proposedPoints.length,
+    points,
+  };
 }

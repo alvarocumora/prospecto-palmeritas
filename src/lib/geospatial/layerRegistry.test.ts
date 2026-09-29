@@ -47,4 +47,15 @@ describe("canonical geospatial layer registry", () => {
     expect(reportLayers.some((layer) => layer.id === "targets.exploration")).toBe(true);
     expect(reportLayers.some((layer) => layer.id === "models.implicit_geology")).toBe(true);
   });
+  it("keeps the official 3D preset restricted to 3D-capable layers", () => {
+    const preset = GEO_VIEWER_PRESETS.find((item) => item.id === "official_3d");
+    expect(preset).toBeDefined();
+    for (const id of preset?.enabled ?? []) {
+      expect(getGeoLayer(id)?.capabilities).toContain("3d");
+    }
+    expect(preset?.enabled).toContain("drilling.completed");
+    expect(preset?.enabled).toContain("drilling.proposed");
+    expect(preset?.enabled).toContain("geophysics.anomalies");
+  });
+
 });

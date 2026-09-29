@@ -142,7 +142,7 @@ export function useSatAnomaliesLayer(projectId: string | null, visible = true) {
     () =>
       visible && polys.length > 0
         ? new PolygonLayer({
-            id: "geoscene-sat-anomalies",
+            id: "remote_sensing.sentinel2_alteration",
             data: polys,
             pickable: true,
             extruded: true,

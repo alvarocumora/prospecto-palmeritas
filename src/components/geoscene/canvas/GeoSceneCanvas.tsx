@@ -1,8 +1,6 @@
 // GeoSceneCanvas — canvas unificado MapLibre + deck.gl con terreno 3D.
-// Sustituye gradualmente a Geology3DViewer (three.js) y SatToSubsurface3DViewer (three.js).
-//
-// Sprint 4.0: terreno + targets + sondajes + flyTo desde anclajes del copilot.
-// Sprint 4.1+: anomalías mag/sat extruidas, vetas, drape Sentinel.
+// Consume ids del Canonical Geospatial Layer Registry y separa evidencia medida,
+// derivada, interpretada y propuesta antes de renderizar.
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
@@ -18,13 +16,15 @@ import { useSatAnomaliesLayer } from "./useSatAnomaliesLayer";
 import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
+import { sceneLayerEnabled } from "../layerPolicy";
 import type { GeoSceneMode } from "../types";
 
 interface Props {
   mode: GeoSceneMode;
+  visibleLayerIds: ReadonlySet<string>;
 }
 
-// Estilo MapLibre con base OpenFreeMap (sin API key) + DEM Terrarium de AWS Open Data.
+// Base MapLibre + DEM Terrarium servido por proxy propio.
 const MAP_STYLE: maplibregl.StyleSpecification = {
   version: 8,
   glyphs: "https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf",
@@ -40,8 +40,6 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
     },
     terrainDEM: {
       type: "raster-dem",
-      // Proxy propio con CORS: el bucket AWS no manda ACAO y ennegrece el
-      // canvas (ver src/routes/api.terrain.$z.$x.$y.ts).
       tiles: ["/api/terrain/{z}/{x}/{y}"],
       tileSize: 256,
       encoding: "terrarium",
@@ -50,8 +48,6 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
     },
   },
   layers: [{ id: "basemap", type: "raster", source: "basemap" }],
-  // El terreno 3D se aplica tras el load con fallback (ver useEffect de init):
-  // si el DEM falla, el basemap 2D+pitch sigue visible en vez de un canvas negro.
   sky: {
     "sky-color": "#0a1224",
     "sky-horizon-blend": 0.5,
@@ -62,51 +58,73 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
   },
 };
 
-export function GeoSceneCanvas({ mode }: Props) {
+export function GeoSceneCanvas({ mode, visibleLayerIds }: Props) {
   const { active } = useProjects();
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const overlayRef = useRef<MapboxOverlay | null>(null);
   const [ready, setReady] = useState(false);
 
-  // Capas por modo
   const surfaceMode = mode === "surface";
   const subsurfaceMode = mode === "subsurface";
   const centerLng = Number(active?.center_lng ?? -70.5);
   const centerLat = Number(active?.center_lat ?? -30);
 
-  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, surfaceMode);
-  // Collares (columnas) — útil en zoom alejado.
-  const { layer: holesColumnLayer } = useDrillHolesLayer(
-    active?.id ?? null,
-    centerLng,
-    centerLat,
-    subsurfaceMode,
-  );
-  // Trayectorias 3D + intercepts coloreados por Au — el verdadero subsuelo.
+  const terrainVisible = sceneLayerEnabled(visibleLayerIds, "terrain");
+  const targetsVisible =
+    (surfaceMode || subsurfaceMode) && sceneLayerEnabled(visibleLayerIds, "targets");
+  const satelliteVisible =
+    surfaceMode && sceneLayerEnabled(visibleLayerIds, "satellite_anomalies");
+  const completedDrillingVisible =
+    subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "drillholes_completed");
+  const proposedDrillingVisible =
+    subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "drillholes_proposed");
+  const interceptsVisible =
+    subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "drill_intercepts");
+  const geophysicsVisible =
+    subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geophysics_anomalies");
+  const wireframesVisible =
+    subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
+
+  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, targetsVisible);
+  const {
+    layers: holeColumnLayers,
+    completedCount: completedCollarCount,
+    proposedCount: proposedCollarCount,
+  } = useDrillHolesLayer(active?.id ?? null, centerLng, centerLat, {
+    completed: completedDrillingVisible,
+    proposed: proposedDrillingVisible,
+  });
+
   const {
     layers: trajectoryLayers,
-    holeCount,
+    completedCount: completedTrajectoryCount,
+    proposedCount: proposedTrajectoryCount,
     interceptCount,
-  } = useDrillTrajectoriesLayer(active?.id ?? null, centerLng, centerLat, subsurfaceMode);
+  } = useDrillTrajectoriesLayer(active?.id ?? null, centerLng, centerLat, {
+    completed: completedDrillingVisible,
+    proposed: proposedDrillingVisible,
+    intercepts: interceptsVisible,
+  });
+
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
     active?.id ?? null,
-    subsurfaceMode,
+    geophysicsVisible,
   );
   const { layer: satAnomaliesLayer, count: satAnomaliesCount } = useSatAnomaliesLayer(
     active?.id ?? null,
-    surfaceMode,
+    satelliteVisible,
   );
   const { layers: wireframeLayers, count: wireframeCount } = useWireframesLayer(
     active?.id ?? null,
     centerLng,
     centerLat,
-    subsurfaceMode,
+    wireframesVisible,
   );
 
-  // Init map
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
+
     const center: [number, number] = [
       Number(active?.center_lng ?? -70.5),
       Number(active?.center_lat ?? -30),
@@ -121,32 +139,26 @@ export function GeoSceneCanvas({ mode }: Props) {
       maxPitch: 80,
       attributionControl: { compact: true },
     });
+
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
     map.on("load", () => {
       const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
       map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
-      // Terreno 3D fail-safe: se activa después del load. Si el DEM no carga o
-      // el WebGL falla, se retira para que el basemap satelital siga visible
-      // (2D con pitch) en vez de un canvas negro.
-      try {
-        map.setTerrain({ source: "terrainDEM", exaggeration: 1.5 });
-      } catch {
-        /* sin terreno: el mapa sigue funcionando en 2D con pitch */
-      }
       setReady(true);
     });
-    // Un error de fuente DEM/terreno degrada a 2D en vez de ennegrecer todo.
-    map.on("error", (e: { error?: { message?: string } }) => {
-      const msg = e?.error?.message ?? "";
-      if (/terrain|raster-dem|terrainDEM/i.test(msg)) {
+
+    map.on("error", (event: { error?: { message?: string } }) => {
+      const message = event?.error?.message ?? "";
+      if (/terrain|raster-dem|terrainDEM/i.test(message)) {
         try {
           map.setTerrain(null);
         } catch {
-          /* noop */
+          // El basemap con pitch sigue disponible si falla el DEM.
         }
       }
     });
+
     mapRef.current = map;
     return () => {
       map.remove();
@@ -156,7 +168,21 @@ export function GeoSceneCanvas({ mode }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Recentrar al cambiar de proyecto
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    try {
+      mapRef.current.setTerrain(
+        terrainVisible ? { source: "terrainDEM", exaggeration: 1.5 } : null,
+      );
+    } catch {
+      try {
+        mapRef.current.setTerrain(null);
+      } catch {
+        // Fail-safe: canvas 2D con pitch.
+      }
+    }
+  }, [ready, terrainVisible]);
+
   useEffect(() => {
     if (!mapRef.current || !active?.center_lat || !active?.center_lng) return;
     mapRef.current.flyTo({
@@ -167,13 +193,12 @@ export function GeoSceneCanvas({ mode }: Props) {
     });
   }, [active?.id, active?.center_lat, active?.center_lng]);
 
-  // Empujar capas deck.gl
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
     const layers = [
       targetsLayer,
       satAnomaliesLayer,
-      holesColumnLayer,
+      ...holeColumnLayers,
       ...trajectoryLayers,
       ...wireframeLayers,
       anomaliesLayer,
@@ -183,19 +208,19 @@ export function GeoSceneCanvas({ mode }: Props) {
     ready,
     targetsLayer,
     satAnomaliesLayer,
-    holesColumnLayer,
+    holeColumnLayers,
     trajectoryLayers,
     wireframeLayers,
     anomaliesLayer,
   ]);
 
-  // Anclajes del copilot → flyTo
   useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent<SceneFocusDetail>).detail;
+    const handler = (event: Event) => {
+      const detail = (event as CustomEvent<SceneFocusDetail>).detail;
       if (!detail || !mapRef.current) return;
       const anchor = findAnchor(detail.kind, detail.code);
       if (!anchor) return;
+
       mapRef.current.flyTo({
         center: [anchor.lng, anchor.lat],
         zoom: 14.5,
@@ -213,7 +238,7 @@ export function GeoSceneCanvas({ mode }: Props) {
       [
         targetsLayer,
         satAnomaliesLayer,
-        holesColumnLayer,
+        ...holeColumnLayers,
         ...trajectoryLayers,
         ...wireframeLayers,
         anomaliesLayer,
@@ -221,15 +246,24 @@ export function GeoSceneCanvas({ mode }: Props) {
     [
       targetsLayer,
       satAnomaliesLayer,
-      holesColumnLayer,
+      holeColumnLayers,
       trajectoryLayers,
       wireframeLayers,
       anomaliesLayer,
     ],
   );
 
+  const canonicalManifest = useMemo(
+    () => Array.from(visibleLayerIds).sort().join(","),
+    [visibleLayerIds],
+  );
+
   return (
-    <div className="relative h-full w-full">
+    <div
+      className="relative h-full w-full"
+      data-geo-engine="deckgl"
+      data-geo-layer-ids={canonicalManifest}
+    >
       <div ref={mapDiv} className="absolute inset-0" />
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-bg-panel/80 backdrop-blur">
@@ -239,21 +273,25 @@ export function GeoSceneCanvas({ mode }: Props) {
           </div>
         </div>
       )}
-      <div className="absolute bottom-3 right-3 z-10 text-[10px] font-mono text-muted-foreground bg-bg-secondary/90 backdrop-blur border border-border rounded px-2 py-1">
+      <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}
         {surfaceMode && satAnomaliesCount > 0 && (
           <span className="ml-1 text-gold">· {satAnomaliesCount} anomalías sat</span>
         )}
-        {subsurfaceMode && holeCount > 0 && (
-          <span className="ml-1 text-gold">
-            · {holeCount} sondajes · {interceptCount} intercepts
-          </span>
+        {subsurfaceMode && (completedTrajectoryCount > 0 || completedCollarCount > 0) && (
+          <span className="ml-1 text-gold">· {completedTrajectoryCount} sondajes ejecutados</span>
+        )}
+        {subsurfaceMode && (proposedTrajectoryCount > 0 || proposedCollarCount > 0) && (
+          <span className="ml-1 text-amber-500">· {proposedTrajectoryCount} propuestos</span>
+        )}
+        {subsurfaceMode && interceptCount > 0 && (
+          <span className="ml-1 text-gold">· {interceptCount} interceptos</span>
         )}
         {subsurfaceMode && wireframeCount > 0 && (
           <span className="ml-1 text-gold">· {wireframeCount} wireframes</span>
         )}
         {subsurfaceMode && anomaliesCount > 0 && (
-          <span className="ml-1 text-gold">· {anomaliesCount} anomalías</span>
+          <span className="ml-1 text-gold">· {anomaliesCount} anomalías geofísicas</span>
         )}
       </div>
     </div>

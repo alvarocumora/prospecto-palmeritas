@@ -1,9 +1,12 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { Loader2, Sparkles, Crosshair, X, Layers, Box } from "lucide-react";
+import { Loader2, Sparkles, Crosshair, X, Layers, Box, Layers3 } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneEngine, type GeoSceneMode, type GeoSceneProps } from "./types";
 import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchors";
+import { SceneLayerPanel } from "./controls/SceneLayerPanel";
+import { initialGeoSceneLayerIds } from "./layerPolicy";
+import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -40,6 +43,8 @@ export function GeoScene3D({
   showModeTabs = true,
   className = "",
   engine: engineProp,
+  initialPreset = "official_3d",
+  showLegacyEngineSwitch = false,
 }: GeoSceneProps) {
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
   const [internalEngine, setInternalEngine] = useState<GeoSceneEngine>(engineProp ?? "deckgl");
@@ -47,6 +52,19 @@ export function GeoScene3D({
   const engine = engineProp ?? internalEngine;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
+  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() =>
+    initialGeoSceneLayerIds(initialPreset),
+  );
+
+  const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
+    setEnabledLayerIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -66,7 +84,17 @@ export function GeoScene3D({
             <Sparkles className="w-3 h-3 text-gold" />
             GeoScene3D · {meta.sub}
           </div>
-          {!engineProp && (
+          {engine === "deckgl" && (
+            <button
+              type="button"
+              onClick={() => setLayerPanelOpen((value) => !value)}
+              className="inline-flex items-center gap-1 rounded border border-border bg-bg-secondary/95 px-2 py-1 font-mono text-[10px] uppercase text-foreground backdrop-blur hover:bg-accent"
+              title="Capas 3D canónicas"
+            >
+              <Layers3 className="h-3 w-3" /> capas
+            </button>
+          )}
+          {!engineProp && showLegacyEngineSwitch && (
             <div className="flex items-center rounded border border-border bg-bg-secondary/95 backdrop-blur overflow-hidden text-[10px] font-mono uppercase">
               <button
                 type="button"
@@ -101,7 +129,9 @@ export function GeoScene3D({
       {/* Scene */}
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
-          {engine === "deckgl" && mode !== "resource" && <GeoSceneCanvas mode={mode} />}
+          {engine === "deckgl" && mode !== "resource" && (
+            <GeoSceneCanvas mode={mode} visibleLayerIds={enabledLayerIds} />
+          )}
           {engine === "legacy" && mode === "surface" && (
             <Geology3DViewer className="h-full w-full" />
           )}
@@ -112,6 +142,16 @@ export function GeoScene3D({
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
+
+      {engine === "deckgl" && (
+        <SceneLayerPanel
+          mode={mode}
+          enabled={enabledLayerIds}
+          open={layerPanelOpen}
+          onClose={() => setLayerPanelOpen(false)}
+          onToggle={toggleCanonicalLayer}
+        />
+      )}
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (

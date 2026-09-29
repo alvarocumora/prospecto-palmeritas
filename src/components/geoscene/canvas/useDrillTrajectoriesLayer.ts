@@ -1,7 +1,5 @@
-// Sprint 4.2 — Trayectorias reales de sondajes + intercepts coloreados por ley.
-// drill_holes guarda easting/northing como metros locales relativos al centro
-// del proyecto. Convertimos a lng/lat aquí y proyectamos la trayectoria 3D
-// usando azimuth/dip y la profundidad real.
+// Trayectorias reales/planificadas de sondajes + interceptos coloreados por ley.
+// La separación por evidencia evita mostrar un sondaje propuesto como dato medido.
 import { useEffect, useMemo, useState } from "react";
 import { PathLayer } from "@deck.gl/layers";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,26 +87,34 @@ type RealTrajectory = {
   points: Array<{ md: number; x: number; y: number; z: number }>;
 };
 
+export type DrillTrajectoryVisibility = {
+  completed: boolean;
+  proposed: boolean;
+  intercepts: boolean;
+};
+
 export function useDrillTrajectoriesLayer(
   projectId: string | null,
   centerLng: number,
   centerLat: number,
-  visible = true,
+  visibility: DrillTrajectoryVisibility,
 ) {
   const [holes, setHoles] = useState<Hole[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
   const [real, setReal] = useState<Map<string, RealTrajectory["points"]>>(new Map());
+  const anyVisible = visibility.completed || visibility.proposed || visibility.intercepts;
 
   useEffect(() => {
-    if (!projectId || !visible) {
+    if (!projectId || !anyVisible) {
       setHoles([]);
       setLogs([]);
       setReal(new Map());
       return;
     }
+
     let cancelled = false;
     (async () => {
-      const [{ data: h }, { data: l }] = await Promise.all([
+      const [{ data: holeData }, { data: logData }] = await Promise.all([
         supabase
           .from("drill_holes")
           .select(
@@ -122,130 +128,171 @@ export function useDrillTrajectoriesLayer(
           .gt("au_gpt", 0),
       ]);
       if (cancelled) return;
-      const holeRows = ((h ?? []) as (Hole & { id: string })[]).filter(
-        (x) => x.easting != null && x.northing != null,
+
+      const holeRows = ((holeData ?? []) as (Hole & { id: string })[]).filter(
+        (hole) => hole.easting != null && hole.northing != null,
       );
       setHoles(holeRows);
-      setLogs((l ?? []) as Log[]);
+      setLogs((logData ?? []) as Log[]);
 
-      const holeIds = holeRows.map((x) => x.id);
-      if (holeIds.length > 0) {
-        const { data: trajRows } = await supabase
-          .from("drill_hole_trajectories")
-          .select("hole_id,points")
-          .in("hole_id", holeIds);
-        if (cancelled) return;
-        const m = new Map<string, RealTrajectory["points"]>();
-        const codeByUuid = new Map(holeRows.map((x) => [x.id, x.hole_id] as const));
-        for (const r of trajRows ?? []) {
-          const code = codeByUuid.get(r.hole_id as string);
-          const pts = r.points as RealTrajectory["points"] | null;
-          if (code && Array.isArray(pts) && pts.length >= 2) m.set(code, pts);
-        }
-        setReal(m);
-      } else {
+      const holeIds = holeRows.map((hole) => hole.id);
+      if (holeIds.length === 0) {
         setReal(new Map());
+        return;
       }
+
+      const { data: trajectoryRows } = await supabase
+        .from("drill_hole_trajectories")
+        .select("hole_id,points")
+        .in("hole_id", holeIds);
+      if (cancelled) return;
+
+      const mapped = new Map<string, RealTrajectory["points"]>();
+      const codeByUuid = new Map(holeRows.map((hole) => [hole.id, hole.hole_id] as const));
+      for (const row of trajectoryRows ?? []) {
+        const code = codeByUuid.get(row.hole_id as string);
+        const points = row.points as RealTrajectory["points"] | null;
+        if (code && Array.isArray(points) && points.length >= 2) mapped.set(code, points);
+      }
+      setReal(mapped);
     })();
+
     return () => {
       cancelled = true;
     };
-  }, [projectId, visible]);
+  }, [projectId, anyVisible]);
 
-  // mining-engine /desurvey devuelve x/y absolutos en el mismo marco local
-  // (metros) que collar.easting/northing y z absoluto en metros.
-  function realPath(_h: Hole, pts: RealTrajectory["points"]): Vec3[] {
+  function realPath(points: RealTrajectory["points"]): Vec3[] {
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
-    return pts.map(
-      (p) => [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
+    return points.map(
+      (point) =>
+        [
+          centerLng + point.x / mPerDegLng,
+          centerLat + point.y / M_PER_DEG_LAT,
+          point.z,
+        ] as Vec3,
     );
   }
 
   const trajectories = useMemo(
     () =>
-      holes.map((h) => {
-        const total = Number(h.actual_depth ?? h.planned_depth ?? 100);
-        const collar = holeCollarLngLat(h, centerLng, centerLat);
-        const realPts = real.get(h.hole_id);
+      holes.map((hole) => {
+        const total = Number(hole.actual_depth ?? hole.planned_depth ?? 100);
+        const collar = holeCollarLngLat(hole, centerLng, centerLat);
+        const realPoints = real.get(hole.hole_id);
         const path =
-          realPts && realPts.length >= 2
-            ? realPath(h, realPts)
-            : holeSegment(h, centerLng, centerLat, 0, total);
+          realPoints && realPoints.length >= 2
+            ? realPath(realPoints)
+            : holeSegment(hole, centerLng, centerLat, 0, total);
         return {
-          code: h.hole_id,
+          code: hole.hole_id,
           path,
-          status: (h.status ?? "planned").toLowerCase(),
+          status: (hole.status ?? "planned").toLowerCase(),
           collarLng: collar.lng,
           collarLat: collar.lat,
-          isReal: Boolean(realPts && realPts.length >= 2),
+          isReal: Boolean(realPoints && realPoints.length >= 2),
         };
       }),
-    // realPath uses centerLng/centerLat which are deps below
+    // realPath uses centerLng/centerLat which are deps below.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [holes, centerLng, centerLat, real],
   );
 
+  const completedTrajectories = useMemo(
+    () => trajectories.filter((trajectory) => trajectory.status !== "planned"),
+    [trajectories],
+  );
+  const proposedTrajectories = useMemo(
+    () => trajectories.filter((trajectory) => trajectory.status === "planned"),
+    [trajectories],
+  );
+
   const intercepts = useMemo(() => {
-    const byHole = new Map(holes.map((h) => [h.hole_id, h] as const));
+    const byHole = new Map(holes.map((hole) => [hole.hole_id, hole] as const));
     return logs
-      .filter((l) => l.depth_from != null && l.depth_to != null && byHole.has(l.hole_id))
-      .map((l, i) => {
-        const h = byHole.get(l.hole_id)!;
+      .filter((log) => log.depth_from != null && log.depth_to != null && byHole.has(log.hole_id))
+      .map((log, index) => {
+        const hole = byHole.get(log.hole_id)!;
         return {
-          id: `${l.hole_id}-${i}`,
-          path: holeSegment(h, centerLng, centerLat, Number(l.depth_from), Number(l.depth_to)),
-          au: Number(l.au_gpt ?? 0),
+          id: `${log.hole_id}-${index}`,
+          path: holeSegment(
+            hole,
+            centerLng,
+            centerLat,
+            Number(log.depth_from),
+            Number(log.depth_to),
+          ),
+          au: Number(log.au_gpt ?? 0),
         };
       });
   }, [holes, logs, centerLng, centerLat]);
 
   useEffect(() => {
-    const entries: AnchorEntry[] = trajectories.map((t) => ({
+    const entries: AnchorEntry[] = trajectories.map((trajectory) => ({
       kind: "hole",
-      code: t.code,
-      lng: t.collarLng,
-      lat: t.collarLat,
+      code: trajectory.code,
+      lng: trajectory.collarLng,
+      lat: trajectory.collarLat,
     }));
     return registerAnchors(entries);
   }, [trajectories]);
 
   const layers = useMemo(() => {
-    if (!visible) return [] as PathLayer[];
-    const out: PathLayer[] = [];
-    if (trajectories.length > 0) {
-      out.push(
+    const output: PathLayer[] = [];
+
+    if (visibility.completed && completedTrajectories.length > 0) {
+      output.push(
         new PathLayer({
-          id: "geoscene-trajectories",
-          data: trajectories,
+          id: "drilling.completed:trajectory",
+          data: completedTrajectories,
           pickable: true,
           widthUnits: "pixels",
-          getPath: (d: (typeof trajectories)[number]) => d.path,
-          getColor: (d: (typeof trajectories)[number]) =>
-            d.status === "completed"
-              ? [180, 180, 200, 220]
-              : d.status === "in_progress"
-                ? [96, 165, 250, 220]
-                : [148, 163, 184, 180],
+          getPath: (trajectory: (typeof completedTrajectories)[number]) => trajectory.path,
+          getColor: (trajectory: (typeof completedTrajectories)[number]) =>
+            trajectory.status === "in_progress"
+              ? [96, 165, 250, 220]
+              : [180, 180, 200, 220],
           getWidth: 2.5,
         }),
       );
     }
-    if (intercepts.length > 0) {
-      out.push(
+
+    if (visibility.proposed && proposedTrajectories.length > 0) {
+      output.push(
         new PathLayer({
-          id: "geoscene-intercepts",
+          id: "drilling.proposed:trajectory",
+          data: proposedTrajectories,
+          pickable: true,
+          widthUnits: "pixels",
+          getPath: (trajectory: (typeof proposedTrajectories)[number]) => trajectory.path,
+          getColor: [245, 158, 11, 175],
+          getWidth: 2,
+        }),
+      );
+    }
+
+    if (visibility.intercepts && intercepts.length > 0) {
+      output.push(
+        new PathLayer({
+          id: "sampling.drill_intercepts",
           data: intercepts,
           pickable: true,
           widthUnits: "pixels",
-          getPath: (d: (typeof intercepts)[number]) => d.path,
-          getColor: (d: (typeof intercepts)[number]) =>
-            [...auColor(d.au), 240] as [number, number, number, number],
+          getPath: (intercept: (typeof intercepts)[number]) => intercept.path,
+          getColor: (intercept: (typeof intercepts)[number]) =>
+            [...auColor(intercept.au), 240] as [number, number, number, number],
           getWidth: 6,
         }),
       );
     }
-    return out;
-  }, [visible, trajectories, intercepts]);
 
-  return { layers, holeCount: trajectories.length, interceptCount: intercepts.length };
+    return output;
+  }, [visibility.completed, visibility.proposed, visibility.intercepts, completedTrajectories, proposedTrajectories, intercepts]);
+
+  return {
+    layers,
+    completedCount: completedTrajectories.length,
+    proposedCount: proposedTrajectories.length,
+    interceptCount: intercepts.length,
+  };
 }

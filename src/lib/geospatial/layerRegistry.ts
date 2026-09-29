@@ -497,6 +497,19 @@ export const GEO_LAYER_REGISTRY = [
     legacyAliases: ["ipResSurfaceProject"],
   }),
   layer({
+    id: "geophysics.anomalies",
+    label: "Anomalías geofísicas interpretadas",
+    domain: "geophysics",
+    evidence: "INTERPRETADO",
+    use: "evidence",
+    scaleLabel: "anomalía / profundidad estimada",
+    sourceSystem: "geophysics_anomalies",
+    datasetType: "geophysics",
+    capabilities: ["2d", "3d", "report"],
+    legacyAliases: ["geoscene-geophys-anomalies"],
+    caution: "La profundidad y geometría son interpretadas; no equivalen a un cuerpo mineral probado.",
+  }),
+  layer({
     id: "geochemistry.stream_sediment",
     label: "Geoquímica de sedimentos",
     domain: "geochemistry",
@@ -520,6 +533,19 @@ export const GEO_LAYER_REGISTRY = [
     datasetType: "assay",
     capabilities: ["2d", "3d", "field", "public", "report"],
     legacyAliases: ["ensayes", "samples:project"],
+  }),
+  layer({
+    id: "sampling.drill_intercepts",
+    label: "Interceptos de sondaje",
+    domain: "sampling",
+    evidence: "INTERPRETADO",
+    use: "evidence",
+    scaleLabel: "intervalo compositado",
+    sourceSystem: "drill_core_logs / desurvey",
+    datasetType: "assay",
+    capabilities: ["3d", "report"],
+    legacyAliases: ["geoscene-intercepts"],
+    caution: "Intervalo interpretado a partir de logs/ensayes; no es una estimación de recursos.",
   }),
   layer({
     id: "remote_sensing.drone_survey",
@@ -633,6 +659,7 @@ export function layersForDomain(domain: GeoLayerDomain): GeoLayerDefinition[] {
 
 export type GeoViewerPresetId =
   | "official_workbench"
+  | "official_3d"
   | "field"
   | "public_live"
   | "toki2_field";
@@ -660,6 +687,21 @@ export const GEO_VIEWER_PRESETS: readonly GeoViewerPreset[] = [
       "sampling.assays",
       "targets.exploration",
       "drilling.completed",
+    ],
+  },
+  {
+    id: "official_3d",
+    label: "Official GeoScene3D",
+    capability: "3d",
+    enabled: [
+      "territory.dem",
+      "remote_sensing.sentinel2_alteration",
+      "targets.exploration",
+      "drilling.completed",
+      "drilling.proposed",
+      "sampling.drill_intercepts",
+      "geophysics.anomalies",
+      "models.implicit_geology",
     ],
   },
   {
