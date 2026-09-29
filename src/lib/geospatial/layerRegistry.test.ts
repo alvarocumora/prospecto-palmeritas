@@ -23,6 +23,10 @@ describe("canonical geospatial layer registry", () => {
     expect(resolveGeoLayer("geophys:emag2")?.id).toBe("geophysics.emag2");
     expect(resolveGeoLayer("ensayes")?.id).toBe("sampling.assays");
     expect(resolveGeoLayer("samples:project")?.id).toBe("sampling.assays");
+    expect(resolveGeoLayer("sat:s2-truecolor")?.id).toBe("remote_sensing.sentinel2_truecolor");
+    expect(resolveGeoLayer("geo:prospect")?.id).toBe("territory.project_center");
+    expect(resolveGeoLayer("geophys:planned")?.id).toBe("geophysics.planned_survey");
+    expect(resolveGeoLayer("geophys:hillshade")?.id).toBe("territory.hillshade");
   });
 
   it("keeps regional geophysics explicitly contextual", () => {
