@@ -46,8 +46,17 @@ export async function requireUser(
   return { userId: data.user.id };
 }
 
+// Minimal structural type: any Supabase client with rpc() works, regardless of
+// the Database generic the caller used (avoids protected-prop type clashes).
+type RpcClient = {
+  rpc: (
+    fn: string,
+    args: Record<string, unknown>,
+  ) => Promise<{ data: unknown; error: { message: string } | null }>;
+};
+
 export async function requireProjectMember(
-  admin: ReturnType<typeof createClient>,
+  admin: RpcClient,
   userId: string,
   projectId: string,
   opts?: { isServiceRole?: boolean },
