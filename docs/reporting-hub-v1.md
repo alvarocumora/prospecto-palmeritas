@@ -40,7 +40,7 @@ La plataforma mantiene un checklist orientado a JORC Code 2012 / Table 1, preser
 - accesos contextuales apuntan primero al Hub.
 
 ### REPORT-02 — Narrative engine
-Agregar bloques documentales Narrative, Finding, Figure, EvidenceCallout, Map y AppendixTable. Limitar tablas principales y mover listados extensos a anexos.
+Implementado en la capa documental: Narrative, Finding, Evidence, Figure, Map, DataGap, Recommendation y AppendixTable. El renderer técnico separa cuerpo principal y anexos; Cholqui v3.1 es la primera migración narrative-first.
 
 ### REPORT-03 — Readiness y revisión
 Conectar report_readiness, dataset provenance, QP/CP status, versionado, fecha de corte y checklist por sección.
@@ -55,4 +55,4 @@ Las exportaciones rápidas actuales permanecen temporalmente disponibles desde P
 
 ## Estado de la migración
 
-REPORT-01 introduce el Hub y los contratos de producto/estándar sin eliminar los generadores existentes. La retirada de exportaciones contextuales repetidas queda condicionada a REPORT-02, cuando el motor narrativo pueda generar los cuatro productos canónicos desde una sola fuente.
+REPORT-01 introdujo el Hub y los contratos de producto/estándar. REPORT-02 incorpora el motor narrativo y permite comenzar a retirar la composición table-first. Las exportaciones contextuales permanecen como compatibilidad hasta que REPORT-03 conecte readiness/provenance y REPORT-04 migre el informe completo de Cholqui/Toki 2.
