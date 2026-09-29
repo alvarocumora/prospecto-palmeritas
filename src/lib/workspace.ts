@@ -161,9 +161,9 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     hideForInvestor: true,
     capability: "reports",
     tabs: [
+      { label: "Reporting Hub", to: "/dashboard/reports" },
       { label: "Informe 43-101", to: "/dashboard/ni43101" },
-      { label: "Reportes", to: "/dashboard/reports" },
-      { label: "Reporte del proyecto", to: "/dashboard/project-report" },
+      { label: "Vista interactiva", to: "/dashboard/project-report" },
       { label: "Cholqui live", to: "/dashboard/cholqui" },
       { label: "QPs · Firmas", to: "/dashboard/qps" },
       { label: "Validación de datos", to: "/dashboard/validation", capability: "audit" },
