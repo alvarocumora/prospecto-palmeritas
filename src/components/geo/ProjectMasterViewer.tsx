@@ -24,6 +24,7 @@ import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface"
 import { buildAnomalySurface, anomalyIntensityColor } from "@/lib/geoscience/anomalySurface";
 import type { GeophysicsData } from "@/types/geophysics";
 import { EvidenceBadge, type Evidence } from "@/components/ui-system";
+import { resolveGeoLayer } from "@/lib/geospatial/layerRegistry";
 
 /**
  * Visor geoespacial maestro, genérico por proyecto. Reemplaza los mapas apilados
@@ -197,26 +198,37 @@ const PROV: Record<ProvKind, { label: string; bg: string }> = {
 // Badge de evidencia + escala/resolución por capa: hace evidente qué está viendo
 // el usuario y evita que un raster regional se confunda con geofísica de detalle.
 // El badge vive en el design system (@/components/ui-system).
+function canonicalLayerMeta(key: LayerKey): { evidence: Evidence; scale: string } {
+  const definition = resolveGeoLayer(key);
+  if (!definition) {
+    throw new Error(`Missing canonical geospatial layer mapping for ${key}`);
+  }
+  return {
+    evidence: definition.evidence,
+    scale: definition.scaleLabel,
+  };
+}
+
 const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
-  tenencia: { evidence: "OFICIAL", scale: "catastro" },
-  pedimentosPendientes: { evidence: "CONTEXTO", scale: "KML titular" },
-  mojones: { evidence: "CONTEXTO", scale: "HM declarado" },
-  relieve: { evidence: "OFICIAL", scale: "DEM 30 m" },
-  franjas: { evidence: "OFICIAL", scale: "regional" },
-  yacimientos: { evidence: "OFICIAL", scale: "depósito" },
-  geoquimica: { evidence: "MEDIDO", scale: "sedimento" },
-  estructuras: { evidence: "MEDIDO", scale: "punto/rumbo" },
-  halos: { evidence: "DERIVADO", scale: "10–20 m" },
-  halosIntensidad: { evidence: "DERIVADO", scale: "IDW · z-score" },
-  magneticaRegional: { evidence: "DERIVADO", scale: "~3.7 km reg." },
-  gravedadRegional: { evidence: "DERIVADO", scale: "~10 km reg." },
-  geofisicaProyecto: { evidence: "MEDIDO", scale: "estaciones" },
-  magSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
-  ipChargeSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
-  ipResSurfaceProject: { evidence: "INTERPRETADO", scale: "CAMPO→IDW" },
-  ensayes: { evidence: "MEDIDO", scale: "puntual" },
-  sondajes: { evidence: "PROPUESTO", scale: "conceptual" },
-  pedimentos: { evidence: "PROPUESTO", scale: "borrador" },
+  tenencia: canonicalLayerMeta("tenencia"),
+  pedimentosPendientes: canonicalLayerMeta("pedimentosPendientes"),
+  mojones: canonicalLayerMeta("mojones"),
+  halos: canonicalLayerMeta("halos"),
+  halosIntensidad: canonicalLayerMeta("halosIntensidad"),
+  magneticaRegional: canonicalLayerMeta("magneticaRegional"),
+  gravedadRegional: canonicalLayerMeta("gravedadRegional"),
+  geofisicaProyecto: canonicalLayerMeta("geofisicaProyecto"),
+  magSurfaceProject: canonicalLayerMeta("magSurfaceProject"),
+  ipChargeSurfaceProject: canonicalLayerMeta("ipChargeSurfaceProject"),
+  ipResSurfaceProject: canonicalLayerMeta("ipResSurfaceProject"),
+  relieve: canonicalLayerMeta("relieve"),
+  franjas: canonicalLayerMeta("franjas"),
+  yacimientos: canonicalLayerMeta("yacimientos"),
+  geoquimica: canonicalLayerMeta("geoquimica"),
+  estructuras: canonicalLayerMeta("estructuras"),
+  sondajes: canonicalLayerMeta("sondajes"),
+  ensayes: canonicalLayerMeta("ensayes"),
+  pedimentos: canonicalLayerMeta("pedimentos"),
 };
 
 export function ProjectMasterViewer({

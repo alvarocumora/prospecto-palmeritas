@@ -6,6 +6,22 @@ Turn the project viewer into an evidence-driven geoscience workbench. Remote sen
 public geophysics, field geophysics, geology and 3D interpretation must remain distinct
 evidence classes and retain source, scale, CRS, units, version and processing lineage.
 
+## Canonical viewer contract
+
+GEO-VIEW-01 establishes `src/lib/geospatial/layerRegistry.ts` as the single layer metadata
+contract shared by ProjectMap, GeoScene3D, FieldMap, Public/Live views and report snapshots.
+Existing viewer-specific ids are migration aliases only. New layers must receive a canonical id,
+domain, evidence class, source/scale metadata and explicit renderer capabilities before being
+surfaced in another viewer.
+
+The official engines are:
+
+- 2D surface workbench: `ProjectMap`
+- 3D scene: `GeoScene3D`
+- field experience: `FieldMap`
+
+Project-specific viewers should progressively become adapters/presets over these engines.
+
 ## Viewer information architecture
 
 1. **Territory**
