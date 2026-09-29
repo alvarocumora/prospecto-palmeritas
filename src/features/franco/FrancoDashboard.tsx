@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
 import { CholquiMasterViewer } from "./components/CholquiMasterViewer";
 import { CholquiTargetsSummary } from "./components/CholquiTargetsSummary";
+import { Toki2DemPanel } from "./components/Toki2DemPanel";
 
 import { CholquiScenariosPanel } from "./components/CholquiScenariosPanel";
 import { CholquiMinePlanPanel } from "./components/CholquiMinePlanPanel";
@@ -62,6 +63,7 @@ export function FrancoDashboard({ authenticated = false }: { authenticated?: boo
           items={[
             { href: "#resumen", label: "Resumen" },
             { href: "#inteligencia", label: "Inteligencia" },
+            { href: "#terreno", label: "Terreno" },
             { href: "#economia", label: "Economía" },
             { href: "#operacion", label: "Operación" },
             { href: "#evidencia", label: "Evidencia" },
@@ -72,6 +74,10 @@ export function FrancoDashboard({ authenticated = false }: { authenticated?: boo
         <div id="inteligencia" className="scroll-mt-24 space-y-4">
           <CholquiMasterViewer />
           <CholquiTargetsSummary />
+        </div>
+
+        <div id="terreno" className="scroll-mt-24">
+          <Toki2DemPanel />
         </div>
 
         <div id="economia" className="scroll-mt-24">

@@ -16,6 +16,9 @@ const InputSchema = z.object({
   size: z.number().int().min(65).max(1025).optional(),
   /** Extensión en metros del lado del tile. */
   extentMeters: z.number().min(500).max(20000).optional(),
+  /** Centro explícito para subáreas (p. ej. una concesión); si falta, usa el centro del proyecto. */
+  centerLat: z.number().min(-90).max(90).optional(),
+  centerLng: z.number().min(-180).max(180).optional(),
 });
 
 export type DemTile = {
@@ -25,6 +28,11 @@ export type DemTile = {
   extentMeters: number;
   minH: number;
   maxH: number;
+  /** Centro geográfico real del parche solicitado. */
+  centerLat: number | null;
+  centerLng: number | null;
+  /** Elevación absoluta del píxel central en Copernicus; null en fallback sintético. */
+  centerElevationM: number | null;
   /** "copernicus" = GLO-30 real; "synthetic" = fallback procedural. */
   source: "copernicus" | "synthetic";
 };
@@ -97,7 +105,17 @@ async function fetchCopernicusDem(
     // Sanity check: un DEM real en zona cordillerana no debería ser plano perfecto
     if (!Number.isFinite(minH) || !Number.isFinite(maxH)) return null;
 
-    return { heights, size, extentMeters, minH, maxH, source: "copernicus" };
+    return {
+      heights,
+      size,
+      extentMeters,
+      minH,
+      maxH,
+      centerLat: lat,
+      centerLng: lng,
+      centerElevationM: centerH,
+      source: "copernicus",
+    };
   } catch {
     return null;
   }
@@ -134,7 +152,12 @@ function fbm(x: number, y: number, seed: number, octaves = 5): number {
   return v;
 }
 
-function syntheticDem(projectId: string, size: number, extentMeters: number): DemTile {
+function syntheticDem(
+  projectId: string,
+  size: number,
+  extentMeters: number,
+  center: { lat: number; lng: number } | null,
+): DemTile {
   // Determinístico por projectId para que el DEM sea estable entre sesiones.
   const seedBase = Array.from(projectId).reduce((s, c) => (s * 31 + c.charCodeAt(0)) | 0, 7);
   const seed = (seedBase % 10000) / 100;
@@ -161,7 +184,17 @@ function syntheticDem(projectId: string, size: number, extentMeters: number): De
     }
   }
 
-  return { heights, size, extentMeters, minH, maxH, source: "synthetic" };
+  return {
+    heights,
+    size,
+    extentMeters,
+    minH,
+    maxH,
+    centerLat: center?.lat ?? null,
+    centerLng: center?.lng ?? null,
+    centerElevationM: null,
+    source: "synthetic",
+  };
 }
 
 // ── Server function ───────────────────────────────────────────────────────────
@@ -171,28 +204,34 @@ export const getDemTile = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const size = data.size ?? 257;
     const extent = data.extentMeters ?? 4000;
-    const cacheKey = `${data.projectId}:${size}:${extent}`;
+    const explicitCenter =
+      data.centerLat != null && data.centerLng != null
+        ? { lat: data.centerLat, lng: data.centerLng }
+        : null;
+    const cacheKey = `${data.projectId}:${size}:${extent}:${explicitCenter?.lat ?? "project"}:${explicitCenter?.lng ?? "project"}`;
     const cached = demCache.get(cacheKey);
     if (cached) return cached;
 
-    // Centro del proyecto → tile Copernicus
-    let center: { lat: number; lng: number } | null = null;
-    try {
-      const supabase = createClient<Database>(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_PUBLISHABLE_KEY!,
-        { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-      );
-      const { data: proj } = await supabase
-        .from("projects")
-        .select("center_lat, center_lng")
-        .eq("id", data.projectId)
-        .maybeSingle();
-      if (proj?.center_lat != null && proj?.center_lng != null) {
-        center = { lat: Number(proj.center_lat), lng: Number(proj.center_lng) };
+    // Centro explícito de subárea o, por defecto, centro del proyecto.
+    let center: { lat: number; lng: number } | null = explicitCenter;
+    if (!center) {
+      try {
+        const supabase = createClient<Database>(
+          process.env.SUPABASE_URL!,
+          process.env.SUPABASE_PUBLISHABLE_KEY!,
+          { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
+        );
+        const { data: proj } = await supabase
+          .from("projects")
+          .select("center_lat, center_lng")
+          .eq("id", data.projectId)
+          .maybeSingle();
+        if (proj?.center_lat != null && proj?.center_lng != null) {
+          center = { lat: Number(proj.center_lat), lng: Number(proj.center_lng) };
+        }
+      } catch {
+        center = null;
       }
-    } catch {
-      center = null;
     }
 
     let tile: DemTile | null = null;
@@ -200,7 +239,7 @@ export const getDemTile = createServerFn({ method: "POST" })
       tile = await fetchCopernicusDem(center.lat, center.lng, size, extent);
     }
     if (!tile) {
-      tile = syntheticDem(data.projectId, size, extent);
+      tile = syntheticDem(data.projectId, size, extent, center);
     }
 
     demCache.set(cacheKey, tile);
