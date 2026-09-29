@@ -79,7 +79,10 @@ The registry deliberately resolves old identifiers such as:
 - `tenencia` and `concessions:project` → `territory.cadastre`
 - `magneticaRegional` and `geophys:emag2` → `geophysics.emag2`
 - `ensayes` and `samples:project` → `sampling.assays`
-- `sondajes` and `geophys:planned` → `drilling.proposed`
+- `sondajes` → `drilling.proposed`
+- `geophys:planned` → `geophysics.planned_survey`
+- `geophys:hillshade` / `relieve` → `territory.hillshade`
+- `sat:s2-truecolor` → `remote_sensing.sentinel2_truecolor`
 
 Aliases are temporary compatibility, not new canonical names.
 
@@ -122,8 +125,10 @@ This PR. Introduce the canonical registry, aliases, presets and tests. Make the 
 master viewer consume registry metadata.
 
 ### GEO-VIEW-02 — official 2D workbench
-Make `ProjectMap` consume the registry for labels, domains, provenance, scale warnings and
-default presets. Absorb the best inspector/grouping behavior from `ProjectMasterViewer`.
+Implemented: `ProjectMap` now starts from a canonical preset, identifies itself as the official
+2D workbench and its layer panel resolves canonical domains, evidence badges, source, scale and
+interpretation cautions from the shared registry. Legacy runtime ids remain compatible through
+aliases while project counts/details stay visible.
 
 ### GEO-VIEW-03 — 3D convergence
 Make `GeoScene3D` consume the same canonical ids. Port missing legacy layers to deck.gl and hide
