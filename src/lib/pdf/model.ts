@@ -1,7 +1,6 @@
 /**
  * Modelo canónico de documento de proyecto.
- * Un proyecto se describe una sola vez y las tres plantillas globales
- * (deck de inversión 16:9, one-pager y dossier técnico) leen de aquí.
+ * Un proyecto se describe una sola vez y las plantillas globales leen desde aquí.
  */
 import type { BarDatum, MapPoint, MapPolygon, Slice } from "./brand/kit";
 import type { EvidenceClass, ReportProfile } from "./architecture";
@@ -15,6 +14,9 @@ export type EvidenceStatus =
   | "DERIVED"
   | "CONCEPTUAL"
   | "PENDING_DD";
+
+export type DocConfidence = "high" | "medium" | "low";
+
 export type DataQualityFlag = {
   status: EvidenceStatus;
   label: string;
@@ -22,10 +24,49 @@ export type DataQualityFlag = {
   /** Canonical provenance class used by Report Architecture v4. */
   provenance?: EvidenceClass;
   source?: string;
-  confidence?: "high" | "medium" | "low";
+  confidence?: DocConfidence;
+};
+
+export type DocBlockMeta = {
+  provenance?: EvidenceClass;
+  source?: string;
+  confidence?: DocConfidence;
 };
 
 export type DocBlock =
+  | ({ kind: "narrative"; body: string } & DocBlockMeta)
+  | ({ kind: "finding"; title: string; body: string } & DocBlockMeta)
+  | ({
+      kind: "evidence";
+      label: string;
+      body: string;
+      provenance: EvidenceClass;
+      confidence?: DocConfidence;
+      source?: string;
+    } & DocBlockMeta)
+  | ({
+      kind: "figure";
+      title: string;
+      imageDataUrl: string;
+      caption?: string;
+    } & DocBlockMeta)
+  | ({
+      kind: "map";
+      title: string;
+      imageDataUrl: string;
+      caption?: string;
+      crs?: string;
+      imagery?: string;
+    } & DocBlockMeta)
+  | { kind: "gap"; title: string; body: string; action?: string }
+  | { kind: "recommendation"; title: string; body: string; priority?: "high" | "medium" | "low" }
+  | ({
+      kind: "appendixTable";
+      title: string;
+      head: string[];
+      rows: string[][];
+      widths?: number[];
+    } & DocBlockMeta)
   | { kind: "text"; body: string }
   | { kind: "bullets"; items: string[] }
   | { kind: "kv"; items: Array<[string, string]> }
