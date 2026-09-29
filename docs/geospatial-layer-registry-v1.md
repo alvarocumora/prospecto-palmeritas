@@ -91,6 +91,7 @@ Aliases are temporary compatibility, not new canonical names.
 The first presets are:
 
 - `official_workbench`
+- `official_3d`
 - `field`
 - `public_live`
 - `toki2_field`
@@ -131,8 +132,10 @@ interpretation cautions from the shared registry. Legacy runtime ids remain comp
 aliases while project counts/details stay visible.
 
 ### GEO-VIEW-03 — 3D convergence
-Make `GeoScene3D` consume the same canonical ids. Port missing legacy layers to deck.gl and hide
-the legacy engine from normal users once parity is reached.
+Implemented: `GeoScene3D` defaults to the `official_3d` preset on MapLibre + deck.gl, consumes
+canonical ids, exposes provenance-aware layer controls, separates measured and proposed drilling,
+publishes its canonical layer manifest for snapshots and hides the legacy engine selector from
+normal users. Legacy remains available only for explicit QA while feature parity is completed.
 
 ### GEO-VIEW-04 — project presets
 Replace viewer forks in Cholqui, Palmeras and Los Verdes with adapters/presets over canonical data.
