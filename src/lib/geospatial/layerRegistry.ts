@@ -119,6 +119,18 @@ export const GEO_LAYER_REGISTRY = [
     legacyAliases: ["mojones"],
   }),
   layer({
+    id: "territory.proposed_pedimentos",
+    label: "Pedimentos propuestos",
+    domain: "territory",
+    evidence: "PROPUESTO",
+    use: "proposal",
+    scaleLabel: "borrador",
+    sourceSystem: "Proyecto",
+    capabilities: ["2d", "field", "report"],
+    legacyAliases: ["pedimentos"],
+    caution: "Borrador/propuesta; no tratar como tenencia oficial.",
+  }),
+  layer({
     id: "territory.dem",
     label: "DEM / relieve",
     domain: "territory",
