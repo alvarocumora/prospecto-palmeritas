@@ -24,7 +24,7 @@ import {
 } from "@/features/franco/data/cholqui";
 import type { ProjectDoc } from "../model";
 
-export const CHOLQUI_DOC_VERSION = "v3.0";
+export const CHOLQUI_DOC_VERSION = "v3.1";
 
 export function buildCholquiDoc(): ProjectDoc {
   const cuMax = Math.max(...CHOLQUI_ASSAYS.map((a) => a.cuTotalPct));
@@ -171,12 +171,36 @@ export function buildCholquiDoc(): ProjectDoc {
         deck: true,
         lead: CHOLQUI_GEOLOGY.estilo,
         blocks: [
-          { kind: "text", body: `Litología: ${CHOLQUI_GEOLOGY.litologia}.` },
-          { kind: "text", body: `Mineralogía observada: ${CHOLQUI_GEOLOGY.mineralogia}.` },
-          { kind: "bullets", items: [...CHOLQUI_GEOLOGY.cuerposDetalle] },
           {
-            kind: "text",
-            body: `Potencial geológico conceptual del sector ${CHOLQUI_CONCEPTUAL.sector}: ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t (${CHOLQUI_CONCEPTUAL.formula}). ${CHOLQUI_CONCEPTUAL.note}`,
+            kind: "narrative",
+            body: `La litología descrita comprende ${CHOLQUI_GEOLOGY.litologia}. La mineralogía observada incluye ${CHOLQUI_GEOLOGY.mineralogia}. Estos antecedentes describen el marco de exploración; no demuestran por sí solos continuidad, potencia ni ley media.`,
+            provenance: "OBSERVED",
+            confidence: "medium",
+            source: "Registro geológico del proyecto",
+          },
+          {
+            kind: "evidence",
+            label: "Observaciones de terreno",
+            body: `${CHOLQUI_GEOLOGY.observaciones} observaciones de terreno sustentan la descripción geológica disponible.`,
+            provenance: "OBSERVED",
+            confidence: "medium",
+            source: "Registro de observaciones de terreno",
+          },
+          {
+            kind: "finding",
+            title: "Cuerpos y controles descritos",
+            body: CHOLQUI_GEOLOGY.cuerposDetalle.join(" "),
+            provenance: "INTERPRETED",
+            confidence: "medium",
+            source: "Síntesis geológica del proyecto",
+          },
+          {
+            kind: "evidence",
+            label: "Potencial conceptual La Maza",
+            body: `Se documenta un potencial geológico conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_CONCEPTUAL.sector}, calculado como ${CHOLQUI_CONCEPTUAL.formula}. ${CHOLQUI_CONCEPTUAL.note}`,
+            provenance: "INTERPRETED",
+            confidence: "low",
+            source: "Prospecto Cholqui — no es recurso",
           },
         ],
       },
@@ -185,28 +209,57 @@ export function buildCholquiDoc(): ProjectDoc {
         title: "Trazabilidad de los análisis",
         blocks: [
           {
-            kind: "table",
+            kind: "narrative",
+            body: `El dataset analítico utilizado en este documento contiene ${CHOLQUI_ASSAYS.length} muestras puntuales de superficie respaldadas por ${CHOLQUI_ASSAY_REPORTS.length} informes de laboratorio. Los resultados son evidencia geoquímica localizada y no una estimación de ley media del depósito.`,
+            provenance: "CERTIFIED",
+            confidence: "high",
+            source: CHOLQUI_ASSAY_REPORTS.map((report) => report.id).join(", "),
+          },
+          {
+            kind: "evidence",
+            label: "Ensayes certificados",
+            body: `El cobre total observado en las muestras se ubica entre ${cuMin.toFixed(2).replace(".", ",")} % y ${cuMax.toFixed(2).replace(".", ",")} %, con razón Cu soluble/total entre ${ratioMin.toFixed(0)} % y ${ratioMax.toFixed(0)} %.`,
+            provenance: "CERTIFIED",
+            confidence: "high",
+            source: CHOLQUI_ASSAY_REPORTS.map((report) => report.id).join(", "),
+          },
+          {
+            kind: "finding",
+            title: "Lectura técnica",
+            body:
+              "La respuesta analítica justifica continuar la validación geológica y metalúrgica, pero el muestreo puntual no permite inferir continuidad tridimensional, dilución, recuperación ni ley media de mina.",
+            provenance: "INTERPRETED",
+            confidence: "medium",
+          },
+          {
+            kind: "appendixTable",
+            title: "Informes de laboratorio",
             head: ["Informe", "Laboratorio", "Solicitante", "Muestras", "Fecha informe"],
             widths: [0.16, 0.24, 0.26, 0.14, 0.2],
-            rows: CHOLQUI_ASSAY_REPORTS.map((r) => [
-              r.id,
-              r.lab,
-              r.applicant,
-              String(r.samples),
-              r.reportDate,
+            provenance: "CERTIFIED",
+            source: "Informes de laboratorio del proyecto",
+            rows: CHOLQUI_ASSAY_REPORTS.map((report) => [
+              report.id,
+              report.lab,
+              report.applicant,
+              String(report.samples),
+              report.reportDate,
             ]),
           },
           {
-            kind: "table",
+            kind: "appendixTable",
+            title: "Resultados analíticos completos",
             head: ["Muestra", "Sector", "Cu total %", "Cu sol. %", "Au g/t", "Ag ppm"],
             widths: [0.12, 0.38, 0.14, 0.14, 0.11, 0.11],
-            rows: CHOLQUI_ASSAYS.map((a) => [
-              a.sample.replace(/^P-?/, "P-"),
-              a.location,
-              a.cuTotalPct.toFixed(2).replace(".", ","),
-              a.cuSolublePct.toFixed(2).replace(".", ","),
-              a.auGpt.toFixed(2).replace(".", ","),
-              String(a.agPpm),
+            provenance: "CERTIFIED",
+            source: CHOLQUI_ASSAY_REPORTS.map((report) => report.id).join(", "),
+            rows: CHOLQUI_ASSAYS.map((assay) => [
+              assay.sample.replace(/^P-?/, "P-"),
+              assay.location,
+              assay.cuTotalPct.toFixed(2).replace(".", ","),
+              assay.cuSolublePct.toFixed(2).replace(".", ","),
+              assay.auGpt.toFixed(2).replace(".", ","),
+              String(assay.agPpm),
             ]),
           },
         ],
@@ -216,13 +269,58 @@ export function buildCholquiDoc(): ProjectDoc {
         title: "Ruta de monetización a ENAMI",
         deck: true,
         profiles: ["investment"],
-        lead: `Escenario base entregado por el titular: ${CHOLQUI_BASE_CASE.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses con rampa ${CHOLQUI_BASE_CASE.ramp}, a ${CHOLQUI_BASE_CASE.gradePct} % de Cu soluble. Cifras ilustrativas, sin VAN ni TIR auditados.`,
-        blocks: [{ kind: "kv", items: CHOLQUI_ASSUMPTIONS }],
+        lead: "Escenario comercial separado de la evidencia geológica.",
+        blocks: [
+          {
+            kind: "narrative",
+            body: `El escenario base entregado por el titular considera ${CHOLQUI_BASE_CASE.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses, con rampa ${CHOLQUI_BASE_CASE.ramp} y ${CHOLQUI_BASE_CASE.gradePct} % de Cu soluble. Las cifras son ilustrativas y no corresponden a VAN o TIR auditados.`,
+            provenance: "SCENARIO",
+            confidence: "low",
+            source: "Escenario base entregado por el titular",
+          },
+          {
+            kind: "evidence",
+            label: "Supuestos económicos",
+            body:
+              "Los supuestos de producción, precio, tarifa, logística y costos permanecen separados de la evidencia técnica y requieren due diligence antes de una decisión de capital.",
+            provenance: "SCENARIO",
+            confidence: "low",
+          },
+          {
+            kind: "appendixTable",
+            title: "Supuestos del escenario operacional",
+            head: ["Concepto", "Detalle"],
+            widths: [0.34, 0.66],
+            provenance: "SCENARIO",
+            source: "Escenario base entregado por el titular",
+            rows: CHOLQUI_ASSUMPTIONS.map(([key, value]) => [key, value]),
+          },
+        ],
       },
       {
         eyebrow: "Brechas",
         title: "Materias pendientes antes de comprometer capital",
-        blocks: [{ kind: "bullets", items: CHOLQUI_GAPS }],
+        blocks: [
+          {
+            kind: "narrative",
+            body:
+              "Las siguientes brechas se mantienen explícitas para evitar que una ausencia de datos sea reemplazada por una conclusión automática o por texto generado.",
+            provenance: "PENDING_DD",
+            confidence: "low",
+          },
+          ...CHOLQUI_GAPS.map((gap, index) => ({
+            kind: "gap" as const,
+            title: `Brecha material ${index + 1}`,
+            body: gap,
+          })),
+          {
+            kind: "recommendation",
+            title: "Cerrar brechas antes de escalar el compromiso",
+            body:
+              "Priorizar verificación legal, metalurgia, topografía, logística y demostración de inventario antes de convertir escenarios comerciales en decisiones de inversión.",
+            priority: "high",
+          },
+        ],
       },
     ],
     disclaimers: CHOLQUI_CAVEATS,
