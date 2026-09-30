@@ -17,6 +17,15 @@ export const MODE_LABELS: Record<GeoSceneMode, { label: string; sub: string }> =
 
 export type GeoSceneEngine = "legacy" | "deckgl";
 
+export type GeoSceneFilters = {
+  /** Filter exploration targets by campaign when the entity supports campaign_id. */
+  campaignId?: string | null;
+  /** Millisecond epoch cutoff for time-aware drilling/scene evidence. */
+  timeCursor?: number | null;
+  /** Restrict rendered assay intercepts to Au >= 1 g/t. */
+  highGradeOnly?: boolean;
+};
+
 export type GeoSceneProps = {
   mode?: GeoSceneMode;
   variant?: GeoSceneVariant;
@@ -28,4 +37,6 @@ export type GeoSceneProps = {
   initialPreset?: GeoViewerPresetId;
   /** Expone el selector legacy/deck.gl sólo para QA y migración. */
   showLegacyEngineSwitch?: boolean;
+  /** Operational filters shared with the 2D map/saved views. */
+  filters?: GeoSceneFilters;
 };

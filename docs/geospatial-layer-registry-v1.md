@@ -149,10 +149,13 @@ loads Palmeras static AOI/veins/palms/workings/drill/anomaly geometry by default
 lazy-loaded only by the explicit Palmeras public compatibility mode. Remaining duplicate viewers
 are tracked in `legacyViewerRegistry.ts` with successors and parity blockers.
 
-**05B pending:** migrate anonymous Cholqui/Los Verdes public data contracts and the Operations
-campaign/time-filter semantics to canonical adapters, then delete the corresponding compatibility
-renderers. Field and Public remain distinct experiences, but must converge on the same evidence
-definitions.
+**05B implemented:** Operations now uses GeoScene3D with campaign/time/high-grade filter parity,
+and Los Verdes public payloads publish a canonical `public_live` layer manifest. `Map3DView` is
+reference-only pending one QA window.
+
+**05C pending:** make Los Verdes and Cholqui public renderers consume the canonical public contract,
+then retire their compatibility viewers after anonymous-data/RLS parity. Field and Public remain
+distinct experiences but share the same evidence definitions.
 
 ### GEO-VIEW-06 — reports and snapshots
 Persist visible canonical layer ids, bounds, timestamp, CRS, source and provenance in the

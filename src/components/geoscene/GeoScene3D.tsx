@@ -45,6 +45,7 @@ export function GeoScene3D({
   engine: engineProp,
   initialPreset = "official_3d",
   showLegacyEngineSwitch = false,
+  filters,
 }: GeoSceneProps) {
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
   const [internalEngine, setInternalEngine] = useState<GeoSceneEngine>(engineProp ?? "deckgl");
@@ -130,7 +131,11 @@ export function GeoScene3D({
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
           {engine === "deckgl" && mode !== "resource" && (
-            <GeoSceneCanvas mode={mode} visibleLayerIds={enabledLayerIds} />
+            <GeoSceneCanvas
+              mode={mode}
+              visibleLayerIds={enabledLayerIds}
+              filters={filters}
+            />
           )}
           {engine === "legacy" && mode === "surface" && (
             <Geology3DViewer className="h-full w-full" />

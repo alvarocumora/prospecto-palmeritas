@@ -17,11 +17,13 @@ import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import { sceneLayerEnabled } from "../layerPolicy";
-import type { GeoSceneMode } from "../types";
+import type { GeoSceneFilters, GeoSceneMode } from "../types";
+import { sceneFilterManifest } from "../filterPolicy";
 
 interface Props {
   mode: GeoSceneMode;
   visibleLayerIds: ReadonlySet<string>;
+  filters?: GeoSceneFilters;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -58,7 +60,7 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
   },
 };
 
-export function GeoSceneCanvas({ mode, visibleLayerIds }: Props) {
+export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const { active } = useProjects();
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
@@ -86,26 +88,38 @@ export function GeoSceneCanvas({ mode, visibleLayerIds }: Props) {
   const wireframesVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
 
-  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, targetsVisible);
+  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, targetsVisible, filters);
   const {
     layers: holeColumnLayers,
     completedCount: completedCollarCount,
     proposedCount: proposedCollarCount,
-  } = useDrillHolesLayer(active?.id ?? null, centerLng, centerLat, {
-    completed: completedDrillingVisible,
-    proposed: proposedDrillingVisible,
-  });
+  } = useDrillHolesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    {
+      completed: completedDrillingVisible,
+      proposed: proposedDrillingVisible,
+    },
+    filters,
+  );
 
   const {
     layers: trajectoryLayers,
     completedCount: completedTrajectoryCount,
     proposedCount: proposedTrajectoryCount,
     interceptCount,
-  } = useDrillTrajectoriesLayer(active?.id ?? null, centerLng, centerLat, {
-    completed: completedDrillingVisible,
-    proposed: proposedDrillingVisible,
-    intercepts: interceptsVisible,
-  });
+  } = useDrillTrajectoriesLayer(
+    active?.id ?? null,
+    centerLng,
+    centerLat,
+    {
+      completed: completedDrillingVisible,
+      proposed: proposedDrillingVisible,
+      intercepts: interceptsVisible,
+    },
+    filters,
+  );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
     active?.id ?? null,
@@ -257,12 +271,17 @@ export function GeoSceneCanvas({ mode, visibleLayerIds }: Props) {
     () => Array.from(visibleLayerIds).sort().join(","),
     [visibleLayerIds],
   );
+  const filterManifest = useMemo(
+    () => sceneFilterManifest(filters),
+    [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
+  );
 
   return (
     <div
       className="relative h-full w-full"
       data-geo-engine="deckgl"
       data-geo-layer-ids={canonicalManifest}
+      data-geo-filters={filterManifest}
     >
       <div ref={mapDiv} className="absolute inset-0" />
       {!ready && (

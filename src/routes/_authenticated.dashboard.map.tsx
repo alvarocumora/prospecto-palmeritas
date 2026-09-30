@@ -27,8 +27,8 @@ import { useDroneFlights } from "@/hooks/useDroneFlights";
 import { RasterControlPanel, type RasterSettings } from "@/components/drones/RasterControlPanel";
 import { buildRasterOverlayLayer, fitToRaster } from "@/components/drones/rasterOverlayLayer";
 import { RasterSwipePanel } from "@/components/drones/RasterSwipePanel";
-import { Map3DView } from "@/components/map/Map3DView";
 import { ViewModeToggle, type ViewMode } from "@/components/map/ViewModeToggle";
+import { GeoScene3D } from "@/components/geoscene";
 import { MapCommandPalette } from "@/components/map/MapCommandPalette";
 import { SavedViewsPanel } from "@/components/map/SavedViewsPanel";
 import { AnnotationsLayer } from "@/components/map/AnnotationsLayer";
@@ -333,12 +333,14 @@ function OperationalMap() {
 
       <div className="relative flex-1 min-h-0">
         {viewMode === "3d" ? (
-          <Map3DView
-            centerLat={active?.center_lat ?? -33.898438}
-            centerLng={active?.center_lng ?? -71.115471}
-            holes={filteredHoles}
-            logsByHole={logsByHole}
-            targets={targets}
+          <GeoScene3D
+            mode="subsurface"
+            initialPreset="official_3d"
+            filters={{
+              campaignId,
+              timeCursor: timeActive ? timeCursor : null,
+              highGradeOnly,
+            }}
           />
         ) : (
           <>

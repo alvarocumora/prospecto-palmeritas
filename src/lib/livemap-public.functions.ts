@@ -1,5 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import {
+  buildPublicGeoManifest,
+  type PublicGeoManifest,
+} from "@/lib/geospatial/publicGeoContract";
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
@@ -28,6 +32,7 @@ export type PublicProjectLayers = {
   project: { id: string; name: string; center_lat: number | null; center_lng: number | null };
   targets: PublicTarget[];
   concessions: PublicProjectConcession[];
+  canonical: PublicGeoManifest;
 };
 
 export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handler(
@@ -58,15 +63,18 @@ export const getLosVerdesPublicLayers = createServerFn({ method: "GET" }).handle
       .order("code", { ascending: true });
     if (cErr) throw new Error(cErr.message);
 
+    const publicProject = {
+      id: project.id,
+      name: project.name,
+      center_lat: project.center_lat != null ? Number(project.center_lat) : null,
+      center_lng: project.center_lng != null ? Number(project.center_lng) : null,
+    };
+
     return {
-      project: {
-        id: project.id,
-        name: project.name,
-        center_lat: project.center_lat != null ? Number(project.center_lat) : null,
-        center_lng: project.center_lng != null ? Number(project.center_lng) : null,
-      },
+      project: publicProject,
       targets: (targets ?? []) as PublicTarget[],
       concessions: (concessions ?? []) as PublicProjectConcession[],
+      canonical: buildPublicGeoManifest(publicProject),
     };
   },
 );
