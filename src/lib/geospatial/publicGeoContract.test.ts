@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildPublicGeoManifest,
-  isCertificationEvidence,
-} from "./publicGeoContract";
+import { buildPublicGeoManifest, isCertificationEvidence } from "./publicGeoContract";
 
 const project = {
   id: "p1",
@@ -24,9 +21,9 @@ describe("public canonical geospatial contract", () => {
   });
 
   it("rejects authenticated-only layers from a public manifest", () => {
-    expect(() =>
-      buildPublicGeoManifest(project, ["geophysics.project_stations"]),
-    ).toThrow(/not public-capable/);
+    expect(() => buildPublicGeoManifest(project, ["geophysics.project_stations"])).toThrow(
+      /not public-capable/,
+    );
   });
   it("defines certification mode from evidence class rather than project-specific flags", () => {
     expect(isCertificationEvidence("OFICIAL")).toBe(true);
@@ -36,5 +33,4 @@ describe("public canonical geospatial contract", () => {
     expect(isCertificationEvidence("INTERPRETADO")).toBe(false);
     expect(isCertificationEvidence("PROPUESTO")).toBe(false);
   });
-
 });
