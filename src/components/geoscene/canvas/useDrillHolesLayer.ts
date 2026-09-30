@@ -5,6 +5,7 @@ import { ColumnLayer } from "@deck.gl/layers";
 import { useDrillHoles } from "@/hooks/useDrilling";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 import type { GeoSceneFilters } from "../types";
+import { sceneHolePassesTime } from "../filterPolicy";
 
 type LooseHole = {
   hole_id: string;
@@ -45,10 +46,7 @@ export function useDrillHolesLayer(
     return list
       .filter((hole) => {
         if (hole.easting == null || hole.northing == null) return false;
-        if (filters?.timeCursor == null) return true;
-        if (!hole.started_at) return false;
-        const started = Date.parse(hole.started_at);
-        return Number.isFinite(started) && started <= filters.timeCursor;
+        return sceneHolePassesTime(hole.started_at, filters?.timeCursor);
       })
       .map((hole) => ({
         code: hole.hole_id,
