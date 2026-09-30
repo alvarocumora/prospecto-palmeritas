@@ -5,6 +5,7 @@ import { PathLayer } from "@deck.gl/layers";
 import { supabase } from "@/integrations/supabase/client";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 import type { GeoSceneFilters } from "../types";
+import { sceneHolePassesTime, sceneInterceptPassesGrade } from "../filterPolicy";
 
 type Hole = {
   id?: string;
@@ -134,10 +135,7 @@ export function useDrillTrajectoriesLayer(
 
       const holeRows = ((holeData ?? []) as (Hole & { id: string })[]).filter((hole) => {
         if (hole.easting == null || hole.northing == null) return false;
-        if (filters?.timeCursor == null) return true;
-        if (!hole.started_at) return false;
-        const started = Date.parse(hole.started_at);
-        return Number.isFinite(started) && started <= filters.timeCursor;
+        return sceneHolePassesTime(hole.started_at, filters?.timeCursor);
       });
       setHoles(holeRows);
       setLogs((logData ?? []) as Log[]);
@@ -222,7 +220,7 @@ export function useDrillTrajectoriesLayer(
           log.depth_from != null &&
           log.depth_to != null &&
           byHole.has(log.hole_id) &&
-          (!filters?.highGradeOnly || Number(log.au_gpt ?? 0) >= 1),
+          sceneInterceptPassesGrade(log.au_gpt, filters?.highGradeOnly),
       )
       .map((log, index) => {
         const hole = byHole.get(log.hole_id)!;
