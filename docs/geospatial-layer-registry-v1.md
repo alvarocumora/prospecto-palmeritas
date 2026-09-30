@@ -153,9 +153,11 @@ are tracked in `legacyViewerRegistry.ts` with successors and parity blockers.
 and Los Verdes public payloads publish a canonical `public_live` layer manifest. `Map3DView` is
 reference-only pending one QA window.
 
-**05C pending:** make Los Verdes and Cholqui public renderers consume the canonical public contract,
-then retire their compatibility viewers after anonymous-data/RLS parity. Field and Public remain
-distinct experiences but share the same evidence definitions.
+**05C implemented:** Los Verdes and Cholqui public routes now consume `PublicGeoBundle` through
+`PublicCanonicalMap` and, for Los Verdes, `PublicCanonicalScene`. Public sampling, certified
+assays, derived satellite lineaments, interpreted veins and official tenure remain separate
+canonical evidence classes. The former project-specific public renderers are reference-only for one
+QA window while Actions CI is unavailable.
 
 ### GEO-VIEW-06 — reports and snapshots
 Persist visible canonical layer ids, bounds, timestamp, CRS, source and provenance in the
