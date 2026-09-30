@@ -12,12 +12,6 @@ import {
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-import aoiData from "@/data/geo/aoi.geojson?url";
-import veinsData from "@/data/geo/veins.geojson?url";
-import palmsData from "@/data/geo/palm_clusters.geojson?url";
-import workingsData from "@/data/geo/workings.geojson?url";
-import drillsData from "@/data/geo/drill_collars.geojson?url";
-import anomaliesData from "@/data/geo/satellite_anomalies.geojson?url";
 
 import { CENTER, type AnyFC, type LeafletNS } from "./map/types";
 import { buildBasemaps } from "./map/basemaps";
@@ -372,10 +366,16 @@ export function ProjectMap({
       overpassCtl.attach(map);
 
       if (legacyStaticProjectFeatures) {
+        const staticUrls = await Promise.all([
+          import("@/data/geo/aoi.geojson?url").then((module) => module.default),
+          import("@/data/geo/veins.geojson?url").then((module) => module.default),
+          import("@/data/geo/palm_clusters.geojson?url").then((module) => module.default),
+          import("@/data/geo/workings.geojson?url").then((module) => module.default),
+          import("@/data/geo/drill_collars.geojson?url").then((module) => module.default),
+          import("@/data/geo/satellite_anomalies.geojson?url").then((module) => module.default),
+        ]);
         const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
-          [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
-            fetch(u).then((response) => response.json()),
-          ),
+          staticUrls.map((url) => fetch(url).then((response) => response.json())),
         )) as AnyFC[];
         if (cancelled) return;
 
