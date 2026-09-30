@@ -18,6 +18,7 @@ import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import { sceneLayerEnabled } from "../layerPolicy";
 import type { GeoSceneFilters, GeoSceneMode } from "../types";
+import { sceneFilterManifest } from "../filterPolicy";
 
 interface Props {
   mode: GeoSceneMode;
@@ -271,12 +272,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     [visibleLayerIds],
   );
   const filterManifest = useMemo(
-    () =>
-      JSON.stringify({
-        campaignId: filters?.campaignId ?? null,
-        timeCursor: filters?.timeCursor ?? null,
-        highGradeOnly: Boolean(filters?.highGradeOnly),
-      }),
+    () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
   );
 
