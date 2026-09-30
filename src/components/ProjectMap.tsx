@@ -89,6 +89,12 @@ interface ProjectMapProps {
   basemapOverride?: "satellite" | "topo" | null;
   /** Initial canonical layer preset. Runtime user choices still persist in localStorage. */
   initialPreset?: GeoViewerPresetId;
+  /**
+   * Transitional public Palmeras compatibility only.
+   * Loads the historical static AOI/veins/palms/workings/drill/anomaly bundle.
+   * Never enable this in authenticated multi-project workspaces.
+   */
+  legacyStaticProjectFeatures?: boolean;
 }
 
 type CatastroLayersByOrigen = Partial<Record<CatastroOrigen, LeafletGeoJSON>>;
@@ -148,6 +154,7 @@ export function ProjectMap({
   onMapReady,
   basemapOverride,
   initialPreset = "official_workbench",
+  legacyStaticProjectFeatures = false,
 }: ProjectMapProps = {}) {
   const samplesLayerRef = useRef<LayerGroup | null>(null);
   const droneLayerRef = useRef<LayerGroup | null>(null);
@@ -180,6 +187,13 @@ export function ProjectMap({
   const [lithoLegend, setLithoLegend] = useState<GeologyLegendEntry[]>([]);
   const [altLegend, setAltLegend] = useState<GeologyLegendEntry[]>([]);
   const { active } = useProjects();
+  const mapCenter = useMemo<[number, number]>(
+    () =>
+      active?.center_lat != null && active?.center_lng != null
+        ? [Number(active.center_lat), Number(active.center_lng)]
+        : CENTER,
+    [active?.center_lat, active?.center_lng],
+  );
   const { data: geologyMap } = useProjectGeologyMap(active?.id ?? null);
   const { data: geoph } = useGeophysicsData(active?.id ?? null);
   const { data: concessions } = useMiningConcessions(active?.id ?? null);
@@ -233,7 +247,7 @@ export function ProjectMap({
     const map = mapRef.current;
     if (!L || !map) return;
 
-    const bbox = bboxAround(CENTER, 8);
+    const bbox = bboxAround(mapCenter, 8);
     let result: Awaited<ReturnType<typeof loadCatastro>>;
     try {
       result = await loadCatastro(L, bbox);
@@ -271,14 +285,14 @@ export function ProjectMap({
     ]);
     setCounts(result.countsByOrigen);
     featuresByOrigenRef.current = result.featuresByOrigen;
-  }, []);
+  }, [mapCenter]);
 
   const handleExportPdf = useCallback(async () => {
     const f = featuresByOrigenRef.current;
     if (!f) return;
     const { exportCatastroPdf } = await import("./map/exportCatastroPdf");
-    exportCatastroPdf(f, { center: CENTER, halfKm: 8, aoi: aoiRef.current });
-  }, []);
+    exportCatastroPdf(f, { center: mapCenter, halfKm: 8, aoi: aoiRef.current });
+  }, [mapCenter]);
 
   const handleRefresh = useCallback(async () => {
     if (refreshing) return;
@@ -304,7 +318,7 @@ export function ProjectMap({
       if (mapRef.current) return;
 
       const map = L.map(containerRef.current, {
-        center: CENTER,
+        center: mapCenter,
         zoom: 16,
         scrollWheelZoom: false,
         zoomControl: false,
@@ -357,23 +371,26 @@ export function ProjectMap({
       const overpassCtl = buildOverpassInfraLayer(L);
       overpassCtl.attach(map);
 
-      const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
-        [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
-          fetch(u).then((r) => r.json()),
-        ),
-      )) as AnyFC[];
-      if (cancelled) return;
+      if (legacyStaticProjectFeatures) {
+        const [aoiFC, veinsFC, palmsFC, workingsFC, drillsFC, anomaliesFC] = (await Promise.all(
+          [aoiData, veinsData, palmsData, workingsData, drillsData, anomaliesData].map((u) =>
+            fetch(u).then((response) => response.json()),
+          ),
+        )) as AnyFC[];
+        if (cancelled) return;
 
-      addProjectFeatures(L, map, {
-        aoi: aoiFC,
-        veins: veinsFC,
-        palms: palmsFC,
-        workings: workingsFC,
-        drills: drillsFC,
-        anomalies: anomaliesFC,
-      });
-
-      aoiRef.current = (await loadAoiPolygon()) ?? null;
+        addProjectFeatures(L, map, {
+          aoi: aoiFC,
+          veins: veinsFC,
+          palms: palmsFC,
+          workings: workingsFC,
+          drills: drillsFC,
+          anomalies: anomaliesFC,
+        });
+        aoiRef.current = (await loadAoiPolygon()) ?? null;
+      } else {
+        aoiRef.current = null;
+      }
 
       // Build managed layers list (basemaps + overlays). Catastro added later.
       const initial: ManagedLayer[] = [
@@ -553,8 +570,9 @@ export function ProjectMap({
       cancelled = true;
       cleanup?.();
     };
+    // onMapReady is intentionally omitted to avoid recreating Leaflet for inline callbacks.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadCatastroData]);
+  }, [loadCatastroData, legacyStaticProjectFeatures, mapCenter]);
 
   // Build geophysics layers (planned/synthetic + real captured) for the active project
   useEffect(() => {
@@ -835,8 +853,8 @@ export function ProjectMap({
   const centerOnAoi = useCallback(() => {
     const map = mapRef.current;
     if (!map) return;
-    map.setView(CENTER, 16, { animate: true });
-  }, []);
+    map.setView(mapCenter, 16, { animate: true });
+  }, [mapCenter]);
 
   // Measure tool
   const clearMeasure = useCallback(() => {
@@ -1090,7 +1108,7 @@ export function ProjectMap({
             <span className="text-muted-foreground/70">Catastro 8 km AOI:</span>
             {ORIGEN_ORDER.map(renderChip)}
             <a
-              href={`https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index?lat=${CENTER[0]}&lng=${CENTER[1]}`}
+              href={`https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index?lat=${mapCenter[0]}&lng=${mapCenter[1]}`}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-border bg-bg-secondary text-muted-foreground hover:text-foreground hover:border-foreground/40 transition-colors"
@@ -1100,78 +1118,81 @@ export function ProjectMap({
             </a>
           </div>
 
-          <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-4 h-0.5 bg-gold-light" /> Veta Au–Cu
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full border-2 border-teal" /> Cluster palmeras
-            </span>
-            <span className="inline-flex items-center gap-1.5">
+          {legacyStaticProjectFeatures && (
+            <div className="flex flex-wrap gap-x-3 gap-y-1.5 text-[11px] font-mono text-muted-foreground">
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-gold border border-background" /> Centroide
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-4 h-0.5 bg-gold-light" /> Veta Au–Cu
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full border-2 border-teal" /> Cluster palmeras
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="w-2.5 h-2.5 bg-copper inline-block"
+                  style={{ transform: "rotate(45deg)" }}
+                />{" "}
+                Labor antigua
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar
+                sondaje ({drillHoles.length})
+              </span>
               <span
-                className="w-2.5 h-2.5 bg-copper inline-block"
-                style={{ transform: "rotate(45deg)" }}
-              />{" "}
-              Labor antigua
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm border-2 border-info" /> Collar DDH
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-full bg-info border border-background" /> Collar
-              sondaje ({drillHoles.length})
-            </span>
-            <span
-              className="inline-flex items-center gap-1.5"
-              title="Halo = mejor intercept (Au g/t × m)"
-            >
-              <span className="text-muted-foreground/70">Halo GT:</span>
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: "#86efac" }}
-                title="≤5"
-              />
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: "#bef264" }}
-                title="5–20"
-              />
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: "#fbbf24" }}
-                title="20–50"
-              />
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: "#fb923c" }}
-                title="50–150"
-              />
-              <span
-                className="w-2.5 h-2.5 rounded-full"
-                style={{ background: "#dc2626" }}
-                title=">150"
-              />
-              <span className="text-muted-foreground/70">g·m/t</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <span
-                className="w-3 h-0.5"
-                style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }}
-              />{" "}
-              Línea geofísica
-            </span>
-            <span className="text-muted-foreground/70">
-              · panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad
-            </span>
-          </div>
+                className="inline-flex items-center gap-1.5"
+                title="Halo = mejor intercept (Au g/t × m)"
+              >
+                <span className="text-muted-foreground/70">Halo GT:</span>
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: "#86efac" }}
+                  title="≤5"
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: "#bef264" }}
+                  title="5–20"
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: "#fbbf24" }}
+                  title="20–50"
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: "#fb923c" }}
+                  title="50–150"
+                />
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: "#dc2626" }}
+                  title=">150"
+                />
+                <span className="text-muted-foreground/70">g·m/t</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <span
+                  className="w-3 h-0.5"
+                  style={{ background: "#E11D48", borderTop: "1px dashed #E11D48" }}
+                />{" "}
+                Línea geofísica
+              </span>
+              <span className="text-muted-foreground/70">
+                · panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad
+              </span>
+            </div>
+  
+            <div className="flex flex-wrap items-center gap-3">
+              <MagnetometryLegend stats={magStats} />
+              <GeologyLegend hostRock={lithoLegend} alteration={altLegend} />
+            </div>
+          )}
 
-          <div className="flex flex-wrap items-center gap-3">
-            <MagnetometryLegend stats={magStats} />
-            <GeologyLegend hostRock={lithoLegend} alteration={altLegend} />
-          </div>
         </>
       )}
     </div>
