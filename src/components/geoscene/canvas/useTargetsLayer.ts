@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { ScatterplotLayer } from "@deck.gl/layers";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
+import type { GeoSceneFilters } from "../types";
 
 const PRIORITY_COLOR: Record<string, [number, number, number]> = {
   critical: [239, 68, 68],
@@ -12,13 +13,22 @@ const PRIORITY_COLOR: Record<string, [number, number, number]> = {
   low: [148, 163, 184],
 };
 
-export function useTargetsLayer(projectId: string | null, visible = true) {
+export function useTargetsLayer(
+  projectId: string | null,
+  visible = true,
+  filters?: GeoSceneFilters,
+) {
   const { targets } = useExplorationTargets(projectId);
 
   const points = useMemo(
     () =>
       (targets ?? [])
-        .filter((t) => t.lat != null && t.lng != null)
+        .filter(
+          (target) =>
+            target.lat != null &&
+            target.lng != null &&
+            (!filters?.campaignId || target.campaign_id === filters.campaignId),
+        )
         .map((t) => ({
           code: t.code,
           name: t.name,
@@ -27,7 +37,7 @@ export function useTargetsLayer(projectId: string | null, visible = true) {
           score: Number(t.score ?? 0),
           priority: (t.priority ?? "medium").toLowerCase(),
         })),
-    [targets],
+    [targets, filters?.campaignId],
   );
 
   // Sincroniza el registro de anclajes.
