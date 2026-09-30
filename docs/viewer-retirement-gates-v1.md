@@ -69,14 +69,15 @@ Implemented parity:
 
 ### Cholqui public viewer
 
-Requires an anonymous/public adapter for the same canonical domain datasets before
-`CholquiMasterViewer` can disappear.
+The active public route now uses `PublicCanonicalMap` with
+`buildCholquiPublicGeoBundle`. `CholquiMasterViewer` is reference-only until CI/build and visual
+QA can run.
 
 ### Los Verdes public viewers
 
-`LosVerdesStrategicMap` and `LosVerdesPublicScene` still implement an anonymous server-backed
-contract and public certification/filter UX. They remain public compatibility surfaces until the
-canonical public adapter has equivalent RLS, disclosure and layer behavior.
+The active public route now uses `PublicCanonicalMap` and `PublicCanonicalScene` with the
+server-backed public bundle. `LosVerdesStrategicMap` and `LosVerdesPublicScene` are
+reference-only until CI/build and visual QA can run.
 
 ### Legacy 3D QA
 
@@ -91,6 +92,6 @@ silently coexisting as equal "official" engines.
 
 ## Next
 
-GEO-VIEW-05B should add a canonical public data contract, beginning with Cholqui or Los Verdes,
-then remove public duplicate renderers one by one. After that GEO-VIEW-06 can persist canonical
-layer ids, filters, bounds, timestamp, CRS and provenance in report snapshots.
+GEO-VIEW-06 should persist canonical layer ids, filters, bounds/camera, timestamp, CRS, dataset
+references and provenance/evidence class in report snapshots. After Actions CI is restored and the
+visual QA window closes, reference-only viewer files can be removed in a dedicated cleanup PR.
