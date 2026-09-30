@@ -4,6 +4,7 @@ import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
 import { FileText } from "lucide-react";
 import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
+import { resolveProjectViewerProfile } from "@/lib/geospatial/projectViewerProfiles";
 
 
 // Punto único de entrada a los reportes de proyecto piloto.
@@ -45,21 +46,17 @@ function ProjectReportPage() {
     );
   }
 
-  const code = (active.code ?? "").toUpperCase();
+  const profile = resolveProjectViewerProfile(active);
 
-  // Routing por código de proyecto (pilotos hardcoded por ahora).
-  if (code.includes("PALM") || code.includes("TRK-ALH")) {
+  if (profile?.key === "palmeras") {
     return <TrackminGeoIntel />;
   }
-  if (code.includes("CHOLQUI") || code.includes("FRC") || code.includes("FRANCO")) {
-    return <FrancoDashboard />;
+
+  if (profile?.key === "cholqui") {
+    return <FrancoDashboard authenticated />;
   }
-  if (
-    code.includes("LV5") ||
-    code.includes("VERDES") ||
-    code.includes("TILAMA") ||
-    code.includes("LV-TIL")
-  ) {
+
+  if (profile?.key === "losverdes") {
     return (
       <div className="w-full p-4">
         <CanonicalProjectViewer
