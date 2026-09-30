@@ -78,7 +78,7 @@ describe("Los Verdes canonical public adapter", () => {
   it("keeps satellite-derived lineaments separate from measured geological structures", () => {
     const manifest = buildPublicGeoManifest(
       { id: "lv", name: "Los Verdes", center_lat: -32, center_lng: -71 },
-      ["remote_sensing.lineaments", "geology.structures"],
+      ["remote_sensing.lineaments", "geology.interpreted_structures"],
     );
     const mapData = {
       bbox: null,
@@ -154,6 +154,6 @@ describe("Los Verdes canonical public adapter", () => {
     const bundle = buildLosVerdesPublicGeoBundle(manifest, mapData, mining, anomalies);
 
     expect(bundle.layers["remote_sensing.lineaments"]?.features).toHaveLength(1);
-    expect(bundle.layers["geology.structures"]?.features).toHaveLength(1);
+    expect(bundle.layers["geology.interpreted_structures"]?.features).toHaveLength(1);
   });
 });
