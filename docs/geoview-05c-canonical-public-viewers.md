@@ -23,10 +23,12 @@ Both expose:
 - evidence class;
 - scale;
 - interpretation cautions;
-- certification mode.
+- primary-evidence filter.
 
-Certification mode is defined centrally as `OFICIAL | CERTIFICADO | MEDIDO`. Derived,
-interpreted and proposed layers are suppressed without changing the underlying payload.
+The primary-evidence filter is defined centrally as `OFICIAL | CERTIFICADO | MEDIDO`. It does
+not imply every measured record is laboratory-certified: `sampling.results` can still carry draft
+`record_status` and an explicit caution. Derived, interpreted and proposed layers are suppressed
+without changing the underlying payload.
 
 ## Sampling correction
 
@@ -46,7 +48,7 @@ Its canonical bundle combines:
 - exploration targets;
 - full satellite anomaly geometry;
 - satellite-derived structural lineaments;
-- mapped vein/structure geometry;
+- interpreted vein/structure geometry;
 - magnetic anomaly targets;
 - project sampling results;
 - DEM terrain in 3D.
