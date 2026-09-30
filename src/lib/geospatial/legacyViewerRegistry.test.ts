@@ -6,10 +6,14 @@ import {
 } from "./legacyViewerRegistry";
 
 describe("legacy viewer retirement registry", () => {
-  it("keeps public compatibility viewers explicit instead of treating them as canonical", () => {
+  it("moves migrated Cholqui and Los Verdes viewers out of active public compatibility", () => {
     const publicViewers = legacyViewersByStatus("public_compatibility");
-    expect(publicViewers.map((viewer) => viewer.id)).toContain("cholqui-master-viewer");
-    expect(publicViewers.map((viewer) => viewer.id)).toContain("losverdes-strategic-map");
+    const referenceViewers = legacyViewersByStatus("reference_only");
+    expect(publicViewers.map((viewer) => viewer.id)).not.toContain("cholqui-master-viewer");
+    expect(publicViewers.map((viewer) => viewer.id)).not.toContain("losverdes-strategic-map");
+    expect(referenceViewers.map((viewer) => viewer.id)).toContain("cholqui-master-viewer");
+    expect(referenceViewers.map((viewer) => viewer.id)).toContain("losverdes-strategic-map");
+    expect(referenceViewers.map((viewer) => viewer.id)).toContain("losverdes-public-scene");
   });
 
   it("does not mark a viewer deletable while a parity blocker remains", () => {
