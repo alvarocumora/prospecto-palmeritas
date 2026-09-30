@@ -40,7 +40,10 @@ const PublicCanonicalScene = lazy(() =>
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
-import { getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
+import {
+  getLosVerdesAnomalies,
+  getLosVerdesPublicLayers,
+} from "@/lib/livemap-public.functions";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
@@ -192,6 +195,7 @@ function priorityColor(p: string | null) {
 
 function LiveLosVerdesPage() {
   const fetchLayers = useServerFn(getLosVerdesPublicLayers);
+  const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchMapData = useServerFn(getLosVerdesMapData);
   const fetchReport = useServerFn(getTilamaReport);
@@ -199,6 +203,11 @@ function LiveLosVerdesPage() {
   const layersQ = useQuery({
     queryKey: ["losverdes", "public-layers"],
     queryFn: () => fetchLayers(),
+    staleTime: 5 * 60_000,
+  });
+  const anomalyQ = useQuery({
+    queryKey: ["losverdes", "public-anomalies"],
+    queryFn: () => fetchAnomalies(),
     staleTime: 5 * 60_000,
   });
   const miningQ = useQuery({
@@ -316,9 +325,14 @@ function LiveLosVerdesPage() {
   const publicGeoBundle = useMemo(
     () =>
       layersQ.data && mapDataQ.data
-        ? buildLosVerdesPublicGeoBundle(layersQ.data.canonical, mapDataQ.data, miningQ.data)
+        ? buildLosVerdesPublicGeoBundle(
+            layersQ.data.canonical,
+            mapDataQ.data,
+            miningQ.data,
+            anomalyQ.data,
+          )
         : null,
-    [layersQ.data, mapDataQ.data, miningQ.data],
+    [anomalyQ.data, layersQ.data, mapDataQ.data, miningQ.data],
   );
 
   const stats = reportQ.data?.stats;
@@ -526,7 +540,10 @@ function LiveLosVerdesPage() {
               Visor estratégico · Catastro · Muestreo · Targets · Anomalías
             </h2>
             <div className="flex items-center gap-2">
-              {(layersQ.isLoading || miningQ.isLoading || mapDataQ.isLoading) && (
+              {(layersQ.isLoading ||
+                anomalyQ.isLoading ||
+                miningQ.isLoading ||
+                mapDataQ.isLoading) && (
                 <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
               )}
               <Button
