@@ -13,6 +13,7 @@ import {
 } from "@/lib/cholqui/toki2Terrain";
 import catastroRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
+import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 
 const PROJECT_ID = "e5360f13-1647-4e44-bb13-c0614e6f39fe";
 const DEM_SIZE = 65;
@@ -77,7 +78,7 @@ function anomalyCountInside(ring: LonLat[] | null): number {
   }, 0);
 }
 
-export function Toki2DemPanel() {
+export function Toki2DemPanel({ authenticated = false }: { authenticated?: boolean }) {
   const demFn = useServerFn(getDemTile);
   const satelliteInside = useMemo(() => anomalyCountInside(toki2Ring), []);
 
@@ -105,7 +106,15 @@ export function Toki2DemPanel() {
   );
 
   return (
-    <section className="overflow-hidden rounded-brand-lg border border-hairline bg-surface-3">
+    <div className="space-y-4">
+      {authenticated && (
+        <CanonicalProjectViewer
+          profileKey="toki2"
+          heightClassName="h-[460px]"
+          compactHeader
+        />
+      )}
+      <section className="overflow-hidden rounded-brand-lg border border-hairline bg-surface-3">
       <header className="flex flex-col gap-3 border-b border-hairline px-5 py-5 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-accent-brand">
@@ -285,6 +294,7 @@ export function Toki2DemPanel() {
           </div>
         </>
       )}
-    </section>
+      </section>
+    </div>
   );
 }
