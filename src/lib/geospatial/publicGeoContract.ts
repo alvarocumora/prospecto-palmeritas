@@ -85,7 +85,6 @@ export function buildPublicGeoManifest(
   };
 }
 
-
 export function isCertificationEvidence(evidence: GeoEvidenceClass): boolean {
   return evidence === "OFICIAL" || evidence === "CERTIFICADO" || evidence === "MEDIDO";
 }
