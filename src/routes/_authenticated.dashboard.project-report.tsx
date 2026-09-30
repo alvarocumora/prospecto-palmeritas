@@ -1,14 +1,10 @@
-import { lazy } from "react";
-import { createFileRoute, Link, ClientOnly } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useProjects } from "@/hooks/useProjects";
 import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
 import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
 import { FileText } from "lucide-react";
+import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 
-// react-leaflet toca `window` al importarse: cargar solo en cliente (evita crash SSR).
-const Lv5Page5Preview = lazy(() =>
-  import("@/features/lv5/Lv5Page5Preview").then((m) => ({ default: m.Lv5Page5Preview })),
-);
 
 // Punto único de entrada a los reportes de proyecto piloto.
 // Detecta el proyecto activo y monta el feature correspondiente.
@@ -65,18 +61,11 @@ function ProjectReportPage() {
     code.includes("LV-TIL")
   ) {
     return (
-      <div className="h-[calc(100vh-4rem)] w-full p-4 flex flex-col">
-        <header className="mb-3">
-          <h1 className="text-xl font-mono text-gold">Los Verdes 5 · Página 5 interactiva</h1>
-          <p className="text-xs font-mono text-muted-foreground">
-            Esquema litoestratigráfico Hoja Illapel 1:250.000 sobre ESRI World Imagery.
-          </p>
-        </header>
-        <div className="flex-1 min-h-0">
-          <ClientOnly fallback={<div className="h-full w-full animate-pulse bg-muted/20" />}>
-            <Lv5Page5Preview />
-          </ClientOnly>
-        </div>
+      <div className="w-full p-4">
+        <CanonicalProjectViewer
+          profileKey="losverdes"
+          heightClassName="h-[calc(100vh-8rem)]"
+        />
       </div>
     );
   }
