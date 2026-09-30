@@ -79,6 +79,7 @@ export function PublicCanonicalMap({
   const containerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const renderedLayerIdsRef = useRef<string[]>([]);
+  const renderedSourceIdsRef = useRef<string[]>([]);
   const layerLookupRef = useRef(new Map<string, CanonicalGeoLayerId>());
   const [ready, setReady] = useState(false);
   const [certificationMode, setCertificationMode] = useState(false);
@@ -161,11 +162,11 @@ export function PublicCanonicalMap({
     for (const layerId of renderedLayerIdsRef.current) {
       if (map.getLayer(layerId)) map.removeLayer(layerId);
     }
-    for (const sourceId of layerLookupRef.current.keys()) {
-      const source = sourceId.replace(/:(fill|line|circle)$/, "");
-      if (map.getSource(source)) map.removeSource(source);
+    for (const sourceId of renderedSourceIdsRef.current) {
+      if (map.getSource(sourceId)) map.removeSource(sourceId);
     }
     renderedLayerIdsRef.current = [];
+    renderedSourceIdsRef.current = [];
     layerLookupRef.current = new Map();
 
     for (const meta of bundle.manifest.layers) {
@@ -175,6 +176,7 @@ export function PublicCanonicalMap({
 
       const sourceId = `public-src-${safeId(meta.id)}`;
       map.addSource(sourceId, { type: "geojson", data: data as GeoJSON.FeatureCollection });
+      renderedSourceIdsRef.current.push(sourceId);
       const color = DOMAIN_COLOR[meta.domain];
       const kinds = geometryKinds(data as GeoJSON.FeatureCollection);
 
@@ -225,11 +227,11 @@ export function PublicCanonicalMap({
       for (const layerId of renderedLayerIdsRef.current) {
         if (map.getLayer(layerId)) map.removeLayer(layerId);
       }
-      for (const meta of bundle.manifest.layers) {
-        const sourceId = `public-src-${safeId(meta.id)}`;
+      for (const sourceId of renderedSourceIdsRef.current) {
         if (map.getSource(sourceId)) map.removeSource(sourceId);
       }
       renderedLayerIdsRef.current = [];
+      renderedSourceIdsRef.current = [];
       layerLookupRef.current = new Map();
     };
   }, [bundle, certificationMode, ready, visible]);
