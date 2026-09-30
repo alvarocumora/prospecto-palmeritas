@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PathLayer } from "@deck.gl/layers";
 import { supabase } from "@/integrations/supabase/client";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
+import type { GeoSceneFilters } from "../types";
 
 type Hole = {
   id?: string;
@@ -16,6 +17,7 @@ type Hole = {
   azimuth: number | null;
   dip: number | null;
   status: string | null;
+  started_at: string | null;
 };
 
 type Log = {
@@ -98,6 +100,7 @@ export function useDrillTrajectoriesLayer(
   centerLng: number,
   centerLat: number,
   visibility: DrillTrajectoryVisibility,
+  filters?: GeoSceneFilters,
 ) {
   const [holes, setHoles] = useState<Hole[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
@@ -118,7 +121,7 @@ export function useDrillTrajectoriesLayer(
         supabase
           .from("drill_holes")
           .select(
-            "id,hole_id,easting,northing,elevation,actual_depth,planned_depth,azimuth,dip,status",
+            "id,hole_id,easting,northing,elevation,actual_depth,planned_depth,azimuth,dip,status,started_at",
           )
           .eq("project_id", projectId),
         supabase
@@ -129,9 +132,13 @@ export function useDrillTrajectoriesLayer(
       ]);
       if (cancelled) return;
 
-      const holeRows = ((holeData ?? []) as (Hole & { id: string })[]).filter(
-        (hole) => hole.easting != null && hole.northing != null,
-      );
+      const holeRows = ((holeData ?? []) as (Hole & { id: string })[]).filter((hole) => {
+        if (hole.easting == null || hole.northing == null) return false;
+        if (filters?.timeCursor == null) return true;
+        if (!hole.started_at) return false;
+        const started = Date.parse(hole.started_at);
+        return Number.isFinite(started) && started <= filters.timeCursor;
+      });
       setHoles(holeRows);
       setLogs((logData ?? []) as Log[]);
 
@@ -160,7 +167,7 @@ export function useDrillTrajectoriesLayer(
     return () => {
       cancelled = true;
     };
-  }, [projectId, anyVisible]);
+  }, [projectId, anyVisible, filters?.timeCursor]);
 
   function realPath(points: RealTrajectory["points"]): Vec3[] {
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
@@ -210,7 +217,13 @@ export function useDrillTrajectoriesLayer(
   const intercepts = useMemo(() => {
     const byHole = new Map(holes.map((hole) => [hole.hole_id, hole] as const));
     return logs
-      .filter((log) => log.depth_from != null && log.depth_to != null && byHole.has(log.hole_id))
+      .filter(
+        (log) =>
+          log.depth_from != null &&
+          log.depth_to != null &&
+          byHole.has(log.hole_id) &&
+          (!filters?.highGradeOnly || Number(log.au_gpt ?? 0) >= 1),
+      )
       .map((log, index) => {
         const hole = byHole.get(log.hole_id)!;
         return {
@@ -225,7 +238,7 @@ export function useDrillTrajectoriesLayer(
           au: Number(log.au_gpt ?? 0),
         };
       });
-  }, [holes, logs, centerLng, centerLat]);
+  }, [holes, logs, centerLng, centerLat, filters?.highGradeOnly]);
 
   useEffect(() => {
     const entries: AnchorEntry[] = trajectories.map((trajectory) => ({
