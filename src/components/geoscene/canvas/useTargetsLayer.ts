@@ -5,6 +5,7 @@ import { ScatterplotLayer } from "@deck.gl/layers";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 import type { GeoSceneFilters } from "../types";
+import { sceneTargetPassesCampaign } from "../filterPolicy";
 
 const PRIORITY_COLOR: Record<string, [number, number, number]> = {
   critical: [239, 68, 68],
@@ -27,7 +28,7 @@ export function useTargetsLayer(
           (target) =>
             target.lat != null &&
             target.lng != null &&
-            (!filters?.campaignId || target.campaign_id === filters.campaignId),
+            sceneTargetPassesCampaign(target.campaign_id, filters?.campaignId),
         )
         .map((t) => ({
           code: t.code,
