@@ -4,6 +4,7 @@ import { useEffect, useMemo } from "react";
 import { ColumnLayer } from "@deck.gl/layers";
 import { useDrillHoles } from "@/hooks/useDrilling";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
+import type { GeoSceneFilters } from "../types";
 
 type LooseHole = {
   hole_id: string;
@@ -12,6 +13,7 @@ type LooseHole = {
   planned_depth?: number | null;
   easting?: number | null;
   northing?: number | null;
+  started_at?: string | null;
 };
 
 const STATUS_COLOR: Record<string, [number, number, number]> = {
@@ -33,6 +35,7 @@ export function useDrillHolesLayer(
   centerLng: number,
   centerLat: number,
   visibility: DrillHoleLayerVisibility,
+  filters?: GeoSceneFilters,
 ) {
   const { data: holes } = useDrillHoles(projectId);
 
@@ -40,7 +43,13 @@ export function useDrillHolesLayer(
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
     const list = (holes ?? []) as unknown as LooseHole[];
     return list
-      .filter((hole) => hole.easting != null && hole.northing != null)
+      .filter((hole) => {
+        if (hole.easting == null || hole.northing == null) return false;
+        if (filters?.timeCursor == null) return true;
+        if (!hole.started_at) return false;
+        const started = Date.parse(hole.started_at);
+        return Number.isFinite(started) && started <= filters.timeCursor;
+      })
       .map((hole) => ({
         code: hole.hole_id,
         lng: centerLng + Number(hole.easting) / mPerDegLng,
@@ -48,7 +57,7 @@ export function useDrillHolesLayer(
         depth: Number(hole.actual_depth ?? hole.planned_depth ?? 100),
         status: (hole.status ?? "planned").toLowerCase(),
       }));
-  }, [holes, centerLng, centerLat]);
+  }, [holes, centerLng, centerLat, filters?.timeCursor]);
 
   useEffect(() => {
     const entries: AnchorEntry[] = points.map((point) => ({
