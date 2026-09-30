@@ -57,15 +57,15 @@ explicit first.
 
 ### Map3DView
 
-Still used by the Operations 2D/3D toggle because it accepts campaign/time-filtered holes, logs and
-targets directly. Replacing it immediately with GeoScene3D would silently drop those filters.
+Operations now uses GeoScene3D with the canonical filter contract. `Map3DView` is reference-only
+and retained for a short QA window while Actions CI is unavailable.
 
-Required before retirement:
+Implemented parity:
 
-1. canonical scene filter contract;
-2. campaign id support;
-3. time cursor support;
-4. snapshot manifest records those filters.
+1. campaign-aware target filtering;
+2. drilling time cursor filtering;
+3. high-grade intercept filtering;
+4. deterministic `data-geo-filters` metadata for snapshots.
 
 ### Cholqui public viewer
 
