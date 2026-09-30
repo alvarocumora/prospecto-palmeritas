@@ -16,9 +16,10 @@ describe("legacy viewer retirement registry", () => {
     expect(deletableLegacyViewers()).toHaveLength(0);
   });
 
-  it("documents the operations 3D filter-parity blocker", () => {
+  it("marks the legacy Operations 3D renderer as reference-only after filter parity", () => {
     const map3d = LEGACY_VIEWER_REGISTRY.find((viewer) => viewer.id === "map-3d-view");
-    expect(map3d?.status).toBe("active_compatibility");
-    expect(map3d?.blocker).toContain("campaign/time-filter");
+    expect(map3d?.status).toBe("reference_only");
+    expect(map3d?.successor).toBe("GeoScene3D");
+    expect(map3d?.blocker).toContain("Actions CI");
   });
 });
