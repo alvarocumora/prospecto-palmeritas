@@ -57,10 +57,10 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "map-3d-view",
     path: "src/components/map/Map3DView.tsx",
-    status: "active_compatibility",
+    status: "reference_only",
     successor: "GeoScene3D",
-    uniqueCapability: "Receives route-filtered holes/logs/targets directly",
-    blocker: "Port campaign/time-filter semantics before replacing the Operations 3D toggle",
+    uniqueCapability: "Historical props-based Operations 3D renderer",
+    blocker: "Keep for one QA window until Actions CI can validate the canonical replacement",
   },
   {
     id: "lv5-page5-preview",
