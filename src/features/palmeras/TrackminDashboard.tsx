@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ProjectMap } from "@/components/ProjectMap";
+import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 import { GeophysicsModule } from "@/components/Geophysics";
 import { useGeologyData } from "@/hooks/useGeologyData";
 
@@ -358,7 +358,11 @@ function Overview() {
         <SectionTitle icon={MapPin} sub="Vetas · Palmeras · Collares DDH">
           Mapa Geológico Interactivo
         </SectionTitle>
-        <ProjectMap />
+        <CanonicalProjectViewer
+          profileKey="palmeras"
+          heightClassName="h-[620px]"
+          compactHeader
+        />
       </Card>
 
       <Card delay={400} className="p-6">

@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
 import { CholquiMasterViewer } from "./components/CholquiMasterViewer";
+import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 import { CholquiTargetsSummary } from "./components/CholquiTargetsSummary";
 import { Toki2DemPanel } from "./components/Toki2DemPanel";
 
@@ -72,12 +73,16 @@ export function FrancoDashboard({ authenticated = false }: { authenticated?: boo
         />
 
         <div id="inteligencia" className="scroll-mt-24 space-y-4">
-          <CholquiMasterViewer />
+          {authenticated ? (
+            <CanonicalProjectViewer profileKey="cholqui" />
+          ) : (
+            <CholquiMasterViewer />
+          )}
           <CholquiTargetsSummary />
         </div>
 
         <div id="terreno" className="scroll-mt-24">
-          <Toki2DemPanel />
+          <Toki2DemPanel authenticated={authenticated} />
         </div>
 
         <div id="economia" className="scroll-mt-24">
