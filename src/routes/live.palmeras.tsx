@@ -21,7 +21,7 @@ function LiveMapPalmerasPage() {
   return (
     <div>
       <DemoLiveBanner />
-      <TrackminGeoIntel />
+      <TrackminGeoIntel publicMode />
     </div>
   );
 }

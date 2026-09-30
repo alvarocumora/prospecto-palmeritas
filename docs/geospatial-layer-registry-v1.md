@@ -144,8 +144,15 @@ preset over its parent Cholqui project. Public/live compatibility viewers remain
 verifies anonymous-data parity and retires duplicate engines.
 
 ### GEO-VIEW-05 — retire duplicates
-Deprecate/remove standalone satellite and legacy viewers after feature parity. Keep Field and
-Public as separate experiences, but never separate evidence definitions.
+**05A implemented:** authenticated `ProjectMap` is now centered on the active project and no longer
+loads Palmeras static AOI/veins/palms/workings/drill/anomaly geometry by default. Those assets are
+lazy-loaded only by the explicit Palmeras public compatibility mode. Remaining duplicate viewers
+are tracked in `legacyViewerRegistry.ts` with successors and parity blockers.
+
+**05B pending:** migrate anonymous Cholqui/Los Verdes public data contracts and the Operations
+campaign/time-filter semantics to canonical adapters, then delete the corresponding compatibility
+renderers. Field and Public remain distinct experiences, but must converge on the same evidence
+definitions.
 
 ### GEO-VIEW-06 — reports and snapshots
 Persist visible canonical layer ids, bounds, timestamp, CRS, source and provenance in the
