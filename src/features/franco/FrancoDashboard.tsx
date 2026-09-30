@@ -1,8 +1,9 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { CholquiHero } from "./components/CholquiHero";
-import { CholquiMasterViewer } from "./components/CholquiMasterViewer";
 import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
+import { PublicCanonicalMap } from "@/components/geo/PublicCanonicalMap";
+import { buildCholquiPublicGeoBundle } from "./cholquiPublicGeo";
 import { CholquiTargetsSummary } from "./components/CholquiTargetsSummary";
 import { Toki2DemPanel } from "./components/Toki2DemPanel";
 
@@ -22,6 +23,7 @@ import { downloadCholquiInvestmentPdf, downloadCholquiInvestmentTeaserPdf } from
 export function FrancoDashboard({ authenticated = false }: { authenticated?: boolean }) {
   const [downloading, setDownloading] = useState(false);
   const [downloadingTeaser, setDownloadingTeaser] = useState(false);
+  const publicGeoBundle = useMemo(() => buildCholquiPublicGeoBundle(), []);
 
   const handleDownload = useCallback(async () => {
     setDownloading(true);
@@ -76,7 +78,7 @@ export function FrancoDashboard({ authenticated = false }: { authenticated?: boo
           {authenticated ? (
             <CanonicalProjectViewer profileKey="cholqui" />
           ) : (
-            <CholquiMasterViewer />
+            <PublicCanonicalMap bundle={publicGeoBundle} height={620} />
           )}
           <CholquiTargetsSummary />
         </div>

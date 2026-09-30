@@ -30,6 +30,29 @@ export type PublicGeoManifest = {
   layers: PublicGeoLayerManifestEntry[];
 };
 
+export type PublicGeoFeature = {
+  type: "Feature";
+  id?: string | number;
+  geometry: GeoJSON.Geometry | null;
+  properties: Record<string, unknown>;
+};
+
+export type PublicGeoFeatureCollection = {
+  type: "FeatureCollection";
+  features: PublicGeoFeature[];
+};
+
+export type PublicGeoLayerData = Partial<
+  Record<CanonicalGeoLayerId, PublicGeoFeatureCollection>
+>;
+
+export type PublicGeoBundle = {
+  manifest: PublicGeoManifest;
+  center: [number, number];
+  bbox: [number, number, number, number] | null;
+  layers: PublicGeoLayerData;
+};
+
 export function buildPublicGeoManifest(
   project: PublicGeoProjectRef,
   requestedLayerIds?: readonly CanonicalGeoLayerId[],
@@ -60,4 +83,14 @@ export function buildPublicGeoManifest(
     project,
     layers,
   };
+}
+
+export function isCertificationEvidence(evidence: GeoEvidenceClass): boolean {
+  return evidence === "OFICIAL" || evidence === "CERTIFICADO" || evidence === "MEDIDO";
+}
+
+export function publicBundleLayerIds(bundle: PublicGeoBundle): CanonicalGeoLayerId[] {
+  return bundle.manifest.layers
+    .map((layer) => layer.id)
+    .filter((id) => id === "territory.dem" || Boolean(bundle.layers[id]));
 }
