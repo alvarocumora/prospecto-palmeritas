@@ -232,7 +232,7 @@ function LiveLosVerdesPage() {
   const [genBusy, setGenBusy] = useState(false);
   const [aiTarget, setAiTarget] = useState<{ code: string; name: string } | null>(null);
   const [mounted, setMounted] = useState(false);
-  // Visor 3D gated on-demand: evita que un crash del monolito tumbe toda la página.
+  // Visor 3D canónico bajo demanda: aísla fallos gráficos del resto de la ficha pública.
   const [engineOn, setEngineOn] = useState(false);
   const [engineKey, setEngineKey] = useState(0);
   const [qr, setQr] = useState<string | null>(null);
@@ -314,6 +314,7 @@ function LiveLosVerdesPage() {
       );
       // Refresca capas y reporte
       layersQ.refetch();
+      mapDataQ.refetch();
       reportQ.refetch();
     } catch (e) {
       toast.error(`Error: ${e instanceof Error ? e.message : String(e)}`, { id: tid });
@@ -554,7 +555,7 @@ function LiveLosVerdesPage() {
                 className="h-7 text-[11px]"
               >
                 <Box className="w-3 h-3 mr-1" />
-                {engineOn ? "Ocultar 3D" : "Ver 3D (beta)"}
+                {engineOn ? "Ocultar 3D" : "Ver 3D"}
               </Button>
             </div>
           </div>
@@ -569,7 +570,7 @@ function LiveLosVerdesPage() {
           )}
         </section>
 
-        {/* Visor 3D bajo demanda (beta) */}
+        {/* Visor 3D público canónico bajo demanda */}
         {engineOn && (
           <section>
             <div className="flex items-center justify-between mb-2">
