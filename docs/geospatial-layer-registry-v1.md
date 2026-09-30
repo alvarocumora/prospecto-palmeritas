@@ -138,8 +138,10 @@ publishes its canonical layer manifest for snapshots and hides the legacy engine
 normal users. Legacy remains available only for explicit QA while feature parity is completed.
 
 ### GEO-VIEW-04 — project presets
-Replace viewer forks in Cholqui, Palmeras and Los Verdes with adapters/presets over canonical data.
-Toki 2 becomes a field-plan preset, not a new viewer.
+Implemented for the authenticated workspace: Cholqui, Palmeras and Los Verdes now enter the
+official 2D/3D engines through `CanonicalProjectViewer` profiles, and Toki 2 is a `toki2_field`
+preset over its parent Cholqui project. Public/live compatibility viewers remain until GEO-VIEW-05
+verifies anonymous-data parity and retires duplicate engines.
 
 ### GEO-VIEW-05 — retire duplicates
 Deprecate/remove standalone satellite and legacy viewers after feature parity. Keep Field and
