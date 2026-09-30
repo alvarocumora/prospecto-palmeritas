@@ -127,7 +127,7 @@ export function buildLosVerdesPublicGeoBundle(
       "territory.cadastre": featureCollection(mapData.concessions.features),
       "remote_sensing.sentinel2_alteration": satelliteFeatures(anomalies, satFallback),
       "remote_sensing.lineaments": lineamentFeatures(anomalies),
-      "geology.structures": veinFeatures(mining),
+      "geology.interpreted_structures": veinFeatures(mining),
       "geophysics.anomalies": magneticFeatures(anomalies, magFallback),
       "sampling.results": featureCollection(mapData.samples.features),
       "targets.exploration": featureCollection(mapData.targets.features),
