@@ -41,7 +41,9 @@ export function CanonicalProjectViewer({
 
   if (loading) {
     return (
-      <div className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary`}>
+      <div
+        className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary`}
+      >
         <div className="font-mono text-xs text-muted-foreground">Cargando proyecto…</div>
       </div>
     );
@@ -49,7 +51,9 @@ export function CanonicalProjectViewer({
 
   if (!targetProject) {
     return (
-      <div className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary p-6`}>
+      <div
+        className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary p-6`}
+      >
         <div className="max-w-md text-center">
           <div className="font-mono text-xs uppercase text-amber-500">
             Proyecto no disponible
@@ -67,6 +71,7 @@ export function CanonicalProjectViewer({
     <section
       className="overflow-hidden rounded border border-border bg-background"
       data-canonical-project-viewer={profile.key}
+      data-geo-profile={profile.key}
       data-project-id={targetProject.id}
     >
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg-secondary px-3 py-2.5">
@@ -86,7 +91,9 @@ export function CanonicalProjectViewer({
             type="button"
             onClick={() => setMode("2d")}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 ${
-              mode === "2d" ? "bg-gold text-background" : "text-muted-foreground hover:text-foreground"
+              mode === "2d"
+                ? "bg-gold text-background"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <MapIcon className="h-3 w-3" />
@@ -96,7 +103,9 @@ export function CanonicalProjectViewer({
             type="button"
             onClick={() => setMode("3d")}
             className={`inline-flex items-center gap-1.5 border-l border-border px-3 py-1.5 ${
-              mode === "3d" ? "bg-gold text-background" : "text-muted-foreground hover:text-foreground"
+              mode === "3d"
+                ? "bg-gold text-background"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             <Box className="h-3 w-3" />
@@ -114,12 +123,8 @@ export function CanonicalProjectViewer({
           </div>
         )}
 
-        {ready && mode === "2d" && (
-          <ProjectMap initialPreset={profile.twoD} fillHeight />
-        )}
-        {ready && mode === "3d" && (
-          <GeoScene3D initialPreset={profile.threeD} />
-        )}
+        {ready && mode === "2d" && <ProjectMap initialPreset={profile.twoD} fillHeight />}
+        {ready && mode === "3d" && <GeoScene3D initialPreset={profile.threeD} />}
       </div>
     </section>
   );
