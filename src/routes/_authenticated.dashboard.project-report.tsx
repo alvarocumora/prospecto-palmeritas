@@ -6,7 +6,6 @@ import { FileText } from "lucide-react";
 import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 import { resolveProjectViewerProfile } from "@/lib/geospatial/projectViewerProfiles";
 
-
 // Punto único de entrada a los reportes de proyecto piloto.
 // Detecta el proyecto activo y monta el feature correspondiente.
 export const Route = createFileRoute("/_authenticated/dashboard/project-report")({
