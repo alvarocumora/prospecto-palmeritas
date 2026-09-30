@@ -227,7 +227,11 @@ export function PublicCanonicalScene({
         activeIds.has("territory.dem") ? { source: "terrainDEM", exaggeration: 1.5 } : null,
       );
     } catch {
-      mapRef.current.setTerrain(null);
+      try {
+        mapRef.current.setTerrain(null);
+      } catch {
+        // Keep the pitched basemap available if terrain is unsupported.
+      }
     }
   }, [activeIds, ready]);
 
@@ -289,7 +293,9 @@ export function PublicCanonicalScene({
             radiusUnits: "meters",
             getPosition: (datum: PointDatum) => datum.position,
             getRadius: (datum: PointDatum) => {
-              if (meta.domain === "targets") return 130 + numericProperty(datum.properties, "score") * 3;
+              if (meta.domain === "targets") {
+                return 130 + numericProperty(datum.properties, "score") * 3;
+              }
               if (meta.domain === "geophysics") {
                 return Math.max(160, numericProperty(datum.properties, "radius_m"));
               }
