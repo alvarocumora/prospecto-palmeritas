@@ -25,10 +25,10 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "cholqui-master-viewer",
     path: "src/features/franco/components/CholquiMasterViewer.tsx",
-    status: "public_compatibility",
-    successor: "CanonicalProjectViewer(profile=cholqui)",
-    uniqueCapability: "Bundles current public Cholqui static catastro, assays and structures",
-    blocker: "Public RLS/server adapter for the same canonical domain data",
+    status: "reference_only",
+    successor: "PublicCanonicalMap + buildCholquiPublicGeoBundle",
+    uniqueCapability: "Historical all-in-one Cholqui public renderer",
+    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
   },
   {
     id: "satellite-map-viewer",
@@ -73,18 +73,18 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "losverdes-strategic-map",
     path: "src/components/live/LosVerdesStrategicMap.tsx",
-    status: "public_compatibility",
-    successor: "Future public canonical adapter",
-    uniqueCapability: "Anonymous public layers plus certification/filter UX",
-    blocker: "Public anonymous dataset contract and RLS parity",
+    status: "reference_only",
+    successor: "PublicCanonicalMap + buildLosVerdesPublicGeoBundle",
+    uniqueCapability: "Historical Los Verdes MapLibre presentation",
+    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
   },
   {
     id: "losverdes-public-scene",
     path: "src/components/live/LosVerdesPublicScene.tsx",
-    status: "public_compatibility",
-    successor: "Future public GeoScene3D adapter",
-    uniqueCapability: "Anonymous public 3D scene",
-    blocker: "Public 3D dataset contract and anonymous access parity",
+    status: "reference_only",
+    successor: "PublicCanonicalScene + buildLosVerdesPublicGeoBundle",
+    uniqueCapability: "Historical Los Verdes public deck.gl scene",
+    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
   },
 ];
 
