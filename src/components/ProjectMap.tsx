@@ -949,6 +949,7 @@ export function ProjectMap({
         className={`relative ${fillHeight ? "flex-1 min-h-0" : ""} ${isFullscreen ? "h-screen w-screen bg-background" : ""}`}
         data-geo-workbench="official-2d"
         data-geo-preset={initialPreset}
+        data-legacy-static-project-features={legacyStaticProjectFeatures ? "true" : "false"}
       >
         <div
           ref={containerRef}
@@ -1186,13 +1187,12 @@ export function ProjectMap({
                 · panel <strong>Capas</strong> arriba-derecha controla visibilidad y opacidad
               </span>
             </div>
-  
-            <div className="flex flex-wrap items-center gap-3">
-              <MagnetometryLegend stats={magStats} />
-              <GeologyLegend hostRock={lithoLegend} alteration={altLegend} />
-            </div>
           )}
 
+          <div className="flex flex-wrap items-center gap-3">
+            <MagnetometryLegend stats={magStats} />
+            <GeologyLegend hostRock={lithoLegend} alteration={altLegend} />
+          </div>
         </>
       )}
     </div>
