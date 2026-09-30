@@ -43,7 +43,7 @@ export function PublicGeoLayerControls({
           title="Mostrar sólo evidencia oficial, certificada o medida"
         >
           <ShieldCheck className="h-3 w-3" />
-          Certificación
+          Evidencia primaria
         </button>
       </div>
 
