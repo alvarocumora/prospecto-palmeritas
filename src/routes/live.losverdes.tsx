@@ -6,6 +6,7 @@ import {
   lazy,
   Suspense,
   useEffect,
+  useMemo,
   useState,
   type ErrorInfo,
   type ReactNode,
@@ -30,18 +31,18 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-// Visor estratégico 2D (focus exploración + certificación). El 3D queda
-// disponible bajo demanda para no bloquear el flujo principal.
-import { LosVerdesStrategicMap } from "@/components/live/LosVerdesStrategicMap";
-const LosVerdesPublicScene = lazy(() =>
-  import("@/components/live/LosVerdesPublicScene").then((m) => ({
-    default: m.LosVerdesPublicScene,
+import { PublicCanonicalMap } from "@/components/geo/PublicCanonicalMap";
+const PublicCanonicalScene = lazy(() =>
+  import("@/components/geo/PublicCanonicalScene").then((module) => ({
+    default: module.PublicCanonicalScene,
   })),
 );
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
 import { getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
+import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
+import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getTilamaReport } from "@/lib/tilama.functions";
 import { generateTilamaPdf } from "@/lib/tilama-pdf";
@@ -192,6 +193,7 @@ function priorityColor(p: string | null) {
 function LiveLosVerdesPage() {
   const fetchLayers = useServerFn(getLosVerdesPublicLayers);
   const fetchMining = useServerFn(getLosVerdesMining);
+  const fetchMapData = useServerFn(getLosVerdesMapData);
   const fetchReport = useServerFn(getTilamaReport);
 
   const layersQ = useQuery({
@@ -202,6 +204,11 @@ function LiveLosVerdesPage() {
   const miningQ = useQuery({
     queryKey: ["losverdes", "mining"],
     queryFn: () => fetchMining(),
+    staleTime: 5 * 60_000,
+  });
+  const mapDataQ = useQuery({
+    queryKey: ["losverdes", "canonical-public-map"],
+    queryFn: () => fetchMapData(),
     staleTime: 5 * 60_000,
   });
   const reportQ = useQuery({
@@ -305,6 +312,14 @@ function LiveLosVerdesPage() {
       setCatBusy(false);
     }
   };
+
+  const publicGeoBundle = useMemo(
+    () =>
+      layersQ.data && mapDataQ.data
+        ? buildLosVerdesPublicGeoBundle(layersQ.data.canonical, mapDataQ.data, miningQ.data)
+        : null,
+    [layersQ.data, mapDataQ.data, miningQ.data],
+  );
 
   const stats = reportQ.data?.stats;
   const totals = miningQ.data?.totals;
@@ -511,7 +526,7 @@ function LiveLosVerdesPage() {
               Visor estratégico · Catastro · Muestreo · Targets · Anomalías
             </h2>
             <div className="flex items-center gap-2">
-              {(layersQ.isLoading || miningQ.isLoading) && (
+              {(layersQ.isLoading || miningQ.isLoading || mapDataQ.isLoading) && (
                 <span className="font-mono text-[10px] text-muted-foreground">cargando datos…</span>
               )}
               <Button
@@ -526,7 +541,15 @@ function LiveLosVerdesPage() {
               </Button>
             </div>
           </div>
-          <LosVerdesStrategicMap height={620} />
+          {publicGeoBundle ? (
+            <PublicCanonicalMap bundle={publicGeoBundle} height={620} />
+          ) : (
+            <div className="grid h-[620px] place-items-center rounded-lg border border-border bg-bg-secondary font-mono text-[11px] text-muted-foreground">
+              {mapDataQ.error
+                ? "No fue posible cargar el contrato geoespacial público."
+                : "Preparando capas públicas canónicas…"}
+            </div>
+          )}
         </section>
 
         {/* Visor 3D bajo demanda (beta) */}
@@ -534,7 +557,7 @@ function LiveLosVerdesPage() {
           <section>
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-mono text-[11px] uppercase tracking-wider text-gold">
-                Engine 3D · Marching Cubes · IDW · Sondajes (beta)
+                Visor 3D público canónico · DEM · Evidencia trazable
               </h2>
             </div>
             <EngineErrorBoundary onReset={() => setEngineKey((k) => k + 1)}>
@@ -546,7 +569,13 @@ function LiveLosVerdesPage() {
                   </div>
                 }
               >
-                <LosVerdesPublicScene key={engineKey} height={640} />
+                {publicGeoBundle ? (
+                  <PublicCanonicalScene key={engineKey} bundle={publicGeoBundle} height={640} />
+                ) : (
+                  <div className="grid h-[640px] place-items-center font-mono text-[11px] text-muted-foreground">
+                    Preparando escena pública canónica…
+                  </div>
+                )}
               </Suspense>
             </EngineErrorBoundary>
           </section>
