@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
+import { ProjectMap } from "@/components/ProjectMap";
 import { GeophysicsModule } from "@/components/Geophysics";
 import { useGeologyData } from "@/hooks/useGeologyData";
 
@@ -222,7 +223,7 @@ function TopNav({
    MODULE 1 — OVERVIEW
    ============================================================ */
 
-function Overview() {
+function Overview({ publicMode = false }: { publicMode?: boolean }) {
   const metrics = [
     { label: "Tipo Depósito", value: "Epit–Meso", sub: "Au–Cu vetas" },
     { label: "Edad Roca Caja", value: "Cret. Sup.", sub: "Fm. Lo Valle" },
@@ -358,11 +359,18 @@ function Overview() {
         <SectionTitle icon={MapPin} sub="Vetas · Palmeras · Collares DDH">
           Mapa Geológico Interactivo
         </SectionTitle>
-        <CanonicalProjectViewer
-          profileKey="palmeras"
-          heightClassName="h-[620px]"
-          compactHeader
-        />
+        {publicMode ? (
+          <ProjectMap
+            initialPreset="public_live"
+            legacyStaticProjectFeatures
+          />
+        ) : (
+          <CanonicalProjectViewer
+            profileKey="palmeras"
+            heightClassName="h-[620px]"
+            compactHeader
+          />
+        )}
       </Card>
 
       <Card delay={400} className="p-6">
@@ -1456,7 +1464,7 @@ function Budget() {
    ROOT
    ============================================================ */
 
-export function TrackminGeoIntel() {
+export function TrackminGeoIntel({ publicMode = false }: { publicMode?: boolean } = {}) {
   const [active, setActive] = useState<TabId>("overview");
   const [exporting, setExporting] = useState(false);
 
@@ -1494,7 +1502,7 @@ export function TrackminGeoIntel() {
         </div>
 
         <div key={active} className="animate-fade-up">
-          {active === "overview" && <Overview />}
+          {active === "overview" && <Overview publicMode={publicMode} />}
           {active === "geology" && <Geology />}
           {active === "geophysics" && (
             <GeophysicsModule Card={Card} SectionTitle={SectionTitle} Badge={Badge} />
