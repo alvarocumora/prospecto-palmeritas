@@ -15,7 +15,8 @@ function isChunkLoadError(error: Error): boolean {
   );
 }
 
-function DefaultErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function DefaultErrorComponent({ error: rawError, reset }: { error: unknown; reset: () => void }) {
+  const error = rawError as Error;
   const router = useRouter();
 
   // Auto-recovery for stale chunk errors after a new deploy.
