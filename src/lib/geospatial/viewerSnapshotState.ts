@@ -66,10 +66,13 @@ export function buildManifestFromViewerDataset(
 }
 
 export function readGeoSnapshotManifest(
-  root: ParentNode = document,
+  root?: ParentNode,
   generatedAt?: string,
 ): GeoSnapshotManifest | null {
-  const element = root.querySelector<HTMLElement>(
+  const resolvedRoot = root ?? (typeof document !== "undefined" ? document : null);
+  if (!resolvedRoot) return null;
+
+  const element = resolvedRoot.querySelector<HTMLElement>(
     '[data-geo-engine][data-geo-project-id][data-geo-view-state]',
   );
   if (!element) return null;
