@@ -10,6 +10,11 @@ import mojonesRaw from "@/data/geo/cholqui_mojones.geojson?raw";
 
 import { CHOLQUI, CHOLQUI_ASSAYS, CHOLQUI_POINTS } from "./data/cholqui";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "./data/cholquiStructures";
+import { polygonCentroid } from "@/lib/cholqui/drillGrid";
+import {
+  anomalySurfaceToFeatureCollection,
+  buildAnomalySurface,
+} from "@/lib/geoscience/anomalySurface";
 import {
   buildPublicGeoManifest,
   type PublicGeoBundle,
@@ -102,13 +107,39 @@ function certifiedAssays(): PublicGeoFeatureCollection {
   };
 }
 
+/**
+ * Reinterpola el MISMO remote_sensing.sentinel2_alteration (z_score por
+ * anomalía) sobre una grilla continua — igual algoritmo que usaba
+ * ProjectMasterViewer (halosIntensidad). No vuelve a tocar Sentinel-2; es
+ * visualización derivada de datos que ya están en el bundle.
+ */
+function anomalyIntensityCollection(
+  anomalies: FeatureCollection,
+): PublicGeoFeatureCollection | null {
+  const points = anomalies.features.flatMap((feature) => {
+    const centroid = polygonCentroid(feature.geometry);
+    const zScore = Number(feature.properties?.z_score ?? feature.properties?.score);
+    if (!centroid || !Number.isFinite(zScore)) return [];
+    return [{ lat: centroid.lat, lng: centroid.lng, value: zScore }];
+  });
+  const surface = buildAnomalySurface(points, { unit: "z-score" });
+  if (!surface) return null;
+  return anomalySurfaceToFeatureCollection(surface) as PublicGeoFeatureCollection;
+}
+
 export function buildCholquiPublicGeoBundle(): PublicGeoBundle {
+  const anomalies = JSON.parse(anomaliesRaw) as FeatureCollection;
+  const intensity = anomalyIntensityCollection(anomalies);
+
   const layers: PublicGeoBundle["layers"] = {
+    // Primero: debe quedar DEBAJO de los demás layers en el orden de render
+    // de PublicCanonicalMap (itera bundle.manifest.layers en este orden).
+    ...(intensity ? { "remote_sensing.anomaly_intensity": intensity } : {}),
     "territory.cadastre": parse(concessionsRaw),
     "territory.pending_pedimentos": parse(pedimentosPendientesRaw),
     "territory.mojones": parse(mojonesRaw),
     "territory.proposed_pedimentos": parse(pedimentosRaw),
-    "remote_sensing.sentinel2_alteration": parse(anomaliesRaw),
+    "remote_sensing.sentinel2_alteration": asPublicCollection(anomalies),
     "geology.structures": asPublicCollection(CHOLQUI_STRUCTURES_GEOJSON),
     "geology.metallogenic_belts": parse(franjasRaw),
     "geology.known_deposits": parse(yacimientosRaw),

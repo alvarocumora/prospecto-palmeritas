@@ -173,3 +173,58 @@ export function anomalyIntensityColor(t: number): string {
   const b = Math.round(loC[2] + (hiC[2] - loC[2]) * f);
   return `rgb(${r},${g},${b})`;
 }
+
+/**
+ * Mismos 5 stops que `anomalyIntensityColor`, como pares [t, "#rrggbb"] para
+ * usar en una expresión data-driven de MapLibre (`interpolate`/`linear`) o
+ * en una leyenda CSS — evita duplicar la rampa en cada consumidor.
+ */
+export const ANOMALY_INTENSITY_COLOR_STOPS: ReadonlyArray<[number, string]> = [
+  [0, "#254299"],
+  [0.3, "#0ea5e9"],
+  [0.55, "#22c55e"],
+  [0.75, "#eab308"],
+  [1, "#d946ef"],
+];
+
+/**
+ * Convierte una AnomalySurface a un FeatureCollection de polígonos (un
+ * rectángulo por celda) en GeoJSON estándar — sin dependencias de Leaflet,
+ * MapLibre ni del contrato público; cada consumidor decide cómo pintarlo
+ * (color por `value`/`normalized` en sus properties).
+ */
+export function anomalySurfaceToFeatureCollection(surface: AnomalySurface): {
+  type: "FeatureCollection";
+  features: Array<{
+    type: "Feature";
+    id: string;
+    geometry: { type: "Polygon"; coordinates: number[][][] };
+    properties: { value: number; normalized: number; unit: string; sourceCount: number };
+  }>;
+} {
+  return {
+    type: "FeatureCollection",
+    features: surface.cells.map((cell, index) => ({
+      type: "Feature",
+      id: `intensity-cell-${index}`,
+      geometry: {
+        type: "Polygon",
+        coordinates: [
+          [
+            [cell.west, cell.south],
+            [cell.east, cell.south],
+            [cell.east, cell.north],
+            [cell.west, cell.north],
+            [cell.west, cell.south],
+          ],
+        ],
+      },
+      properties: {
+        value: cell.value,
+        normalized: cell.normalized,
+        unit: surface.unit,
+        sourceCount: surface.sourceCount,
+      },
+    })),
+  };
+}

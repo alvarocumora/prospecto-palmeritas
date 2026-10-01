@@ -9,6 +9,17 @@ import {
   type PublicGeoBundle,
 } from "@/lib/geospatial/publicGeoContract";
 import type { CanonicalGeoLayerId, GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
+import { ANOMALY_INTENSITY_COLOR_STOPS } from "@/lib/geoscience/anomalySurface";
+
+const INTENSITY_SURFACE_LAYER_ID: CanonicalGeoLayerId = "remote_sensing.anomaly_intensity";
+
+/** Expresión MapLibre `interpolate/linear` sobre la misma rampa que usa la leyenda. */
+const INTENSITY_FILL_COLOR = [
+  "interpolate",
+  ["linear"],
+  ["coalesce", ["get", "normalized"], 0],
+  ...ANOMALY_INTENSITY_COLOR_STOPS.flatMap(([stop, color]) => [stop, color]),
+] as unknown as maplibregl.ExpressionSpecification;
 
 const BASE_STYLE: StyleSpecification = {
   version: 8,
@@ -180,6 +191,23 @@ export function PublicCanonicalMap({
       const color = DOMAIN_COLOR[meta.domain];
       const kinds = geometryKinds(data as GeoJSON.FeatureCollection);
 
+      // Superficie IDW (celdas de grilla con `normalized` en vez de un color
+      // de dominio fijo): mismo lenguaje visual azul→magenta que ya usaba
+      // ProjectMasterViewer. Sin stroke — son celdas contiguas, una línea por
+      // celda se vería como una grilla, no como una superficie continua.
+      if (meta.id === INTENSITY_SURFACE_LAYER_ID) {
+        const id = `${sourceId}:fill`;
+        map.addLayer({
+          id,
+          type: "fill",
+          source: sourceId,
+          paint: { "fill-color": INTENSITY_FILL_COLOR, "fill-opacity": 0.45 },
+        });
+        renderedLayerIdsRef.current.push(id);
+        layerLookupRef.current.set(id, meta.id);
+        continue;
+      }
+
       if (kinds.polygon) {
         const id = `${sourceId}:fill`;
         map.addLayer({
@@ -267,6 +295,26 @@ export function PublicCanonicalMap({
           }
         />
       </div>
+
+      {visible.has(INTENSITY_SURFACE_LAYER_ID) && available.has(INTENSITY_SURFACE_LAYER_ID) && (
+        <div className="pointer-events-none absolute right-3 top-3 z-20 w-[11rem] rounded border border-border bg-background/95 p-2.5 shadow-lg backdrop-blur">
+          <div className="font-mono text-[9px] uppercase tracking-wider text-foreground">
+            Intensidad · IDW
+          </div>
+          <div
+            className="mt-1.5 h-2.5 w-full rounded-full"
+            style={{
+              background: `linear-gradient(to right, ${ANOMALY_INTENSITY_COLOR_STOPS.map(
+                ([stop, color]) => `${color} ${stop * 100}%`,
+              ).join(", ")})`,
+            }}
+          />
+          <div className="mt-1 flex justify-between font-mono text-[8px] text-muted-foreground">
+            <span>bajo</span>
+            <span>alto</span>
+          </div>
+        </div>
+      )}
 
       {selected && selectedMeta && (
         <div className="absolute bottom-3 right-3 z-20 w-[20rem] rounded border border-border bg-background/95 p-3 shadow-xl backdrop-blur">

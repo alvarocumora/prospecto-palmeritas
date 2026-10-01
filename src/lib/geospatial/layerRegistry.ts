@@ -300,7 +300,10 @@ export const GEO_LAYER_REGISTRY = [
     scaleLabel: "IDW · z-score",
     sourceSystem: "GeoCapitals",
     datasetType: "remote_sensing",
-    capabilities: ["2d", "3d", "report"],
+    // "public" agregado al portar la superficie IDW de ProjectMasterViewer
+    // (Cholqui) a PublicCanonicalMap — la definición ya existía pero sin
+    // datos ni renderer conectados a ningún preset público.
+    capabilities: ["2d", "3d", "public", "report"],
     legacyAliases: ["halosIntensidad"],
     caution: "Superficie interpolada; no es kriging ni medición continua en terreno.",
   }),
@@ -772,6 +775,7 @@ export const GEO_VIEWER_PRESETS: readonly GeoViewerPreset[] = [
       "territory.mojones",
       "territory.proposed_pedimentos",
       "territory.dem",
+      "remote_sensing.anomaly_intensity",
       "remote_sensing.sentinel2_alteration",
       "geology.structures",
       "geology.interpreted_structures",
