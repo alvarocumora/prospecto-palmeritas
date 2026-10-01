@@ -2,6 +2,7 @@
  * Modelo canónico de documento de proyecto.
  * Un proyecto se describe una sola vez y las plantillas globales leen desde aquí.
  */
+import type { GeoSnapshotManifest } from "@/lib/geospatial/snapshotManifest";
 import type { BarDatum, MapPoint, MapPolygon, Slice } from "./brand/kit";
 import type { EvidenceClass, ReportProfile } from "./architecture";
 
@@ -57,6 +58,8 @@ export type DocBlock =
       caption?: string;
       crs?: string;
       imagery?: string;
+      /** Runtime viewer evidence manifest captured with the same map image. */
+      snapshotManifest?: GeoSnapshotManifest;
     } & DocBlockMeta)
   | { kind: "gap"; title: string; body: string; action?: string }
   | { kind: "recommendation"; title: string; body: string; priority?: "high" | "medium" | "low" }
@@ -126,6 +129,7 @@ export type ProjectDoc = {
     source?: string;
     crs?: string;
     imagery?: string;
+    snapshotManifest?: GeoSnapshotManifest;
   };
   dataQuality?: DataQualityFlag[];
   milestones?: Array<{ when: string; what: string }>;
