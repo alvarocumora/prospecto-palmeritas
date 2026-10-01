@@ -26,6 +26,7 @@ import { HeroTopoBackground } from "@/features/marketing/HeroTopoBackground";
 import { Reveal } from "@/features/marketing/Reveal";
 import { Eyebrow } from "@/components/brand";
 import heroMining from "@/assets/hero-mining.jpg";
+import colateralCover from "@/assets/colateral/cover-maule.jpg";
 
 export function MarketingLanding() {
   const { t } = useLocale();
@@ -219,6 +220,64 @@ export function MarketingLanding() {
           <InvestableProjects />
         </div>
       </section>
+
+      {/* 2b. INVERSIÓN CON COLATERAL INMOBILIARIO */}
+      <section id="colateral" className="border-b border-hairline bg-white">
+        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
+          <Reveal>
+            <div>
+              <Eyebrow className="mb-3">Inversión con colateral</Eyebrow>
+              <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
+                Invierte en minería con una parcela real en garantía.
+              </h2>
+              <p className="mt-3 text-content-muted max-w-xl">
+                Desde $25 MM, UF + 12 % anual con pago mensual. Te entregamos en garantía una
+                parcela con rol individual en Hualañé o Licantén, Región del Maule.
+              </p>
+              <div className="mt-6 grid grid-cols-3 gap-px bg-hairline border border-hairline rounded-sm overflow-hidden">
+                {[
+                  { v: "UF + 12 %", l: "Tasa anual" },
+                  { v: "$250.000", l: "Interés/mes por $25 MM" },
+                  { v: "116", l: "Parcelas en cartera" },
+                ].map((k) => (
+                  <div key={k.l} className="bg-white px-4 py-4">
+                    <div className="font-mono text-xl text-content">{k.v}</div>
+                    <div className="text-[10px] font-mono uppercase tracking-widest text-content-muted mt-1">
+                      {k.l}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <Link
+                  to="/inversion-colateral"
+                  className="inline-flex items-center gap-2 h-11 px-5 bg-content text-white text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-accent-brand transition-colors"
+                >
+                  Simular y ver parcelas <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+              <p className="mt-4 text-[11px] text-content-muted">
+                Tasa pactada por contrato, no proyección minera. No es oferta pública de valores.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal>
+            <Link to="/inversion-colateral" className="group block relative overflow-hidden border border-hairline">
+              <img
+                src={colateralCover}
+                alt="Valle rural del Maule (imagen ilustrativa)"
+                loading="lazy"
+                className="w-full h-80 object-cover group-hover:scale-[1.02] transition-transform duration-700"
+              />
+              <span className="absolute bottom-0 inset-x-0 bg-white/85 px-4 py-2 text-[11px] font-mono text-content-muted">
+                Imagen ilustrativa · Hualañé 41,75 ha · Licantén 44 ha
+              </span>
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+
 
       {/* ─────────────────────────────────────────────
           3. CATASTRO LIVE

@@ -120,6 +120,21 @@ function InvPage() {
         </ol>
       </div>
 
+      <Link
+        to="/inversion-colateral"
+        className="mb-16 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-accent-brand bg-accent-brand-subtle p-6 hover:shadow-md transition"
+      >
+        <div>
+          <Eyebrow className="mb-1">Nuevo · Inversión con colateral</Eyebrow>
+          <div className="brand-display text-xl text-content">
+            UF + 12 % anual con pago mensual y una parcela en garantía en el Maule.
+          </div>
+        </div>
+        <span className="text-sm text-accent-brand inline-flex items-center gap-1.5 font-medium">
+          Simular mi inversión <ArrowRight className="w-4 h-4" />
+        </span>
+      </Link>
+
       {/* Fichas de inversión de los proyectos showcase (fuente única: fichas.ts) */}
       <div className="mb-16">
         <div className="flex items-end justify-between flex-wrap gap-3 mb-5">
