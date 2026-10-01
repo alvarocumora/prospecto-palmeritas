@@ -119,6 +119,7 @@ import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './ro
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
 import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
+import { Route as AuthenticatedDashboardInversionColateralRouteImport } from './routes/_authenticated.dashboard.inversion-colateral'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
@@ -770,6 +771,12 @@ const AuthenticatedDashboardInvestmentsRoute =
     path: '/dashboard/investments',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardInversionColateralRoute =
+  AuthenticatedDashboardInversionColateralRouteImport.update({
+    id: '/dashboard/inversion-colateral',
+    path: '/dashboard/inversion-colateral',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardInventoryRoute =
   AuthenticatedDashboardInventoryRouteImport.update({
     id: '/dashboard/inventory',
@@ -1242,6 +1249,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1417,6 +1425,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1594,6 +1603,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/_authenticated/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/_authenticated/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/_authenticated/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1771,6 +1781,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/inversion-colateral'
     | '/dashboard/investments'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
@@ -1946,6 +1957,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/inversion-colateral'
     | '/dashboard/investments'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
@@ -2122,6 +2134,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
+    | '/_authenticated/dashboard/inversion-colateral'
     | '/_authenticated/dashboard/investments'
     | '/_authenticated/dashboard/listings'
     | '/_authenticated/dashboard/lv5-page5'
@@ -3067,6 +3080,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardInvestmentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/inversion-colateral': {
+      id: '/_authenticated/dashboard/inversion-colateral'
+      path: '/dashboard/inversion-colateral'
+      fullPath: '/dashboard/inversion-colateral'
+      preLoaderRoute: typeof AuthenticatedDashboardInversionColateralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/inventory': {
       id: '/_authenticated/dashboard/inventory'
       path: '/dashboard/inventory'
@@ -3638,6 +3658,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
+  AuthenticatedDashboardInversionColateralRoute: typeof AuthenticatedDashboardInversionColateralRoute
   AuthenticatedDashboardInvestmentsRoute: typeof AuthenticatedDashboardInvestmentsRoute
   AuthenticatedDashboardListingsRoute: typeof AuthenticatedDashboardListingsRouteWithChildren
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
@@ -3722,6 +3743,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
+  AuthenticatedDashboardInversionColateralRoute:
+    AuthenticatedDashboardInversionColateralRoute,
   AuthenticatedDashboardInvestmentsRoute:
     AuthenticatedDashboardInvestmentsRoute,
   AuthenticatedDashboardListingsRoute:
