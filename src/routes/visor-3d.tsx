@@ -60,7 +60,8 @@ export const Route = createFileRoute("/visor-3d")({
   notFoundComponent: () => <p className="p-10 text-center">Escena no disponible.</p>,
 });
 
-function Visor3DError({ error }: { error: Error }) {
+function Visor3DError({ error: rawError }: { error: unknown }) {
+  const error = rawError as Error;
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />
