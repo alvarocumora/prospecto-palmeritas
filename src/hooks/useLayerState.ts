@@ -20,14 +20,19 @@ export function readStoredLayerState(): LayerStateMap {
   }
 }
 
+function publishState(state: LayerStateMap) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<LayerStateMap>(MAP_LAYER_STATE_EVENT, { detail: state }));
+}
+
 function writeStorage(state: LayerStateMap) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(MAP_LAYER_STATE_STORAGE_KEY, JSON.stringify(state));
-    window.dispatchEvent(new CustomEvent<LayerStateMap>(MAP_LAYER_STATE_EVENT, { detail: state }));
   } catch {
-    /* ignore quota */
+    /* ignore quota; runtime snapshot state still needs to be published */
   }
+  publishState(state);
 }
 
 export function useLayerState(defaults: LayerStateMap) {
