@@ -145,15 +145,15 @@
     "vitest": "^3.0.5"
   },
   "overrides": {
-    "seroval": "^1.6.0"
+    "seroval": "^1.6.8"
   },
   "resolutions": {
-    "seroval": "^1.6.0"
+    "seroval": "^1.6.8"
   },
   "pnpm": {
     "overrides": {
       "entities": "4.5.0",
-      "seroval": "^1.6.0"
+      "seroval": "^1.6.8"
     }
   }
 }
