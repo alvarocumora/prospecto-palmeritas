@@ -17,26 +17,30 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "project-master-viewer",
     path: "src/components/geo/ProjectMasterViewer.tsx",
-    status: "public_compatibility",
+    status: "active_compatibility",
     successor: "ProjectMap + Canonical Geospatial Layer Registry",
-    uniqueCapability: "Static/public GeoJSON adapter used by Cholqui live",
-    blocker: "Anonymous/public data parity before Cholqui live can use the canonical adapter",
+    uniqueCapability:
+      "IDW intensity-surface layer, grouped/collapsible evidence legend with per-section caution notes — no canonical equivalent yet",
+    blocker:
+      "/live/cholqui already migrated to the canonical adapter (public parity is done), but /terminal/cholqui (ProjectTerminalShell, no auth gate) still renders this via CholquiMasterViewer for the 2D tab. Port the IDW intensity surface + grouped legend to the canonical stack before retiring.",
   },
   {
     id: "cholqui-master-viewer",
     path: "src/features/franco/components/CholquiMasterViewer.tsx",
-    status: "reference_only",
+    status: "active_compatibility",
     successor: "PublicCanonicalMap + buildCholquiPublicGeoBundle",
     uniqueCapability: "Historical all-in-one Cholqui public renderer",
-    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
+    blocker:
+      'Still the live 2D renderer for /terminal/cholqui (src/features/terminal/ProjectTerminalShell.tsx:220, view === "2d") — a real, unauthenticated route, not just a QA fallback. Not safe to delete until the terminal shell is migrated to CanonicalProjectViewer or an equivalent.',
   },
   {
     id: "satellite-map-viewer",
     path: "src/components/satellite/SatelliteMapViewer.tsx",
-    status: "reference_only",
+    status: "active_compatibility",
     successor: "ProjectMap canonical remote_sensing layers",
     uniqueCapability: "InSAR, hyperspectral and DEM-diff presentation patterns",
-    blocker: "Verify every product is exposed as a canonical layer before file removal",
+    blocker:
+      "Still the live renderer at /dashboard/satellite-intel (src/routes/_authenticated.dashboard.satellite-intel.tsx:99), not behind any legacy/QA switch. Verify every product is exposed as a canonical layer, then migrate that route, before file removal.",
   },
   {
     id: "geology-3d-viewer",
@@ -74,10 +78,11 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "losverdes-strategic-map",
     path: "src/components/live/LosVerdesStrategicMap.tsx",
-    status: "reference_only",
+    status: "active_compatibility",
     successor: "PublicCanonicalMap + buildLosVerdesPublicGeoBundle",
     uniqueCapability: "Historical Los Verdes MapLibre presentation",
-    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
+    blocker:
+      "Still the live renderer for /terminal/losverdes (src/features/terminal/ProjectTerminalShell.tsx:234) — a real, unauthenticated route, not just a QA fallback. /live/losverdes itself is already migrated to PublicCanonicalMap. Not safe to delete until the terminal shell is migrated.",
   },
   {
     id: "losverdes-public-scene",
