@@ -125,10 +125,15 @@ function CollateralPage() {
               Región del Maule.
             </p>
           </div>
+          <div className="flex flex-col gap-2">
+          <Link to="/dashboard/colateral-documentos" className="text-sm text-accent-brand underline">
+            Documentos legales de los valles
+          </Link>
           <Button onClick={download} disabled={busy} size="lg">
             {busy ? <Loader2 className="animate-spin" /> : <FileDown />}
             Descargar deck (PDF)
           </Button>
+          </div>
         </header>
 
         <figure className="mt-8 relative overflow-hidden border border-hairline">
