@@ -1,8 +1,20 @@
 -- ============================================================================
 -- GEO-2026-004 — Nahuelbuta REE
--- Script de carga idempotente para el deal, el proyecto, los 7 pedimentos,
--- la ficha técnica (project_facts), las 2 alertas (follow_up_tasks) y el
--- comparable (deal_comparables) descritos en la ficha entregada 01-10-2026.
+-- Script de carga idempotente para el proyecto, los 7 pedimentos, la ficha
+-- técnica completa (project_facts, incluye estructura de negocio, QP
+-- propuesto, estándar objetivo y el comparable Trinity One Metals) y las 2
+-- alertas (follow_up_tasks) descritas en la ficha entregada 01-10-2026.
+--
+-- NO usa la tabla `deals` (ni deal_comparables ni deal_certifier_assignments):
+-- `public.deals` está marcada DEPRECADA en el propio schema —
+-- supabase/migrations/20260821230028_1fe2541e-53e9-4046-87a9-e20ab68afc31.sql:1
+-- dice textualmente "reemplazada por property_deal_inquiries +
+-- deal_stage_events ... No usar en UI ni en métricas". Esas dos tablas de
+-- reemplazo modelan el flujo de VENTA (un comprador externo consultando un
+-- property_listing publicado) y no encajan con una oportunidad de
+-- adquisición sourceada internamente como esta — así que en vez de forzar
+-- un modelo que no corresponde, todo el contenido de "deal" (código,
+-- estructura de negocio, comparable, QP) vive como filas de project_facts.
 --
 -- CÓMO CORRERLO
 --   Este sandbox de Claude Code no tiene credenciales de la base en vivo
@@ -22,11 +34,11 @@
 --      organización (toma la más antigua via organization_members). Si
 --      tiene varias organizaciones y no es la que corresponde, fijá
 --      v_org_id a mano.
---   3) El QP (Enrique Viteri) NO se carga: qualified_persons exige
---      user_id + license_no + registration_body reales, que no vinieron en
---      la ficha y que no se deben inventar (son datos de acreditación
---      profesional real). Al final del script queda el bloque comentado
---      con placeholders — completalo cuando tengas esos tres datos.
+--   3) El QP (Enrique Viteri) NO se carga en qualified_persons: esa tabla
+--      exige user_id + license_no + registration_body reales, que no
+--      vinieron en la ficha y que no se deben inventar (son datos de
+--      acreditación profesional real). Queda solo como project_facts
+--      ("QP propuesto", sección legal) hasta tener esos tres datos.
 --
 -- ⚠ HALLAZGO QUE NO SE PUDO VERIFICAR Y QUE SE CARGA TAL CUAL VINO, CON
 --   ALERTA REFORZADA (no se "corrigió" nada — ver sección PEDIMENTOS):
@@ -50,8 +62,6 @@ DECLARE
   v_org_id          uuid;
   v_project_code    text := 'NAHUELBUTA-REE';
   v_project_id      uuid;
-  v_deal_code       text := 'GEO-2026-004';
-  v_deal_id         uuid;
 BEGIN
   -- ---- resolver creador y organización ----
   SELECT id INTO v_creator_id FROM auth.users WHERE email = v_creator_email LIMIT 1;
@@ -82,35 +92,6 @@ BEGIN
       'REE', 'Biobío / Araucanía', 'Chile', -37.717, -73.033, 'pedimento', false
     )
     RETURNING id INTO v_project_id;
-  END IF;
-
-  -- ============================================================
-  -- DEAL
-  -- ============================================================
-  SELECT id INTO v_deal_id FROM public.deals WHERE code = v_deal_code;
-  IF v_deal_id IS NULL THEN
-    INSERT INTO public.deals (
-      created_by, project_id, code, name, description,
-      commodity, region, deal_status, acquisition_structure, acquisition_terms
-    ) VALUES (
-      v_creator_id, v_project_id, v_deal_code, 'Nahuelbuta REE',
-      'REE ion-adsorción (IAD), análogo Jiangxi. Batolito Costero Sur, granitoides tipo-S Carbonífero-Pérmico. 7 pedimentos de 5.000 ha (PRELIMINAR, sin verificar en SIGEX).',
-      'REE', 'Biobío / Araucanía', 'pedimento_pre_exploracion', 'opcion_o_jv_major',
-      jsonb_build_object(
-        'modelo_preferido', 'Opción o JV con major canadiense/australiano',
-        'exits', jsonb_build_array('JV (BHP/Rio Tinto)', 'Venta a fondo TSX-V', 'Listing', 'Royalty NSR'),
-        'estandar_objetivo', jsonb_build_array('NI 43-101 (TSX-V/CSE)', 'CH 20235 CMC Chile'),
-        'owner_nombre', 'Álvaro Oliva Herrera',
-        'owner_email', 'aoliva@ligniumenergy.com',
-        'qp_propuesto', jsonb_build_object(
-          'nombre', 'Enrique Viteri Aldunate',
-          'telefono', '+56 9 82896199',
-          'email', 'enriqueviteri@gmail.com',
-          'estado', 'PROPUESTO — no contratado aún'
-        )
-      )
-    )
-    RETURNING id INTO v_deal_id;
   END IF;
 
   -- ============================================================
@@ -244,20 +225,11 @@ BEGIN
     (v_project_id, v_creator_id, 'economico', 'Exits posibles', 'JV (BHP/Rio Tinto), venta a fondo TSX-V, listing, royalty NSR', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 24),
     (v_project_id, v_creator_id, 'economico', 'Comparable', 'Trinity One Metals (TSXV:TOM) — opción firmada 03-08-2026', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 25),
     (v_project_id, v_creator_id, 'otro', 'Data sheet publicado', 'https://claude.ai/artifact/S2uqRdgDWH8JE2aavE3a4K', NULL, 'declarado', 'ficha_geo_2026_004', 'DATA_SHEET_V1', 26),
-    (v_project_id, v_creator_id, 'otro', 'Referencias científicas', 'Bustos et al. (J. Geochem. Explor. 2023) · UC.cl REE Cordillera Costa Biobío · SERNAGEOMIN IR-25-122 (2025) · Metalogénesis Batolito Nahuelbuta (ResearchGate 2018)', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 27);
+    (v_project_id, v_creator_id, 'otro', 'Referencias científicas', 'Bustos et al. (J. Geochem. Explor. 2023) · UC.cl REE Cordillera Costa Biobío · SERNAGEOMIN IR-25-122 (2025) · Metalogénesis Batolito Nahuelbuta (ResearchGate 2018)', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 27),
+    (v_project_id, v_creator_id, 'activo', 'Código del deal', 'GEO-2026-004', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 28),
+    (v_project_id, v_creator_id, 'legal', 'Owner', 'Álvaro Oliva Herrera · aoliva@ligniumenergy.com', NULL, 'declarado', 'ficha_geo_2026_004', NULL, 29);
 
-  -- ============================================================
-  -- COMPARABLE (deal_comparables)
-  -- ============================================================
-  INSERT INTO public.deal_comparables (deal_id, comparable_project, country, year, notes)
-  SELECT v_deal_id, 'Trinity One Metals (TSXV:TOM)', 'Canadá', 2026,
-    'Opción firmada 03-08-2026 — comparable de estructura de negocio para Nahuelbuta REE.'
-  WHERE NOT EXISTS (
-    SELECT 1 FROM public.deal_comparables dc
-    WHERE dc.deal_id = v_deal_id AND dc.comparable_project = 'Trinity One Metals (TSXV:TOM)'
-  );
-
-  RAISE NOTICE 'GEO-2026-004 cargado. project_id=%, deal_id=%', v_project_id, v_deal_id;
+  RAISE NOTICE 'GEO-2026-004 cargado. project_id=%', v_project_id;
 END $$;
 
 -- ============================================================================
@@ -265,25 +237,20 @@ END $$;
 --   - ¿Ya tiene cuenta de usuario en Geocapitals? (user_id)
 --   - license_no (N° de registro profesional)
 --   - registration_body (ej. CMC Chile / otro colegio profesional)
--- Descomentar y completar cuando los tengas:
+-- No hay todavía una tabla no-deprecada que asocie un QP a un proyecto
+-- fuera del flujo de informes NI 43-101 (technical_reports.lead_qp_id) —
+-- crear un informe solo para registrar un QP "propuesto, no contratado"
+-- sería forzar ese modelo. Por ahora el QP propuesto queda documentado
+-- como project_facts (fila "QP propuesto" arriba); recién insertar en
+-- qualified_persons cuando estén esos 3 datos reales y se sepa cómo se
+-- va a asociar al proyecto/informe:
 --
--- DO $$
--- DECLARE
---   v_qp_id uuid;
---   v_deal_id uuid;
--- BEGIN
---   SELECT id INTO v_deal_id FROM public.deals WHERE code = 'GEO-2026-004';
---
---   INSERT INTO public.qualified_persons (user_id, full_name, profession, registration_body, license_no, competency_areas)
---   VALUES (
---     '<<TODO: user_id real de Enrique Viteri>>'::uuid,
---     'Enrique Viteri Aldunate', 'Geólogo',
---     '<<TODO: ej. CMC Chile>>', '<<TODO: N° de registro>>',
---     ARRAY['REE', 'geología de exploración']
---   )
---   RETURNING id INTO v_qp_id;
---
---   INSERT INTO public.deal_certifier_assignments (deal_id, qualified_person_id, discipline, standard, role, status)
---   VALUES (v_deal_id, v_qp_id, 'Geología', 'NI 43-101', 'QP', 'propuesto');
+-- INSERT INTO public.qualified_persons (user_id, full_name, profession, registration_body, license_no, competency_areas)
+-- VALUES (
+--   '<<TODO: user_id real de Enrique Viteri>>'::uuid,
+--   'Enrique Viteri Aldunate', 'Geólogo',
+--   '<<TODO: ej. CMC Chile>>', '<<TODO: N° de registro>>',
+--   ARRAY['REE', 'geología de exploración']
+-- );
 -- END $$;
 -- ============================================================================

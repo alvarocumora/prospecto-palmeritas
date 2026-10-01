@@ -1,17 +1,20 @@
-// Pipeline interno de adquisición: deals + pedimentos + ficha técnica +
-// alertas + comparables + QP propuesto. Lado de adquisición/opción —
-// distinto del marketplace de venta en /dashboard/deals ("Deal Flow").
+// Pipeline interno de adquisición: proyectos en fase pedimento + pedimentos +
+// ficha técnica + alertas. Lado de adquisición/opción — distinto del
+// marketplace de venta en /dashboard/deals ("Deal Flow"). Se apoya en
+// projects/pedimentos/project_facts/follow_up_tasks, no en `public.deals`
+// (ver nota en acquisitionProjects.functions.ts sobre por qué esa tabla
+// está deprecada y no corresponde acá).
 import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Compass, MapPin, ShieldAlert, FileText, Scale, Loader2 } from "lucide-react";
+import { Compass, MapPin, ShieldAlert, FileText, Loader2 } from "lucide-react";
 import {
-  listAcquisitionDeals,
-  getAcquisitionDealDetail,
-  type AcquisitionDealDetail,
+  listAcquisitionProjects,
+  getAcquisitionProjectDetail,
   type AcquisitionFact,
-} from "@/lib/acquisitionDeals.functions";
+  type AcquisitionProjectDetail,
+} from "@/lib/acquisitionProjects.functions";
 import {
   FACT_SECTION_LABELS,
   PROVENANCE_LABELS,
@@ -41,18 +44,18 @@ function groupBySection(facts: AcquisitionFact[]): Array<[FactSection, Acquisiti
 }
 
 function AcquisitionsPage() {
-  const list = useServerFn(listAcquisitionDeals);
-  const detail = useServerFn(getAcquisitionDealDetail);
+  const list = useServerFn(listAcquisitionProjects);
+  const detail = useServerFn(getAcquisitionProjectDetail);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const deals = useQuery({ queryKey: ["acquisition-deals"], queryFn: () => list() });
+  const projects = useQuery({ queryKey: ["acquisition-projects"], queryFn: () => list() });
 
-  const firstId = deals.data?.deals[0]?.id ?? null;
+  const firstId = projects.data?.projects[0]?.id ?? null;
   const activeId = selectedId ?? firstId;
 
-  const dealDetail = useQuery({
-    queryKey: ["acquisition-deal", activeId],
-    queryFn: () => detail({ data: { dealId: activeId as string } }),
+  const projectDetail = useQuery({
+    queryKey: ["acquisition-project", activeId],
+    queryFn: () => detail({ data: { projectId: activeId as string } }),
     enabled: !!activeId,
   });
 
@@ -64,63 +67,63 @@ function AcquisitionsPage() {
           Pipeline de Adquisición
         </h1>
         <p className="text-muted-foreground mt-1">
-          Deals internos de adquisición/opción de pedimentos y proyectos en fase pre-exploración —
-          ficha técnica, pedimentos, alertas y comparables en un solo lugar.
+          Proyectos en fase pedimento/pre-exploración que estamos evaluando adquirir — ficha
+          técnica, pedimentos y alertas en un solo lugar.
         </p>
       </header>
 
-      {deals.isLoading && (
+      {projects.isLoading && (
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
-          <Loader2 className="h-4 w-4 animate-spin" /> Cargando deals…
+          <Loader2 className="h-4 w-4 animate-spin" /> Cargando proyectos…
         </div>
       )}
-      {deals.data?.pending && (
+      {projects.data?.pending && (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-700">
           El pipeline de adquisición todavía no está migrado en esta base.
         </div>
       )}
-      {deals.data && !deals.data.pending && deals.data.deals.length === 0 && (
+      {projects.data && !projects.data.pending && projects.data.projects.length === 0 && (
         <div className="rounded-lg border border-border p-4 text-sm text-muted-foreground">
-          No hay deals de adquisición cargados todavía.
+          No hay proyectos en fase de adquisición cargados todavía.
         </div>
       )}
 
-      {deals.data && deals.data.deals.length > 0 && (
+      {projects.data && projects.data.projects.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-[22rem_1fr] gap-6">
           <div className="space-y-2">
-            {deals.data.deals.map((d) => (
+            {projects.data.projects.map((p) => (
               <button
-                key={d.id}
-                onClick={() => setSelectedId(d.id)}
+                key={p.id}
+                onClick={() => setSelectedId(p.id)}
                 className={`w-full text-left rounded-lg border p-3 transition-colors ${
-                  d.id === activeId ? "border-gold bg-gold/5" : "border-border hover:border-gold/50"
+                  p.id === activeId ? "border-gold bg-gold/5" : "border-border hover:border-gold/50"
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs text-muted-foreground">{d.code}</span>
-                  {d.openAlerts > 0 && (
+                  <span className="font-mono text-xs text-muted-foreground">{p.code}</span>
+                  {p.openAlerts > 0 && (
                     <span className="inline-flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-medium text-amber-700">
-                      <ShieldAlert className="h-3 w-3" /> {d.openAlerts}
+                      <ShieldAlert className="h-3 w-3" /> {p.openAlerts}
                     </span>
                   )}
                 </div>
-                <div className="font-semibold mt-0.5">{d.name}</div>
+                <div className="font-semibold mt-0.5">{p.name}</div>
                 <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-2">
-                  {d.commodity && <span>{d.commodity}</span>}
-                  {d.region && <span>· {d.region}</span>}
-                  <span>· {d.dealStatus}</span>
+                  {p.commodity && <span>{p.commodity}</span>}
+                  {p.region && <span>· {p.region}</span>}
+                  <span>· {p.status}</span>
                 </div>
               </button>
             ))}
           </div>
 
           <div>
-            {dealDetail.isLoading && (
+            {projectDetail.isLoading && (
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" /> Cargando ficha…
               </div>
             )}
-            {dealDetail.data && <DealDetailPanel detail={dealDetail.data} />}
+            {projectDetail.data && <ProjectDetailPanel detail={projectDetail.data} />}
           </div>
         </div>
       )}
@@ -128,26 +131,25 @@ function AcquisitionsPage() {
   );
 }
 
-function DealDetailPanel({ detail: d }: { detail: AcquisitionDealDetail }) {
+function ProjectDetailPanel({ detail: d }: { detail: AcquisitionProjectDetail }) {
   const sections = groupBySection(d.facts);
 
   return (
     <div className="space-y-6">
       <div className="rounded-lg border border-border p-4">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <h2 className="text-xl font-semibold">{d.deal.name}</h2>
-          <span className="font-mono text-xs text-muted-foreground">{d.deal.code}</span>
+          <h2 className="text-xl font-semibold">{d.project.name}</h2>
+          <span className="font-mono text-xs text-muted-foreground">{d.project.code}</span>
         </div>
-        {d.deal.description && (
-          <p className="text-sm text-muted-foreground mt-2">{d.deal.description}</p>
+        {d.project.description && (
+          <p className="text-sm text-muted-foreground mt-2">{d.project.description}</p>
         )}
         <div className="text-xs text-muted-foreground mt-2 flex flex-wrap gap-x-3">
-          <span>Estructura: {d.deal.acquisitionStructure}</span>
-          <span>Estado: {d.deal.dealStatus}</span>
-          {d.project && (
+          <span>Estado: {d.project.status}</span>
+          {d.project.centerLat != null && d.project.centerLng != null && (
             <span className="inline-flex items-center gap-1">
-              <MapPin className="h-3 w-3" /> {d.project.centerLat?.toFixed(3)} /{" "}
-              {d.project.centerLng?.toFixed(3)}
+              <MapPin className="h-3 w-3" /> {d.project.centerLat.toFixed(3)} /{" "}
+              {d.project.centerLng.toFixed(3)}
             </span>
           )}
         </div>
@@ -156,7 +158,7 @@ function DealDetailPanel({ detail: d }: { detail: AcquisitionDealDetail }) {
       {d.alerts.length > 0 && (
         <div className="space-y-2">
           <h3 className="text-sm font-semibold flex items-center gap-1.5">
-            <ShieldAlert className="h-4 w-4" /> Alertas
+            <ShieldAlert className="h-4 w-4" /> Alertas abiertas
           </h3>
           {d.alerts.map((a) => (
             <div key={a.id} className="rounded-lg border border-border p-3">
@@ -246,36 +248,6 @@ function DealDetailPanel({ detail: d }: { detail: AcquisitionDealDetail }) {
               </dl>
             </div>
           ))}
-        </div>
-      )}
-
-      {(d.comparables.length > 0 || d.certifiers.length > 0) && (
-        <div className="space-y-2">
-          <h3 className="text-sm font-semibold flex items-center gap-1.5">
-            <Scale className="h-4 w-4" /> Comparables y certificación
-          </h3>
-          {d.comparables.map((c) => (
-            <div key={c.id} className="rounded-lg border border-border p-3 text-xs">
-              <span className="font-medium">{c.comparableProject}</span>
-              {c.country && <span className="text-muted-foreground"> · {c.country}</span>}
-              {c.year && <span className="text-muted-foreground"> · {c.year}</span>}
-              {c.notes && <p className="text-muted-foreground mt-1">{c.notes}</p>}
-            </div>
-          ))}
-          {d.certifiers.map((c) => (
-            <div key={c.id} className="rounded-lg border border-border p-3 text-xs">
-              <span className="font-medium">{c.qualifiedPersonName ?? "QP sin nombre"}</span>
-              <span className="text-muted-foreground">
-                {" "}
-                · {c.discipline} · {c.standard} · {c.status}
-              </span>
-            </div>
-          ))}
-          {d.certifiers.length === 0 && (
-            <p className="text-xs text-muted-foreground">
-              Sin QP certificador cargado todavía (ver nota en la ficha técnica, sección Legal).
-            </p>
-          )}
         </div>
       )}
     </div>
