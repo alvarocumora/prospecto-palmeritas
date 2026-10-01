@@ -91,7 +91,7 @@ export function buildCollateralDeck(): ProjectDoc {
   return {
     reportProfile: "investment",
     code: "GC-COLATERAL",
-    name: "Invierte en minería con respaldo inmobiliario",
+    name: "Inversión con colateral",
     subtitle: "Financia el portafolio minero Geocapitals y recibe una parcela en garantía",
     commodity: "Portafolio",
     stage: "Programa de inversión",
