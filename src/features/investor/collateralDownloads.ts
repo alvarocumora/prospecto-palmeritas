@@ -28,6 +28,11 @@ async function toDataUrl(src: string, maxW = 1400): Promise<string | undefined> 
 }
 
 export async function downloadCollateralDoc(kind: "deck" | "teaser"): Promise<void> {
+  if (kind === "teaser") {
+    const { downloadCollateralMemo } = await import("@/lib/investor/collateralMemo");
+    await downloadCollateralMemo(publicUrl("/inversion-colateral"));
+    return;
+  }
   const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
   const [cover, plan, ve, ve2, hs, vs] = await Promise.all(
     [coverImg, hualanePlan, velValle, velLago, hualaneSat, velSat].map((u) => toDataUrl(u)),
