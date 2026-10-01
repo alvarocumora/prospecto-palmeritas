@@ -2,13 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, CalendarClock, Landmark, Repeat, ShieldCheck } from "lucide-react";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
-import { ContactForm } from "@/features/marketing/ContactForm";
+import { CollateralLeadForm } from "@/features/investor/CollateralLeadForm";
 import { CollateralSimulator } from "@/features/investor/CollateralSimulator";
 import {
   COLLATERAL_DISCLAIMERS,
   COLLATERAL_PROJECTS,
   COLLATERAL_STEPS,
-  fmtClp,
 } from "@/lib/investor/collateralProgram";
 import coverImg from "@/assets/colateral/cover-maule.jpg";
 import hualanePlan from "@/assets/colateral/hualane-og.png";
@@ -44,7 +43,6 @@ const HIGHLIGHTS = [
 
 function PublicCollateralPage() {
   const [sim, setSim] = useState({ amount: 25_000_000, months: 12 });
-  const msg = `Me interesa el programa con colateral. Monto estimado: ${fmtClp(sim.amount)} a ${sim.months} meses. Quisiera recibir el deck y agendar una reunión.`;
 
   return (
     <div className="brand-light min-h-screen">
@@ -170,7 +168,7 @@ function PublicCollateralPage() {
               <h2 className="font-serif text-3xl mt-2">Recibe el deck y agenda una reunión</h2>
               <p className="mt-3 text-content-subtle">
                 Te enviamos el deck completo, revisamos tu perfil y te mostramos las parcelas
-                disponibles. El mensaje ya incluye el monto que simulaste.
+                disponibles. La solicitud incluye el monto y plazo que simulaste.
               </p>
               <Link
                 to="/auth"
@@ -180,11 +178,7 @@ function PublicCollateralPage() {
                 O crea tu cuenta de inversionista <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-            <ContactForm
-              source="inversion-colateral"
-              defaultRole="investor"
-              defaultMessage={msg}
-            />
+            <CollateralLeadForm amount={sim.amount} months={sim.months} />
           </section>
 
           <footer className="mt-16 mb-12 border-t border-hairline pt-4 text-[11px] leading-relaxed text-content-subtle space-y-1">

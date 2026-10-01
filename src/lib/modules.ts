@@ -53,6 +53,8 @@ export function moduleForRoute(path: string): ModuleKey | "core" {
       "team",
       "audit",
       "marketplace",
+      "colateral-leads",
+      "colateral-documentos",
     ].includes(seg)
   ) {
     return "core";
