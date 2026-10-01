@@ -38,6 +38,7 @@ export function CanonicalProjectViewer({
   }, [active?.id, setActiveId, targetProject]);
 
   const ready = Boolean(targetProject && active?.id === targetProject.id);
+  const activePreset = mode === "2d" ? profile.twoD : profile.threeD;
 
   if (loading) {
     return (
@@ -73,6 +74,7 @@ export function CanonicalProjectViewer({
       data-canonical-project-viewer={profile.key}
       data-geo-profile={profile.key}
       data-geo-mode={mode}
+      data-geo-preset={activePreset}
       data-project-id={targetProject.id}
     >
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg-secondary px-3 py-2.5">
