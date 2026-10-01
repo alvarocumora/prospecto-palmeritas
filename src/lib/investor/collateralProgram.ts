@@ -129,7 +129,7 @@ export const COLLATERAL_DISCLAIMERS = [
   "Toda inversión está sujeta a due diligence, validación KYC y firma de documentación definitiva.",
 ];
 
-export function buildCollateralDeck(): ProjectDoc {
+export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc {
   const t = COLLATERAL_TERMS;
   const example = monthlyInterestClp(t.minTicketClp);
   const parcelRows = COLLATERAL_PARCELS.length
@@ -150,7 +150,7 @@ export function buildCollateralDeck(): ProjectDoc {
     subtitle: "Financia el portafolio minero Geocapitals y recibe una parcela en garantía",
     commodity: "Portafolio",
     stage: "Programa de inversión",
-    location: "Chile · colateral en la Región del Maule",
+    location: "Chile · colateral en Hualañé y Licantén, Maule",
     liveUrl: publicUrl("/proyectos"),
     docVersion: COLLATERAL_DOC_VERSION,
     tags: ["UF + 12 % anual", "Interés mensual", "Desde $25 MM", "Parcela en garantía"],
@@ -168,6 +168,15 @@ export function buildCollateralDeck(): ProjectDoc {
     ],
     milestones: COLLATERAL_STEPS.map((s, i) => ({ when: `Paso ${i + 1}`, what: s.title.replace(/^\d+\.\s*/, "") })),
     sections: [
+      ...(img.cover
+        ? [{
+            eyebrow: "Respaldo real",
+            title: "Activos inmobiliarios en el Maule",
+            lead: "Tu inversión minera queda respaldada por tierra con inscripción y plano.",
+            deck: true,
+            blocks: [{ kind: "figure" as const, title: "Valle rural, Región del Maule", imageDataUrl: img.cover, caption: "Imagen ilustrativa de ambientación. No corresponde a un predio específico." }],
+          }]
+        : []),
       {
         eyebrow: "El modelo",
         title: "Cómo funciona",
@@ -194,6 +203,41 @@ export function buildCollateralDeck(): ProjectDoc {
           },
         ],
       },
+      {
+        eyebrow: "Cartera de colateral",
+        title: "Dos proyectos elegibles",
+        lead: "116 parcelas sobre 85,75 ha en Hualañé y Licantén, Región del Maule.",
+        deck: true,
+        blocks: [
+          {
+            kind: "table",
+            head: ["Proyecto", "Comuna", "Superficie", "Parcelas", "Precio lista", "Registro"],
+            rows: COLLATERAL_PROJECTS.map((p) => [p.name, p.commune, `${p.areaHa.toLocaleString("es-CL")} ha`, String(p.lots), p.priceRange, p.registry]),
+          },
+          { kind: "text", body: "Titular: Forestal Valle Escondido SpA. Precios de lista publicados, no tasaciones. La parcela, su rol individual y su tasación se fijan en cada contrato." },
+        ],
+      },
+      ...(img.hualanePlan
+        ? [{
+            eyebrow: "Colateral 01",
+            title: "Valle de Hualañé",
+            lead: "40 parcelas desde 1 ha sobre 41,75 ha. Rol matriz 168-921, sector Caone.",
+            deck: true,
+            blocks: [{ kind: "figure" as const, title: "Plano maestro, rol 168-921", imageDataUrl: img.hualanePlan, caption: "Plano comercial del proyecto. Valores y disponibilidad sujetos a confirmación." }],
+          }]
+        : []),
+      ...(img.valleEscondido
+        ? [{
+            eyebrow: "Colateral 02",
+            title: "Valle Escondido Licantén",
+            lead: "76 parcelas sobre 44 ha. Inscripción Fs. 243 N 133 (2012), plano N 192 (2023), CBR Licantén.",
+            deck: true,
+            blocks: [
+              { kind: "figure" as const, title: "Valle Escondido Licantén", imageDataUrl: img.valleEscondido, caption: "Imagen referencial del material comercial del proyecto." },
+              ...(img.valleEscondido2 ? [{ kind: "figure" as const, title: "Entorno del proyecto", imageDataUrl: img.valleEscondido2, caption: "Imagen referencial del material comercial del proyecto." }] : []),
+            ],
+          }]
+        : []),
       {
         eyebrow: "Respaldo",
         title: "Tu parcela en garantía",
