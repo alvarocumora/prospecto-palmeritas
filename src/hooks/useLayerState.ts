@@ -7,12 +7,13 @@ export type LayerState = {
 
 export type LayerStateMap = Record<string, LayerState>;
 
-const STORAGE_KEY = "map:layer-state:v1";
+export const MAP_LAYER_STATE_STORAGE_KEY = "map:layer-state:v1";
+export const MAP_LAYER_STATE_EVENT = "geocapitals:map-layer-state";
 
-function readStorage(): LayerStateMap {
+export function readStoredLayerState(): LayerStateMap {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(MAP_LAYER_STATE_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as LayerStateMap) : {};
   } catch {
     return {};
@@ -22,7 +23,8 @@ function readStorage(): LayerStateMap {
 function writeStorage(state: LayerStateMap) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(MAP_LAYER_STATE_STORAGE_KEY, JSON.stringify(state));
+    window.dispatchEvent(new CustomEvent<LayerStateMap>(MAP_LAYER_STATE_EVENT, { detail: state }));
   } catch {
     /* ignore quota */
   }
@@ -30,7 +32,7 @@ function writeStorage(state: LayerStateMap) {
 
 export function useLayerState(defaults: LayerStateMap) {
   const [state, setState] = useState<LayerStateMap>(() => {
-    const stored = readStorage();
+    const stored = readStoredLayerState();
     return { ...defaults, ...stored };
   });
 
