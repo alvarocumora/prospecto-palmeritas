@@ -16,6 +16,7 @@ import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as InscripcionRouteImport } from './routes/inscripcion'
+import { Route as InversionColateralRouteImport } from './routes/inversion-colateral'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
@@ -217,6 +218,11 @@ const EnRoute = EnRouteImport.update({
 const InscripcionRoute = InscripcionRouteImport.update({
   id: '/inscripcion',
   path: '/inscripcion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InversionColateralRoute = InversionColateralRouteImport.update({
+  id: '/inversion-colateral',
+  path: '/inversion-colateral',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InversionistasRoute = InversionistasRouteImport.update({
@@ -1166,6 +1172,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1342,6 +1349,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1520,6 +1528,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1698,6 +1707,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1874,6 +1884,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -2051,6 +2062,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -2229,6 +2241,7 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRoute
   EnRoute: typeof EnRoute
   InscripcionRoute: typeof InscripcionRouteWithChildren
+  InversionColateralRoute: typeof InversionColateralRoute
   InversionistasRoute: typeof InversionistasRoute
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
@@ -2357,6 +2370,13 @@ declare module '@tanstack/react-router' {
       path: '/inscripcion'
       fullPath: '/inscripcion'
       preLoaderRoute: typeof InscripcionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inversion-colateral': {
+      id: '/inversion-colateral'
+      path: '/inversion-colateral'
+      fullPath: '/inversion-colateral'
+      preLoaderRoute: typeof InversionColateralRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inversionistas': {
@@ -3878,6 +3898,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRoute,
   EnRoute: EnRoute,
   InscripcionRoute: InscripcionRouteWithChildren,
+  InversionColateralRoute: InversionColateralRoute,
   InversionistasRoute: InversionistasRoute,
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,

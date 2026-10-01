@@ -17,17 +17,21 @@ const ROLES: { v: Role; label: string }[] = [
 export function ContactForm({
   source = "landing",
   compact = false,
+  defaultRole = "owner",
+  defaultMessage = "",
 }: {
   source?: string;
   compact?: boolean;
+  defaultRole?: Role;
+  defaultMessage?: string;
 }) {
   const submit = useServerFn(submitContactMessage);
   const [form, setForm] = useState({
     name: "",
     email: "",
     organization: "",
-    role: "owner" as Role,
-    message: "",
+    role: defaultRole as Role,
+    message: defaultMessage,
   });
   const mut = useMutation({
     mutationFn: () => submit({ data: { ...form, source } }),
