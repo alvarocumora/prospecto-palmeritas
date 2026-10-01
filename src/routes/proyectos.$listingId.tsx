@@ -74,7 +74,11 @@ export const Route = createFileRoute("/proyectos/$listingId")({
     </MarketingPage>
   ),
   errorComponent: ({ error }) => (
-    <MarketingPage eyebrow="Error" title="No pudimos cargar el proyecto" intro={error.message}>
+    <MarketingPage
+      eyebrow="Error"
+      title="No pudimos cargar el proyecto"
+      intro={(error as Error).message}
+    >
       <Link to="/inversionistas" className="text-accent-brand hover:underline">
         ← Volver al deal flow
       </Link>

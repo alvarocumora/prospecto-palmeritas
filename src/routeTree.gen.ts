@@ -119,6 +119,7 @@ import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './ro
 import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
 import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
 import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
+import { Route as AuthenticatedDashboardInversionColateralRouteImport } from './routes/_authenticated.dashboard.inversion-colateral'
 import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
 import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
 import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
@@ -148,11 +149,11 @@ import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
-import { Route as AuthenticatedDashboardAcquisitionsRouteImport } from './routes/_authenticated.dashboard.acquisitions'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardRfqsIndexRouteImport } from './routes/_authenticated.dashboard.rfqs.index'
 import { Route as AuthenticatedDashboardProveedoresIndexRouteImport } from './routes/_authenticated.dashboard.proveedores.index'
+import { Route as AuthenticatedDashboardPipelineIndexRouteImport } from './routes/_authenticated.dashboard.pipeline.index'
 import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './routes/_authenticated.dashboard.documentos.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -172,6 +173,7 @@ import { Route as AuthenticatedDashboardProveedoresIdRouteImport } from './route
 import { Route as AuthenticatedDashboardProjectsNuevoRouteImport } from './routes/_authenticated.dashboard.projects_.nuevo'
 import { Route as AuthenticatedDashboardProjectsCompararRouteImport } from './routes/_authenticated.dashboard.projects_.comparar'
 import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated.dashboard.projects_.$projectId'
+import { Route as AuthenticatedDashboardPipelineCodeRouteImport } from './routes/_authenticated.dashboard.pipeline.$code'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
@@ -769,6 +771,12 @@ const AuthenticatedDashboardInvestmentsRoute =
     path: '/dashboard/investments',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardInversionColateralRoute =
+  AuthenticatedDashboardInversionColateralRouteImport.update({
+    id: '/dashboard/inversion-colateral',
+    path: '/dashboard/inversion-colateral',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardInventoryRoute =
   AuthenticatedDashboardInventoryRouteImport.update({
     id: '/dashboard/inventory',
@@ -943,12 +951,6 @@ const AuthenticatedDashboardAdminRoute =
     path: '/dashboard/admin',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardAcquisitionsRoute =
-  AuthenticatedDashboardAcquisitionsRouteImport.update({
-    id: '/dashboard/acquisitions',
-    path: '/dashboard/acquisitions',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -970,6 +972,12 @@ const AuthenticatedDashboardProveedoresIndexRoute =
   AuthenticatedDashboardProveedoresIndexRouteImport.update({
     id: '/dashboard/proveedores/',
     path: '/dashboard/proveedores/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPipelineIndexRoute =
+  AuthenticatedDashboardPipelineIndexRouteImport.update({
+    id: '/dashboard/pipeline/',
+    path: '/dashboard/pipeline/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardDocumentosIndexRoute =
@@ -1083,6 +1091,12 @@ const AuthenticatedDashboardProjectsProjectIdRoute =
   AuthenticatedDashboardProjectsProjectIdRouteImport.update({
     id: '/dashboard/projects_/$projectId',
     path: '/dashboard/projects/$projectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPipelineCodeRoute =
+  AuthenticatedDashboardPipelineCodeRouteImport.update({
+    id: '/dashboard/pipeline/$code',
+    path: '/dashboard/pipeline/$code',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardListingsListingIdRoute =
@@ -1206,7 +1220,6 @@ export interface FileRoutesByFullPath {
   '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1236,6 +1249,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1293,6 +1307,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/dashboard/projects/comparar': typeof AuthenticatedDashboardProjectsCompararRoute
   '/dashboard/projects/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
@@ -1312,6 +1327,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
+  '/dashboard/pipeline/': typeof AuthenticatedDashboardPipelineIndexRoute
   '/dashboard/proveedores/': typeof AuthenticatedDashboardProveedoresIndexRoute
   '/dashboard/rfqs/': typeof AuthenticatedDashboardRfqsIndexRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -1380,7 +1396,6 @@ export interface FileRoutesByTo {
   '/verificar': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1410,6 +1425,7 @@ export interface FileRoutesByTo {
   '/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1467,6 +1483,7 @@ export interface FileRoutesByTo {
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
   '/dashboard/projects/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/dashboard/projects/comparar': typeof AuthenticatedDashboardProjectsCompararRoute
   '/dashboard/projects/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
@@ -1486,6 +1503,7 @@ export interface FileRoutesByTo {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/dashboard/documentos': typeof AuthenticatedDashboardDocumentosIndexRoute
+  '/dashboard/pipeline': typeof AuthenticatedDashboardPipelineIndexRoute
   '/dashboard/proveedores': typeof AuthenticatedDashboardProveedoresIndexRoute
   '/dashboard/rfqs': typeof AuthenticatedDashboardRfqsIndexRoute
   '/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -1556,7 +1574,6 @@ export interface FileRoutesById {
   '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
-  '/_authenticated/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/_authenticated/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1586,6 +1603,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/geophysics': typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   '/_authenticated/dashboard/hse': typeof AuthenticatedDashboardHseRoute
   '/_authenticated/dashboard/inventory': typeof AuthenticatedDashboardInventoryRoute
+  '/_authenticated/dashboard/inversion-colateral': typeof AuthenticatedDashboardInversionColateralRoute
   '/_authenticated/dashboard/investments': typeof AuthenticatedDashboardInvestmentsRoute
   '/_authenticated/dashboard/listings': typeof AuthenticatedDashboardListingsRouteWithChildren
   '/_authenticated/dashboard/lv5-page5': typeof AuthenticatedDashboardLv5Page5Route
@@ -1643,6 +1661,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
+  '/_authenticated/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
   '/_authenticated/dashboard/projects_/$projectId': typeof AuthenticatedDashboardProjectsProjectIdRoute
   '/_authenticated/dashboard/projects_/comparar': typeof AuthenticatedDashboardProjectsCompararRoute
   '/_authenticated/dashboard/projects_/nuevo': typeof AuthenticatedDashboardProjectsNuevoRoute
@@ -1662,6 +1681,7 @@ export interface FileRoutesById {
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
   '/_authenticated/dashboard/documentos/': typeof AuthenticatedDashboardDocumentosIndexRoute
+  '/_authenticated/dashboard/pipeline/': typeof AuthenticatedDashboardPipelineIndexRoute
   '/_authenticated/dashboard/proveedores/': typeof AuthenticatedDashboardProveedoresIndexRoute
   '/_authenticated/dashboard/rfqs/': typeof AuthenticatedDashboardRfqsIndexRoute
   '/_authenticated/dashboard/geophysics/$surveyId/field': typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRoute
@@ -1732,7 +1752,6 @@ export interface FileRouteTypes {
     | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/dashboard/acquisitions'
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/agua'
@@ -1762,6 +1781,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/inversion-colateral'
     | '/dashboard/investments'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
@@ -1819,6 +1839,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
+    | '/dashboard/pipeline/$code'
     | '/dashboard/projects/$projectId'
     | '/dashboard/projects/comparar'
     | '/dashboard/projects/nuevo'
@@ -1838,6 +1859,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/dashboard/documentos/'
+    | '/dashboard/pipeline/'
     | '/dashboard/proveedores/'
     | '/dashboard/rfqs/'
     | '/dashboard/geophysics/$surveyId/field'
@@ -1906,7 +1928,6 @@ export interface FileRouteTypes {
     | '/verificar'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/dashboard/acquisitions'
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/agua'
@@ -1936,6 +1957,7 @@ export interface FileRouteTypes {
     | '/dashboard/geophysics'
     | '/dashboard/hse'
     | '/dashboard/inventory'
+    | '/dashboard/inversion-colateral'
     | '/dashboard/investments'
     | '/dashboard/listings'
     | '/dashboard/lv5-page5'
@@ -1993,6 +2015,7 @@ export interface FileRouteTypes {
     | '/dashboard/documentos/$templateId'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
+    | '/dashboard/pipeline/$code'
     | '/dashboard/projects/$projectId'
     | '/dashboard/projects/comparar'
     | '/dashboard/projects/nuevo'
@@ -2012,6 +2035,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/dashboard/documentos'
+    | '/dashboard/pipeline'
     | '/dashboard/proveedores'
     | '/dashboard/rfqs'
     | '/dashboard/geophysics/$surveyId/field'
@@ -2081,7 +2105,6 @@ export interface FileRouteTypes {
     | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
-    | '/_authenticated/dashboard/acquisitions'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
     | '/_authenticated/dashboard/agua'
@@ -2111,6 +2134,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/geophysics'
     | '/_authenticated/dashboard/hse'
     | '/_authenticated/dashboard/inventory'
+    | '/_authenticated/dashboard/inversion-colateral'
     | '/_authenticated/dashboard/investments'
     | '/_authenticated/dashboard/listings'
     | '/_authenticated/dashboard/lv5-page5'
@@ -2168,6 +2192,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/documentos/$templateId'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
+    | '/_authenticated/dashboard/pipeline/$code'
     | '/_authenticated/dashboard/projects_/$projectId'
     | '/_authenticated/dashboard/projects_/comparar'
     | '/_authenticated/dashboard/projects_/nuevo'
@@ -2187,6 +2212,7 @@ export interface FileRouteTypes {
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
     | '/_authenticated/dashboard/documentos/'
+    | '/_authenticated/dashboard/pipeline/'
     | '/_authenticated/dashboard/proveedores/'
     | '/_authenticated/dashboard/rfqs/'
     | '/_authenticated/dashboard/geophysics/$surveyId/field'
@@ -3054,6 +3080,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardInvestmentsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/inversion-colateral': {
+      id: '/_authenticated/dashboard/inversion-colateral'
+      path: '/dashboard/inversion-colateral'
+      fullPath: '/dashboard/inversion-colateral'
+      preLoaderRoute: typeof AuthenticatedDashboardInversionColateralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/inventory': {
       id: '/_authenticated/dashboard/inventory'
       path: '/dashboard/inventory'
@@ -3257,13 +3290,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/acquisitions': {
-      id: '/_authenticated/dashboard/acquisitions'
-      path: '/dashboard/acquisitions'
-      fullPath: '/dashboard/acquisitions'
-      preLoaderRoute: typeof AuthenticatedDashboardAcquisitionsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -3290,6 +3316,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/proveedores'
       fullPath: '/dashboard/proveedores/'
       preLoaderRoute: typeof AuthenticatedDashboardProveedoresIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/pipeline/': {
+      id: '/_authenticated/dashboard/pipeline/'
+      path: '/dashboard/pipeline'
+      fullPath: '/dashboard/pipeline/'
+      preLoaderRoute: typeof AuthenticatedDashboardPipelineIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/documentos/': {
@@ -3423,6 +3456,13 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/projects/$projectId'
       fullPath: '/dashboard/projects/$projectId'
       preLoaderRoute: typeof AuthenticatedDashboardProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/pipeline/$code': {
+      id: '/_authenticated/dashboard/pipeline/$code'
+      path: '/dashboard/pipeline/$code'
+      fullPath: '/dashboard/pipeline/$code'
+      preLoaderRoute: typeof AuthenticatedDashboardPipelineCodeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/listings/$listingId': {
@@ -3589,7 +3629,6 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
-  AuthenticatedDashboardAcquisitionsRoute: typeof AuthenticatedDashboardAcquisitionsRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
   AuthenticatedDashboardAguaRoute: typeof AuthenticatedDashboardAguaRoute
@@ -3619,6 +3658,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardGeophysicsRoute: typeof AuthenticatedDashboardGeophysicsRouteWithChildren
   AuthenticatedDashboardHseRoute: typeof AuthenticatedDashboardHseRoute
   AuthenticatedDashboardInventoryRoute: typeof AuthenticatedDashboardInventoryRoute
+  AuthenticatedDashboardInversionColateralRoute: typeof AuthenticatedDashboardInversionColateralRoute
   AuthenticatedDashboardInvestmentsRoute: typeof AuthenticatedDashboardInvestmentsRoute
   AuthenticatedDashboardListingsRoute: typeof AuthenticatedDashboardListingsRouteWithChildren
   AuthenticatedDashboardLv5Page5Route: typeof AuthenticatedDashboardLv5Page5Route
@@ -3653,6 +3693,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedDashboardClientesPartnerIdRoute: typeof AuthenticatedDashboardClientesPartnerIdRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  AuthenticatedDashboardPipelineCodeRoute: typeof AuthenticatedDashboardPipelineCodeRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
   AuthenticatedDashboardProjectsCompararRoute: typeof AuthenticatedDashboardProjectsCompararRoute
   AuthenticatedDashboardProjectsNuevoRoute: typeof AuthenticatedDashboardProjectsNuevoRoute
@@ -3662,14 +3703,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardSourcingRequestIdRoute: typeof AuthenticatedDashboardSourcingRequestIdRoute
   AuthenticatedDashboardTradesTradeIdRoute: typeof AuthenticatedDashboardTradesTradeIdRoute
   AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
+  AuthenticatedDashboardPipelineIndexRoute: typeof AuthenticatedDashboardPipelineIndexRoute
   AuthenticatedDashboardProveedoresIndexRoute: typeof AuthenticatedDashboardProveedoresIndexRoute
   AuthenticatedDashboardRfqsIndexRoute: typeof AuthenticatedDashboardRfqsIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPanelRoute: AuthenticatedPanelRouteWithChildren,
-  AuthenticatedDashboardAcquisitionsRoute:
-    AuthenticatedDashboardAcquisitionsRoute,
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,
@@ -3703,6 +3743,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardGeophysicsRouteWithChildren,
   AuthenticatedDashboardHseRoute: AuthenticatedDashboardHseRoute,
   AuthenticatedDashboardInventoryRoute: AuthenticatedDashboardInventoryRoute,
+  AuthenticatedDashboardInversionColateralRoute:
+    AuthenticatedDashboardInversionColateralRoute,
   AuthenticatedDashboardInvestmentsRoute:
     AuthenticatedDashboardInvestmentsRoute,
   AuthenticatedDashboardListingsRoute:
@@ -3748,6 +3790,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardClientesPartnerIdRoute,
   AuthenticatedDashboardDocumentosTemplateIdRoute:
     AuthenticatedDashboardDocumentosTemplateIdRoute,
+  AuthenticatedDashboardPipelineCodeRoute:
+    AuthenticatedDashboardPipelineCodeRoute,
   AuthenticatedDashboardProjectsProjectIdRoute:
     AuthenticatedDashboardProjectsProjectIdRoute,
   AuthenticatedDashboardProjectsCompararRoute:
@@ -3764,6 +3808,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardTradesTradeIdRoute,
   AuthenticatedDashboardDocumentosIndexRoute:
     AuthenticatedDashboardDocumentosIndexRoute,
+  AuthenticatedDashboardPipelineIndexRoute:
+    AuthenticatedDashboardPipelineIndexRoute,
   AuthenticatedDashboardProveedoresIndexRoute:
     AuthenticatedDashboardProveedoresIndexRoute,
   AuthenticatedDashboardRfqsIndexRoute: AuthenticatedDashboardRfqsIndexRoute,

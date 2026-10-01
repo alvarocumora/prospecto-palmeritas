@@ -19,6 +19,7 @@ import {
   FileText,
   FolderKanban,
   Handshake,
+  KanbanSquare,
   KeyRound,
   LayoutDashboard,
   LayoutGrid,
@@ -277,9 +278,9 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
   },
 
   {
-    to: "/dashboard/acquisitions",
-    label: "Pipeline de Adquisición",
-    icon: Compass,
+    to: "/dashboard/pipeline",
+    label: "Pipeline de Deals",
+    icon: KanbanSquare,
     group: "CAPITAL & DEALS",
     module: "capital",
     hideForInvestor: true,

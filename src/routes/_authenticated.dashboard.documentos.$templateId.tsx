@@ -86,7 +86,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/documentos/$temp
   errorComponent: ({ error, reset }) => (
     <div className="max-w-3xl mx-auto p-8">
       <h1 className="font-display text-2xl mb-2">Error cargando el documento</h1>
-      <p className="text-sm text-content-subtle mb-4">{error.message}</p>
+      <p className="text-sm text-content-subtle mb-4">{(error as Error).message}</p>
       <button onClick={reset} className="text-accent-brand underline text-sm">
         Reintentar
       </button>

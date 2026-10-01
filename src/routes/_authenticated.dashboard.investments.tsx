@@ -72,6 +72,19 @@ function MyInvestmentsPage() {
         </button>
       </header>
 
+      <Link
+        to="/dashboard/inversion-colateral"
+        className="mb-4 flex items-center justify-between gap-3 rounded border border-gold/40 bg-bg-panel p-4 hover:border-gold"
+      >
+        <div>
+          <div className="text-sm font-semibold">Inversión con colateral inmobiliario</div>
+          <div className="text-xs text-muted-foreground">
+            UF + 12 % anual, interés mensual y parcela en garantía en el Maule · ver deck
+          </div>
+        </div>
+        <FileText className="w-4 h-4 text-gold" />
+      </Link>
+
       {loading && !data ? (
         <div className="flex items-center gap-2 text-sm text-muted-foreground p-8 justify-center">
           <Loader2 className="w-4 h-4 animate-spin" /> Cargando…

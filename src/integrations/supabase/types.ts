@@ -3905,6 +3905,50 @@ export type Database = {
         }
         Relationships: []
       }
+      deal_alerts: {
+        Row: {
+          alert_type: string
+          created_at: string
+          deal_id: string
+          description: string | null
+          id: string
+          priority: string
+          resolved: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          alert_type: string
+          created_at?: string
+          deal_id: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolved?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          alert_type?: string
+          created_at?: string
+          deal_id?: string
+          description?: string | null
+          id?: string
+          priority?: string
+          resolved?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_alerts_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_certifications: {
         Row: {
           budget_clp: number
@@ -4212,6 +4256,65 @@ export type Database = {
           },
         ]
       }
+      deal_pedimentos: {
+        Row: {
+          court: string | null
+          created_at: string
+          datum: string | null
+          deal_id: string
+          e_from: number | null
+          e_to: number | null
+          ha: number | null
+          id: string
+          n_from: number | null
+          n_to: number | null
+          name: string
+          seq: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          court?: string | null
+          created_at?: string
+          datum?: string | null
+          deal_id: string
+          e_from?: number | null
+          e_to?: number | null
+          ha?: number | null
+          id?: string
+          n_from?: number | null
+          n_to?: number | null
+          name: string
+          seq: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          court?: string | null
+          created_at?: string
+          datum?: string | null
+          deal_id?: string
+          e_from?: number | null
+          e_to?: number | null
+          ha?: number | null
+          id?: string
+          n_from?: number | null
+          n_to?: number | null
+          name?: string
+          seq?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deal_pedimentos_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deal_settlements: {
         Row: {
           amount_clp: number | null
@@ -4372,6 +4475,8 @@ export type Database = {
           id: string
           name: string
           owner_type: string | null
+          pipeline_stage: string
+          profile: Json
           project_id: string | null
           region: string | null
           resource_moz: number | null
@@ -4392,6 +4497,8 @@ export type Database = {
           id?: string
           name: string
           owner_type?: string | null
+          pipeline_stage?: string
+          profile?: Json
           project_id?: string | null
           region?: string | null
           resource_moz?: number | null
@@ -4412,6 +4519,8 @@ export type Database = {
           id?: string
           name?: string
           owner_type?: string | null
+          pipeline_stage?: string
+          profile?: Json
           project_id?: string | null
           region?: string | null
           resource_moz?: number | null

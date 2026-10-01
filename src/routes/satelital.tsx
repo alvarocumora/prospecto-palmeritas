@@ -55,7 +55,8 @@ export const Route = createFileRoute("/satelital")({
   notFoundComponent: () => <p className="p-10 text-center">No hay datos disponibles.</p>,
 });
 
-function SatelitalError({ error }: { error: Error }) {
+function SatelitalError({ error: rawError }: { error: unknown }) {
+  const error = rawError as Error;
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />

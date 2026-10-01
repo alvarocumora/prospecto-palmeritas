@@ -27,7 +27,7 @@ export const Route = createFileRoute("/share/targets/$projectId")({
   errorComponent: ({ error }) => (
     <div className="min-h-screen flex items-center justify-center p-8 bg-background">
       <div className="text-center text-sm font-mono text-muted-foreground">
-        Error: {error.message}
+        Error: {(error as Error).message}
       </div>
     </div>
   ),
