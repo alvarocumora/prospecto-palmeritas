@@ -52,7 +52,7 @@ export const Route = createFileRoute("/catastro/mapa")({
       { rel: "canonical", href: "/catastro/mapa" },
     ],
   }),
-  component: CatastroMap,
+  component: NationalCatastroMap,
 });
 
 // La capa nacional tiene ~103.000 polígonos: solo se piden al servidor desde
@@ -99,7 +99,9 @@ function rolOf(p: SelectedProps): string {
   return `${p.NUMERO_ROL ?? ""}${p.DV_ROL ? `-${p.DV_ROL}` : ""}`;
 }
 
-function CatastroMap() {
+// Nacional (todo Chile). Distinto de src/components/ops/CatastroMap.tsx, que es
+// el mapa de catastro a nivel de proyecto — no confundir los dos nombres.
+function NationalCatastroMap() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
 
