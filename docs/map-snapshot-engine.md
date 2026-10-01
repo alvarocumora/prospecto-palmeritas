@@ -53,6 +53,8 @@ Such a manifest can still be inspected for QA but is not eligible for a report f
 
 `buildReportMapBlock` only creates a report `map` block when the manifest is report-eligible. The PDF model stores the same `snapshotManifest` beside the map image.
 
+Report eligibility is derived only from the canonical evidence manifest and viewer state; CI/runtime tooling status is operational metadata and is never serialized as evidence provenance.
+
 This does **not** mean that a viewer screenshot is automatically technical evidence. The evidence class and caution come from the canonical registry and remain attached to each layer.
 
 ## Export policy
