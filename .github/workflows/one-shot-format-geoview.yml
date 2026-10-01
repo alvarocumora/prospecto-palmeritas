@@ -23,7 +23,18 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Apply safe ESLint/Prettier autofixes
-        run: npx eslint . --fix
+        shell: bash
+        run: |
+          npx eslint . --fix || true
+          python - <<'PY'
+          from pathlib import Path
+          path = Path('src/integrations/supabase/previewAuthStorage.ts')
+          text = path.read_text()
+          needle = '      let timer: ReturnType<typeof setTimeout>;'
+          replacement = '      // Timer is assigned after the message handler is registered.\n      // eslint-disable-next-line prefer-const\n      let timer: ReturnType<typeof setTimeout>;'
+          if needle in text and 'eslint-disable-next-line prefer-const' not in text:
+              path.write_text(text.replace(needle, replacement))
+          PY
       - name: Verify lint after autofix
         run: npm run lint
       - name: Commit formatting baseline and remove one-shot workflow
