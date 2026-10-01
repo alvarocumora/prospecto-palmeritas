@@ -32,6 +32,61 @@ export type CollateralParcel = {
 /** Parcelas disponibles. Pendiente: antecedentes reales a entregar por Geocapitals. */
 export const COLLATERAL_PARCELS: CollateralParcel[] = [];
 
+/**
+ * Cartera de proyectos elegibles como colateral (fuente: plataforma Oferta Terrenos).
+ * Datos registrales/comerciales tal como figuran en esa plataforma; la parcela
+ * concreta, su rol individual y tasación se fijan en cada contrato.
+ */
+export type CollateralProject = {
+  key: "hualane" | "valle-escondido";
+  name: string;
+  owner: string;
+  commune: string;
+  region: string;
+  areaHa: number;
+  lots: number;
+  lotSize: string;
+  priceRange: string;
+  registry: string;
+  status: string;
+};
+
+export const COLLATERAL_PROJECTS: CollateralProject[] = [
+  {
+    key: "hualane",
+    name: "Valle de Hualañé (Sector Caone)",
+    owner: "Forestal Valle Escondido SpA",
+    commune: "Hualañé",
+    region: "Región del Maule",
+    areaHa: 41.75,
+    lots: 40,
+    lotSize: "1 ha (lotes 0,75 a 2 ha)",
+    priceRange: "$12.990.000 a $25.980.000",
+    registry: "Rol matriz SII 168-921 (Hijuela 10)",
+    status: "Rol individual por parcela: por verificar",
+  },
+  {
+    key: "valle-escondido",
+    name: "Valle Escondido Licantén",
+    owner: "Forestal Valle Escondido SpA",
+    commune: "Licantén",
+    region: "Región del Maule",
+    areaHa: 44,
+    lots: 76,
+    lotSize: "5.789 m2 promedio",
+    priceRange: "$19.990.000 a $42.990.000",
+    registry: "Insc. Fs. 243 N 133 (2012), Plano N 192 (2023), CBR Licantén",
+    status: "70 de 76 parcelas disponibles",
+  },
+];
+
+export type CollateralDeckImages = Partial<{
+  cover: string;
+  hualanePlan: string;
+  valleEscondido: string;
+  valleEscondido2: string;
+}>;
+
 export const fmtClp = (n: number) => `$${Math.round(n).toLocaleString("es-CL")}`;
 
 /** Interés mensual nominal sobre el capital en UF (antes del reajuste UF). */
