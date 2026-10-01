@@ -403,7 +403,8 @@ export const GEO_LAYER_REGISTRY = [
     datasetType: "structure",
     capabilities: ["2d", "3d", "public", "report"],
     legacyAliases: ["veins:interpreted"],
-    caution: "Geometría interpretada o conceptual; no tratar como estructura medida sin respaldo de terreno.",
+    caution:
+      "Geometría interpretada o conceptual; no tratar como estructura medida sin respaldo de terreno.",
   }),
   layer({
     id: "geology.metallogenic_belts",
@@ -533,7 +534,8 @@ export const GEO_LAYER_REGISTRY = [
     datasetType: "geophysics",
     capabilities: ["2d", "3d", "public", "report"],
     legacyAliases: ["geoscene-geophys-anomalies"],
-    caution: "La profundidad y geometría son interpretadas; no equivalen a un cuerpo mineral probado.",
+    caution:
+      "La profundidad y geometría son interpretadas; no equivalen a un cuerpo mineral probado.",
   }),
   layer({
     id: "geochemistry.stream_sediment",
@@ -559,7 +561,8 @@ export const GEO_LAYER_REGISTRY = [
     datasetType: "assay",
     capabilities: ["2d", "3d", "field", "public", "report"],
     legacyAliases: ["samples:raw", "samples:draft"],
-    caution: "Revisar record_status, laboratorio y certificado antes de tratar un resultado como certificado.",
+    caution:
+      "Revisar record_status, laboratorio y certificado antes de tratar un resultado como certificado.",
   }),
   layer({
     id: "sampling.assays",
@@ -658,7 +661,8 @@ export const GEO_LAYER_REGISTRY = [
     datasetType: "block_model",
     capabilities: ["3d", "report"],
     legacyAliases: ["resource:blocks"],
-    caution: "Sólo mostrar clasificación de recursos cuando exista estimación y revisión competente aplicable.",
+    caution:
+      "Sólo mostrar clasificación de recursos cuando exista estimación y revisión competente aplicable.",
   }),
 ] as const satisfies readonly GeoLayerDefinition[];
 

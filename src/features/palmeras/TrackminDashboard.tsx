@@ -360,16 +360,9 @@ function Overview({ publicMode = false }: { publicMode?: boolean }) {
           Mapa Geológico Interactivo
         </SectionTitle>
         {publicMode ? (
-          <ProjectMap
-            initialPreset="public_live"
-            legacyStaticProjectFeatures
-          />
+          <ProjectMap initialPreset="public_live" legacyStaticProjectFeatures />
         ) : (
-          <CanonicalProjectViewer
-            profileKey="palmeras"
-            heightClassName="h-[620px]"
-            compactHeader
-          />
+          <CanonicalProjectViewer profileKey="palmeras" heightClassName="h-[620px]" compactHeader />
         )}
       </Card>
 

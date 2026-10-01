@@ -8,6 +8,7 @@ import { Loader2 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useProjects } from "@/hooks/useProjects";
+import type { GeoSnapshotViewState } from "@/lib/geospatial/snapshotManifest";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
 import { useDrillTrajectoriesLayer } from "./useDrillTrajectoriesLayer";
@@ -16,7 +17,7 @@ import { useSatAnomaliesLayer } from "./useSatAnomaliesLayer";
 import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
-import { sceneLayerEnabled } from "../layerPolicy";
+import { sceneBindingsForMode, sceneLayerEnabled } from "../layerPolicy";
 import type { GeoSceneFilters, GeoSceneMode } from "../types";
 import { sceneFilterManifest } from "../filterPolicy";
 
@@ -60,12 +61,30 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
   },
 };
 
+function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
+  const center = map.getCenter();
+  const bounds = map.getBounds();
+  return {
+    center: { lng: center.lng, lat: center.lat },
+    bounds: {
+      west: bounds.getWest(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      north: bounds.getNorth(),
+    },
+    zoom: map.getZoom(),
+    pitch: map.getPitch(),
+    bearing: map.getBearing(),
+  };
+}
+
 export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const { active } = useProjects();
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const overlayRef = useRef<MapboxOverlay | null>(null);
   const [ready, setReady] = useState(false);
+  const [snapshotViewState, setSnapshotViewState] = useState<GeoSnapshotViewState | null>(null);
 
   const surfaceMode = mode === "surface";
   const subsurfaceMode = mode === "subsurface";
@@ -75,8 +94,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const terrainVisible = sceneLayerEnabled(visibleLayerIds, "terrain");
   const targetsVisible =
     (surfaceMode || subsurfaceMode) && sceneLayerEnabled(visibleLayerIds, "targets");
-  const satelliteVisible =
-    surfaceMode && sceneLayerEnabled(visibleLayerIds, "satellite_anomalies");
+  const satelliteVisible = surfaceMode && sceneLayerEnabled(visibleLayerIds, "satellite_anomalies");
   const completedDrillingVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "drillholes_completed");
   const proposedDrillingVisible =
@@ -154,13 +172,17 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
       attributionControl: { compact: true },
     });
 
+    const syncSnapshotViewState = () => setSnapshotViewState(mapSnapshotViewState(map));
+
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
     map.on("load", () => {
       const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
       map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
+      syncSnapshotViewState();
       setReady(true);
     });
+    map.on("moveend", syncSnapshotViewState);
 
     map.on("error", (event: { error?: { message?: string } }) => {
       const message = event?.error?.message ?? "";
@@ -175,6 +197,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
 
     mapRef.current = map;
     return () => {
+      map.off("moveend", syncSnapshotViewState);
       map.remove();
       mapRef.current = null;
       overlayRef.current = null;
@@ -267,10 +290,14 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     ],
   );
 
-  const canonicalManifest = useMemo(
-    () => Array.from(visibleLayerIds).sort().join(","),
-    [visibleLayerIds],
-  );
+  const canonicalManifest = useMemo(() => {
+    const rendered = sceneBindingsForMode(mode)
+      .filter((binding) => visibleLayerIds.has(binding.canonicalId))
+      .map((binding) => binding.canonicalId);
+    return Array.from(new Set(["basemap.esri_imagery", ...rendered]))
+      .sort()
+      .join(",");
+  }, [mode, visibleLayerIds]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
@@ -280,8 +307,13 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     <div
       className="relative h-full w-full"
       data-geo-engine="deckgl"
+      data-geo-mode="3d"
+      data-geo-project-id={active?.id ?? undefined}
+      data-geo-crs="EPSG:4326"
       data-geo-layer-ids={canonicalManifest}
       data-geo-filters={filterManifest}
+      data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
+      data-geo-scene-mode={mode}
     >
       <div ref={mapDiv} className="absolute inset-0" />
       {!ready && (

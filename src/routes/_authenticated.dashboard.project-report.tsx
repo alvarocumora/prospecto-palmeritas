@@ -58,10 +58,7 @@ function ProjectReportPage() {
   if (profile?.key === "losverdes") {
     return (
       <div className="w-full p-4">
-        <CanonicalProjectViewer
-          profileKey="losverdes"
-          heightClassName="h-[calc(100vh-8rem)]"
-        />
+        <CanonicalProjectViewer profileKey="losverdes" heightClassName="h-[calc(100vh-8rem)]" />
       </div>
     );
   }

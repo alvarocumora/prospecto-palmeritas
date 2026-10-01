@@ -2,7 +2,9 @@ import type { DocBlock, DocSection, ProjectDoc } from "./model";
 
 export const MAX_INLINE_TABLE_ROWS = 8;
 
-export function isAppendixTable(block: DocBlock): block is Extract<DocBlock, { kind: "appendixTable" }> {
+export function isAppendixTable(
+  block: DocBlock,
+): block is Extract<DocBlock, { kind: "appendixTable" }> {
   return block.kind === "appendixTable";
 }
 
@@ -15,9 +17,7 @@ export function appendixTables(model: ProjectDoc): Array<{
   block: Extract<DocBlock, { kind: "appendixTable" }>;
 }> {
   return model.sections.flatMap((section) =>
-    section.blocks
-      .filter(isAppendixTable)
-      .map((block) => ({ sectionTitle: section.title, block })),
+    section.blocks.filter(isAppendixTable).map((block) => ({ sectionTitle: section.title, block })),
   );
 }
 

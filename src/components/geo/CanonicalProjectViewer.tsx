@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Box, Layers3, Map as MapIcon } from "lucide-react";
-import { ProjectMap } from "@/components/ProjectMap";
 import { GeoScene3D } from "@/components/geoscene";
+import { SnapshotAwareProjectMap } from "@/components/geo/SnapshotAwareProjectMap";
 import { useProjects } from "@/hooks/useProjects";
 import {
   findProjectForProfile,
@@ -38,6 +38,7 @@ export function CanonicalProjectViewer({
   }, [active?.id, setActiveId, targetProject]);
 
   const ready = Boolean(targetProject && active?.id === targetProject.id);
+  const activePreset = mode === "2d" ? profile.twoD : profile.threeD;
 
   if (loading) {
     return (
@@ -55,9 +56,7 @@ export function CanonicalProjectViewer({
         className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary p-6`}
       >
         <div className="max-w-md text-center">
-          <div className="font-mono text-xs uppercase text-amber-500">
-            Proyecto no disponible
-          </div>
+          <div className="font-mono text-xs uppercase text-amber-500">Proyecto no disponible</div>
           <p className="mt-2 text-sm text-muted-foreground">
             El visor canónico necesita que el proyecto esté disponible en tu workspace para evitar
             mezclar capas de otra iniciativa.
@@ -72,6 +71,8 @@ export function CanonicalProjectViewer({
       className="overflow-hidden rounded border border-border bg-background"
       data-canonical-project-viewer={profile.key}
       data-geo-profile={profile.key}
+      data-geo-mode={mode}
+      data-geo-preset={activePreset}
       data-project-id={targetProject.id}
     >
       <header className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-bg-secondary px-3 py-2.5">
@@ -123,7 +124,9 @@ export function CanonicalProjectViewer({
           </div>
         )}
 
-        {ready && mode === "2d" && <ProjectMap initialPreset={profile.twoD} fillHeight />}
+        {ready && mode === "2d" && (
+          <SnapshotAwareProjectMap preset={profile.twoD} profile={profile.key} />
+        )}
         {ready && mode === "3d" && <GeoScene3D initialPreset={profile.threeD} />}
       </div>
     </section>

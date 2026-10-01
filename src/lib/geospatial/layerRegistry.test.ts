@@ -57,5 +57,4 @@ describe("canonical geospatial layer registry", () => {
     expect(preset?.enabled).toContain("drilling.proposed");
     expect(preset?.enabled).toContain("geophysics.anomalies");
   });
-
 });

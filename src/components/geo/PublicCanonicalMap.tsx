@@ -42,9 +42,11 @@ function safeId(id: string): string {
   return id.replace(/[^a-zA-Z0-9_-]/g, "-");
 }
 
-function geometryKinds(
-  collection: GeoJSON.FeatureCollection,
-): { polygon: boolean; line: boolean; point: boolean } {
+function geometryKinds(collection: GeoJSON.FeatureCollection): {
+  polygon: boolean;
+  line: boolean;
+  point: boolean;
+} {
   let polygon = false;
   let line = false;
   let point = false;
@@ -91,9 +93,7 @@ export function PublicCanonicalMap({
   const available = useMemo(
     () =>
       new Set(
-        bundle.manifest.layers
-          .map((layer) => layer.id)
-          .filter((id) => Boolean(bundle.layers[id])),
+        bundle.manifest.layers.map((layer) => layer.id).filter((id) => Boolean(bundle.layers[id])),
       ),
     [bundle],
   );
@@ -237,7 +237,7 @@ export function PublicCanonicalMap({
   }, [bundle, certificationMode, ready, visible]);
 
   const selectedMeta = selected
-    ? bundle.manifest.layers.find((layer) => layer.id === selected.layerId) ?? null
+    ? (bundle.manifest.layers.find((layer) => layer.id === selected.layerId) ?? null)
     : null;
 
   return (

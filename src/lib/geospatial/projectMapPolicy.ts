@@ -1,9 +1,5 @@
 import type { LayerStateMap } from "@/hooks/useLayerState";
-import {
-  getGeoViewerPreset,
-  resolveGeoLayer,
-  type GeoViewerPresetId,
-} from "./layerRegistry";
+import { getGeoViewerPreset, resolveGeoLayer, type GeoViewerPresetId } from "./layerRegistry";
 
 export function layerStateForPreset(
   defaults: LayerStateMap,

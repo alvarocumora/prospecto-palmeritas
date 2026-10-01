@@ -26,13 +26,15 @@ export const STANDARD_FRAMEWORKS: Record<DisclosureStandard, StandardFramework> 
       {
         id: "scope",
         title: "Scope, purpose and reliance",
-        description: "Definir propósito del informe, destinatario, alcance y dependencia de terceros.",
+        description:
+          "Definir propósito del informe, destinatario, alcance y dependencia de terceros.",
         requiredForDelivery: true,
       },
       {
         id: "property",
         title: "Property description and ownership",
-        description: "Identificar propiedad, derechos mineros, ubicación, CRS y materialidad legal.",
+        description:
+          "Identificar propiedad, derechos mineros, ubicación, CRS y materialidad legal.",
         requiredForDelivery: true,
       },
       {
@@ -44,7 +46,8 @@ export const STANDARD_FRAMEWORKS: Record<DisclosureStandard, StandardFramework> 
       {
         id: "exploration_data",
         title: "Exploration, sampling and QA/QC",
-        description: "Documentar métodos, datos de entrada, muestreo, laboratorio y controles de calidad.",
+        description:
+          "Documentar métodos, datos de entrada, muestreo, laboratorio y controles de calidad.",
         requiredForDelivery: true,
       },
       {
@@ -63,13 +66,15 @@ export const STANDARD_FRAMEWORKS: Record<DisclosureStandard, StandardFramework> 
       {
         id: "interpretation_recommendations",
         title: "Interpretation and recommendations",
-        description: "Distinguir interpretación, incertidumbre, riesgos y programa de trabajo recomendado.",
+        description:
+          "Distinguir interpretación, incertidumbre, riesgos y programa de trabajo recomendado.",
         requiredForDelivery: true,
       },
       {
         id: "qp",
         title: "Qualified Person review",
-        description: "Registrar identidad, responsabilidad, revisión y aprobación del QP cuando corresponda.",
+        description:
+          "Registrar identidad, responsabilidad, revisión y aprobación del QP cuando corresponda.",
         requiredForDelivery: true,
       },
     ],
@@ -90,7 +95,8 @@ export const STANDARD_FRAMEWORKS: Record<DisclosureStandard, StandardFramework> 
       {
         id: "reporting",
         title: "Reporting of exploration results",
-        description: "Ubicación, tenencia, contexto geológico, método de agregación y balance de la divulgación.",
+        description:
+          "Ubicación, tenencia, contexto geológico, método de agregación y balance de la divulgación.",
         requiredForDelivery: true,
       },
       {

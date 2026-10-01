@@ -123,7 +123,9 @@ export function LayerOpacityPanel({
       label: DOMAIN_LABEL[domain],
       items: layers.filter((layer) => canonicalMeta(layer)?.domain === domain),
     })),
-    ...Array.from(new Set(layers.filter((layer) => !canonicalMeta(layer)).map((layer) => layer.group)))
+    ...Array.from(
+      new Set(layers.filter((layer) => !canonicalMeta(layer)).map((layer) => layer.group)),
+    )
       .sort()
       .map((group) => ({
         key: `legacy:${group}`,
@@ -219,7 +221,9 @@ export function LayerOpacityPanel({
                       {meta ? (
                         <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
                           <EvidenceBadge kind={meta.evidence} scale={meta.scaleLabel} size="xs" />
-                          <span className="text-[9px] text-muted-foreground">{meta.sourceSystem}</span>
+                          <span className="text-[9px] text-muted-foreground">
+                            {meta.sourceSystem}
+                          </span>
                         </div>
                       ) : (
                         <div className="mt-1 text-[9px] uppercase tracking-wider text-muted-foreground">

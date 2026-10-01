@@ -160,5 +160,12 @@ canonical evidence classes. The former project-specific public renderers are ref
 QA window while Actions CI is unavailable.
 
 ### GEO-VIEW-06 — reports and snapshots
-Persist visible canonical layer ids, bounds, timestamp, CRS, source and provenance in the
-snapshot manifest so Reporting renders exactly what the official viewer showed.
+**06A implemented:** the official 2D and 3D engines publish project, mode, canonical visible layer
+ids, WGS84 view state and applicable campaign/time filters. `GeoSnapshotManifest` canonicalizes
+aliases and derives evidence/source/scale metadata only from the layer registry. Unknown or
+non-report-capable visible layers block report eligibility, and the PDF map model can retain the
+same manifest beside the captured image.
+
+`stableGeoSnapshotPayload` provides a deterministic evidence payload for a future SHA-256 snapshot
+identity. The bitmap itself is **not yet** claimed as deterministic: headless/server rendering,
+artifact storage, image hash and immutable snapshot versioning remain GEO-VIEW-06B.

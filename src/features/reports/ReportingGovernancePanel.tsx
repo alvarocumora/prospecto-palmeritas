@@ -17,15 +17,8 @@ function shortHash(value: string | null | undefined): string {
 }
 
 export function ReportingGovernancePanel() {
-  const {
-    readiness,
-    latestReport,
-    reviewer,
-    versions,
-    gate,
-    loading,
-    error,
-  } = useReportGovernance();
+  const { readiness, latestReport, reviewer, versions, gate, loading, error } =
+    useReportGovernance();
 
   const latestVersion = versions[0] ?? null;
   const standards = latestReport?.active_standards ?? [];

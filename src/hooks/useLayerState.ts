@@ -7,30 +7,37 @@ export type LayerState = {
 
 export type LayerStateMap = Record<string, LayerState>;
 
-const STORAGE_KEY = "map:layer-state:v1";
+export const MAP_LAYER_STATE_STORAGE_KEY = "map:layer-state:v1";
+export const MAP_LAYER_STATE_EVENT = "geocapitals:map-layer-state";
 
-function readStorage(): LayerStateMap {
+export function readStoredLayerState(): LayerStateMap {
   if (typeof window === "undefined") return {};
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(MAP_LAYER_STATE_STORAGE_KEY);
     return raw ? (JSON.parse(raw) as LayerStateMap) : {};
   } catch {
     return {};
   }
 }
 
+function publishState(state: LayerStateMap) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent<LayerStateMap>(MAP_LAYER_STATE_EVENT, { detail: state }));
+}
+
 function writeStorage(state: LayerStateMap) {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    localStorage.setItem(MAP_LAYER_STATE_STORAGE_KEY, JSON.stringify(state));
   } catch {
-    /* ignore quota */
+    /* ignore quota; runtime snapshot state still needs to be published */
   }
+  publishState(state);
 }
 
 export function useLayerState(defaults: LayerStateMap) {
   const [state, setState] = useState<LayerStateMap>(() => {
-    const stored = readStorage();
+    const stored = readStoredLayerState();
     return { ...defaults, ...stored };
   });
 

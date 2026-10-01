@@ -26,7 +26,9 @@ export function PublicGeoLayerControls({
   const layers = manifest.layers.filter((layer) => available.has(layer.id));
 
   return (
-    <div className={`rounded border border-border bg-background/95 p-2.5 shadow-lg backdrop-blur ${compact ? "w-[18rem]" : "w-[21rem]"}`}>
+    <div
+      className={`rounded border border-border bg-background/95 p-2.5 shadow-lg backdrop-blur ${compact ? "w-[18rem]" : "w-[21rem]"}`}
+    >
       <div className="mb-2 flex items-center justify-between gap-2 border-b border-border pb-2">
         <div className="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-foreground">
           <Layers3 className="h-3.5 w-3.5 text-gold" />
@@ -80,9 +82,7 @@ export function PublicGeoLayerControls({
                 </span>
               </div>
               {layer.caution && active && (
-                <div className="mt-1.5 text-[9px] leading-snug text-amber-600">
-                  {layer.caution}
-                </div>
+                <div className="mt-1.5 text-[9px] leading-snug text-amber-600">{layer.caution}</div>
               )}
             </button>
           );
