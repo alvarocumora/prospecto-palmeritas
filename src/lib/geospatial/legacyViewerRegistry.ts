@@ -20,7 +20,7 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
     status: "active_compatibility",
     successor: "ProjectMap + Canonical Geospatial Layer Registry",
     uniqueCapability:
-      "IDW intensity-surface layer, grouped/collapsible evidence legend with per-section caution notes — no canonical equivalent yet",
+      "Grouped/collapsible evidence legend with per-section caution notes — no canonical equivalent yet. The IDW intensity-surface layer itself was ported to the canonical stack (remote_sensing.anomaly_intensity in PublicCanonicalMap); this entry's remaining gap is the legend UX, not the surface.",
     blocker:
       "/live/cholqui already migrated to the canonical adapter (public parity is done), but /terminal/cholqui (ProjectTerminalShell, no auth gate) still renders this via CholquiMasterViewer for the 2D tab. Port the IDW intensity surface + grouped legend to the canonical stack before retiring.",
   },
@@ -91,6 +91,25 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
     successor: "PublicCanonicalScene + buildLosVerdesPublicGeoBundle",
     uniqueCapability: "Historical Los Verdes public deck.gl scene",
     blocker: "Keep for one QA window until Actions CI validates the canonical public route",
+  },
+  {
+    id: "losverdes-engine3d",
+    path: "src/engine3d/LosVerdesEngine3D.tsx",
+    status: "active_compatibility",
+    successor: "GeoScene3D",
+    uniqueCapability:
+      "react-three-fiber cinematic 3D report renderer (terrain, DEM worker, custom camera/lighting) for the Pre-43-101 report shell",
+    blocker:
+      "Live renderer for /reports/losverdes/pre43101 (src/features/reports/pre43101/components/Pre43101Shell.tsx:12,21) — a distinct engine from GeoScene3D, not just a QA fallback. Was previously absent from this registry entirely.",
+  },
+  {
+    id: "cholqui-terrain-3d",
+    path: "src/features/franco/components/CholquiTerrain3D.tsx",
+    status: "active_compatibility",
+    successor: "GeoScene3D",
+    uniqueCapability: "react-three-fiber Cholqui terrain renderer for the terminal 3D tab",
+    blocker:
+      "Live renderer for the 3D tab of /terminal/cholqui (src/features/terminal/ProjectTerminalShell.tsx:220) — a real, unauthenticated route. Was previously absent from this registry entirely.",
   },
 ];
 

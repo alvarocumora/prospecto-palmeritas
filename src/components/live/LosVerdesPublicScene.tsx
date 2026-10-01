@@ -1,7 +1,9 @@
 // Visor 3D público Los Verdes — Sprint B (MVP real).
 // MapLibre + deck.gl con DEM real (terrarium AWS), basemap satelital,
 // anomalías satelitales extruidas, vetas, targets, anomalías magnéticas.
-// Reemplaza al monolito LosVerdesEngine3D en /live/losverdes.
+// Sin importers activos: /live/losverdes migró a PublicCanonicalScene +
+// buildLosVerdesPublicGeoBundle. Se conserva como referencia (ver
+// legacyViewerRegistry.ts, id "losverdes-public-scene", reference_only).
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
