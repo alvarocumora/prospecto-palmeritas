@@ -42,7 +42,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/listings/$listin
   ),
   errorComponent: ({ error }) => (
     <div className="p-8 text-sm text-danger">
-      Error: {error.message}{" "}
+      Error: {(error as Error).message}{" "}
       <Link to="/dashboard/listings" className="text-gold hover:underline">
         Volver
       </Link>

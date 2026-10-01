@@ -65,7 +65,7 @@ export const Route = createFileRoute("/catastro/c/$code")({
     <PublicCatastroShell>
       <div className="max-w-3xl mx-auto px-4 py-20 text-center">
         <h1 className="text-xl font-bold mb-2">Error al cargar la ficha</h1>
-        <p className="text-xs font-mono text-muted-foreground">{error.message}</p>
+        <p className="text-xs font-mono text-muted-foreground">{(error as Error).message}</p>
       </div>
     </PublicCatastroShell>
   ),
