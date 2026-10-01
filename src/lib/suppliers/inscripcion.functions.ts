@@ -54,8 +54,7 @@ async function sha256(input: string): Promise<string> {
 }
 
 export type SubmitResult =
-  | { ok: true; folio: string; supplierId: string }
-  | { ok: false; error: string };
+  { ok: true; folio: string; supplierId: string } | { ok: false; error: string };
 
 export const submitInscripcion = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => InputSchema.parse(raw))

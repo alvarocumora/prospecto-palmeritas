@@ -491,8 +491,7 @@ export const verifyFlowSignatures = createServerFn({ method: "POST" })
     // validar que cada signOrder cae dentro del rango de partes esperadas.
     const doc = row.doc as GeneratedDoc;
     const sigBlock = doc?.blocks?.find((b) => (b as { kind?: string }).kind === "signature") as
-      | { kind: "signature"; parties: string[] }
-      | undefined;
+      { kind: "signature"; parties: string[] } | undefined;
     const partiesCount = sigBlock?.parties?.length ?? 0;
 
     // Todas las filas del flujo (o la única fila si no hay flow_id) que ya

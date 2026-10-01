@@ -29,23 +29,13 @@ export type EvidenceModality =
  * que es puramente de presentación y no corresponde 1:1 con estas columnas.
  */
 export type EvidenceProvenance =
-  | "OFFICIAL"
-  | "CERTIFIED"
-  | "DOCUMENTARY"
-  | "DECLARED"
-  | "DERIVED"
-  | "INTERPRETED";
+  "OFFICIAL" | "CERTIFIED" | "DOCUMENTARY" | "DECLARED" | "DERIVED" | "INTERPRETED";
 
 export type EvidenceValidationStatus =
-  | "unverified"
-  | "source_verified"
-  | "technically_reviewed"
-  | "validated";
+  "unverified" | "source_verified" | "technically_reviewed" | "validated";
 
 export type EvidenceSourceTable =
-  | "satellite_evidence"
-  | "satellite_anomalies"
-  | "geophysics_anomalies";
+  "satellite_evidence" | "satellite_anomalies" | "geophysics_anomalies";
 
 export interface ProjectEvidenceProvenance {
   classification: EvidenceProvenance;

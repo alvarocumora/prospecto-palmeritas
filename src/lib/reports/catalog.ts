@@ -1,10 +1,7 @@
 import type { ReportProfile } from "@/lib/pdf/architecture";
 
 export type ReportProductId =
-  | "executive_summary"
-  | "investment_memorandum"
-  | "exploration_targeting"
-  | "technical_evidence";
+  "executive_summary" | "investment_memorandum" | "exploration_targeting" | "technical_evidence";
 
 export type ReportProduct = {
   id: ReportProductId;

@@ -1,6 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, FileDown, Loader2, ShieldCheck, Landmark, CalendarClock, Repeat } from "lucide-react";
+import {
+  ArrowLeft,
+  FileDown,
+  Loader2,
+  ShieldCheck,
+  Landmark,
+  CalendarClock,
+  Repeat,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,10 +53,14 @@ export const Route = createFileRoute("/_authenticated/dashboard/inversion-colate
       { title: "Inversión con colateral inmobiliario — Geocapitals" },
       {
         name: "description",
-        content: "Invierte en minería con UF + 12 % anual e interés mensual, respaldado por una parcela en garantía.",
+        content:
+          "Invierte en minería con UF + 12 % anual e interés mensual, respaldado por una parcela en garantía.",
       },
       { property: "og:title", content: "Inversión con colateral inmobiliario — Geocapitals" },
-      { property: "og:description", content: "UF + 12 % anual, interés mensual y parcela en garantía en el Maule." },
+      {
+        property: "og:description",
+        content: "UF + 12 % anual, interés mensual y parcela en garantía en el Maule.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -66,7 +78,9 @@ function CollateralPage() {
     const id = toast.loading("Generando deck…");
     try {
       const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
-      const [cover, plan, ve, ve2] = await Promise.all([coverImg, hualanePlan, velValle, velLago].map((u) => toDataUrl(u)));
+      const [cover, plan, ve, ve2] = await Promise.all(
+        [coverImg, hualanePlan, velValle, velLago].map((u) => toDataUrl(u)),
+      );
       await downloadProjectDoc(
         buildCollateralDeck({ cover, hualanePlan: plan, valleEscondido: ve, valleEscondido2: ve2 }),
         "deck",
@@ -118,7 +132,13 @@ function CollateralPage() {
         </header>
 
         <figure className="mt-8 relative overflow-hidden border border-hairline">
-          <img src={coverImg} alt="Valle rural de la Región del Maule" width={1600} height={912} className="w-full h-56 md:h-80 object-cover" />
+          <img
+            src={coverImg}
+            alt="Valle rural de la Región del Maule"
+            width={1600}
+            height={912}
+            className="w-full h-56 md:h-80 object-cover"
+          />
           <figcaption className="absolute bottom-0 left-0 right-0 bg-surface/85 px-4 py-2 text-[11px] font-mono text-content-subtle">
             Imagen ilustrativa · colateral en Hualañé y Licantén, Región del Maule
           </figcaption>
@@ -135,8 +155,12 @@ function CollateralPage() {
         </section>
 
         <section className="mt-12">
-          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent-brand">Cartera de colateral</p>
-          <h2 className="font-serif text-2xl mt-2">Dos proyectos elegibles · 116 parcelas · 85,75 ha</h2>
+          <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent-brand">
+            Cartera de colateral
+          </p>
+          <h2 className="font-serif text-2xl mt-2">
+            Dos proyectos elegibles · 116 parcelas · 85,75 ha
+          </h2>
           <div className="mt-5 grid gap-6 md:grid-cols-2">
             {COLLATERAL_PROJECTS.map((p) => (
               <article key={p.key} className="border border-hairline overflow-hidden">
@@ -148,20 +172,38 @@ function CollateralPage() {
                 />
                 <div className="p-5">
                   <h3 className="font-serif text-xl">{p.name}</h3>
-                  <p className="text-xs text-content-subtle mt-1">{p.commune} · {p.region} · {p.owner}</p>
+                  <p className="text-xs text-content-subtle mt-1">
+                    {p.commune} · {p.region} · {p.owner}
+                  </p>
                   <dl className="mt-4 grid grid-cols-3 gap-px bg-hairline border border-hairline text-center">
-                    <div className="bg-surface p-3"><dt className="text-[10px] text-content-subtle">Superficie</dt><dd className="font-mono">{p.areaHa.toLocaleString("es-CL")} ha</dd></div>
-                    <div className="bg-surface p-3"><dt className="text-[10px] text-content-subtle">Parcelas</dt><dd className="font-mono">{p.lots}</dd></div>
-                    <div className="bg-surface p-3"><dt className="text-[10px] text-content-subtle">Tamaño</dt><dd className="font-mono text-xs">{p.lotSize}</dd></div>
+                    <div className="bg-surface p-3">
+                      <dt className="text-[10px] text-content-subtle">Superficie</dt>
+                      <dd className="font-mono">{p.areaHa.toLocaleString("es-CL")} ha</dd>
+                    </div>
+                    <div className="bg-surface p-3">
+                      <dt className="text-[10px] text-content-subtle">Parcelas</dt>
+                      <dd className="font-mono">{p.lots}</dd>
+                    </div>
+                    <div className="bg-surface p-3">
+                      <dt className="text-[10px] text-content-subtle">Tamaño</dt>
+                      <dd className="font-mono text-xs">{p.lotSize}</dd>
+                    </div>
                   </dl>
-                  <p className="text-xs mt-3"><span className="text-content-subtle">Precio lista:</span> {p.priceRange}</p>
-                  <p className="text-xs mt-1"><span className="text-content-subtle">Registro:</span> {p.registry}</p>
+                  <p className="text-xs mt-3">
+                    <span className="text-content-subtle">Precio lista:</span> {p.priceRange}
+                  </p>
+                  <p className="text-xs mt-1">
+                    <span className="text-content-subtle">Registro:</span> {p.registry}
+                  </p>
                   <p className="text-xs mt-1 text-content-subtle">{p.status}</p>
                 </div>
               </article>
             ))}
           </div>
-          <p className="mt-3 text-[11px] text-content-subtle">Precios de lista publicados, no tasaciones. Rol individual y tasación se fijan en cada contrato.</p>
+          <p className="mt-3 text-[11px] text-content-subtle">
+            Precios de lista publicados, no tasaciones. Rol individual y tasación se fijan en cada
+            contrato.
+          </p>
         </section>
 
         <section className="mt-12">
@@ -218,7 +260,9 @@ function CollateralPage() {
               <ul className="mt-4 divide-y divide-hairline text-sm">
                 {COLLATERAL_PARCELS.map((p) => (
                   <li key={p.code} className="py-2 flex justify-between gap-3">
-                    <span>{p.code} · {p.project}</span>
+                    <span>
+                      {p.code} · {p.project}
+                    </span>
                     <span className="font-mono">{p.surface}</span>
                   </li>
                 ))}

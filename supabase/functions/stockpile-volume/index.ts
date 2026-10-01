@@ -139,8 +139,7 @@ Deno.serve(async (req) => {
     const height = image.getHeight();
     const bbox = image.getBoundingBox(); // raster CRS
     const data = (await image.readRasters({ samples: [0] })) as unknown as (
-      | Float32Array
-      | number[]
+      Float32Array | number[]
     )[];
     const raster = data[0];
 

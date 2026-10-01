@@ -2,10 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 export type SatIndexCode =
-  | "IRON_OXIDE"
-  | "CLAY_MINERALS"
-  | "HYDROTHERMAL_ALTERATION"
-  | "STRUCTURAL_LINEAMENTS";
+  "IRON_OXIDE" | "CLAY_MINERALS" | "HYDROTHERMAL_ALTERATION" | "STRUCTURAL_LINEAMENTS";
 
 export type AnomalyRow = {
   id: string;

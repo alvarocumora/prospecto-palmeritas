@@ -1,8 +1,7 @@
 export const SESSION_COOKIE = "live_map_session";
 
 export type LiveMapVerifyResult =
-  | { ok: true; token: string; cookieName: string }
-  | { ok: false; error: string };
+  { ok: true; token: string; cookieName: string } | { ok: false; error: string };
 
 function constantTimeEqual(a: string, b: string): boolean {
   if (a.length !== b.length) return false;

@@ -21,13 +21,7 @@ export type GeoLayerDomain =
   | "models";
 
 export type GeoEvidenceClass =
-  | "OFICIAL"
-  | "MEDIDO"
-  | "CERTIFICADO"
-  | "DERIVADO"
-  | "INTERPRETADO"
-  | "PROPUESTO"
-  | "CONTEXTO";
+  "OFICIAL" | "MEDIDO" | "CERTIFICADO" | "DERIVADO" | "INTERPRETADO" | "PROPUESTO" | "CONTEXTO";
 
 export type GeoLayerCapability = "2d" | "3d" | "field" | "public" | "report";
 
@@ -704,11 +698,7 @@ export function layersForDomain(domain: GeoLayerDomain): GeoLayerDefinition[] {
 }
 
 export type GeoViewerPresetId =
-  | "official_workbench"
-  | "official_3d"
-  | "field"
-  | "public_live"
-  | "toki2_field";
+  "official_workbench" | "official_3d" | "field" | "public_live" | "toki2_field";
 
 export type GeoViewerPreset = {
   id: GeoViewerPresetId;

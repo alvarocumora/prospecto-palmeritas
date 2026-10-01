@@ -41,8 +41,7 @@ export const getBoardPrefs = createServerFn({ method: "GET" })
       wip_limits: row.wip_limits ?? {},
       column_order: row.column_order ?? [],
       preferred_view: (row.preferred_view === "timeline" ? "timeline" : "kanban") as
-        | "kanban"
-        | "timeline",
+        "kanban" | "timeline",
     };
   });
 

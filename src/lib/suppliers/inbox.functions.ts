@@ -57,11 +57,7 @@ export const listInboxSuppliers = createServerFn({ method: "GET" })
       q = q.eq(
         "status",
         data.status as
-          | "nuevo"
-          | "en_revision"
-          | "verificado"
-          | "descartado"
-          | "documentos_incompletos",
+          "nuevo" | "en_revision" | "verificado" | "descartado" | "documentos_incompletos",
       );
     if (data.country) q = q.eq("country", data.country as "CL" | "PE" | "AR" | "BO" | "OTRO");
     if (data.search && data.search.length > 1) {

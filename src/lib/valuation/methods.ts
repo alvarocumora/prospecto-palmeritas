@@ -15,14 +15,7 @@ export type Stage =
   | "production";
 
 export type Commodity =
-  | "copper"
-  | "gold"
-  | "silver"
-  | "lithium"
-  | "iron"
-  | "zinc"
-  | "molybdenum"
-  | string;
+  "copper" | "gold" | "silver" | "lithium" | "iron" | "zinc" | "molybdenum" | string;
 
 /* ————————————————————————————————————————
    1) COSTO / REEMPLAZO — US$/ha por etapa

@@ -9,12 +9,7 @@ import type { EvidenceClass, ReportProfile } from "./architecture";
 export type DocKpi = { label: string; value: string; note?: string };
 
 export type EvidenceStatus =
-  | "VERIFIED"
-  | "OBSERVED"
-  | "DECLARED"
-  | "DERIVED"
-  | "CONCEPTUAL"
-  | "PENDING_DD";
+  "VERIFIED" | "OBSERVED" | "DECLARED" | "DERIVED" | "CONCEPTUAL" | "PENDING_DD";
 
 export type DocConfidence = "high" | "medium" | "low";
 

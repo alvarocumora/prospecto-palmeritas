@@ -141,7 +141,16 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
         p.rol ?? "Por confirmar",
         p.appraisalUf != null ? `UF ${p.appraisalUf.toLocaleString("es-CL")}` : "Por confirmar",
       ])
-    : [["[Por completar]", "Proyecto Maule", "Por confirmar", "5.000 m2 / 1 ha", "Por confirmar", "Por confirmar"]];
+    : [
+        [
+          "[Por completar]",
+          "Proyecto Maule",
+          "Por confirmar",
+          "5.000 m2 / 1 ha",
+          "Por confirmar",
+          "Por confirmar",
+        ],
+      ];
 
   return {
     reportProfile: "investment",
@@ -157,7 +166,11 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
     kpis: [
       { label: "Inversión mínima", value: "$25 MM", note: "Pesos chilenos" },
       { label: "Tasa", value: "UF + 12 %", note: "Anual, capital reajustable en UF" },
-      { label: "Pago de intereses", value: "Mensual", note: `Ej.: ${fmtClp(example)}/mes sobre $25 MM + UF` },
+      {
+        label: "Pago de intereses",
+        value: "Mensual",
+        note: `Ej.: ${fmtClp(example)}/mes sobre $25 MM + UF`,
+      },
       { label: "Colateral", value: "5.000 m2 - 1 ha", note: "Parcela con rol individual, Maule" },
     ],
     thesis: [
@@ -166,16 +179,29 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
       "Tu inversión queda respaldada por un activo real: una parcela con rol individual en la Región del Maule.",
       "Cada 12 meses decides: reinviertes o retiras tu capital.",
     ],
-    milestones: COLLATERAL_STEPS.map((s, i) => ({ when: `Paso ${i + 1}`, what: s.title.replace(/^\d+\.\s*/, "") })),
+    milestones: COLLATERAL_STEPS.map((s, i) => ({
+      when: `Paso ${i + 1}`,
+      what: s.title.replace(/^\d+\.\s*/, ""),
+    })),
     sections: [
       ...(img.cover
-        ? [{
-            eyebrow: "Respaldo real",
-            title: "Activos inmobiliarios en el Maule",
-            lead: "Tu inversión minera queda respaldada por tierra con inscripción y plano.",
-            deck: true,
-            blocks: [{ kind: "figure" as const, title: "Valle rural, Región del Maule", imageDataUrl: img.cover, caption: "Imagen ilustrativa de ambientación. No corresponde a un predio específico." }],
-          }]
+        ? [
+            {
+              eyebrow: "Respaldo real",
+              title: "Activos inmobiliarios en el Maule",
+              lead: "Tu inversión minera queda respaldada por tierra con inscripción y plano.",
+              deck: true,
+              blocks: [
+                {
+                  kind: "figure" as const,
+                  title: "Valle rural, Región del Maule",
+                  imageDataUrl: img.cover,
+                  caption:
+                    "Imagen ilustrativa de ambientación. No corresponde a un predio específico.",
+                },
+              ],
+            },
+          ]
         : []),
       {
         eyebrow: "El modelo",
@@ -212,30 +238,57 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
           {
             kind: "table",
             head: ["Proyecto", "Comuna", "Superficie", "Parcelas", "Precio lista", "Registro"],
-            rows: COLLATERAL_PROJECTS.map((p) => [p.name, p.commune, `${p.areaHa.toLocaleString("es-CL")} ha`, String(p.lots), p.priceRange, p.registry]),
+            rows: COLLATERAL_PROJECTS.map((p) => [
+              p.name,
+              p.commune,
+              `${p.areaHa.toLocaleString("es-CL")} ha`,
+              String(p.lots),
+              p.priceRange,
+              p.registry,
+            ]),
           },
-          { kind: "text", body: "Titular: Forestal Valle Escondido SpA. Precios de lista publicados, no tasaciones. La parcela, su rol individual y su tasación se fijan en cada contrato." },
+          {
+            kind: "text",
+            body: "Titular: Forestal Valle Escondido SpA. Precios de lista publicados, no tasaciones. La parcela, su rol individual y su tasación se fijan en cada contrato.",
+          },
         ],
       },
       ...(img.hualanePlan
-        ? [{
-            eyebrow: "Colateral 01",
-            title: "Valle de Hualañé",
-            lead: "40 parcelas desde 1 ha sobre 41,75 ha. Rol matriz 168-921, sector Caone.",
-            deck: true,
-            blocks: [{ kind: "figure" as const, title: "Plano maestro, rol 168-921", imageDataUrl: img.hualanePlan, caption: "Plano comercial del proyecto. Valores y disponibilidad sujetos a confirmación." }],
-          }]
+        ? [
+            {
+              eyebrow: "Colateral 01",
+              title: "Valle de Hualañé",
+              lead: "40 parcelas desde 1 ha sobre 41,75 ha. Rol matriz 168-921, sector Caone.",
+              deck: true,
+              blocks: [
+                {
+                  kind: "figure" as const,
+                  title: "Plano maestro, rol 168-921",
+                  imageDataUrl: img.hualanePlan,
+                  caption:
+                    "Plano comercial del proyecto. Valores y disponibilidad sujetos a confirmación.",
+                },
+              ],
+            },
+          ]
         : []),
       ...(img.valleEscondido
-        ? [{
-            eyebrow: "Colateral 02",
-            title: "Valle Escondido Licantén",
-            lead: "76 parcelas sobre 44 ha. Inscripción Fs. 243 N 133 (2012), plano N 192 (2023), CBR Licantén.",
-            deck: true,
-            blocks: [
-              { kind: "figure" as const, title: "Valle Escondido Licantén", imageDataUrl: img.valleEscondido, caption: "Imagen referencial del material comercial del proyecto." },
-            ],
-          }]
+        ? [
+            {
+              eyebrow: "Colateral 02",
+              title: "Valle Escondido Licantén",
+              lead: "76 parcelas sobre 44 ha. Inscripción Fs. 243 N 133 (2012), plano N 192 (2023), CBR Licantén.",
+              deck: true,
+              blocks: [
+                {
+                  kind: "figure" as const,
+                  title: "Valle Escondido Licantén",
+                  imageDataUrl: img.valleEscondido,
+                  caption: "Imagen referencial del material comercial del proyecto.",
+                },
+              ],
+            },
+          ]
         : []),
       {
         eyebrow: "Respaldo",

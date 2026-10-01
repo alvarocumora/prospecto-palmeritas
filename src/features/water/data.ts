@@ -233,10 +233,7 @@ export const QUALITY_STATUS_LABEL: Record<string, string> = {
 };
 
 export type QualityStatusKey =
-  | "not_tested"
-  | "historical"
-  | "lab_verified"
-  | "pending_verification";
+  "not_tested" | "historical" | "lab_verified" | "pending_verification";
 
 export const QUALITY_STATUS_META: Record<
   QualityStatusKey,
