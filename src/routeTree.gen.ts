@@ -86,6 +86,8 @@ import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardCholquiRouteImport } from './routes/_authenticated.dashboard.cholqui'
 import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
 import { Route as AuthenticatedDashboardCobranzaRouteImport } from './routes/_authenticated.dashboard.cobranza'
+import { Route as AuthenticatedDashboardColateralDocumentosRouteImport } from './routes/_authenticated.dashboard.colateral-documentos'
+import { Route as AuthenticatedDashboardColateralLeadsRouteImport } from './routes/_authenticated.dashboard.colateral-leads'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
@@ -586,6 +588,18 @@ const AuthenticatedDashboardCobranzaRoute =
   AuthenticatedDashboardCobranzaRouteImport.update({
     id: '/dashboard/cobranza',
     path: '/dashboard/cobranza',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralDocumentosRoute =
+  AuthenticatedDashboardColateralDocumentosRouteImport.update({
+    id: '/dashboard/colateral-documentos',
+    path: '/dashboard/colateral-documentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralLeadsRoute =
+  AuthenticatedDashboardColateralLeadsRouteImport.update({
+    id: '/dashboard/colateral-leads',
+    path: '/dashboard/colateral-leads',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardCommandCenterRoute =
@@ -1241,6 +1255,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1418,6 +1434,8 @@ export interface FileRoutesByTo {
   '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1597,6 +1615,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/_authenticated/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/_authenticated/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/_authenticated/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/_authenticated/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1776,6 +1796,8 @@ export interface FileRouteTypes {
     | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
+    | '/dashboard/colateral-documentos'
+    | '/dashboard/colateral-leads'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -1953,6 +1975,8 @@ export interface FileRouteTypes {
     | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
+    | '/dashboard/colateral-documentos'
+    | '/dashboard/colateral-leads'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -2131,6 +2155,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cholqui'
     | '/_authenticated/dashboard/clientes'
     | '/_authenticated/dashboard/cobranza'
+    | '/_authenticated/dashboard/colateral-documentos'
+    | '/_authenticated/dashboard/colateral-leads'
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
@@ -2860,6 +2886,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/cobranza'
       fullPath: '/dashboard/cobranza'
       preLoaderRoute: typeof AuthenticatedDashboardCobranzaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-documentos': {
+      id: '/_authenticated/dashboard/colateral-documentos'
+      path: '/dashboard/colateral-documentos'
+      fullPath: '/dashboard/colateral-documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-leads': {
+      id: '/_authenticated/dashboard/colateral-leads'
+      path: '/dashboard/colateral-leads'
+      fullPath: '/dashboard/colateral-leads'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralLeadsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/command-center': {
@@ -3663,6 +3703,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCholquiRoute: typeof AuthenticatedDashboardCholquiRoute
   AuthenticatedDashboardClientesRoute: typeof AuthenticatedDashboardClientesRoute
   AuthenticatedDashboardCobranzaRoute: typeof AuthenticatedDashboardCobranzaRoute
+  AuthenticatedDashboardColateralDocumentosRoute: typeof AuthenticatedDashboardColateralDocumentosRoute
+  AuthenticatedDashboardColateralLeadsRoute: typeof AuthenticatedDashboardColateralLeadsRoute
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
@@ -3745,6 +3787,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCholquiRoute: AuthenticatedDashboardCholquiRoute,
   AuthenticatedDashboardClientesRoute: AuthenticatedDashboardClientesRoute,
   AuthenticatedDashboardCobranzaRoute: AuthenticatedDashboardCobranzaRoute,
+  AuthenticatedDashboardColateralDocumentosRoute:
+    AuthenticatedDashboardColateralDocumentosRoute,
+  AuthenticatedDashboardColateralLeadsRoute:
+    AuthenticatedDashboardColateralLeadsRoute,
   AuthenticatedDashboardCommandCenterRoute:
     AuthenticatedDashboardCommandCenterRoute,
   AuthenticatedDashboardCommodityLotsRoute:

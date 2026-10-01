@@ -1925,6 +1925,81 @@ export type Database = {
           },
         ]
       }
+      collateral_documents: {
+        Row: {
+          created_at: string
+          doc_type: string
+          id: string
+          project_key: string
+          storage_path: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          id?: string
+          project_key: string
+          storage_path: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          id?: string
+          project_key?: string
+          storage_path?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
+      collateral_leads: {
+        Row: {
+          amount_clp: number
+          created_at: string
+          email: string
+          id: string
+          message: string | null
+          months: number
+          name: string
+          phone: string | null
+          project_pref: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount_clp: number
+          created_at?: string
+          email: string
+          id?: string
+          message?: string | null
+          months: number
+          name: string
+          phone?: string | null
+          project_pref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_clp?: number
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string | null
+          months?: number
+          name?: string
+          phone?: string | null
+          project_pref?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       commodity_certifications: {
         Row: {
           category: string | null
