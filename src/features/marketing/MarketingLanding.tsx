@@ -27,6 +27,7 @@ import { Reveal } from "@/features/marketing/Reveal";
 import { Eyebrow } from "@/components/brand";
 import heroMining from "@/assets/hero-mining.jpg";
 import colateralCover from "@/assets/colateral/cover-maule.jpg";
+import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 
 export function MarketingLanding() {
   const { t } = useLocale();
@@ -256,6 +257,7 @@ export function MarketingLanding() {
                   Simular y ver parcelas <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
+              <CollateralDownloadButtons className="mt-3" />
               <p className="mt-4 text-[11px] text-content-muted">
                 Tasa pactada por contrato, no proyección minera. No es oferta pública de valores.
               </p>
