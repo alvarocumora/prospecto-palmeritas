@@ -181,7 +181,6 @@ function PublicCollateralPage() {
               </Link>
             </div>
             <ContactForm
-              key={msg}
               source="inversion-colateral"
               defaultRole="investor"
               defaultMessage={msg}
