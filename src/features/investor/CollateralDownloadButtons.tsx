@@ -32,7 +32,7 @@ export function CollateralDownloadButtons({ className = "" }: { className?: stri
         className={`${base} border border-hairline text-content hover:border-accent-brand hover:text-accent-brand`}
       >
         {busy === "teaser" ? <Loader2 className="w-4 h-4 animate-spin" /> : <QrCode className="w-4 h-4" />}
-        Teaser PDF con QR
+        Memorándum ejecutivo (PDF)
       </button>
       <button
         type="button"
