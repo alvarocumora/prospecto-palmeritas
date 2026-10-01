@@ -6,13 +6,32 @@ import {
 } from "./legacyViewerRegistry";
 
 describe("legacy viewer retirement registry", () => {
-  it("moves migrated Cholqui and Los Verdes viewers out of active public compatibility", () => {
+  it("moves migrated Cholqui and Los Verdes PUBLIC viewers out of public compatibility", () => {
+    // /live/cholqui y /live/losverdes ya migraron al stack canónico — esos dos
+    // viewers dejan de ser necesarios para el parity público.
     const publicViewers = legacyViewersByStatus("public_compatibility");
-    const referenceViewers = legacyViewersByStatus("reference_only");
     expect(publicViewers.map((viewer) => viewer.id)).not.toContain("cholqui-master-viewer");
     expect(publicViewers.map((viewer) => viewer.id)).not.toContain("losverdes-strategic-map");
-    expect(referenceViewers.map((viewer) => viewer.id)).toContain("cholqui-master-viewer");
-    expect(referenceViewers.map((viewer) => viewer.id)).toContain("losverdes-strategic-map");
+  });
+
+  it("no marca reference_only (retirado) lo que sigue siendo el renderer real de una ruta viva", () => {
+    // cholqui-master-viewer y losverdes-strategic-map NO están retirados: siguen
+    // siendo el renderer 2D de /terminal/cholqui y /terminal/losverdes
+    // (ProjectTerminalShell, sin auth gate) — una ruta distinta de /live/*, que
+    // sí migró. Marcarlos reference_only invitaría a borrarlos pensando que ya
+    // no se usan en ningún lado.
+    const referenceViewers = legacyViewersByStatus("reference_only");
+    const activeViewers = legacyViewersByStatus("active_compatibility");
+    expect(referenceViewers.map((viewer) => viewer.id)).not.toContain("cholqui-master-viewer");
+    expect(referenceViewers.map((viewer) => viewer.id)).not.toContain("losverdes-strategic-map");
+    expect(activeViewers.map((viewer) => viewer.id)).toContain("cholqui-master-viewer");
+    expect(activeViewers.map((viewer) => viewer.id)).toContain("losverdes-strategic-map");
+    expect(activeViewers.map((viewer) => viewer.id)).toContain("project-master-viewer");
+    expect(activeViewers.map((viewer) => viewer.id)).toContain("satellite-map-viewer");
+  });
+
+  it("losverdes-public-scene (sin importers) sí queda reference_only — retiro real", () => {
+    const referenceViewers = legacyViewersByStatus("reference_only");
     expect(referenceViewers.map((viewer) => viewer.id)).toContain("losverdes-public-scene");
   });
 
