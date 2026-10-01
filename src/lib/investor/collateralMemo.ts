@@ -155,7 +155,7 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
     ["Tasa", `UF + ${t.annualRatePct},00 % anual sobre capital reajustado.`],
     ["Pago de intereses", `${t.interestPayment}, mes vencido. Ejemplo: ${fmtClp(ex)} por mes sobre ${fmtClp(t.minTicketClp)}, más reajuste UF.`],
     ["Plazo", `${t.reinvestEveryMonths} meses, renovable de común acuerdo o con restitución del capital.`],
-    ["Garantía", `Parcela de ${t.collateralSizes.join(" o ")} con ${t.collateralRol.toLowerCase()}; gravamen inscrito en el Conservador de Bienes Raíces competente.`],
+    ["Garantía", `Parcela de ${t.collateralSizes.join(" o ")} con ${t.collateralRol.replace(/^Rol/, "rol")}; gravamen inscrito en el Conservador de Bienes Raíces competente.`],
     ["Forma del gravamen", "Hipoteca y prohibición de enajenar, sujeta a confirmación del asesor legal en el contrato definitivo."],
     ["Destino de fondos", "Proyectos de pequeña y mediana minería del portafolio Geocapitals."],
     ["Alzamiento", "Al restituirse íntegramente capital e intereses."],
@@ -189,7 +189,7 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
   y = section(doc, y, "04", "Cartera de respaldo y estado registral");
 
   // Tabla editorial
-  const head = ["Proyecto", "Comuna", "Superficie", "Parcelas", "Antecedente registral", "Estado"];
+  const head = ["Proyecto", "Comuna", "Sup.", "Parcelas", "Antecedente registral", "Estado"];
   const widths = [0.2, 0.11, 0.1, 0.09, 0.3, 0.2].map((f) => f * CW);
   fill(doc, [241, 244, 246] as never);
   doc.rect(M, y - 9, CW, 16, "F");
