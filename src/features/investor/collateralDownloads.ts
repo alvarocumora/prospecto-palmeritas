@@ -48,9 +48,5 @@ export async function downloadCollateralDoc(kind: "deck" | "teaser"): Promise<vo
     }),
     liveUrl: publicUrl("/inversion-colateral"),
   };
-  if (kind === "teaser") {
-    await downloadProjectDoc({ ...model, code: "GC-COLATERAL-TEASER" }, "onepager");
-  } else {
-    await downloadProjectDoc(model, "deck");
-  }
+  await downloadProjectDoc(model, "deck");
 }
