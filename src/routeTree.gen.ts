@@ -148,6 +148,7 @@ import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
 import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
 import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
+import { Route as AuthenticatedDashboardAcquisitionsRouteImport } from './routes/_authenticated.dashboard.acquisitions'
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardRfqsIndexRouteImport } from './routes/_authenticated.dashboard.rfqs.index'
@@ -942,6 +943,12 @@ const AuthenticatedDashboardAdminRoute =
     path: '/dashboard/admin',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardAcquisitionsRoute =
+  AuthenticatedDashboardAcquisitionsRouteImport.update({
+    id: '/dashboard/acquisitions',
+    path: '/dashboard/acquisitions',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const Char91DotmcpChar93InvokeToolToolRoute =
   Char91DotmcpChar93InvokeToolToolRouteImport.update({
     id: '/.mcp/invoke-tool/$tool',
@@ -1199,6 +1206,7 @@ export interface FileRoutesByFullPath {
   '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1372,6 +1380,7 @@ export interface FileRoutesByTo {
   '/verificar': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1547,6 +1556,7 @@ export interface FileRoutesById {
   '/verificar/': typeof VerificarIndexRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/.mcp/invoke-tool/$tool': typeof Char91DotmcpChar93InvokeToolToolRoute
+  '/_authenticated/dashboard/acquisitions': typeof AuthenticatedDashboardAcquisitionsRoute
   '/_authenticated/dashboard/admin': typeof AuthenticatedDashboardAdminRouteWithChildren
   '/_authenticated/dashboard/agents': typeof AuthenticatedDashboardAgentsRoute
   '/_authenticated/dashboard/agua': typeof AuthenticatedDashboardAguaRoute
@@ -1722,6 +1732,7 @@ export interface FileRouteTypes {
     | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/dashboard/acquisitions'
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/agua'
@@ -1895,6 +1906,7 @@ export interface FileRouteTypes {
     | '/verificar'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/dashboard/acquisitions'
     | '/dashboard/admin'
     | '/dashboard/agents'
     | '/dashboard/agua'
@@ -2069,6 +2081,7 @@ export interface FileRouteTypes {
     | '/verificar/'
     | '/.lovable/oauth/consent'
     | '/.mcp/invoke-tool/$tool'
+    | '/_authenticated/dashboard/acquisitions'
     | '/_authenticated/dashboard/admin'
     | '/_authenticated/dashboard/agents'
     | '/_authenticated/dashboard/agua'
@@ -3244,6 +3257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/acquisitions': {
+      id: '/_authenticated/dashboard/acquisitions'
+      path: '/dashboard/acquisitions'
+      fullPath: '/dashboard/acquisitions'
+      preLoaderRoute: typeof AuthenticatedDashboardAcquisitionsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/.mcp/invoke-tool/$tool': {
       id: '/.mcp/invoke-tool/$tool'
       path: '/.mcp/invoke-tool/$tool'
@@ -3569,6 +3589,7 @@ const AuthenticatedDashboardTargetsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedPanelRoute: typeof AuthenticatedPanelRouteWithChildren
+  AuthenticatedDashboardAcquisitionsRoute: typeof AuthenticatedDashboardAcquisitionsRoute
   AuthenticatedDashboardAdminRoute: typeof AuthenticatedDashboardAdminRouteWithChildren
   AuthenticatedDashboardAgentsRoute: typeof AuthenticatedDashboardAgentsRoute
   AuthenticatedDashboardAguaRoute: typeof AuthenticatedDashboardAguaRoute
@@ -3647,6 +3668,8 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedPanelRoute: AuthenticatedPanelRouteWithChildren,
+  AuthenticatedDashboardAcquisitionsRoute:
+    AuthenticatedDashboardAcquisitionsRoute,
   AuthenticatedDashboardAdminRoute:
     AuthenticatedDashboardAdminRouteWithChildren,
   AuthenticatedDashboardAgentsRoute: AuthenticatedDashboardAgentsRoute,

@@ -277,6 +277,15 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
   },
 
   {
+    to: "/dashboard/acquisitions",
+    label: "Pipeline de Adquisición",
+    icon: Compass,
+    group: "CAPITAL & DEALS",
+    module: "capital",
+    hideForInvestor: true,
+  },
+
+  {
     to: "/dashboard/agua",
     label: "Water Assets",
     icon: Droplets,
