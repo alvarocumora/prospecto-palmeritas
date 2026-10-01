@@ -85,6 +85,8 @@ export type CollateralDeckImages = Partial<{
   hualanePlan: string;
   valleEscondido: string;
   valleEscondido2: string;
+  hualaneSat: string;
+  valleEscondidoSat: string;
 }>;
 
 export const fmtClp = (n: number) => `$${Math.round(n).toLocaleString("es-CL")}`;
@@ -284,7 +286,7 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
                   kind: "figure" as const,
                   title: "Valle Escondido Licantén",
                   imageDataUrl: img.valleEscondido,
-                  caption: "Imagen referencial del material comercial del proyecto.",
+                  caption: "IMAGEN REFERENCIAL / ILUSTRATIVA del material comercial del proyecto; puede no corresponder a una fotografía del predio.",
                 },
               ],
             },

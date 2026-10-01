@@ -25,6 +25,8 @@ import coverImg from "@/assets/colateral/cover-maule.jpg";
 import hualanePlan from "@/assets/colateral/hualane-og.png";
 import velValle from "@/assets/colateral/vel-valle.jpg";
 import velLago from "@/assets/colateral/vel-lago.jpg";
+import hualaneSat from "@/assets/colateral/hualane-satelite.jpg";
+import velSat from "@/assets/colateral/vel-satelite.jpg";
 
 /** Carga una imagen y la reduce a JPEG data URL para el PDF. */
 async function toDataUrl(src: string, maxW = 1400): Promise<string | undefined> {
@@ -78,11 +80,18 @@ function CollateralPage() {
     const id = toast.loading("Generando deck…");
     try {
       const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
-      const [cover, plan, ve, ve2] = await Promise.all(
-        [coverImg, hualanePlan, velValle, velLago].map((u) => toDataUrl(u)),
+      const [cover, plan, ve, ve2, hs, vs] = await Promise.all(
+        [coverImg, hualanePlan, velValle, velLago, hualaneSat, velSat].map((u) => toDataUrl(u)),
       );
       await downloadProjectDoc(
-        buildCollateralDeck({ cover, hualanePlan: plan, valleEscondido: ve, valleEscondido2: ve2 }),
+        buildCollateralDeck({
+          cover,
+          hualanePlan: plan,
+          valleEscondido: ve,
+          valleEscondido2: ve2,
+          hualaneSat: hs,
+          valleEscondidoSat: vs,
+        }),
         "deck",
       );
       toast.success("Deck generado", { id });
