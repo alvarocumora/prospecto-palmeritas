@@ -234,7 +234,6 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
             deck: true,
             blocks: [
               { kind: "figure" as const, title: "Valle Escondido Licantén", imageDataUrl: img.valleEscondido, caption: "Imagen referencial del material comercial del proyecto." },
-              ...(img.valleEscondido2 ? [{ kind: "figure" as const, title: "Entorno del proyecto", imageDataUrl: img.valleEscondido2, caption: "Imagen referencial del material comercial del proyecto." }] : []),
             ],
           }]
         : []),
