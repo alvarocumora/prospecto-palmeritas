@@ -171,11 +171,7 @@ export function useDrillTrajectoriesLayer(
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
     return points.map(
       (point) =>
-        [
-          centerLng + point.x / mPerDegLng,
-          centerLat + point.y / M_PER_DEG_LAT,
-          point.z,
-        ] as Vec3,
+        [centerLng + point.x / mPerDegLng, centerLat + point.y / M_PER_DEG_LAT, point.z] as Vec3,
     );
   }
 
@@ -260,9 +256,7 @@ export function useDrillTrajectoriesLayer(
           widthUnits: "pixels",
           getPath: (trajectory: (typeof completedTrajectories)[number]) => trajectory.path,
           getColor: (trajectory: (typeof completedTrajectories)[number]) =>
-            trajectory.status === "in_progress"
-              ? [96, 165, 250, 220]
-              : [180, 180, 200, 220],
+            trajectory.status === "in_progress" ? [96, 165, 250, 220] : [180, 180, 200, 220],
           getWidth: 2.5,
         }),
       );
@@ -298,7 +292,14 @@ export function useDrillTrajectoriesLayer(
     }
 
     return output;
-  }, [visibility.completed, visibility.proposed, visibility.intercepts, completedTrajectories, proposedTrajectories, intercepts]);
+  }, [
+    visibility.completed,
+    visibility.proposed,
+    visibility.intercepts,
+    completedTrajectories,
+    proposedTrajectories,
+    intercepts,
+  ]);
 
   return {
     layers,

@@ -40,10 +40,7 @@ const PublicCanonicalScene = lazy(() =>
 import { MinePlanPanel } from "@/components/live/MinePlanPanel";
 import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { TargetExplainerDialog } from "@/components/live/TargetExplainerDialog";
-import {
-  getLosVerdesAnomalies,
-  getLosVerdesPublicLayers,
-} from "@/lib/livemap-public.functions";
+import { getLosVerdesAnomalies, getLosVerdesPublicLayers } from "@/lib/livemap-public.functions";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";

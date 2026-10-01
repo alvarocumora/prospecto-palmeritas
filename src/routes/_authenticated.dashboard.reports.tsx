@@ -41,8 +41,8 @@ function ReportingHubPage() {
         <h1 className="font-display text-3xl text-content">Sistema único de informes</h1>
         <p className="max-w-4xl text-sm leading-relaxed text-content-muted">
           Los módulos del proyecto producen evidencia; Reporting decide qué evidencia entra, cómo se
-          narra y qué estándar de revisión aplica. No se generan versiones distintas del mismo informe
-          desde cada pantalla.
+          narra y qué estándar de revisión aplica. No se generan versiones distintas del mismo
+          informe desde cada pantalla.
         </p>
       </header>
 
@@ -125,7 +125,9 @@ function ReportingHubPage() {
               </div>
             </div>
             <h2 className="mt-2 text-lg font-semibold text-content">{framework.name}</h2>
-            <p className="mt-2 text-xs leading-relaxed text-content-muted">{framework.positioning}</p>
+            <p className="mt-2 text-xs leading-relaxed text-content-muted">
+              {framework.positioning}
+            </p>
             <div className="mt-4 space-y-2">
               {framework.checklist.map((item) => (
                 <div key={item.id} className="flex items-start gap-2 text-xs">
@@ -170,7 +172,8 @@ function ReportingHubPage() {
             Revisión técnica, QP y estado del borrador regulatorio.
           </p>
           <div className="mt-3 flex items-center gap-1 text-xs text-accent-brand">
-            Abrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            Abrir{" "}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </div>
         </Link>
 
@@ -183,7 +186,8 @@ function ReportingHubPage() {
             Revisar evidencia, gaps y trazabilidad antes de emitir.
           </p>
           <div className="mt-3 flex items-center gap-1 text-xs text-accent-brand">
-            Abrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            Abrir{" "}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </div>
         </Link>
 
@@ -196,7 +200,8 @@ function ReportingHubPage() {
             KPI operativo, QA/QC, targets, costos y HSE; separado del reporte técnico.
           </p>
           <div className="mt-3 flex items-center gap-1 text-xs text-accent-brand">
-            Abrir <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            Abrir{" "}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </div>
         </a>
       </section>

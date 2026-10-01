@@ -7,10 +7,7 @@ import {
   readStoredLayerState,
   type LayerStateMap,
 } from "@/hooks/useLayerState";
-import {
-  resolveGeoLayer,
-  type GeoViewerPresetId,
-} from "@/lib/geospatial/layerRegistry";
+import { resolveGeoLayer, type GeoViewerPresetId } from "@/lib/geospatial/layerRegistry";
 import type { GeoSnapshotViewState } from "@/lib/geospatial/snapshotManifest";
 
 function visibleCanonicalLayerIds(state: LayerStateMap): string[] {

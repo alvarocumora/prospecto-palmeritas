@@ -42,9 +42,7 @@ export type PublicGeoFeatureCollection = {
   features: PublicGeoFeature[];
 };
 
-export type PublicGeoLayerData = Partial<
-  Record<CanonicalGeoLayerId, PublicGeoFeatureCollection>
->;
+export type PublicGeoLayerData = Partial<Record<CanonicalGeoLayerId, PublicGeoFeatureCollection>>;
 
 export type PublicGeoBundle = {
   manifest: PublicGeoManifest;

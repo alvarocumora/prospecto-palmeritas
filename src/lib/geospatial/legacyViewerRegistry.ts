@@ -68,7 +68,8 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
     status: "reference_only",
     successor: "CanonicalProjectViewer(profile=losverdes)",
     uniqueCapability: "Historical LV5 lithostratigraphic presentation",
-    blocker: "Retain as reference until its unique explanatory overlays are either migrated or archived",
+    blocker:
+      "Retain as reference until its unique explanatory overlays are either migrated or archived",
   },
   {
     id: "losverdes-strategic-map",

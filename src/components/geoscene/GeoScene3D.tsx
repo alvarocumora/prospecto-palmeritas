@@ -131,11 +131,7 @@ export function GeoScene3D({
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
           {engine === "deckgl" && mode !== "resource" && (
-            <GeoSceneCanvas
-              mode={mode}
-              visibleLayerIds={enabledLayerIds}
-              filters={filters}
-            />
+            <GeoSceneCanvas mode={mode} visibleLayerIds={enabledLayerIds} filters={filters} />
           )}
           {engine === "legacy" && mode === "surface" && (
             <Geology3DViewer className="h-full w-full" />

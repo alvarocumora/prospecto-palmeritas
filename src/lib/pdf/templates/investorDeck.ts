@@ -263,7 +263,8 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
         doc.setLineWidth(0.7);
         doc.rect(M, y, imageW, imageH);
         y += imageH + 10;
-        if (block.caption) y += paragraph(doc, M, y, block.caption, imageW, 7.6, GC_COLOR.slate) + 8;
+        if (block.caption)
+          y += paragraph(doc, M, y, block.caption, imageW, 7.6, GC_COLOR.slate) + 8;
       }
       if (block.kind === "bullets") y += bullets(doc, M, y, block.items, CW * 0.78, 9.5) + 8;
       if (block.kind === "kv") {

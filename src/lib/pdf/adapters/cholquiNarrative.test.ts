@@ -39,5 +39,4 @@ describe("Cholqui narrative report", () => {
     expect(appendix && appendix.kind === "appendixTable" ? appendix.rows : []).toHaveLength(9);
     expect(JSON.stringify(section)).toContain("no confirma ni descarta mineralización");
   });
-
 });

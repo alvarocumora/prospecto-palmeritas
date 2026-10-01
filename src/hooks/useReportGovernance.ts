@@ -80,7 +80,7 @@ export function useReportGovernance() {
   const reviewer = useMemo(
     () =>
       latestReport?.lead_qp_id
-        ? registry.qps.find((qp) => qp.id === latestReport.lead_qp_id) ?? null
+        ? (registry.qps.find((qp) => qp.id === latestReport.lead_qp_id) ?? null)
         : null,
     [latestReport?.lead_qp_id, registry.qps],
   );

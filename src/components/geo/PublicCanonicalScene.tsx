@@ -111,7 +111,8 @@ function polygonsFrom(collection: PublicGeoFeatureCollection): PolygonDatum[] {
         const ring = polygon[0]
           ?.map(asLngLat)
           .filter((coord): coord is [number, number] => Boolean(coord));
-        if (ring && ring.length >= 3) output.push({ polygon: ring, properties: feature.properties });
+        if (ring && ring.length >= 3)
+          output.push({ polygon: ring, properties: feature.properties });
       }
     }
   }

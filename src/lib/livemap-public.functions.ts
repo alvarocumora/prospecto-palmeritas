@@ -1,9 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import {
-  buildPublicGeoManifest,
-  type PublicGeoManifest,
-} from "@/lib/geospatial/publicGeoContract";
+import { buildPublicGeoManifest, type PublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 

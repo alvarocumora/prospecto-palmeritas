@@ -240,8 +240,7 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "finding",
             title: "Lectura técnica",
-            body:
-              "La respuesta analítica justifica continuar la validación geológica y metalúrgica, pero el muestreo puntual no permite inferir continuidad tridimensional, dilución, recuperación ni ley media de mina.",
+            body: "La respuesta analítica justifica continuar la validación geológica y metalúrgica, pero el muestreo puntual no permite inferir continuidad tridimensional, dilución, recuperación ni ley media de mina.",
             provenance: "INTERPRETED",
             confidence: "medium",
           },
@@ -295,8 +294,7 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "evidence",
             label: "Supuestos económicos",
-            body:
-              "Los supuestos de producción, precio, tarifa, logística y costos permanecen separados de la evidencia técnica y requieren due diligence antes de una decisión de capital.",
+            body: "Los supuestos de producción, precio, tarifa, logística y costos permanecen separados de la evidencia técnica y requieren due diligence antes de una decisión de capital.",
             provenance: "SCENARIO",
             confidence: "low",
           },
@@ -330,30 +328,27 @@ export function buildCholquiDoc(): ProjectDoc {
                   body: `El pase Sentinel-2 actualmente cargado contiene ${toki2.satelliteAnomaliesInside} anomalías cuyo centroide cae dentro de Toki 2. Este conteo es evidencia derivada de teledetección y no confirma ni descarta mineralización.`,
                   provenance: "DERIVED" as const,
                   confidence: "medium" as const,
-                  source: [toki2.satelliteProvider, toki2.satelliteRunId]
-                    .filter(Boolean)
-                    .join(" · ") || "GeoCapitals satellite candidates",
+                  source:
+                    [toki2.satelliteProvider, toki2.satelliteRunId].filter(Boolean).join(" · ") ||
+                    "GeoCapitals satellite candidates",
                 },
                 {
                   kind: "finding" as const,
                   title: "Lectura de terreno requerida",
-                  body:
-                    "La ausencia de una anomalía espectral interna no es evidencia de ausencia de mineralización. Cobertura vegetal, sombra topográfica, resolución de Sentinel-2 y mineralización estructural sin expresión superficial obligan a validar el sector mediante mapeo y muestreo.",
+                  body: "La ausencia de una anomalía espectral interna no es evidencia de ausencia de mineralización. Cobertura vegetal, sombra topográfica, resolución de Sentinel-2 y mineralización estructural sin expresión superficial obligan a validar el sector mediante mapeo y muestreo.",
                   provenance: "INTERPRETED" as const,
                   confidence: "medium" as const,
                 },
                 {
                   kind: "recommendation" as const,
                   title: "Campaña inicial Toki 2",
-                  body:
-                    "Ejecutar control perimetral y accesos, traverse N–S, traverse E–O, seguimiento de estructuras y muestreo selectivo. En cada estación registrar GPS, fotografía, litología, alteración, mineralización visible, rumbo, manteo, potencia, acceso y pendiente local.",
+                  body: "Ejecutar control perimetral y accesos, traverse N–S, traverse E–O, seguimiento de estructuras y muestreo selectivo. En cada estación registrar GPS, fotografía, litología, alteración, mineralización visible, rumbo, manteo, potencia, acceso y pendiente local.",
                   priority: "high" as const,
                 },
                 {
                   kind: "gap" as const,
                   title: "Volumen y tonelaje todavía no habilitados",
-                  body:
-                    "El DEM permite caracterizar geometría superficial, pendiente y relieve. No existe base suficiente para estimar toneladas mineralizadas hasta delimitar un cuerpo geológico, medir potencia y continuidad y disponer de una densidad sustentada.",
+                  body: "El DEM permite caracterizar geometría superficial, pendiente y relieve. No existe base suficiente para estimar toneladas mineralizadas hasta delimitar un cuerpo geológico, medir potencia y continuidad y disponer de una densidad sustentada.",
                   action:
                     "Completar ground-truth y, si se define un cuerpo, versionar la geometría 3D y la densidad antes de habilitar cualquier escenario volumétrico.",
                 },
@@ -381,8 +376,7 @@ export function buildCholquiDoc(): ProjectDoc {
         blocks: [
           {
             kind: "narrative",
-            body:
-              "Las siguientes brechas se mantienen explícitas para evitar que una ausencia de datos sea reemplazada por una conclusión automática o por texto generado.",
+            body: "Las siguientes brechas se mantienen explícitas para evitar que una ausencia de datos sea reemplazada por una conclusión automática o por texto generado.",
             provenance: "PENDING_DD",
             confidence: "low",
           },
@@ -394,8 +388,7 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "recommendation",
             title: "Cerrar brechas antes de escalar el compromiso",
-            body:
-              "Priorizar verificación legal, metalurgia, topografía, logística y demostración de inventario antes de convertir escenarios comerciales en decisiones de inversión.",
+            body: "Priorizar verificación legal, metalurgia, topografía, logística y demostración de inventario antes de convertir escenarios comerciales en decisiones de inversión.",
             priority: "high",
           },
         ],

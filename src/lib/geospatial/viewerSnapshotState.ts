@@ -73,7 +73,7 @@ export function readGeoSnapshotManifest(
   if (!resolvedRoot) return null;
 
   const element = resolvedRoot.querySelector<HTMLElement>(
-    '[data-geo-engine][data-geo-project-id][data-geo-view-state]',
+    "[data-geo-engine][data-geo-project-id][data-geo-view-state]",
   );
   if (!element) return null;
 

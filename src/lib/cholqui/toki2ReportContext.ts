@@ -1,11 +1,7 @@
 import type { FeatureCollection, Polygon } from "geojson";
 import catastroRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
-import {
-  buildToki2ControlPoints,
-  pointInPolygon,
-  type LonLat,
-} from "@/lib/cholqui/toki2Terrain";
+import { buildToki2ControlPoints, pointInPolygon, type LonLat } from "@/lib/cholqui/toki2Terrain";
 
 type JsonFeatureCollection = FeatureCollection & { metadata?: Record<string, unknown> };
 
@@ -81,7 +77,9 @@ export function getToki2ReportContext(): Toki2ReportContext | null {
     name: String(feature.properties?.nombre ?? "TOKI 2"),
     rol: String(feature.properties?.rol ?? "s/d"),
     holder: String(feature.properties?.titular ?? feature.properties?.holder ?? "s/d"),
-    concessionType: String(feature.properties?.tipo ?? feature.properties?.concession_type ?? "s/d"),
+    concessionType: String(
+      feature.properties?.tipo ?? feature.properties?.concession_type ?? "s/d",
+    ),
     status: String(feature.properties?.estado ?? feature.properties?.status ?? "s/d"),
     areaHa: Number(feature.properties?.hectareas ?? feature.properties?.area_ha ?? 100) || 100,
     controlPoints,

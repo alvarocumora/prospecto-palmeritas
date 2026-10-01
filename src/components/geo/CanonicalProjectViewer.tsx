@@ -56,9 +56,7 @@ export function CanonicalProjectViewer({
         className={`${heightClassName} grid place-items-center rounded border border-border bg-bg-secondary p-6`}
       >
         <div className="max-w-md text-center">
-          <div className="font-mono text-xs uppercase text-amber-500">
-            Proyecto no disponible
-          </div>
+          <div className="font-mono text-xs uppercase text-amber-500">Proyecto no disponible</div>
           <p className="mt-2 text-sm text-muted-foreground">
             El visor canónico necesita que el proyecto esté disponible en tu workspace para evitar
             mezclar capas de otra iniciativa.

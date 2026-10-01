@@ -12,7 +12,6 @@ import {
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, LayerGroup } from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-
 import { CENTER, type AnyFC, type LeafletNS } from "./map/types";
 import { buildBasemaps } from "./map/basemaps";
 import {
@@ -65,10 +64,7 @@ import { useExplorationTargets } from "@/hooks/useExplorationTargets";
 import type { SamplingResult } from "@/hooks/useSamplingResults";
 import type { InspectedFeature } from "./map/FeatureInspectorPanel";
 import { layerStateForPreset } from "@/lib/geospatial/projectMapPolicy";
-import {
-  getGeoViewerPreset,
-  type GeoViewerPresetId,
-} from "@/lib/geospatial/layerRegistry";
+import { getGeoViewerPreset, type GeoViewerPresetId } from "@/lib/geospatial/layerRegistry";
 
 interface ProjectMapProps {
   samples?: SamplingResult[];

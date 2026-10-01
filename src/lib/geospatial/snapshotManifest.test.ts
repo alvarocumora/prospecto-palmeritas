@@ -26,12 +26,9 @@ describe("canonical geo snapshot manifest", () => {
     expect(manifest.layers.find((layer) => layer.id === "geophysics.emag2")?.evidence).toBe(
       "DERIVADO",
     );
-    expect(manifest.layers.find((layer) => layer.id === "geophysics.emag2")?.use).toBe(
-      "context",
-    );
+    expect(manifest.layers.find((layer) => layer.id === "geophysics.emag2")?.use).toBe("context");
     expect(
-      manifest.layers.find((layer) => layer.id === "remote_sensing.sentinel2_alteration")
-        ?.evidence,
+      manifest.layers.find((layer) => layer.id === "remote_sensing.sentinel2_alteration")?.evidence,
     ).toBe("DERIVADO");
     expect(
       manifest.layers.find((layer) => layer.id === "geophysics.planned_survey")?.evidence,
@@ -75,10 +72,7 @@ describe("canonical geo snapshot manifest", () => {
     });
 
     expect(a.filters).toEqual({ campaignId: "c1", timeCursor: 123, highGradeOnly: true });
-    expect(a.layers.map((layer) => layer.id)).toEqual([
-      "targets.exploration",
-      "territory.dem",
-    ]);
+    expect(a.layers.map((layer) => layer.id)).toEqual(["targets.exploration", "territory.dem"]);
     expect(stableGeoSnapshotPayload(a)).toBe(stableGeoSnapshotPayload(b));
   });
 });

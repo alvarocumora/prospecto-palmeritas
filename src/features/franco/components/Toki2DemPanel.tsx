@@ -108,11 +108,7 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
   return (
     <div className="space-y-4">
       {authenticated && (
-        <CanonicalProjectViewer
-          profileKey="toki2"
-          heightClassName="h-[460px]"
-          compactHeader
-        />
+        <CanonicalProjectViewer profileKey="toki2" heightClassName="h-[460px]" compactHeader />
       )}
       <section className="overflow-hidden rounded-brand-lg border border-hairline bg-surface-3">
         <header className="flex flex-col gap-3 border-b border-hairline px-5 py-5 md:flex-row md:items-end md:justify-between">
@@ -135,21 +131,21 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
             <div>{num(toki2AreaHa)} ha · ~1 km × 1 km</div>
           </div>
         </header>
-  
+
         {dem.isLoading && (
           <div className="flex items-center gap-2 px-5 py-10 text-sm text-content-subtle">
             <Loader2 className="h-4 w-4 animate-spin" />
             Leyendo Copernicus DEM GLO-30 sobre Toki 2…
           </div>
         )}
-  
+
         {dem.error && (
           <div className="px-5 py-8 text-sm text-content-subtle">
-            No se pudo cargar el DEM de Toki 2. El módulo no genera una clasificación operacional sin
-            una superficie disponible.
+            No se pudo cargar el DEM de Toki 2. El módulo no genera una clasificación operacional
+            sin una superficie disponible.
           </div>
         )}
-  
+
         {analysis && (
           <>
             {analysis.source === "synthetic" && (
@@ -159,7 +155,7 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                 corrida para decisiones de terreno; repetir cuando la fuente GLO-30 esté disponible.
               </div>
             )}
-  
+
             <div className="grid grid-cols-2 border-b border-hairline bg-surface-2 md:grid-cols-5">
               {[
                 [
@@ -184,7 +180,7 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                 </div>
               ))}
             </div>
-  
+
             <div className="grid border-b border-hairline md:grid-cols-4">
               {analysis.classes.map((item) => (
                 <div
@@ -206,7 +202,7 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                 </div>
               ))}
             </div>
-  
+
             <div className="border-b border-hairline px-5 py-5">
               <div className="mb-3 flex items-center gap-2">
                 <MapPinned className="h-4 w-4 text-accent-brand" />
@@ -259,7 +255,7 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                 </table>
               </div>
             </div>
-  
+
             <div className="grid md:grid-cols-2">
               <div className="border-b border-hairline px-5 py-5 md:border-b-0 md:border-r">
                 <div className="font-mono text-[10px] uppercase tracking-wider text-content-subtle">
@@ -268,8 +264,8 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                 <p className="mt-2 text-xs leading-relaxed text-content-muted">
                   El pase Sentinel-2 actualmente cargado contiene {satelliteInside} anomalías cuyo
                   centroide cae dentro de Toki 2. Un valor cero no descarta mineralización:
-                  vegetación, sombra topográfica, cobertura y resolución espectral pueden ocultar una
-                  expresión superficial. El levantamiento de terreno sigue siendo obligatorio.
+                  vegetación, sombra topográfica, cobertura y resolución espectral pueden ocultar
+                  una expresión superficial. El levantamiento de terreno sigue siendo obligatorio.
                 </p>
               </div>
               <div className="px-5 py-5">
@@ -280,17 +276,17 @@ export function Toki2DemPanel({ authenticated = false }: { authenticated?: boole
                   Estado: <b className="text-content">NO HABILITADA</b>. El DEM permite medir
                   superficie, pendiente y relieve, pero para estimar volumen o tonelaje se requiere
                   delimitar un cuerpo geológico en terreno, medir potencia y continuidad, y aplicar
-                  una densidad sustentada. Cualquier cálculo previo sería solo un escenario geométrico
-                  conceptual, no un recurso mineral.
+                  una densidad sustentada. Cualquier cálculo previo sería solo un escenario
+                  geométrico conceptual, no un recurso mineral.
                 </p>
               </div>
             </div>
-  
+
             <div className="border-t border-hairline px-5 py-3 text-[10px] text-content-subtle">
-              GLO-30 tiene resolución nativa aproximada de 30 m. El grid de análisis se remuestrea a ~
-              {num(analysis.cellSizeM, 0)} m para cálculo numérico, sin crear detalle topográfico
-              nuevo. Las clases A–D son un screening operacional preliminar y no sustituyen geotecnia,
-              topografía de precisión ni diseño de caminos/plataformas.
+              GLO-30 tiene resolución nativa aproximada de 30 m. El grid de análisis se remuestrea a
+              ~{num(analysis.cellSizeM, 0)} m para cálculo numérico, sin crear detalle topográfico
+              nuevo. Las clases A–D son un screening operacional preliminar y no sustituyen
+              geotecnia, topografía de precisión ni diseño de caminos/plataformas.
             </div>
           </>
         )}

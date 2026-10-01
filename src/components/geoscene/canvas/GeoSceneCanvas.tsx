@@ -94,8 +94,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const terrainVisible = sceneLayerEnabled(visibleLayerIds, "terrain");
   const targetsVisible =
     (surfaceMode || subsurfaceMode) && sceneLayerEnabled(visibleLayerIds, "targets");
-  const satelliteVisible =
-    surfaceMode && sceneLayerEnabled(visibleLayerIds, "satellite_anomalies");
+  const satelliteVisible = surfaceMode && sceneLayerEnabled(visibleLayerIds, "satellite_anomalies");
   const completedDrillingVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "drillholes_completed");
   const proposedDrillingVisible =
@@ -295,7 +294,9 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     const rendered = sceneBindingsForMode(mode)
       .filter((binding) => visibleLayerIds.has(binding.canonicalId))
       .map((binding) => binding.canonicalId);
-    return Array.from(new Set(["basemap.esri_imagery", ...rendered])).sort().join(",");
+    return Array.from(new Set(["basemap.esri_imagery", ...rendered]))
+      .sort()
+      .join(",");
   }, [mode, visibleLayerIds]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
