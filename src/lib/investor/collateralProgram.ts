@@ -85,6 +85,8 @@ export type CollateralDeckImages = Partial<{
   hualanePlan: string;
   valleEscondido: string;
   valleEscondido2: string;
+  hualaneSat: string;
+  valleEscondidoSat: string;
 }>;
 
 export const fmtClp = (n: number) => `$${Math.round(n).toLocaleString("es-CL")}`;
@@ -284,7 +286,45 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
                   kind: "figure" as const,
                   title: "Valle Escondido Licantén",
                   imageDataUrl: img.valleEscondido,
-                  caption: "Imagen referencial del material comercial del proyecto.",
+                  caption: "IMAGEN REFERENCIAL / ILUSTRATIVA del material comercial del proyecto; puede no corresponder a una fotografía del predio.",
+                },
+              ],
+            },
+          ]
+        : []),
+      ...(img.hualaneSat
+        ? [
+            {
+              eyebrow: "Imagen real 01",
+              title: "Hualañé desde el satélite",
+              lead: "Fotografía satelital real del terreno con los 40 lotes del plano 168-921 dibujados encima.",
+              deck: true,
+              blocks: [
+                {
+                  kind: "figure" as const,
+                  title: "Imagen satelital real, sector Caone (Hualañé)",
+                  imageDataUrl: img.hualaneSat,
+                  caption:
+                    "IMAGEN REAL: Esri World Imagery (Maxar y otros). Las líneas amarillas son los deslindes del plano comercial superpuestos por Geocapitals; no reemplazan el plano inscrito.",
+                },
+              ],
+            },
+          ]
+        : []),
+      ...(img.valleEscondidoSat
+        ? [
+            {
+              eyebrow: "Imagen real 02",
+              title: "Licantén desde el satélite",
+              lead: "Fotografía satelital real del sector del proyecto Valle Escondido, al oriente de Licantén.",
+              deck: true,
+              blocks: [
+                {
+                  kind: "figure" as const,
+                  title: "Imagen satelital real, sector Valle Escondido (Licantén)",
+                  imageDataUrl: img.valleEscondidoSat,
+                  caption:
+                    "IMAGEN REAL: Esri World Imagery (Maxar y otros). Encuadre aproximado del sector; los deslindes exactos son los del plano N 192 (2023) del CBR Licantén.",
                 },
               ],
             },
