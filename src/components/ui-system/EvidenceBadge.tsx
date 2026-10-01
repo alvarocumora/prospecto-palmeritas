@@ -14,13 +14,7 @@ import { cn } from "@/lib/utils";
  *  CONTEXTO      — contexto regional; verificar antes de usar como detalle.
  */
 export type Evidence =
-  | "OFICIAL"
-  | "MEDIDO"
-  | "CERTIFICADO"
-  | "DERIVADO"
-  | "INTERPRETADO"
-  | "PROPUESTO"
-  | "CONTEXTO";
+  "OFICIAL" | "MEDIDO" | "CERTIFICADO" | "DERIVADO" | "INTERPRETADO" | "PROPUESTO" | "CONTEXTO";
 
 const BG: Record<Evidence, string> = {
   OFICIAL: "#15803d",

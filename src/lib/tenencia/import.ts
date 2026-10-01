@@ -34,10 +34,7 @@ export function looksGeographic([x, y]: [number, number]): boolean {
 }
 
 type AnyGeoJson =
-  | GeoJSON.FeatureCollection
-  | GeoJSON.Feature
-  | GeoJSON.Geometry
-  | GeoJSON.GeometryCollection;
+  GeoJSON.FeatureCollection | GeoJSON.Feature | GeoJSON.Geometry | GeoJSON.GeometryCollection;
 
 /** Extrae los polígonos (Polygon/MultiPolygon) de cualquier GeoJSON de entrada. */
 export function collectPolygons(input: AnyGeoJson): Array<{

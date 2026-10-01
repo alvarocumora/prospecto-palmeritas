@@ -1,13 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 
 export type PalmerasTabId =
-  | "overview"
-  | "geology"
-  | "geophysics"
-  | "targets"
-  | "sampling"
-  | "drill"
-  | "budget";
+  "overview" | "geology" | "geophysics" | "targets" | "sampling" | "drill" | "budget";
 
 export type PalmerasTab = {
   id: PalmerasTabId;

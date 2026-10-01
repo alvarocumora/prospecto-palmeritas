@@ -75,8 +75,7 @@ function SignPage() {
   const myParty = useMemo(() => {
     if (!req) return null;
     const sig = req.doc.blocks.find((b) => (b as { kind?: string }).kind === "signature") as
-      | { kind: "signature"; parties: string[] }
-      | undefined;
+      { kind: "signature"; parties: string[] } | undefined;
     if (!sig) return null;
     const parties = sig.parties ?? [];
     return {

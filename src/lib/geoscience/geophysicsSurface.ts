@@ -1,9 +1,7 @@
 import type { GeophysicsStation } from "@/types/geophysics";
 
 export type GeophysicsSurfaceMetric =
-  | "mag_residual_nt"
-  | "ip_chargeability_mvv"
-  | "ip_resistivity_ohmm";
+  "mag_residual_nt" | "ip_chargeability_mvv" | "ip_resistivity_ohmm";
 
 export type GeophysicsSurfaceCell = {
   lat: number;

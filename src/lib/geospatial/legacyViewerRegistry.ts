@@ -1,8 +1,5 @@
 export type LegacyViewerStatus =
-  | "qa_only"
-  | "public_compatibility"
-  | "active_compatibility"
-  | "reference_only";
+  "qa_only" | "public_compatibility" | "active_compatibility" | "reference_only";
 
 export type LegacyViewerRecord = {
   id: string;

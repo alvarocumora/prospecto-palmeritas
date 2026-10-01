@@ -1,10 +1,5 @@
 export type MiningProvenance =
-  | "OFFICIAL"
-  | "CERTIFIED"
-  | "DOCUMENTARY"
-  | "DECLARED"
-  | "DERIVED"
-  | "INTERPRETED";
+  "OFFICIAL" | "CERTIFIED" | "DOCUMENTARY" | "DECLARED" | "DERIVED" | "INTERPRETED";
 
 export type MiningAssetNodeType =
   | "project"

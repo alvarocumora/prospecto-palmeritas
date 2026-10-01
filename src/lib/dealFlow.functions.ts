@@ -124,8 +124,7 @@ export const getDealFlow = createServerFn({ method: "GET" })
     const resumeStage =
       stage === "pausado"
         ? (((events ?? []).find((e) => e.to_stage === "pausado")?.from_stage as
-            | DealStage
-            | undefined) ?? null)
+            DealStage | undefined) ?? null)
         : null;
     return {
       inquiryId: inquiry.id as string,

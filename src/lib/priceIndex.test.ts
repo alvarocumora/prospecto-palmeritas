@@ -60,14 +60,11 @@ describe("buildPriceIndex", () => {
   });
 
   it("confianza: alta con ≥5 cierres, media con ≥2, baja con pocos", () => {
-    const many = Array.from(
-      { length: 5 },
-      (): PricePoint => ({
-        commodity: "cu_cathode",
-        usdPerT: 9000,
-        kind: "trade_closed",
-      }),
-    );
+    const many = Array.from({ length: 5 }, (): PricePoint => ({
+      commodity: "cu_cathode",
+      usdPerT: 9000,
+      kind: "trade_closed",
+    }));
     expect(buildPriceIndex(many)[0].confidence).toBe("high");
     expect(
       buildPriceIndex([

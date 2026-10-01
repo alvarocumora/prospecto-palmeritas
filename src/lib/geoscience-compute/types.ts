@@ -4,12 +4,7 @@ import {
 } from "../geoscience-registry/types";
 
 export type GeoscienceComputeEngine =
-  | "simpeg"
-  | "gempy"
-  | "loopstructural"
-  | "pygimli"
-  | "gstools"
-  | "custom";
+  "simpeg" | "gempy" | "loopstructural" | "pygimli" | "gstools" | "custom";
 
 export type GeoscienceComputeJobType =
   | "magnetic_inversion"
@@ -24,12 +19,7 @@ export type GeoscienceComputeJobType =
   | "kriging";
 
 export type GeoscienceComputeJobStatus =
-  | "draft"
-  | "queued"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "cancelled";
+  "draft" | "queued" | "running" | "succeeded" | "failed" | "cancelled";
 
 export type GeoscienceDatasetInputRef = {
   datasetId: string;

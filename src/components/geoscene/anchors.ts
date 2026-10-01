@@ -19,8 +19,7 @@ export const SCENE_FOCUS_EVENT = "geoscene:focus";
 const ANCHOR_RE = /\[(target|hole|anomaly):([A-Za-z0-9_\-./]+)\]/g;
 
 export type ParsedSegment =
-  | { type: "text"; value: string }
-  | { type: "anchor"; anchor: SceneAnchor };
+  { type: "text"; value: string } | { type: "anchor"; anchor: SceneAnchor };
 
 export function parseAnchors(text: string): ParsedSegment[] {
   const out: ParsedSegment[] = [];

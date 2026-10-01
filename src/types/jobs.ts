@@ -1,11 +1,5 @@
 export type JobStatus =
-  | "queued"
-  | "running"
-  | "succeeded"
-  | "failed"
-  | "retrying"
-  | "cancelled"
-  | "stale";
+  "queued" | "running" | "succeeded" | "failed" | "retrying" | "cancelled" | "stale";
 
 export type JobStatusInput = {
   status: Exclude<JobStatus, "stale">;

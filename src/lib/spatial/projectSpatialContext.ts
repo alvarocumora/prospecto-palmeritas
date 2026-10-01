@@ -1,10 +1,5 @@
 export type EvidenceProvenance =
-  | "OFFICIAL"
-  | "CERTIFIED"
-  | "DOCUMENTARY"
-  | "DECLARED"
-  | "DERIVED"
-  | "INTERPRETED";
+  "OFFICIAL" | "CERTIFIED" | "DOCUMENTARY" | "DECLARED" | "DERIVED" | "INTERPRETED";
 export type SpatialQcStatus = "verified" | "review" | "invalid";
 export type ProjectSpatialPoint = {
   id: string;

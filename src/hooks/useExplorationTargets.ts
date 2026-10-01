@@ -3,12 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
 export type TargetStage =
-  | "generated"
-  | "validated"
-  | "drill_ready"
-  | "drilling"
-  | "drilled"
-  | "closed";
+  "generated" | "validated" | "drill_ready" | "drilling" | "drilled" | "closed";
 export type TargetPriority = "low" | "medium" | "high" | "critical";
 export type TargetType =
   | "vein"

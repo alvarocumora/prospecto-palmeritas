@@ -239,12 +239,7 @@ export type EngineCommentRow = {
   id: string;
   project_id: string;
   entity_type:
-    | "section"
-    | "target"
-    | "block_model_version"
-    | "qaqc_issue"
-    | "ai_interpretation"
-    | "report";
+    "section" | "target" | "block_model_version" | "qaqc_issue" | "ai_interpretation" | "report";
   entity_id: string;
   body: string;
   mentions: string[];

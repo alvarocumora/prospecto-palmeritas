@@ -68,10 +68,7 @@ export function downloadBlob(content: string, filename: string, mime: string) {
 // Metadatos de exportación (sidecar) ---------------------------------------
 
 export type DatasetKey =
-  | "satellite_anomalies"
-  | "geophysics_anomalies"
-  | "geological_features"
-  | "prospectivity_cells";
+  "satellite_anomalies" | "geophysics_anomalies" | "geological_features" | "prospectivity_cells";
 
 export interface FieldMapping {
   source: string; // columna en la tabla / propiedad original

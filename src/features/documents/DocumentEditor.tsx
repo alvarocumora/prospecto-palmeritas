@@ -310,8 +310,7 @@ export function DocumentEditor({
   // ─── Flujo ordenado multi-firmante (NCNDA y otros con ≥2 partes) ───
   const parties = useMemo(() => {
     const sig = doc.blocks.find((b) => b.kind === "signature") as
-      | { kind: "signature"; parties: string[] }
-      | undefined;
+      { kind: "signature"; parties: string[] } | undefined;
     return sig?.parties ?? [];
   }, [doc]);
   const isMultiParty = parties.length >= 2;

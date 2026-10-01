@@ -68,13 +68,7 @@ type Props = {
 };
 
 type LayerKey =
-  | "aoi"
-  | "hyper_emit"
-  | "hyper_aster"
-  | "insar"
-  | "demdiff"
-  | "targets"
-  | "hotspots_high";
+  "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets" | "hotspots_high";
 
 const LAYER_META: Record<
   LayerKey,
