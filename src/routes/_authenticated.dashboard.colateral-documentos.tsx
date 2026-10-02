@@ -124,7 +124,12 @@ function ProjectColumn({
               <div className="text-[11px] text-content-subtle">{d.doc_type}</div>
             </div>
             {d.url && (
-              <a href={d.url} target="_blank" rel="noreferrer" className="text-sm text-accent-brand">
+              <a
+                href={d.url}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-accent-brand"
+              >
                 Ver
               </a>
             )}
@@ -174,7 +179,9 @@ function UploadBox({ projectKey }: { projectKey: ProjectKey }) {
     setBusy(true);
     try {
       const { path, token } = await createUp({ data: { projectKey, fileName: file.name } });
-      const { error } = await supabase.storage.from("data-room").uploadToSignedUrl(path, token, file);
+      const { error } = await supabase.storage
+        .from("data-room")
+        .uploadToSignedUrl(path, token, file);
       if (error) throw error;
       await register({
         data: { projectKey, docType, title: file.name.replace(/\.[^.]+$/, ""), path },

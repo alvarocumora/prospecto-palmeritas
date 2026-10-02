@@ -73,9 +73,9 @@ export function CollateralSimulator({
         </div>
       </dl>
       <p className="mt-3 text-[11px] text-content-subtle leading-relaxed">
-        Cálculo nominal: {COLLATERAL_TERMS.annualRatePct} % anual / 12 sobre el capital, sin
-        incluir el reajuste UF. La tasa es la pactada en el contrato, no una proyección de los
-        proyectos mineros. Renovación cada {COLLATERAL_TERMS.reinvestEveryMonths} meses.
+        Cálculo nominal: {COLLATERAL_TERMS.annualRatePct} % anual / 12 sobre el capital, sin incluir
+        el reajuste UF. La tasa es la pactada en el contrato, no una proyección de los proyectos
+        mineros. Renovación cada {COLLATERAL_TERMS.reinvestEveryMonths} meses.
       </p>
     </div>
   );

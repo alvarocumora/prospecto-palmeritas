@@ -264,7 +264,10 @@ export function MarketingLanding() {
             </div>
           </Reveal>
           <Reveal>
-            <Link to="/inversion-colateral" className="group block relative overflow-hidden border border-hairline">
+            <Link
+              to="/inversion-colateral"
+              className="group block relative overflow-hidden border border-hairline"
+            >
               <img
                 src={colateralCover}
                 alt="Valle rural del Maule (imagen ilustrativa)"
@@ -278,8 +281,6 @@ export function MarketingLanding() {
           </Reveal>
         </div>
       </section>
-
-
 
       {/* ─────────────────────────────────────────────
           3. CATASTRO LIVE

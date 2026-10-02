@@ -90,12 +90,30 @@ function LeadsPage() {
 
         <div className="mt-6 space-y-3">
           {rows.map((r) => (
-            <article key={r.id} className="border border-hairline p-4 grid md:grid-cols-[1.4fr_1fr_auto] gap-4">
+            <article
+              key={r.id}
+              className="border border-hairline p-4 grid md:grid-cols-[1.4fr_1fr_auto] gap-4"
+            >
               <div>
                 <div className="font-medium">{r.name}</div>
                 <div className="text-sm text-content-subtle">
-                  <a href={`mailto:${r.email}`} className="hover:text-accent-brand">{r.email}</a>
-                  {r.phone && <> · <a href={`https://wa.me/${r.phone.replace(/\D/g, "")}`} target="_blank" rel="noreferrer" className="hover:text-accent-brand">{r.phone}</a></>}
+                  <a href={`mailto:${r.email}`} className="hover:text-accent-brand">
+                    {r.email}
+                  </a>
+                  {r.phone && (
+                    <>
+                      {" "}
+                      ·{" "}
+                      <a
+                        href={`https://wa.me/${r.phone.replace(/\D/g, "")}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:text-accent-brand"
+                      >
+                        {r.phone}
+                      </a>
+                    </>
+                  )}
                 </div>
                 {r.message && <p className="text-sm mt-2">{r.message}</p>}
                 <div className="text-[11px] font-mono text-content-subtle mt-2">
@@ -103,10 +121,22 @@ function LeadsPage() {
                 </div>
               </div>
               <dl className="text-sm space-y-1">
-                <div className="flex justify-between gap-2"><dt className="text-content-subtle">Monto</dt><dd className="font-mono">{fmtClp(r.amount_clp)}</dd></div>
-                <div className="flex justify-between gap-2"><dt className="text-content-subtle">Plazo</dt><dd className="font-mono">{r.months} meses</dd></div>
-                <div className="flex justify-between gap-2"><dt className="text-content-subtle">Interés/mes</dt><dd className="font-mono">{fmtClp(monthlyInterestClp(r.amount_clp))}</dd></div>
-                <div className="flex justify-between gap-2"><dt className="text-content-subtle">Valle</dt><dd>{PREF[r.project_pref ?? "indiferente"] ?? r.project_pref}</dd></div>
+                <div className="flex justify-between gap-2">
+                  <dt className="text-content-subtle">Monto</dt>
+                  <dd className="font-mono">{fmtClp(r.amount_clp)}</dd>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <dt className="text-content-subtle">Plazo</dt>
+                  <dd className="font-mono">{r.months} meses</dd>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <dt className="text-content-subtle">Interés/mes</dt>
+                  <dd className="font-mono">{fmtClp(monthlyInterestClp(r.amount_clp))}</dd>
+                </div>
+                <div className="flex justify-between gap-2">
+                  <dt className="text-content-subtle">Valle</dt>
+                  <dd>{PREF[r.project_pref ?? "indiferente"] ?? r.project_pref}</dd>
+                </div>
               </dl>
               <select
                 aria-label="Estado"
@@ -116,7 +146,9 @@ function LeadsPage() {
                 className="brand-input h-10 self-start"
               >
                 {LEAD_STATUSES.map((s) => (
-                  <option key={s} value={s}>{LABEL[s]}</option>
+                  <option key={s} value={s}>
+                    {LABEL[s]}
+                  </option>
                 ))}
               </select>
             </article>
