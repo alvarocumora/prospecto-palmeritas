@@ -10,7 +10,13 @@ type Pref = "hualane" | "valle-escondido" | "indiferente";
 
 export function CollateralLeadForm({ amount, months }: { amount: number; months: number }) {
   const submit = useServerFn(submitCollateralLead);
-  const [f, setF] = useState({ name: "", email: "", phone: "", pref: "indiferente" as Pref, message: "" });
+  const [f, setF] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    pref: "indiferente" as Pref,
+    message: "",
+  });
   const mut = useMutation({
     mutationFn: () =>
       submit({
@@ -61,16 +67,40 @@ export function CollateralLeadForm({ amount, months }: { amount: number; months:
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <L t="Nombre">
-          <input required minLength={2} maxLength={200} className={cls} value={f.name} onChange={(e) => setF({ ...f, name: e.target.value })} />
+          <input
+            required
+            minLength={2}
+            maxLength={200}
+            className={cls}
+            value={f.name}
+            onChange={(e) => setF({ ...f, name: e.target.value })}
+          />
         </L>
         <L t="Email">
-          <input required type="email" maxLength={320} className={cls} value={f.email} onChange={(e) => setF({ ...f, email: e.target.value })} />
+          <input
+            required
+            type="email"
+            maxLength={320}
+            className={cls}
+            value={f.email}
+            onChange={(e) => setF({ ...f, email: e.target.value })}
+          />
         </L>
         <L t="WhatsApp / teléfono">
-          <input maxLength={40} className={cls} placeholder="(opcional)" value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} />
+          <input
+            maxLength={40}
+            className={cls}
+            placeholder="(opcional)"
+            value={f.phone}
+            onChange={(e) => setF({ ...f, phone: e.target.value })}
+          />
         </L>
         <L t="Valle de preferencia">
-          <select className={cls} value={f.pref} onChange={(e) => setF({ ...f, pref: e.target.value as Pref })}>
+          <select
+            className={cls}
+            value={f.pref}
+            onChange={(e) => setF({ ...f, pref: e.target.value as Pref })}
+          >
             <option value="indiferente">Indiferente</option>
             <option value="hualane">Valle de Hualañé</option>
             <option value="valle-escondido">Valle Escondido Licantén</option>
@@ -78,13 +108,26 @@ export function CollateralLeadForm({ amount, months }: { amount: number; months:
         </L>
       </div>
       <L t="Comentario">
-        <textarea rows={3} maxLength={2000} className={`${cls} resize-y`} placeholder="(opcional)" value={f.message} onChange={(e) => setF({ ...f, message: e.target.value })} />
+        <textarea
+          rows={3}
+          maxLength={2000}
+          className={`${cls} resize-y`}
+          placeholder="(opcional)"
+          value={f.message}
+          onChange={(e) => setF({ ...f, message: e.target.value })}
+        />
       </L>
       {mut.isError && <p className="text-sm text-destructive">{(mut.error as Error).message}</p>}
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[11px] text-content-subtle">Sin compromiso. Tus datos solo los ve el equipo Geocapitals.</p>
+        <p className="text-[11px] text-content-subtle">
+          Sin compromiso. Tus datos solo los ve el equipo Geocapitals.
+        </p>
         <BrandButton type="submit" size="sm" disabled={mut.isPending}>
-          {mut.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArrowRight className="w-4 h-4" />}
+          {mut.isPending ? (
+            <Loader2 className="w-4 h-4 animate-spin" />
+          ) : (
+            <ArrowRight className="w-4 h-4" />
+          )}
           Solicitar deck y reunión
         </BrandButton>
       </div>
@@ -95,7 +138,9 @@ export function CollateralLeadForm({ amount, months }: { amount: number; months:
 function L({ t, children }: { t: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle block mb-1.5">{t}</span>
+      <span className="text-[11px] font-mono uppercase tracking-wider text-content-subtle block mb-1.5">
+        {t}
+      </span>
       {children}
     </label>
   );

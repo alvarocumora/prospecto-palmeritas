@@ -62,8 +62,8 @@ function PublicCollateralPage() {
               Invierte en minería chilena, respaldado por una parcela real.
             </h1>
             <p className="mt-5 max-w-2xl text-content-subtle text-lg">
-              Tu capital financia el portafolio minero Geocapitals. Recibes UF + 12 % anual con
-              pago mensual y una parcela con rol individual en el Maule queda en garantía.
+              Tu capital financia el portafolio minero Geocapitals. Recibes UF + 12 % anual con pago
+              mensual y una parcela con rol individual en el Maule queda en garantía.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -145,7 +145,10 @@ function PublicCollateralPage() {
             </p>
           </section>
 
-          <section id="simulador" className="mt-16 grid gap-6 md:grid-cols-[1.1fr_1fr] scroll-mt-20">
+          <section
+            id="simulador"
+            className="mt-16 grid gap-6 md:grid-cols-[1.1fr_1fr] scroll-mt-20"
+          >
             <CollateralSimulator onChange={(amount, months) => setSim({ amount, months })} />
             <div className="border border-hairline p-6 bg-surface">
               <h3 className="font-serif text-2xl">Cómo funciona</h3>

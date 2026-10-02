@@ -34,7 +34,10 @@ const LeadSchema = z.object({
   phone: z.string().trim().max(40).optional().nullable(),
   amountClp: z.number().int().min(25_000_000).max(5_000_000_000),
   months: z.number().int().min(1).max(120),
-  projectPref: z.enum([...PROJECTS, "indiferente"]).optional().nullable(),
+  projectPref: z
+    .enum([...PROJECTS, "indiferente"])
+    .optional()
+    .nullable(),
   message: z.string().trim().max(2000).optional().nullable(),
 });
 
@@ -101,7 +104,9 @@ export const listCollateralLeads = createServerFn({ method: "GET" })
     await assertStaff(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("collateral_leads")
-      .select("id, created_at, name, email, phone, amount_clp, months, project_pref, message, status")
+      .select(
+        "id, created_at, name, email, phone, amount_clp, months, project_pref, message, status",
+      )
       .order("created_at", { ascending: false })
       .limit(500);
     if (error) throw new Error(error.message);

@@ -109,7 +109,11 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
   y += 16;
   font(doc, "display", "italic", 11.5);
   ink(doc, GC_COLOR.inkSoft);
-  doc.text("Financiamiento del portafolio minero Geocapitals respaldado por parcelas en el Maule", M, y);
+  doc.text(
+    "Financiamiento del portafolio minero Geocapitals respaldado por parcelas en el Maule",
+    M,
+    y,
+  );
   y += 20;
 
   // Bloque PARA / DE / MATERIA
@@ -119,7 +123,10 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
     ["PARA", "Inversionistas privados y family offices"],
     ["DE", `${GC_BRAND.name} · Estructuración de Capital`],
     ["FECHA", `Santiago de Chile, ${issued}`],
-    ["MATERIA", "Mutuo reajustable en UF con garantía sobre parcela individual (Hualañé y Licantén)"],
+    [
+      "MATERIA",
+      "Mutuo reajustable en UF con garantía sobre parcela individual (Hualañé y Licantén)",
+    ],
   ];
   for (const [k, v] of meta) {
     font(doc, "body", "bold", 7.4);
@@ -153,10 +160,22 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
     ["Instrumento", "Contrato privado de mutuo de dinero reajustable en UF (Ley N 18.010)."],
     ["Monto mínimo", `${fmtClp(t.minTicketClp)} por operación.`],
     ["Tasa", `UF + ${t.annualRatePct},00 % anual sobre capital reajustado.`],
-    ["Pago de intereses", `${t.interestPayment}, mes vencido. Ejemplo: ${fmtClp(ex)} por mes sobre ${fmtClp(t.minTicketClp)}, más reajuste UF.`],
-    ["Plazo", `${t.reinvestEveryMonths} meses, renovable de común acuerdo o con restitución del capital.`],
-    ["Garantía", `Parcela de ${t.collateralSizes.join(" o ")} con ${t.collateralRol.replace(/^Rol/, "rol")}; gravamen inscrito en el Conservador de Bienes Raíces competente.`],
-    ["Forma del gravamen", "Hipoteca y prohibición de enajenar, sujeta a confirmación del asesor legal en el contrato definitivo."],
+    [
+      "Pago de intereses",
+      `${t.interestPayment}, mes vencido. Ejemplo: ${fmtClp(ex)} por mes sobre ${fmtClp(t.minTicketClp)}, más reajuste UF.`,
+    ],
+    [
+      "Plazo",
+      `${t.reinvestEveryMonths} meses, renovable de común acuerdo o con restitución del capital.`,
+    ],
+    [
+      "Garantía",
+      `Parcela de ${t.collateralSizes.join(" o ")} con ${t.collateralRol.replace(/^Rol/, "rol")}; gravamen inscrito en el Conservador de Bienes Raíces competente.`,
+    ],
+    [
+      "Forma del gravamen",
+      "Hipoteca y prohibición de enajenar, sujeta a confirmación del asesor legal en el contrato definitivo.",
+    ],
     ["Destino de fondos", "Proyectos de pequeña y mediana minería del portafolio Geocapitals."],
     ["Alzamiento", "Al restituirse íntegramente capital e intereses."],
   ];
@@ -203,7 +222,14 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
   y += 16;
   font(doc, "body", "normal", 7.8);
   for (const p of COLLATERAL_PROJECTS) {
-    const cells = [p.name, p.commune, `${p.areaHa.toLocaleString("es-CL")} ha`, String(p.lots), p.registry, p.status];
+    const cells = [
+      p.name,
+      p.commune,
+      `${p.areaHa.toLocaleString("es-CL")} ha`,
+      String(p.lots),
+      p.registry,
+      p.status,
+    ];
     const wrapped = cells.map((c, i) => doc.splitTextToSize(c, widths[i] - 8) as string[]);
     const h = Math.max(...wrapped.map((l) => l.length)) * 10 + 8;
     x = M + 4;
@@ -230,10 +256,19 @@ export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
   // 5. Clasificación de evidencia
   y = section(doc, y, "05", "Clasificación de la información");
   const ev: Array<[string, string]> = [
-    ["DOCUMENTAL", "Inscripción Fs. 243 N 133 (2012) y Plano N 192 (2023), CBR Licantén; rol matriz SII 168-921."],
+    [
+      "DOCUMENTAL",
+      "Inscripción Fs. 243 N 133 (2012) y Plano N 192 (2023), CBR Licantén; rol matriz SII 168-921.",
+    ],
     ["DECLARADO", "Precios de lista y disponibilidad de parcelas informados por la titular."],
-    ["CONTRACTUAL", `Tasa UF + ${t.annualRatePct} % anual y periodicidad de pago, fijadas en el mutuo.`],
-    ["PENDIENTE DD", "Rol individual, certificado de dominio vigente, gravámenes y tasación de cada parcela asignada."],
+    [
+      "CONTRACTUAL",
+      `Tasa UF + ${t.annualRatePct} % anual y periodicidad de pago, fijadas en el mutuo.`,
+    ],
+    [
+      "PENDIENTE DD",
+      "Rol individual, certificado de dominio vigente, gravámenes y tasación de cada parcela asignada.",
+    ],
   ];
   for (const [k, v] of ev) y = kvRow(doc, y, k, v, 96);
   y += 12;
