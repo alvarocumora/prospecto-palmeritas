@@ -286,7 +286,8 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
                   kind: "figure" as const,
                   title: "Valle Escondido Licantén",
                   imageDataUrl: img.valleEscondido,
-                  caption: "IMAGEN REFERENCIAL / ILUSTRATIVA del material comercial del proyecto; puede no corresponder a una fotografía del predio.",
+                  caption:
+                    "IMAGEN REFERENCIAL / ILUSTRATIVA del material comercial del proyecto; puede no corresponder a una fotografía del predio.",
                 },
               ],
             },

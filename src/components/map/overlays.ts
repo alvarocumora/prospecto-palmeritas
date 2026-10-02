@@ -1,4 +1,5 @@
 import type { LeafletNS } from "./types";
+import { SNGM_CONCESIONES_URL } from "@/lib/sngm";
 
 /** Geological raster overlays. Macrostrat is global and reliable. */
 export function buildGeologyOverlays(L: LeafletNS) {
@@ -26,10 +27,12 @@ export function buildGeologyOverlays(L: LeafletNS) {
  *
  * Filter `ID_SITUACION_CONCESION in (1,3)` = constituidas (active titles).
  * Filter `ID_SITUACION_CONCESION = 9`      = en proceso (in tramite).
+ *
+ * Mismo layer que usa el motor del dashboard (src/lib/cadastre/miningCadastreEngine.ts
+ * vía src/lib/sngm.ts) — la URL base se importa de ahí (SNGM_CONCESIONES_URL)
+ * en vez de hardcodearla de nuevo acá, que es justo lo que sngm.ts pide no
+ * hacer en su comentario de cabecera.
  */
-const CATASTRO_BASE =
-  "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/ArcGIS/rest/services/Marcelo_Layer/FeatureServer";
-
 // Field reference (layer 2 = WGS84_Concesion):
 //   ORIGEN, NUMERO_ROL, DV_ROL, NOMBRE, HECTAREAS, FECHA_VENCIMIENTO,
 //   SITUACION_CONCESION, ID_SITUACION_CONCESION, TIPO_CONCESION, COMUNA,
@@ -57,7 +60,7 @@ export function catastroQueryUrl(bbox: {
     returnGeometry: "true",
     f: "geojson",
   });
-  return `${CATASTRO_BASE}/2/query?${params.toString()}`;
+  return `${SNGM_CONCESIONES_URL}/query?${params.toString()}`;
 }
 
 /** Colors mirror the official SERNAGEOMIN viewer. */

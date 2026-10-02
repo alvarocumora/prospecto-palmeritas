@@ -31,7 +31,11 @@ export function CollateralDownloadButtons({ className = "" }: { className?: stri
         disabled={busy !== null}
         className={`${base} border border-hairline text-content hover:border-accent-brand hover:text-accent-brand`}
       >
-        {busy === "teaser" ? <Loader2 className="w-4 h-4 animate-spin" /> : <QrCode className="w-4 h-4" />}
+        {busy === "teaser" ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <QrCode className="w-4 h-4" />
+        )}
         Memorándum ejecutivo (PDF)
       </button>
       <button
@@ -40,7 +44,11 @@ export function CollateralDownloadButtons({ className = "" }: { className?: stri
         disabled={busy !== null}
         className={`${base} border border-hairline text-content hover:border-accent-brand hover:text-accent-brand`}
       >
-        {busy === "deck" ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileDown className="w-4 h-4" />}
+        {busy === "deck" ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          <FileDown className="w-4 h-4" />
+        )}
         Deck de inversión
       </button>
     </div>
