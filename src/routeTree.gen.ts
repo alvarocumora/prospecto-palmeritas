@@ -16,6 +16,7 @@ import { Route as ContactoRouteImport } from './routes/contacto'
 import { Route as EmpresasRouteImport } from './routes/empresas'
 import { Route as EnRouteImport } from './routes/en'
 import { Route as InscripcionRouteImport } from './routes/inscripcion'
+import { Route as InversionColateralRouteImport } from './routes/inversion-colateral'
 import { Route as InversionistasRouteImport } from './routes/inversionistas'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as MetodologiaRouteImport } from './routes/metodologia'
@@ -85,6 +86,8 @@ import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_au
 import { Route as AuthenticatedDashboardCholquiRouteImport } from './routes/_authenticated.dashboard.cholqui'
 import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
 import { Route as AuthenticatedDashboardCobranzaRouteImport } from './routes/_authenticated.dashboard.cobranza'
+import { Route as AuthenticatedDashboardColateralDocumentosRouteImport } from './routes/_authenticated.dashboard.colateral-documentos'
+import { Route as AuthenticatedDashboardColateralLeadsRouteImport } from './routes/_authenticated.dashboard.colateral-leads'
 import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
 import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
 import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
@@ -217,6 +220,11 @@ const EnRoute = EnRouteImport.update({
 const InscripcionRoute = InscripcionRouteImport.update({
   id: '/inscripcion',
   path: '/inscripcion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InversionColateralRoute = InversionColateralRouteImport.update({
+  id: '/inversion-colateral',
+  path: '/inversion-colateral',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InversionistasRoute = InversionistasRouteImport.update({
@@ -580,6 +588,18 @@ const AuthenticatedDashboardCobranzaRoute =
   AuthenticatedDashboardCobranzaRouteImport.update({
     id: '/dashboard/cobranza',
     path: '/dashboard/cobranza',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralDocumentosRoute =
+  AuthenticatedDashboardColateralDocumentosRouteImport.update({
+    id: '/dashboard/colateral-documentos',
+    path: '/dashboard/colateral-documentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralLeadsRoute =
+  AuthenticatedDashboardColateralLeadsRouteImport.update({
+    id: '/dashboard/colateral-leads',
+    path: '/dashboard/colateral-leads',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardCommandCenterRoute =
@@ -1166,6 +1186,7 @@ export interface FileRoutesByFullPath {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1234,6 +1255,8 @@ export interface FileRoutesByFullPath {
   '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1342,6 +1365,7 @@ export interface FileRoutesByTo {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1410,6 +1434,8 @@ export interface FileRoutesByTo {
   '/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1520,6 +1546,7 @@ export interface FileRoutesById {
   '/empresas': typeof EmpresasRoute
   '/en': typeof EnRoute
   '/inscripcion': typeof InscripcionRouteWithChildren
+  '/inversion-colateral': typeof InversionColateralRoute
   '/inversionistas': typeof InversionistasRoute
   '/mcp': typeof McpRoute
   '/metodologia': typeof MetodologiaRoute
@@ -1588,6 +1615,8 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/cholqui': typeof AuthenticatedDashboardCholquiRoute
   '/_authenticated/dashboard/clientes': typeof AuthenticatedDashboardClientesRoute
   '/_authenticated/dashboard/cobranza': typeof AuthenticatedDashboardCobranzaRoute
+  '/_authenticated/dashboard/colateral-documentos': typeof AuthenticatedDashboardColateralDocumentosRoute
+  '/_authenticated/dashboard/colateral-leads': typeof AuthenticatedDashboardColateralLeadsRoute
   '/_authenticated/dashboard/command-center': typeof AuthenticatedDashboardCommandCenterRoute
   '/_authenticated/dashboard/commodity-lots': typeof AuthenticatedDashboardCommodityLotsRoute
   '/_authenticated/dashboard/deals': typeof AuthenticatedDashboardDealsRoute
@@ -1698,6 +1727,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1766,6 +1796,8 @@ export interface FileRouteTypes {
     | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
+    | '/dashboard/colateral-documentos'
+    | '/dashboard/colateral-leads'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -1874,6 +1906,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -1942,6 +1975,8 @@ export interface FileRouteTypes {
     | '/dashboard/cholqui'
     | '/dashboard/clientes'
     | '/dashboard/cobranza'
+    | '/dashboard/colateral-documentos'
+    | '/dashboard/colateral-leads'
     | '/dashboard/command-center'
     | '/dashboard/commodity-lots'
     | '/dashboard/deals'
@@ -2051,6 +2086,7 @@ export interface FileRouteTypes {
     | '/empresas'
     | '/en'
     | '/inscripcion'
+    | '/inversion-colateral'
     | '/inversionistas'
     | '/mcp'
     | '/metodologia'
@@ -2119,6 +2155,8 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/cholqui'
     | '/_authenticated/dashboard/clientes'
     | '/_authenticated/dashboard/cobranza'
+    | '/_authenticated/dashboard/colateral-documentos'
+    | '/_authenticated/dashboard/colateral-leads'
     | '/_authenticated/dashboard/command-center'
     | '/_authenticated/dashboard/commodity-lots'
     | '/_authenticated/dashboard/deals'
@@ -2229,6 +2267,7 @@ export interface RootRouteChildren {
   EmpresasRoute: typeof EmpresasRoute
   EnRoute: typeof EnRoute
   InscripcionRoute: typeof InscripcionRouteWithChildren
+  InversionColateralRoute: typeof InversionColateralRoute
   InversionistasRoute: typeof InversionistasRoute
   McpRoute: typeof McpRoute
   MetodologiaRoute: typeof MetodologiaRoute
@@ -2357,6 +2396,13 @@ declare module '@tanstack/react-router' {
       path: '/inscripcion'
       fullPath: '/inscripcion'
       preLoaderRoute: typeof InscripcionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inversion-colateral': {
+      id: '/inversion-colateral'
+      path: '/inversion-colateral'
+      fullPath: '/inversion-colateral'
+      preLoaderRoute: typeof InversionColateralRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/inversionistas': {
@@ -2840,6 +2886,20 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/cobranza'
       fullPath: '/dashboard/cobranza'
       preLoaderRoute: typeof AuthenticatedDashboardCobranzaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-documentos': {
+      id: '/_authenticated/dashboard/colateral-documentos'
+      path: '/dashboard/colateral-documentos'
+      fullPath: '/dashboard/colateral-documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-leads': {
+      id: '/_authenticated/dashboard/colateral-leads'
+      path: '/dashboard/colateral-leads'
+      fullPath: '/dashboard/colateral-leads'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralLeadsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/command-center': {
@@ -3643,6 +3703,8 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardCholquiRoute: typeof AuthenticatedDashboardCholquiRoute
   AuthenticatedDashboardClientesRoute: typeof AuthenticatedDashboardClientesRoute
   AuthenticatedDashboardCobranzaRoute: typeof AuthenticatedDashboardCobranzaRoute
+  AuthenticatedDashboardColateralDocumentosRoute: typeof AuthenticatedDashboardColateralDocumentosRoute
+  AuthenticatedDashboardColateralLeadsRoute: typeof AuthenticatedDashboardColateralLeadsRoute
   AuthenticatedDashboardCommandCenterRoute: typeof AuthenticatedDashboardCommandCenterRoute
   AuthenticatedDashboardCommodityLotsRoute: typeof AuthenticatedDashboardCommodityLotsRoute
   AuthenticatedDashboardDealsRoute: typeof AuthenticatedDashboardDealsRoute
@@ -3725,6 +3787,10 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardCholquiRoute: AuthenticatedDashboardCholquiRoute,
   AuthenticatedDashboardClientesRoute: AuthenticatedDashboardClientesRoute,
   AuthenticatedDashboardCobranzaRoute: AuthenticatedDashboardCobranzaRoute,
+  AuthenticatedDashboardColateralDocumentosRoute:
+    AuthenticatedDashboardColateralDocumentosRoute,
+  AuthenticatedDashboardColateralLeadsRoute:
+    AuthenticatedDashboardColateralLeadsRoute,
   AuthenticatedDashboardCommandCenterRoute:
     AuthenticatedDashboardCommandCenterRoute,
   AuthenticatedDashboardCommodityLotsRoute:
@@ -3878,6 +3944,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmpresasRoute: EmpresasRoute,
   EnRoute: EnRoute,
   InscripcionRoute: InscripcionRouteWithChildren,
+  InversionColateralRoute: InversionColateralRoute,
   InversionistasRoute: InversionistasRoute,
   McpRoute: McpRoute,
   MetodologiaRoute: MetodologiaRoute,

@@ -787,6 +787,9 @@ function MarketplaceStatsTab() {
           <a href="/dashboard/admin/investors" className="text-gold hover:underline">
             Revisar KYC pendientes →
           </a>
+          <a href="/dashboard/colateral-leads" className="text-gold hover:underline">
+            Solicitudes de inversión con colateral →
+          </a>
         </div>
       </div>
     </div>
