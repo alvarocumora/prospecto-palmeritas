@@ -265,6 +265,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
 
 /** Iconos usados solo para tipado/exports auxiliares (evita imports muertos). */
 export const WORKSPACE_ICONS = {
+  ClipboardCheck, ClipboardList, DollarSign, Droplets, FileSignature, FileText, KeyRound, Package, PackageSearch, Satellite, ShieldAlert, Sparkles,
   Drill,
   TestTube2,
   ShieldCheck,
