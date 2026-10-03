@@ -1,36 +1,18 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
-import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
-import { CatastroProjectPage } from "@/features/catastro-project/CatastroProjectPage";
-import { supabase } from "@/integrations/supabase/client";
+import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 
-// Vista "catastro por proyecto" bajo el árbol público /catastro/*.
-// Requiere sesión — si no hay usuario, redirige a /auth conservando el retorno.
+// La vista proyecto vive ahora dentro del catastro único (/catastro/mapa?vista=proyecto).
+// Las subrutas (p. ej. titulares/$id) siguen funcionando bajo este layout.
 export const Route = createFileRoute("/catastro/proyecto")({
-  beforeLoad: async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
-      throw redirect({ to: "/auth", search: { redirect: "/catastro/proyecto" } as never });
+  beforeLoad: ({ location }) => {
+    if (location.pathname.replace(/\/$/, "") === "/catastro/proyecto") {
+      throw redirect({ to: "/catastro/mapa", search: { vista: "proyecto" }, statusCode: 301 });
     }
   },
   head: () => ({
     meta: [
       { title: "Catastro · vista proyecto — Geocapitals" },
-      {
-        name: "description",
-        content:
-          "Concesiones, titulares, patentes, conflictos y vigilancia SERNAGEOMIN para tu proyecto minero.",
-      },
+      { name: "description", content: "Concesiones, titulares y vigilancia de tu proyecto minero." },
     ],
   }),
-  component: ProjectCatastroRoute,
+  component: Outlet,
 });
-
-function ProjectCatastroRoute() {
-  return (
-    <PublicCatastroShell>
-      <CatastroProjectPage />
-    </PublicCatastroShell>
-  );
-}
