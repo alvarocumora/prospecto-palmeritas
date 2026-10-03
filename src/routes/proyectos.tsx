@@ -101,7 +101,7 @@ function ProyectosPage() {
               to="/terminal/$slug"
               params={{ slug: p.slug }}
               search={{ tab: "mapa" as const }}
-              className="relative block aspect-[16/10] overflow-hidden bg-surface-muted"
+              className="relative block aspect-[16/10] overflow-hidden bg-surface"
             >
               <img
                 src={p.image}
