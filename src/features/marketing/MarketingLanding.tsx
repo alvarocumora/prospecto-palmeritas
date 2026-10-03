@@ -211,7 +211,7 @@ function DoorCard(props: {
       </span>
     </>
   );
-  const cls = "group block bg-surface p-8 hover:bg-surface-muted transition-colors";
+  const cls = "group block bg-surface p-8 hover:bg-surface-2 transition-colors";
   return props.to ? (
     <Link to={props.to} className={cls}>
       {inner}
@@ -275,7 +275,7 @@ function CatastroQuickSearch() {
                   <Link
                     to="/catastro/c/$code"
                     params={{ code: r.code }}
-                    className="flex items-start gap-3 p-3 hover:bg-surface-muted text-sm"
+                    className="flex items-start gap-3 p-3 hover:bg-surface-2 text-sm"
                   >
                     <Building2 className="w-4 h-4 mt-0.5 text-accent-brand shrink-0" />
                     <div className="flex-1 min-w-0">
