@@ -6,7 +6,8 @@
  */
 import type jsPDF from "jspdf";
 import { GC_BRAND, GC_COLOR, GC_PAGE } from "@/lib/pdf/brand/tokens";
-import { brandQr, drawMark, fill, font, ink, stroke } from "@/lib/pdf/brand/kit";
+import { brandQr, fill, font, ink, stroke } from "@/lib/pdf/brand/kit";
+import { letterhead } from "@/lib/pdf/brand/institutional";
 import {
   COLLATERAL_DISCLAIMERS,
   COLLATERAL_DOC_VERSION,
@@ -59,33 +60,14 @@ function kvRow(doc: jsPDF, y: number, k: string, v: string, labelW = 150): numbe
 }
 
 function chrome(doc: jsPDF, page: number, total: number, issued: string) {
-  fill(doc, GC_COLOR.white);
-  doc.rect(0, 0, W, H, "F");
-  // Pleca tricolor milimétrica
-  fill(doc, NAVY as never);
-  doc.rect(0, 0, W * 0.55, 3, "F");
-  fill(doc, GC_COLOR.slate);
-  doc.rect(W * 0.55, 0, W * 0.3, 3, "F");
-  fill(doc, GOLD as never);
-  doc.rect(W * 0.85, 0, W * 0.15, 3, "F");
-
-  const mw = drawMark(doc, M, 26, 18);
-  font(doc, "body", "bold", 9);
-  ink(doc, NAVY as never);
-  doc.text(GC_BRAND.name, M + mw + 7, 38);
-  font(doc, "body", "normal", 7);
-  ink(doc, GC_COLOR.slate);
-  doc.text("Estructuración de Capital", M + mw + 7, 47);
-  doc.text("ESTRICTAMENTE PRIVADO Y CONFIDENCIAL", W - M, 38, { align: "right", charSpace: 0.4 });
-  doc.text(`Ref. ${REF} · ${COLLATERAL_DOC_VERSION}`, W - M, 47, { align: "right" });
-  rule(doc, 58);
-
-  rule(doc, H - 44);
-  font(doc, "body", "normal", 6.6);
-  ink(doc, GC_COLOR.slate);
-  doc.text(`${GC_BRAND.name} · ${GC_BRAND.site} · ${GC_BRAND.email}`, M, H - 31);
-  doc.text(`Emitido ${issued}`, W / 2, H - 31, { align: "center" });
-  doc.text(`Página ${page} de ${total}`, W - M, H - 31, { align: "right" });
+  letterhead(doc, { w: W, h: H, m: M }, {
+    unit: "Estructuración de Capital",
+    ref: REF,
+    version: COLLATERAL_DOC_VERSION,
+    page,
+    total,
+    issued,
+  });
 }
 
 export async function downloadCollateralMemo(liveUrl: string): Promise<void> {

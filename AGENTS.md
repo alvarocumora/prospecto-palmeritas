@@ -1,0 +1,1 @@
+- PDF documents share one institutional structure from src/lib/pdf/brand/institutional.ts (pleca, letterhead, numbered sections, QR verification seal) — keeps every deck, memo and certificate consistent.
