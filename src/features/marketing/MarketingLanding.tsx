@@ -1,447 +1,298 @@
 import { Link } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import {
-  ArrowRight,
-  ShieldCheck,
-  FileText,
-  Globe2,
-  MapPin,
-  Layers,
-  Coins,
-  Radar,
-} from "lucide-react";
-
-import { getPlatformStats } from "@/lib/platformStats.functions";
-import { HeroLiveMap } from "@/features/marketing/HeroLiveMap";
-import { LandingCatastroBlock } from "@/features/marketing/LandingCatastroBlock";
-import { CatastroComparison } from "@/features/marketing/CatastroComparison";
+import { useMutation } from "@tanstack/react-query";
+import { ArrowRight, Search, Building2, ShieldCheck, Map, FileText, Check } from "lucide-react";
+import { searchConcessions } from "@/lib/catastroPublic.functions";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
-import { useLocale } from "@/features/marketing/i18n";
-import { InvestableProjects } from "@/features/marketing/InvestableProjects";
-import { CommodityTicker } from "@/features/marketing/CommodityTicker";
-import { PublicCommodityLots } from "@/features/marketing/PublicCommodityLots";
-import { AnimatedCounter } from "@/features/marketing/AnimatedCounter";
-import { HeroTopoBackground } from "@/features/marketing/HeroTopoBackground";
-import { Reveal } from "@/features/marketing/Reveal";
 import { Eyebrow } from "@/components/brand";
-import heroMining from "@/assets/hero-mining.jpg";
 import colateralCover from "@/assets/colateral/cover-maule.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 
+/**
+ * Portada = embudo de captura con dos puertas:
+ *  A) Inversionistas → programa con colateral inmobiliario (simular + memorándum + lead).
+ *  B) Clientes de catastro → búsqueda directa de concesiones → ficha → plan.
+ * Todo lo técnico (visores, 3D, terminal) vive dentro de GeoTerminal, no en la portada.
+ */
 export function MarketingLanding() {
-  const { t } = useLocale();
-
-  const statsFn = useServerFn(getPlatformStats);
-  const { data: live } = useQuery({
-    queryKey: ["platform-stats"],
-    queryFn: () => statsFn(),
-    staleTime: 60_000,
-  });
-
   return (
-    <div className="brand-light min-h-screen">
+    <div className="brand-light min-h-screen bg-surface text-content">
       <MarketingHeader />
 
-      {/* ─────────────────────────────────────────────
-          1. HERO — compacto, dos CTAs claros
-         ───────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[#05070a] text-slate-200 border-b border-white/5">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 bg-cover bg-center opacity-[0.32]"
-          style={{ backgroundImage: `url(${heroMining})` }}
-        />
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, rgba(5,7,10,0.72) 0%, rgba(5,7,10,0.86) 55%, rgba(5,7,10,0.96) 100%)",
-          }}
-        />
-        <div
-          className="pointer-events-none absolute -top-40 -right-40 w-[520px] h-[520px] rounded-full blur-[120px]"
-          style={{ background: "color-mix(in oklab, var(--accent-brand) 22%, transparent)" }}
-        />
-        <HeroTopoBackground />
+      {/* 1. HERO — dos puertas */}
+      <section className="border-b border-hairline">
+        <div className="max-w-6xl mx-auto px-5 pt-16 pb-14 sm:pt-24 sm:pb-20">
+          <Eyebrow className="mb-4">Geocapitals · Minería de Chile</Eyebrow>
+          <h1 className="brand-display font-serif text-4xl sm:text-6xl leading-[1.05] max-w-4xl">
+            Invierte con respaldo real. Revisa cualquier concesión en segundos.
+          </h1>
+          <p className="mt-5 text-lg text-content-muted max-w-2xl">
+            Dos servicios, una plataforma: inversión en minería garantizada con bienes raíces, e
+            inteligencia catastral sobre datos oficiales de SERNAGEOMIN.
+          </p>
 
-        <div className="relative max-w-7xl mx-auto px-5 py-14 sm:py-20 lg:py-24 grid lg:grid-cols-[1fr_1.05fr] gap-10 items-center">
+          <div className="mt-10 grid md:grid-cols-2 gap-px bg-hairline border border-hairline">
+            <DoorCard
+              icon={<ShieldCheck className="w-5 h-5" />}
+              tag="Para inversionistas"
+              title="Inversión con colateral inmobiliario"
+              body="Desde $25 MM · UF + 12 % anual con pago mensual · parcela con rol propio en garantía."
+              cta="Simular mi inversión"
+              to="/inversion-colateral"
+            />
+            <DoorCard
+              icon={<Map className="w-5 h-5" />}
+              tag="Para mineros, geólogos y abogados"
+              title="Catastro minero profesional"
+              body="Titular, vigencia, superficie y ubicación de cualquier concesión. Alertas y fichas descargables."
+              cta="Buscar una concesión"
+              href="#catastro"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* 2. INVERSIONISTAS */}
+      <section id="colateral" className="border-b border-hairline">
+        <div className="max-w-6xl mx-auto px-5 py-16 sm:py-20 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-[10px] font-mono uppercase tracking-[0.28em] text-slate-300 mb-6 backdrop-blur">
-              <span className="relative flex h-2 w-2">
-                <span
-                  className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
-                  style={{ background: "var(--accent-brand)" }}
-                />
-                <span
-                  className="relative inline-flex rounded-full h-2 w-2"
-                  style={{ background: "var(--accent-brand)" }}
-                />
-              </span>
-              <span>{t("hero_eyebrow")}</span>
-            </div>
-
-            <h1 className="brand-display text-[36px] sm:text-[52px] lg:text-[60px] leading-[1.02] tracking-tight text-white">
-              Inversión estructurada en minería,{" "}
-              <span className="italic font-normal text-slate-400">
-                respaldada por catastro y activos reales
-              </span>
-              .
-            </h1>
-
-            <p className="mt-5 text-base sm:text-lg text-slate-400 max-w-xl font-light leading-relaxed">
-              Invierte en proyectos mineros verificados con garantía inmobiliaria, analiza
-              concesiones con imágenes satelitales y comercializa mineral con procedencia
-              documentada.
-            </p>
-
-            {/* 3 puertas de entrada por perfil */}
-            <div className="mt-8 grid sm:grid-cols-3 gap-px bg-white/[0.08] border border-white/10">
+            <Eyebrow className="mb-3">Inversionistas</Eyebrow>
+            <h2 className="font-serif text-3xl md:text-4xl leading-tight">
+              Tu inversión, garantizada por una parcela inscrita.
+            </h2>
+            <ol className="mt-6 space-y-3 text-sm">
               {[
-                {
-                  to: "/inversion-colateral" as const,
-                  k: "Soy inversionista",
-                  d: "Renta fija con colateral inmobiliario y proyectos para invertir.",
-                  icon: ShieldCheck,
-                },
-                {
-                  to: "/empresas" as const,
-                  k: "Soy titular o geólogo",
-                  d: "Certifica, visualiza en 3D y financia tu proyecto minero.",
-                  icon: Layers,
-                },
-                {
-                  to: "/marketplace" as const,
-                  k: "Compro o vendo mineral",
-                  d: "Lotes y requerimientos con procedencia trazable.",
-                  icon: Coins,
-                },
-              ].map((door) => (
-                <Link
-                  key={door.k}
-                  to={door.to}
-                  className="group bg-[#05070a] p-4 hover:bg-white/[0.04] transition-colors"
-                >
-                  <door.icon className="w-4 h-4 mb-2" style={{ color: "var(--gold)" }} />
-                  <div className="text-sm text-white font-medium flex items-center gap-1">
-                    {door.k}
-                    <ArrowRight className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                "Simula el monto y plazo: ves tu interés mensual al instante.",
+                "Descarga el memorándum ejecutivo con las condiciones.",
+                "Deja tus datos: un asesor te contacta y abre la sala de documentos.",
+              ].map((s, i) => (
+                <li key={s} className="flex gap-3">
+                  <span className="font-mono text-accent-brand">0{i + 1}</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ol>
+            <div className="mt-6 grid grid-cols-3 gap-px bg-hairline border border-hairline">
+              {[
+                { v: "UF + 12 %", l: "Tasa anual" },
+                { v: "$250.000", l: "Interés/mes por $25 MM" },
+                { v: "Maule", l: "Hualañé · Licantén" },
+              ].map((k) => (
+                <div key={k.l} className="bg-surface px-4 py-4">
+                  <div className="font-mono text-lg">{k.v}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-widest text-content-muted mt-1">
+                    {k.l}
                   </div>
-                  <div className="text-xs text-slate-400 mt-1 leading-snug">{door.d}</div>
-                </Link>
+                </div>
               ))}
             </div>
-
-            {/* Trust strip */}
-            <div className="mt-8 pt-6 border-t border-white/5 flex items-center gap-6 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
-                AML
-              </span>
-              <span className="flex items-center gap-2">
-                <FileText className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> NI 43-101
-              </span>
-              <span className="flex items-center gap-2">
-                <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> LATAM
-              </span>
-              <span className="flex items-center gap-2">
-                <MapPin className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> Garantía
-                inmobiliaria
-              </span>
-            </div>
-
-            {/* KPI live bar — solo cifras reales; se oculta si aún no cargan */}
-            {(() => {
-              const kpis = [
-                { v: live?.projects ?? 0, l: "Proyectos" },
-                { v: live?.concessionsManaged ?? 0, l: "Concesiones", compact: true },
-                { v: live?.satelliteAnomalies ?? 0, l: "Anomalías sat." },
-                { v: live?.mineralDeposits ?? 0, l: "Yacimientos", compact: true },
-              ].filter((k) => k.v > 0);
-              if (kpis.length === 0) return null;
-              return (
-                <div
-                  className="mt-6 grid gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden"
-                  style={{ gridTemplateColumns: `repeat(${kpis.length}, minmax(0, 1fr))` }}
-                >
-                  {kpis.map((k, i) => (
-                    <div key={i} className="bg-[#05070a] px-4 py-4">
-                      <div className="font-mono text-2xl text-white tracking-tight">
-                        <AnimatedCounter value={k.v} format={k.compact ? "compact" : "int"} />
-                      </div>
-                      <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
-                        {k.l}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              );
-            })()}
-          </div>
-
-          {/* Live map wrapped in HUD frame */}
-          <div className="relative">
-            <div className="pointer-events-none absolute -top-2 -left-2 w-8 h-8 border-t-2 border-l-2 border-white/40 z-20" />
-            <div className="pointer-events-none absolute -top-2 -right-2 w-8 h-8 border-t-2 border-r-2 border-white/40 z-20" />
-            <div className="pointer-events-none absolute -bottom-2 -left-2 w-8 h-8 border-b-2 border-l-2 border-white/40 z-20" />
-            <div className="pointer-events-none absolute -bottom-2 -right-2 w-8 h-8 border-b-2 border-r-2 border-white/40 z-20" />
-
-            <div className="pointer-events-none absolute -top-6 left-0 z-20 font-mono text-[10px] uppercase tracking-[0.28em] text-slate-500 flex items-center gap-3">
-              <span
-                className="inline-block w-1.5 h-1.5 rounded-full animate-pulse"
-                style={{ background: "var(--gold)" }}
-              />
-              <span>SCANNING · LATAM · LIVE</span>
-            </div>
-
-            <div
-              className="relative rounded-none overflow-hidden border border-white/10 shadow-[0_40px_80px_-30px_rgba(0,0,0,0.6)]"
-              style={{ background: "#0b1220" }}
-            >
-              <HeroLiveMap />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Ticker de precios spot */}
-      <CommodityTicker />
-
-      {/* ─────────────────────────────────────────────
-          2. PROYECTOS DE MINERÍA
-         ───────────────────────────────────────────── */}
-      <section id="proyectos" className="border-b border-hairline bg-surface">
-        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20">
-          <Reveal>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-              <div>
-                <Eyebrow className="mb-3">Marketplace de proyectos</Eyebrow>
-                <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
-                  Proyectos mineros publicados
-                </h2>
-                <p className="mt-3 text-content-muted max-w-2xl">
-                  Prospectos y activos operativos con ficha técnica, valorización automática y data
-                  room público. Filtra por commodity, país o estado.
-                </p>
-              </div>
+            <div className="mt-6">
               <Link
-                to="/oportunidades"
-                className="group inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.22em] text-content hover:text-accent-brand transition-colors self-start md:self-end"
+                to="/inversion-colateral"
+                className="inline-flex items-center gap-2 h-11 px-5 bg-content text-surface text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-accent-brand transition-colors"
               >
-                Ver todos
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                Simular y solicitar contacto <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
-          </Reveal>
-          <InvestableProjects />
-        </div>
-      </section>
-
-      {/* 2b. INVERSIÓN CON COLATERAL INMOBILIARIO */}
-      <section id="colateral" className="border-b border-hairline bg-white">
-        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">
-          <Reveal>
-            <div>
-              <Eyebrow className="mb-3">Inversión con colateral</Eyebrow>
-              <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
-                Invierte en minería con una parcela real en garantía.
-              </h2>
-              <p className="mt-3 text-content-muted max-w-xl">
-                Desde $25 MM, UF + 12 % anual con pago mensual. Te entregamos en garantía una
-                parcela con rol individual en Hualañé o Licantén, Región del Maule.
-              </p>
-              <div className="mt-6 grid grid-cols-3 gap-px bg-hairline border border-hairline rounded-sm overflow-hidden">
-                {[
-                  { v: "UF + 12 %", l: "Tasa anual" },
-                  { v: "$250.000", l: "Interés/mes por $25 MM" },
-                  { v: "116", l: "Parcelas en cartera" },
-                ].map((k) => (
-                  <div key={k.l} className="bg-white px-4 py-4">
-                    <div className="font-mono text-xl text-content">{k.v}</div>
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-content-muted mt-1">
-                      {k.l}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-6 flex flex-wrap gap-3">
-                <Link
-                  to="/inversion-colateral"
-                  className="inline-flex items-center gap-2 h-11 px-5 bg-content text-white text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-accent-brand transition-colors"
-                >
-                  Simular y ver parcelas <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
-              <CollateralDownloadButtons className="mt-3" />
-              <p className="mt-4 text-[11px] text-content-muted">
-                Tasa pactada por contrato, no proyección minera. No es oferta pública de valores.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal>
-            <Link
-              to="/inversion-colateral"
-              className="group block relative overflow-hidden border border-hairline"
-            >
-              <img
-                src={colateralCover}
-                alt="Valle rural del Maule (imagen ilustrativa)"
-                loading="lazy"
-                className="w-full h-80 object-cover group-hover:scale-[1.02] transition-transform duration-700"
-              />
-              <span className="absolute bottom-0 inset-x-0 bg-white/85 px-4 py-2 text-[11px] font-mono text-content-muted">
-                Imagen ilustrativa · Hualañé 41,75 ha · Licantén 44 ha
-              </span>
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────
-          3. CATASTRO LIVE
-         ───────────────────────────────────────────── */}
-      <section id="catastro" className="border-b border-hairline bg-white">
-        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20">
-          <Reveal>
-            <div className="grid lg:grid-cols-[1fr_2fr] gap-8 items-end mb-8">
-              <div>
-                <Eyebrow className="mb-3">Catastro georreferenciado</Eyebrow>
-                <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
-                  Mapa live de concesiones y proyectos.
-                </h2>
-                <p className="mt-3 text-content-muted">
-                  Cruzamos el catastro minero nacional con boletines oficiales, deudas de patente y
-                  yacimientos indexados. Todo en tiempo real.
-                </p>
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Link
-                    to="/catastro/proyecto"
-                    className="inline-flex items-center gap-2 h-11 px-5 bg-content text-white text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-accent-brand transition-colors"
-                  >
-                    <MapPin className="w-4 h-4" />
-                    Abrir catastro
-                  </Link>
-                  <Link
-                    to="/terminal"
-                    className="inline-flex items-center gap-2 h-11 px-5 border border-hairline text-content text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:border-accent-brand hover:text-accent-brand transition-colors"
-                  >
-                    <Layers className="w-4 h-4" />
-                    Terminal geológico
-                  </Link>
-                </div>
-              </div>
-              <div className="grid grid-cols-3 gap-px bg-hairline border border-hairline rounded-sm overflow-hidden">
-                {[
-                  {
-                    v: live?.cadastreNationalCount ?? 0,
-                    l: "En catastro nacional",
-                    compact: true,
-                  },
-                  { v: live?.concessionsManaged ?? 0, l: "Gestionadas", compact: true },
-                  { v: live?.explorationTargets ?? 0, l: "Targets" },
-                ].map((k, i) => (
-                  <div key={i} className="bg-white px-4 py-4">
-                    <div className="font-mono text-2xl text-content tracking-tight">
-                      <AnimatedCounter value={k.v} format={k.compact ? "compact" : "int"} />
-                    </div>
-                    <div className="text-[10px] font-mono uppercase tracking-widest text-content-muted mt-1">
-                      {k.l}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Reveal>
-
-          <Reveal>
-            <LandingCatastroBlock />
-          </Reveal>
-
-          <div className="mt-8">
-            <Reveal>
-              <CatastroComparison />
-            </Reveal>
+            <CollateralDownloadButtons className="mt-3" />
+            <p className="mt-4 text-[11px] text-content-muted">
+              Tasa pactada por contrato, no proyección minera. No constituye oferta pública de valores.
+            </p>
           </div>
+          <img
+            src={colateralCover}
+            alt="Valle rural del Maule (imagen ilustrativa)"
+            loading="lazy"
+            className="w-full h-80 object-cover border border-hairline"
+          />
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────
-          4. COMMODITIES / MARKETPLACE
-         ───────────────────────────────────────────── */}
-      <section id="commodities" className="border-b border-hairline bg-surface">
-        <div className="max-w-7xl mx-auto px-5 py-16 sm:py-20">
-          <Reveal>
-            <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-              <div>
-                <Eyebrow className="mb-3">Trade de commodities</Eyebrow>
-                <h2 className="brand-display text-3xl md:text-4xl text-content leading-tight">
-                  Lotes de metales verificados.
-                </h2>
-                <p className="mt-3 text-content-muted max-w-2xl">
-                  Cobre, oro, plata, litio y más. Cada ficha incluye ley, tonelaje, Incoterm, país
-                  de origen y ensayos certificados por QP.
-                </p>
-              </div>
-              <Link
-                to="/marketplace"
-                className="group inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.22em] text-content hover:text-accent-brand transition-colors self-start md:self-end"
-              >
-                Ver marketplace completo
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          </Reveal>
-          <Reveal>
-            <PublicCommodityLots />
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────
-          5. CTA final
-         ───────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-surface-inverse text-white">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.6) 1px, transparent 1px)",
-            backgroundSize: "56px 56px",
-            maskImage: "radial-gradient(ellipse at center, black 0%, transparent 70%)",
-          }}
-        />
-        <div className="relative max-w-5xl mx-auto px-5 py-20 text-center">
-          <p className="brand-eyebrow text-accent-brand-subtle mb-4">Comienza hoy</p>
-          <h2 className="brand-display text-4xl md:text-5xl leading-[1.05] max-w-3xl mx-auto">
-            Publica tu proyecto o solicita acceso como inversionista.
+      {/* 3. CATASTRO */}
+      <section id="catastro" className="border-b border-hairline">
+        <div className="max-w-6xl mx-auto px-5 py-16 sm:py-20">
+          <Eyebrow className="mb-3">Catastro</Eyebrow>
+          <h2 className="font-serif text-3xl md:text-4xl leading-tight max-w-3xl">
+            Pruébalo ahora: busca por titular, RUT, nombre o comuna.
           </h2>
-          <p className="mt-5 text-slate-400 max-w-2xl mx-auto">
-            Onboarding en horas. Verificación KYC/AML. Sin costos de listing para proyectos y lotes
-            iniciales.
-          </p>
-          <div className="mt-9 flex flex-wrap items-center justify-center gap-4">
+          <CatastroQuickSearch />
+
+          <div className="mt-12 grid md:grid-cols-3 gap-px bg-hairline border border-hairline">
+            {[
+              {
+                n: "Gratis",
+                d: "Búsqueda y ficha básica",
+                f: ["Titular y estado", "Mapa nacional", "Superficie y comuna"],
+              },
+              {
+                n: "Pro",
+                d: "Para operadores y abogados",
+                f: ["Alertas de vencimiento", "Fichas PDF", "Capas satelitales"],
+              },
+              {
+                n: "Empresa",
+                d: "Due diligence y equipos",
+                f: ["Terreno 3D y geofísica", "Informes técnicos", "Usuarios múltiples"],
+              },
+            ].map((p) => (
+              <div key={p.n} className="bg-surface p-6">
+                <div className="font-serif text-2xl">{p.n}</div>
+                <div className="text-xs text-content-muted mt-1">{p.d}</div>
+                <ul className="mt-4 space-y-2 text-sm">
+                  {p.f.map((x) => (
+                    <li key={x} className="flex gap-2">
+                      <Check className="w-4 h-4 text-accent-brand mt-0.5" /> {x}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap gap-3">
             <Link
-              to="/auth"
-              search={{ intent: "owner", mode: "signup" }}
-              className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors"
+              to="/catastro/precios"
+              className="inline-flex items-center gap-2 h-11 px-5 bg-content text-surface text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-accent-brand transition-colors"
             >
-              Publicar proyecto
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              Ver planes <ArrowRight className="w-4 h-4" />
             </Link>
             <Link
-              to="/auth"
-              search={{ intent: "investor", mode: "signup" }}
-              className="inline-flex items-center gap-2 h-12 px-7 border border-white/25 text-white text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-white/5 transition-colors"
+              to="/contacto"
+              className="inline-flex items-center gap-2 h-11 px-5 border border-hairline text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:border-accent-brand"
             >
-              Soy inversionista
+              Solicitar demo
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* 4. CIERRE */}
+      <section className="border-b border-hairline">
+        <div className="max-w-6xl mx-auto px-5 py-14 flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div>
+            <h2 className="font-serif text-2xl md:text-3xl">¿Ya eres cliente?</h2>
+            <p className="text-content-muted text-sm mt-1">
+              Entra a tu terminal: proyectos, catastro, documentos y reportes en un solo lugar.
+            </p>
+          </div>
+          <Link
+            to="/auth"
+            className="inline-flex items-center gap-2 h-11 px-5 border border-content text-[11px] font-semibold uppercase tracking-[0.2em] rounded-sm hover:bg-content hover:text-surface transition-colors"
+          >
+            <FileText className="w-4 h-4" /> Acceso clientes
+          </Link>
         </div>
       </section>
 
       <MarketingFooter />
+    </div>
+  );
+}
+
+function DoorCard(props: {
+  icon: React.ReactNode;
+  tag: string;
+  title: string;
+  body: string;
+  cta: string;
+  to?: "/inversion-colateral";
+  href?: string;
+}) {
+  const inner = (
+    <>
+      <div className="flex items-center gap-2 text-accent-brand">
+        {props.icon}
+        <span className="text-[10px] font-mono uppercase tracking-[0.2em]">{props.tag}</span>
+      </div>
+      <h3 className="mt-4 font-serif text-2xl">{props.title}</h3>
+      <p className="mt-2 text-sm text-content-muted">{props.body}</p>
+      <span className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] group-hover:text-accent-brand">
+        {props.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+      </span>
+    </>
+  );
+  const cls = "group block bg-surface p-8 hover:bg-surface-muted transition-colors";
+  return props.to ? (
+    <Link to={props.to} className={cls}>
+      {inner}
+    </Link>
+  ) : (
+    <a href={props.href} className={cls}>
+      {inner}
+    </a>
+  );
+}
+
+function CatastroQuickSearch() {
+  const [q, setQ] = useState("");
+  const search = useServerFn(searchConcessions);
+  const m = useMutation({ mutationFn: (term: string) => search({ data: { q: term, limit: 6 } }) });
+
+  return (
+    <div className="mt-6 max-w-2xl">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (q.trim().length >= 2) m.mutate(q.trim());
+        }}
+        className="flex gap-2"
+      >
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-content-muted" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Ej: Esperanza, Codelco, Illapel…"
+            aria-label="Buscar concesión"
+            className="w-full h-12 pl-10 pr-4 border border-hairline bg-surface text-sm focus:outline-none focus:border-accent-brand"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={m.isPending || q.trim().length < 2}
+          className="h-12 px-6 bg-content text-surface text-[11px] font-semibold uppercase tracking-[0.2em] disabled:opacity-50"
+        >
+          {m.isPending ? "Buscando…" : "Buscar"}
+        </button>
+      </form>
+      {m.isError && (
+        <p className="mt-3 text-xs text-content-muted">No pudimos consultar ahora. Intenta de nuevo.</p>
+      )}
+      {m.data && (
+        <div className="mt-4 border border-hairline">
+          {m.data.results.length === 0 ? (
+            <div className="p-4 text-sm text-content-muted">
+              Sin resultados. Prueba en el{" "}
+              <Link to="/catastro/mapa" className="underline text-accent-brand">
+                mapa nacional
+              </Link>
+              .
+            </div>
+          ) : (
+            <ul className="divide-y divide-hairline">
+              {m.data.results.map((r) => (
+                <li key={r.code}>
+                  <Link
+                    to="/catastro/c/$code"
+                    params={{ code: r.code }}
+                    className="flex items-start gap-3 p-3 hover:bg-surface-muted text-sm"
+                  >
+                    <Building2 className="w-4 h-4 mt-0.5 text-accent-brand shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold truncate">{r.name ?? r.code}</div>
+                      <div className="text-xs text-content-muted truncate">
+                        {r.holder ?? "—"} · {r.commune ?? r.region ?? ""}
+                        {r.area_ha ? ` · ${r.area_ha.toLocaleString("es-CL")} ha` : ""}
+                      </div>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-content-muted mt-0.5" />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
     </div>
   );
 }
