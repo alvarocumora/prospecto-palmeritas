@@ -118,6 +118,9 @@ function ProyectosPage() {
                   {p.stage}
                 </span>
               </div>
+              <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
+                Imagen referencial
+              </span>
               <div className="absolute bottom-3 left-4 right-4 text-white">
                 <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
                   {p.region}
