@@ -7,6 +7,10 @@ import { searchConcessions } from "@/lib/catastroPublic.functions";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { Eyebrow } from "@/components/brand";
 import colateralCover from "@/assets/colateral/cover-maule.jpg";
+import hualaneSat from "@/assets/colateral/hualane-satelite.jpg";
+import velValle from "@/assets/colateral/vel-valle.jpg";
+import heroMining from "@/assets/hero-mining.jpg";
+import featureCatastro from "@/assets/feature-catastro.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 
 /**
@@ -20,20 +24,41 @@ export function MarketingLanding() {
     <div className="brand-light min-h-screen bg-surface text-content">
       <MarketingHeader />
 
-      {/* 1. HERO — dos puertas */}
-      <section className="border-b border-hairline">
-        <div className="max-w-6xl mx-auto px-5 pt-16 pb-14 sm:pt-24 sm:pb-20">
-          <Eyebrow className="mb-4">Geocapitals · Minería de Chile</Eyebrow>
-          <h1 className="brand-display font-serif text-4xl sm:text-6xl leading-[1.05] max-w-4xl">
-            Invierte con respaldo real. Revisa cualquier concesión en segundos.
+      {/* 1. HERO — fotografía de terreno real + retícula institucional */}
+      <section className="relative overflow-hidden border-b border-hairline bg-content text-surface">
+        <img
+          src={heroMining}
+          alt="Terreno minero en Chile"
+          className="absolute inset-0 w-full h-full object-cover opacity-45"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-content via-content/80 to-content/20" />
+        <div
+          aria-hidden
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage:
+              "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
+            backgroundSize: "64px 64px",
+          }}
+        />
+        <div className="relative max-w-6xl mx-auto px-5 pt-20 pb-16 sm:pt-28 sm:pb-24">
+          <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.25em] opacity-80">
+            <span>Geocapitals · Minería de Chile</span>
+            <span className="h-px w-8 bg-surface/50" />
+            <span>33°27′S · 70°40′W · WGS84</span>
+          </div>
+          <h1 className="mt-6 font-serif text-5xl sm:text-7xl leading-[1.02] max-w-4xl">
+            Invierte con respaldo real.
+            <span className="block italic opacity-80">Revisa cualquier concesión en segundos.</span>
           </h1>
-          <p className="mt-5 text-lg text-content-muted max-w-2xl">
-            Dos servicios, una plataforma: inversión en minería garantizada con bienes raíces, e
-            inteligencia catastral sobre datos oficiales de SERNAGEOMIN.
+          <p className="mt-6 text-lg opacity-80 max-w-2xl">
+            Inversión en minería garantizada con bienes raíces, e inteligencia catastral sobre datos
+            oficiales de SERNAGEOMIN.
           </p>
 
-          <div className="mt-10 grid md:grid-cols-2 gap-px bg-hairline border border-hairline">
+          <div className="mt-12 grid md:grid-cols-2 gap-4">
             <DoorCard
+              image={hualaneSat}
               icon={<ShieldCheck className="w-5 h-5" />}
               tag="Para inversionistas"
               title="Inversión con colateral inmobiliario"
@@ -42,6 +67,7 @@ export function MarketingLanding() {
               to="/inversion-colateral"
             />
             <DoorCard
+              image={featureCatastro}
               icon={<Map className="w-5 h-5" />}
               tag="Para mineros, geólogos y abogados"
               title="Catastro minero profesional"
@@ -50,6 +76,17 @@ export function MarketingLanding() {
               href="#catastro"
             />
           </div>
+        </div>
+      </section>
+
+      {/* Franja de rigor */}
+      <section className="border-b border-hairline bg-surface-2">
+        <div className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
+          {["Datos SERNAGEOMIN", "Estándar NI 43-101 · CH 20235", "Ley N° 18.045 · NCG 336", "Documentos con QR verificable"].map((t) => (
+            <div key={t} className="flex items-center gap-2">
+              <Check className="w-3.5 h-3.5 text-accent-brand" /> {t}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -100,12 +137,18 @@ export function MarketingLanding() {
               Tasa pactada por contrato, no proyección minera. No constituye oferta pública de valores.
             </p>
           </div>
-          <img
-            src={colateralCover}
-            alt="Valle rural del Maule (imagen ilustrativa)"
-            loading="lazy"
-            className="w-full h-80 object-cover border border-hairline"
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <figure className="col-span-2 relative">
+              <img src={hualaneSat} alt="Vista satelital Hualañé" loading="lazy" className="w-full h-64 object-cover border border-hairline" />
+              <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">Imagen real · satelital</figcaption>
+            </figure>
+            {[{ s: velValle, l: "Valle · referencial" }, { s: colateralCover, l: "Maule · ilustrativa" }].map((x) => (
+              <figure key={x.l} className="relative">
+                <img src={x.s} alt={x.l} loading="lazy" className="w-full h-36 object-cover border border-hairline" />
+                <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">{x.l}</figcaption>
+              </figure>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -190,6 +233,7 @@ export function MarketingLanding() {
 }
 
 function DoorCard(props: {
+  image: string;
   icon: React.ReactNode;
   tag: string;
   title: string;
@@ -200,18 +244,21 @@ function DoorCard(props: {
 }) {
   const inner = (
     <>
+      <div className="h-36 -mx-6 -mt-6 mb-5 overflow-hidden">
+        <img src={props.image} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+      </div>
       <div className="flex items-center gap-2 text-accent-brand">
         {props.icon}
         <span className="text-[10px] font-mono uppercase tracking-[0.2em]">{props.tag}</span>
       </div>
-      <h3 className="mt-4 font-serif text-2xl">{props.title}</h3>
+      <h3 className="mt-3 font-serif text-2xl">{props.title}</h3>
       <p className="mt-2 text-sm text-content-muted">{props.body}</p>
-      <span className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] group-hover:text-accent-brand">
+      <span className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] group-hover:text-accent-brand">
         {props.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
       </span>
     </>
   );
-  const cls = "group block bg-surface p-8 hover:bg-surface-2 transition-colors";
+  const cls = "group block overflow-hidden bg-surface text-content p-6 border border-hairline hover:border-accent-brand transition-colors";
   return props.to ? (
     <Link to={props.to} className={cls}>
       {inner}
