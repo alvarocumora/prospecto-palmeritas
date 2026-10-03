@@ -5,7 +5,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title: "Geocapitals · Proyectos mineros, catastro live y trade de commodities",
+        title: "Geocapitals · Inversión minera con colateral y catastro profesional",
       },
       {
         name: "description",
