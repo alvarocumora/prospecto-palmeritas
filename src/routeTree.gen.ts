@@ -9,277 +9,188 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as ContactoRouteImport } from './routes/contacto'
-import { Route as EmpresasRouteImport } from './routes/empresas'
-import { Route as EnRouteImport } from './routes/en'
-import { Route as InscripcionRouteImport } from './routes/inscripcion'
-import { Route as InversionColateralRouteImport } from './routes/inversion-colateral'
-import { Route as InversionistasRouteImport } from './routes/inversionistas'
-import { Route as McpRouteImport } from './routes/mcp'
-import { Route as MetodologiaRouteImport } from './routes/metodologia'
-import { Route as OportunidadesRouteImport } from './routes/oportunidades'
-import { Route as PortalProveedorRouteImport } from './routes/portal-proveedor'
-import { Route as ProyectosRouteImport } from './routes/proyectos'
-import { Route as RecursosRouteImport } from './routes/recursos'
-import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as SatelitalRouteImport } from './routes/satelital'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
-import { Route as TerminalRouteImport } from './routes/terminal'
-import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as Visor3dRouteImport } from './routes/visor-3d'
-import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
-import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
-import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated.panel'
-import { Route as AguaIndexRouteImport } from './routes/agua.index'
-import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
-import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
-import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
-import { Route as CatastroPeritosRouteImport } from './routes/catastro.peritos'
-import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
-import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto'
-import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedor.$token'
-import { Route as FichaTokenRouteImport } from './routes/ficha.$token'
-import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
-import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
-import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
-import { Route as InscripcionGraciasRouteImport } from './routes/inscripcion.gracias'
-import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
-import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
-import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
-import { Route as LiveCholquiRouteImport } from './routes/live.cholqui'
-import { Route as LiveFrancoRouteImport } from './routes/live.franco'
-import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
-import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
-import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
-import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
-import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
-import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
-import { Route as OperacionTokenRouteImport } from './routes/operacion.$token'
-import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
-import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
-import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
-import { Route as RfqsIndexRouteImport } from './routes/rfqs.index'
-import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
-import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
-import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
-import { Route as TerminalSlugRouteImport } from './routes/terminal_.$slug'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
+import { Route as TerminalRouteImport } from './routes/terminal'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as SatelitalRouteImport } from './routes/satelital'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RecursosRouteImport } from './routes/recursos'
+import { Route as ProyectosRouteImport } from './routes/proyectos'
+import { Route as PortalProveedorRouteImport } from './routes/portal-proveedor'
+import { Route as OportunidadesRouteImport } from './routes/oportunidades'
+import { Route as MetodologiaRouteImport } from './routes/metodologia'
+import { Route as McpRouteImport } from './routes/mcp'
+import { Route as InversionistasRouteImport } from './routes/inversionistas'
+import { Route as InversionColateralRouteImport } from './routes/inversion-colateral'
+import { Route as InscripcionRouteImport } from './routes/inscripcion'
+import { Route as EnRouteImport } from './routes/en'
+import { Route as EmpresasRouteImport } from './routes/empresas'
+import { Route as ContactoRouteImport } from './routes/contacto'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as VerificarIndexRouteImport } from './routes/verificar.index'
+import { Route as RfqsIndexRouteImport } from './routes/rfqs.index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
+import { Route as CatastroIndexRouteImport } from './routes/catastro.index'
+import { Route as AguaIndexRouteImport } from './routes/agua.index'
 import { Route as VerificarRefRouteImport } from './routes/verificar.$ref'
-import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
-import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as TerminalSlugRouteImport } from './routes/terminal_.$slug'
+import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
+import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
+import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
+import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
+import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
+import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
+import { Route as OperacionTokenRouteImport } from './routes/operacion.$token'
+import { Route as OnboardingTokenRouteImport } from './routes/onboarding.$token'
+import { Route as MarketplaceLotIdRouteImport } from './routes/marketplace.$lotId'
+import { Route as LiveTilamaRouteImport } from './routes/live.tilama'
+import { Route as LivePalmerasRouteImport } from './routes/live.palmeras'
+import { Route as LiveLosverdesRouteImport } from './routes/live.losverdes'
+import { Route as LiveFrancoRouteImport } from './routes/live.franco'
+import { Route as LiveCholquiRouteImport } from './routes/live.cholqui'
+import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
+import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
+import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
+import { Route as InscripcionGraciasRouteImport } from './routes/inscripcion.gracias'
+import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
+import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
+import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
+import { Route as FichaTokenRouteImport } from './routes/ficha.$token'
+import { Route as FichaProveedorTokenRouteImport } from './routes/ficha-proveedor.$token'
+import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as CatastroProyectoRouteImport } from './routes/catastro.proyecto'
+import { Route as CatastroPreciosRouteImport } from './routes/catastro.precios'
+import { Route as CatastroPeritosRouteImport } from './routes/catastro.peritos'
+import { Route as CatastroMapaRouteImport } from './routes/catastro.mapa'
+import { Route as CatastroGlobalRouteImport } from './routes/catastro.global'
+import { Route as AuthenticatedPanelRouteImport } from './routes/_authenticated.panel'
+import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
+import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated.dashboard.index'
-import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
-import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
-import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
-import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated.dashboard.analytics'
-import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
-import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
-import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
-import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
-import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
-import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
-import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
-import { Route as AuthenticatedDashboardCholquiRouteImport } from './routes/_authenticated.dashboard.cholqui'
-import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
-import { Route as AuthenticatedDashboardCobranzaRouteImport } from './routes/_authenticated.dashboard.cobranza'
-import { Route as AuthenticatedDashboardColateralDocumentosRouteImport } from './routes/_authenticated.dashboard.colateral-documentos'
-import { Route as AuthenticatedDashboardColateralLeadsRouteImport } from './routes/_authenticated.dashboard.colateral-leads'
-import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
-import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
-import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
-import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
-import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
-import { Route as AuthenticatedDashboardEnviosRouteImport } from './routes/_authenticated.dashboard.envios'
-import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
-import { Route as AuthenticatedDashboardExpedienteRouteImport } from './routes/_authenticated.dashboard.expediente'
-import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
-import { Route as AuthenticatedDashboardFirmasRouteImport } from './routes/_authenticated.dashboard.firmas'
-import { Route as AuthenticatedDashboardFrancoRouteImport } from './routes/_authenticated.dashboard.franco'
-import { Route as AuthenticatedDashboardGeology3dRouteImport } from './routes/_authenticated.dashboard.geology3d'
-import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
-import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
-import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
-import { Route as AuthenticatedDashboardInversionColateralRouteImport } from './routes/_authenticated.dashboard.inversion-colateral'
-import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
-import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
-import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
-import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
-import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
-import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
-import { Route as AuthenticatedDashboardMissionRouteImport } from './routes/_authenticated.dashboard.mission'
-import { Route as AuthenticatedDashboardMyInquiriesRouteImport } from './routes/_authenticated.dashboard.my-inquiries'
-import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
-import { Route as AuthenticatedDashboardOfferingsRouteImport } from './routes/_authenticated.dashboard.offerings'
-import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
-import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
-import { Route as AuthenticatedDashboardPlanRouteImport } from './routes/_authenticated.dashboard.plan'
-import { Route as AuthenticatedDashboardPreciosRouteImport } from './routes/_authenticated.dashboard.precios'
-import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
-import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
-import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
-import { Route as AuthenticatedDashboardProveedorRouteImport } from './routes/_authenticated.dashboard.proveedor'
-import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
-import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
-import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
-import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
-import { Route as AuthenticatedDashboardSat3dRouteImport } from './routes/_authenticated.dashboard.sat3d'
-import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
-import { Route as AuthenticatedDashboardSectionRouteImport } from './routes/_authenticated.dashboard.section'
-import { Route as AuthenticatedDashboardSourcingRouteImport } from './routes/_authenticated.dashboard.sourcing'
-import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
-import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
-import { Route as AuthenticatedDashboardTradeBoardRouteImport } from './routes/_authenticated.dashboard.trade-board'
-import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
-import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
-import { Route as AuthenticatedPanelPrivacidadRouteImport } from './routes/_authenticated.panel.privacidad'
-import { Route as AguaVerificarAssetIdRouteImport } from './routes/agua.verificar.$assetId'
-import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
-import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
-import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
-import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.sync-bulletins'
-import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
-import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhooks.mercadopago'
-import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
-import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
-import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
-import { Route as FirmarOperacionTokenRouteImport } from './routes/firmar.operacion.$token'
-import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
-import { Route as PortalBuyerTokenRouteImport } from './routes/portal.buyer.$token'
-import { Route as PortalSellerTokenRouteImport } from './routes/portal.seller.$token'
-import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.ficha.$slug'
-import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
-import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
 import { Route as VerificarFichaTokenRouteImport } from './routes/verificar.ficha.$token'
-import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
-import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
-import { Route as AuthenticatedDashboardClientesPartnerIdRouteImport } from './routes/_authenticated.dashboard.clientes_.$partnerId'
-import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './routes/_authenticated.dashboard.documentos.index'
-import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
-import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
-import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
-import { Route as AuthenticatedDashboardPipelineIndexRouteImport } from './routes/_authenticated.dashboard.pipeline.index'
-import { Route as AuthenticatedDashboardPipelineCodeRouteImport } from './routes/_authenticated.dashboard.pipeline.$code'
-import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated.dashboard.projects_.$projectId'
-import { Route as AuthenticatedDashboardProjectsCompararRouteImport } from './routes/_authenticated.dashboard.projects_.comparar'
-import { Route as AuthenticatedDashboardProjectsNuevoRouteImport } from './routes/_authenticated.dashboard.projects_.nuevo'
-import { Route as AuthenticatedDashboardProveedoresIndexRouteImport } from './routes/_authenticated.dashboard.proveedores.index'
-import { Route as AuthenticatedDashboardProveedoresIdRouteImport } from './routes/_authenticated.dashboard.proveedores.$id'
+import { Route as ShareTargetsProjectIdRouteImport } from './routes/share.targets.$projectId'
+import { Route as ReportsLosverdesPre43101RouteImport } from './routes/reports.losverdes.pre43101'
+import { Route as ProyectosFichaSlugRouteImport } from './routes/proyectos_.ficha.$slug'
+import { Route as PortalSellerTokenRouteImport } from './routes/portal.seller.$token'
+import { Route as PortalBuyerTokenRouteImport } from './routes/portal.buyer.$token'
+import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as FirmarOperacionTokenRouteImport } from './routes/firmar.operacion.$token'
+import { Route as CatastroPaisCountryRouteImport } from './routes/catastro.pais.$country'
+import { Route as CatastroCCodeRouteImport } from './routes/catastro.c.$code'
+import { Route as CatastroAppWatchlistRouteImport } from './routes/catastro.app.watchlist'
+import { Route as ApiWebhooksMercadopagoRouteImport } from './routes/api.webhooks.mercadopago'
+import { Route as ApiPublicSyncCatastroRouteImport } from './routes/api.public.sync-catastro'
+import { Route as ApiPublicSyncBulletinsRouteImport } from './routes/api.public.sync-bulletins'
+import { Route as ApiPublicStatsRouteImport } from './routes/api/public/stats'
+import { Route as ApiPublicIngestPatentRematesRouteImport } from './routes/api.public.ingest-patent-remates'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
+import { Route as AguaVerificarAssetIdRouteImport } from './routes/agua.verificar.$assetId'
+import { Route as AuthenticatedPanelPrivacidadRouteImport } from './routes/_authenticated.panel.privacidad'
+import { Route as AuthenticatedDashboardValidationRouteImport } from './routes/_authenticated.dashboard.validation'
+import { Route as AuthenticatedDashboardTradesRouteImport } from './routes/_authenticated.dashboard.trades'
+import { Route as AuthenticatedDashboardTradeBoardRouteImport } from './routes/_authenticated.dashboard.trade-board'
+import { Route as AuthenticatedDashboardTeamRouteImport } from './routes/_authenticated.dashboard.team'
+import { Route as AuthenticatedDashboardTargetsRouteImport } from './routes/_authenticated.dashboard.targets'
+import { Route as AuthenticatedDashboardSourcingRouteImport } from './routes/_authenticated.dashboard.sourcing'
+import { Route as AuthenticatedDashboardSectionRouteImport } from './routes/_authenticated.dashboard.section'
+import { Route as AuthenticatedDashboardSatelliteIntelRouteImport } from './routes/_authenticated.dashboard.satellite-intel'
+import { Route as AuthenticatedDashboardSat3dRouteImport } from './routes/_authenticated.dashboard.sat3d'
+import { Route as AuthenticatedDashboardSamplingRouteImport } from './routes/_authenticated.dashboard.sampling'
+import { Route as AuthenticatedDashboardReportsRouteImport } from './routes/_authenticated.dashboard.reports'
+import { Route as AuthenticatedDashboardQpsRouteImport } from './routes/_authenticated.dashboard.qps'
+import { Route as AuthenticatedDashboardQaqcRouteImport } from './routes/_authenticated.dashboard.qaqc'
+import { Route as AuthenticatedDashboardProveedorRouteImport } from './routes/_authenticated.dashboard.proveedor'
+import { Route as AuthenticatedDashboardProjectsRouteImport } from './routes/_authenticated.dashboard.projects'
+import { Route as AuthenticatedDashboardProjectReportRouteImport } from './routes/_authenticated.dashboard.project-report'
+import { Route as AuthenticatedDashboardProfileRouteImport } from './routes/_authenticated.dashboard.profile'
+import { Route as AuthenticatedDashboardPreciosRouteImport } from './routes/_authenticated.dashboard.precios'
+import { Route as AuthenticatedDashboardPlanRouteImport } from './routes/_authenticated.dashboard.plan'
+import { Route as AuthenticatedDashboardPalmerasRouteImport } from './routes/_authenticated.dashboard.palmeras'
+import { Route as AuthenticatedDashboardOpportunitiesRouteImport } from './routes/_authenticated.dashboard.opportunities'
+import { Route as AuthenticatedDashboardOfferingsRouteImport } from './routes/_authenticated.dashboard.offerings'
+import { Route as AuthenticatedDashboardNi43101RouteImport } from './routes/_authenticated.dashboard.ni43101'
+import { Route as AuthenticatedDashboardMyInquiriesRouteImport } from './routes/_authenticated.dashboard.my-inquiries'
+import { Route as AuthenticatedDashboardMissionRouteImport } from './routes/_authenticated.dashboard.mission'
+import { Route as AuthenticatedDashboardMarketplaceRouteImport } from './routes/_authenticated.dashboard.marketplace'
+import { Route as AuthenticatedDashboardMapRouteImport } from './routes/_authenticated.dashboard.map'
+import { Route as AuthenticatedDashboardMagRevalidationsRouteImport } from './routes/_authenticated.dashboard.mag-revalidations'
+import { Route as AuthenticatedDashboardLv5Page5RouteImport } from './routes/_authenticated.dashboard.lv5-page5'
+import { Route as AuthenticatedDashboardListingsRouteImport } from './routes/_authenticated.dashboard.listings'
+import { Route as AuthenticatedDashboardInvestmentsRouteImport } from './routes/_authenticated.dashboard.investments'
+import { Route as AuthenticatedDashboardInversionColateralRouteImport } from './routes/_authenticated.dashboard.inversion-colateral'
+import { Route as AuthenticatedDashboardInventoryRouteImport } from './routes/_authenticated.dashboard.inventory'
+import { Route as AuthenticatedDashboardHseRouteImport } from './routes/_authenticated.dashboard.hse'
+import { Route as AuthenticatedDashboardGeophysicsRouteImport } from './routes/_authenticated.dashboard.geophysics'
+import { Route as AuthenticatedDashboardGeology3dRouteImport } from './routes/_authenticated.dashboard.geology3d'
+import { Route as AuthenticatedDashboardFrancoRouteImport } from './routes/_authenticated.dashboard.franco'
+import { Route as AuthenticatedDashboardFirmasRouteImport } from './routes/_authenticated.dashboard.firmas'
+import { Route as AuthenticatedDashboardFinanceRouteImport } from './routes/_authenticated.dashboard.finance'
+import { Route as AuthenticatedDashboardExpedienteRouteImport } from './routes/_authenticated.dashboard.expediente'
+import { Route as AuthenticatedDashboardEstimationRouteImport } from './routes/_authenticated.dashboard.estimation'
+import { Route as AuthenticatedDashboardEnviosRouteImport } from './routes/_authenticated.dashboard.envios'
+import { Route as AuthenticatedDashboardDronesRouteImport } from './routes/_authenticated.dashboard.drones'
+import { Route as AuthenticatedDashboardDrillingRouteImport } from './routes/_authenticated.dashboard.drilling'
+import { Route as AuthenticatedDashboardDealsRouteImport } from './routes/_authenticated.dashboard.deals'
+import { Route as AuthenticatedDashboardCommodityLotsRouteImport } from './routes/_authenticated.dashboard.commodity-lots'
+import { Route as AuthenticatedDashboardCommandCenterRouteImport } from './routes/_authenticated.dashboard.command-center'
+import { Route as AuthenticatedDashboardColateralLeadsRouteImport } from './routes/_authenticated.dashboard.colateral-leads'
+import { Route as AuthenticatedDashboardColateralDocumentosRouteImport } from './routes/_authenticated.dashboard.colateral-documentos'
+import { Route as AuthenticatedDashboardCobranzaRouteImport } from './routes/_authenticated.dashboard.cobranza'
+import { Route as AuthenticatedDashboardClientesRouteImport } from './routes/_authenticated.dashboard.clientes'
+import { Route as AuthenticatedDashboardCholquiRouteImport } from './routes/_authenticated.dashboard.cholqui'
+import { Route as AuthenticatedDashboardCatastroRouteImport } from './routes/_authenticated.dashboard.catastro'
+import { Route as AuthenticatedDashboardCampaignsRouteImport } from './routes/_authenticated.dashboard.campaigns'
+import { Route as AuthenticatedDashboardBoletinRouteImport } from './routes/_authenticated.dashboard.boletin'
+import { Route as AuthenticatedDashboardAuditRouteImport } from './routes/_authenticated.dashboard.audit'
+import { Route as AuthenticatedDashboardApprovalsRouteImport } from './routes/_authenticated.dashboard.approvals'
+import { Route as AuthenticatedDashboardApiRouteImport } from './routes/_authenticated.dashboard.api'
+import { Route as AuthenticatedDashboardAnticiposRouteImport } from './routes/_authenticated.dashboard.anticipos'
+import { Route as AuthenticatedDashboardAnalyticsRouteImport } from './routes/_authenticated.dashboard.analytics'
+import { Route as AuthenticatedDashboardAguaRouteImport } from './routes/_authenticated.dashboard.agua'
+import { Route as AuthenticatedDashboardAgentsRouteImport } from './routes/_authenticated.dashboard.agents'
+import { Route as AuthenticatedDashboardAdminRouteImport } from './routes/_authenticated.dashboard.admin'
+import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 import { Route as AuthenticatedDashboardRfqsIndexRouteImport } from './routes/_authenticated.dashboard.rfqs.index'
-import { Route as AuthenticatedDashboardRfqsIdRouteImport } from './routes/_authenticated.dashboard.rfqs.$id'
-import { Route as AuthenticatedDashboardRfqsNuevoRouteImport } from './routes/_authenticated.dashboard.rfqs.nuevo'
-import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
-import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
-import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
-import { Route as ApiPublicHooksSignatureRemindersRouteImport } from './routes/api/public/hooks/signature-reminders'
-import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
-import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
-import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
-import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastre.search'
-import { Route as CatastroProyectoTitularesIdRouteImport } from './routes/catastro.proyecto.titulares.$id'
-import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
-import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as AuthenticatedDashboardProveedoresIndexRouteImport } from './routes/_authenticated.dashboard.proveedores.index'
+import { Route as AuthenticatedDashboardPipelineIndexRouteImport } from './routes/_authenticated.dashboard.pipeline.index'
+import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './routes/_authenticated.dashboard.documentos.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
-import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
-import { Route as ApiPublicEmailPixelMessageIdRouteImport } from './routes/api/public/email.pixel.$messageId'
-import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
+import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
+import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as CatastroProyectoTitularesIdRouteImport } from './routes/catastro.proyecto.titulares.$id'
+import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastre.search'
+import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
+import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
+import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
+import { Route as ApiPublicHooksSignatureRemindersRouteImport } from './routes/api/public/hooks/signature-reminders'
+import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
+import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
+import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
+import { Route as AuthenticatedDashboardRfqsNuevoRouteImport } from './routes/_authenticated.dashboard.rfqs.nuevo'
+import { Route as AuthenticatedDashboardRfqsIdRouteImport } from './routes/_authenticated.dashboard.rfqs.$id'
+import { Route as AuthenticatedDashboardProveedoresIdRouteImport } from './routes/_authenticated.dashboard.proveedores.$id'
+import { Route as AuthenticatedDashboardProjectsNuevoRouteImport } from './routes/_authenticated.dashboard.projects_.nuevo'
+import { Route as AuthenticatedDashboardProjectsCompararRouteImport } from './routes/_authenticated.dashboard.projects_.comparar'
+import { Route as AuthenticatedDashboardProjectsProjectIdRouteImport } from './routes/_authenticated.dashboard.projects_.$projectId'
+import { Route as AuthenticatedDashboardPipelineCodeRouteImport } from './routes/_authenticated.dashboard.pipeline.$code'
+import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
+import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
+import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
+import { Route as AuthenticatedDashboardClientesPartnerIdRouteImport } from './routes/_authenticated.dashboard.clientes_.$partnerId'
+import { Route as AuthenticatedDashboardAdminInvestorsRouteImport } from './routes/_authenticated.dashboard.admin.investors'
+import { Route as AuthenticatedDashboardAdminInboxRouteImport } from './routes/_authenticated.dashboard.admin.inbox'
 import { Route as ApiTerrainZXYRouteImport } from './routes/api.terrain.$z.$x.$y'
+import { Route as ApiPublicLiveMapLosverdesVerifyRouteImport } from './routes/api.public.live-map.losverdes.verify'
+import { Route as ApiPublicEmailPixelMessageIdRouteImport } from './routes/api/public/email.pixel.$messageId'
+import { Route as AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId.field'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactoRoute = ContactoRouteImport.update({
-  id: '/contacto',
-  path: '/contacto',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmpresasRoute = EmpresasRouteImport.update({
-  id: '/empresas',
-  path: '/empresas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EnRoute = EnRouteImport.update({
-  id: '/en',
-  path: '/en',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InscripcionRoute = InscripcionRouteImport.update({
-  id: '/inscripcion',
-  path: '/inscripcion',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InversionColateralRoute = InversionColateralRouteImport.update({
-  id: '/inversion-colateral',
-  path: '/inversion-colateral',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InversionistasRoute = InversionistasRouteImport.update({
-  id: '/inversionistas',
-  path: '/inversionistas',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const McpRoute = McpRouteImport.update({
-  id: '/mcp',
-  path: '/mcp',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MetodologiaRoute = MetodologiaRouteImport.update({
-  id: '/metodologia',
-  path: '/metodologia',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OportunidadesRoute = OportunidadesRouteImport.update({
-  id: '/oportunidades',
-  path: '/oportunidades',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalProveedorRoute = PortalProveedorRouteImport.update({
-  id: '/portal-proveedor',
-  path: '/portal-proveedor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProyectosRoute = ProyectosRouteImport.update({
-  id: '/proyectos',
-  path: '/proyectos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RecursosRoute = RecursosRouteImport.update({
-  id: '/recursos',
-  path: '/recursos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ResetPasswordRoute = ResetPasswordRouteImport.update({
-  id: '/reset-password',
-  path: '/reset-password',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SatelitalRoute = SatelitalRouteImport.update({
-  id: '/satelital',
-  path: '/satelital',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TerminalRoute = TerminalRouteImport.update({
-  id: '/terminal',
-  path: '/terminal',
+const Visor3dRoute = Visor3dRouteImport.update({
+  id: '/visor-3d',
+  path: '/visor-3d',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -287,196 +198,98 @@ const UnsubscribeRoute = UnsubscribeRouteImport.update({
   path: '/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Visor3dRoute = Visor3dRouteImport.update({
-  id: '/visor-3d',
-  path: '/visor-3d',
+const TerminalRoute = TerminalRouteImport.update({
+  id: '/terminal',
+  path: '/terminal',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotmcpChar93ListToolsRoute =
-  Char91DotmcpChar93ListToolsRouteImport.update({
-    id: '/.mcp/list-tools',
-    path: '/.mcp/list-tools',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const Char91DotwellKnownChar93OauthProtectedResourceRoute =
-  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
-    id: '/.well-known/oauth-protected-resource',
-    path: '/.well-known/oauth-protected-resource',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
-  id: '/panel',
-  path: '/panel',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AguaIndexRoute = AguaIndexRouteImport.update({
-  id: '/agua/',
-  path: '/agua/',
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroIndexRoute = CatastroIndexRouteImport.update({
-  id: '/catastro/',
-  path: '/catastro/',
+const SatelitalRoute = SatelitalRouteImport.update({
+  id: '/satelital',
+  path: '/satelital',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroGlobalRoute = CatastroGlobalRouteImport.update({
-  id: '/catastro/global',
-  path: '/catastro/global',
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroMapaRoute = CatastroMapaRouteImport.update({
-  id: '/catastro/mapa',
-  path: '/catastro/mapa',
+const RecursosRoute = RecursosRouteImport.update({
+  id: '/recursos',
+  path: '/recursos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroPeritosRoute = CatastroPeritosRouteImport.update({
-  id: '/catastro/peritos',
-  path: '/catastro/peritos',
+const ProyectosRoute = ProyectosRouteImport.update({
+  id: '/proyectos',
+  path: '/proyectos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
-  id: '/catastro/precios',
-  path: '/catastro/precios',
+const PortalProveedorRoute = PortalProveedorRouteImport.update({
+  id: '/portal-proveedor',
+  path: '/portal-proveedor',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CatastroProyectoRoute = CatastroProyectoRouteImport.update({
-  id: '/catastro/proyecto',
-  path: '/catastro/proyecto',
+const OportunidadesRoute = OportunidadesRouteImport.update({
+  id: '/oportunidades',
+  path: '/oportunidades',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
-  id: '/email/unsubscribe',
-  path: '/email/unsubscribe',
+const MetodologiaRoute = MetodologiaRouteImport.update({
+  id: '/metodologia',
+  path: '/metodologia',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FichaProveedorTokenRoute = FichaProveedorTokenRouteImport.update({
-  id: '/ficha-proveedor/$token',
-  path: '/ficha-proveedor/$token',
+const McpRoute = McpRouteImport.update({
+  id: '/mcp',
+  path: '/mcp',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FichaTokenRoute = FichaTokenRouteImport.update({
-  id: '/ficha/$token',
-  path: '/ficha/$token',
+const InversionistasRoute = InversionistasRouteImport.update({
+  id: '/inversionistas',
+  path: '/inversionistas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const FirmarTokenRoute = FirmarTokenRouteImport.update({
-  id: '/firmar/$token',
-  path: '/firmar/$token',
+const InversionColateralRoute = InversionColateralRouteImport.update({
+  id: '/inversion-colateral',
+  path: '/inversion-colateral',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
-  id: '/hooks/sync-boletin-minero',
-  path: '/hooks/sync-boletin-minero',
+const InscripcionRoute = InscripcionRouteImport.update({
+  id: '/inscripcion',
+  path: '/inscripcion',
   getParentRoute: () => rootRouteImport,
 } as any)
-const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
-  id: '/hooks/sync-pjud',
-  path: '/hooks/sync-pjud',
+const EnRoute = EnRouteImport.update({
+  id: '/en',
+  path: '/en',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InscripcionGraciasRoute = InscripcionGraciasRouteImport.update({
-  id: '/gracias',
-  path: '/gracias',
-  getParentRoute: () => InscripcionRoute,
-} as any)
-const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
-  id: '/invitations/$token',
-  path: '/invitations/$token',
+const EmpresasRoute = EmpresasRouteImport.update({
+  id: '/empresas',
+  path: '/empresas',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LegalPrivacidadRoute = LegalPrivacidadRouteImport.update({
-  id: '/legal/privacidad',
-  path: '/legal/privacidad',
+const ContactoRoute = ContactoRouteImport.update({
+  id: '/contacto',
+  path: '/contacto',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LegalTerminosRoute = LegalTerminosRouteImport.update({
-  id: '/legal/terminos',
-  path: '/legal/terminos',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LiveCholquiRoute = LiveCholquiRouteImport.update({
-  id: '/live/cholqui',
-  path: '/live/cholqui',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LiveFrancoRoute = LiveFrancoRouteImport.update({
-  id: '/live/franco',
-  path: '/live/franco',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LiveLosverdesRoute = LiveLosverdesRouteImport.update({
-  id: '/live/losverdes',
-  path: '/live/losverdes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LivePalmerasRoute = LivePalmerasRouteImport.update({
-  id: '/live/palmeras',
-  path: '/live/palmeras',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LiveTilamaRoute = LiveTilamaRouteImport.update({
-  id: '/live/tilama',
-  path: '/live/tilama',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
-  id: '/marketplace/',
-  path: '/marketplace/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
-  id: '/marketplace/$lotId',
-  path: '/marketplace/$lotId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
-  id: '/onboarding/$token',
-  path: '/onboarding/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OperacionTokenRoute = OperacionTokenRouteImport.update({
-  id: '/operacion/$token',
-  path: '/operacion/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
-  id: '/proveedor/$token',
-  path: '/proveedor/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProyectoTokenRoute = ProyectoTokenRouteImport.update({
-  id: '/proyecto/$token',
-  path: '/proyecto/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
-  id: '/$listingId',
-  path: '/$listingId',
-  getParentRoute: () => ProyectosRoute,
-} as any)
-const RfqsIndexRoute = RfqsIndexRouteImport.update({
-  id: '/rfqs/',
-  path: '/rfqs/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
-  id: '/capital-raise',
-  path: '/capital-raise',
-  getParentRoute: () => TerminalRoute,
-} as any)
-const TerminalMarketRoute = TerminalMarketRouteImport.update({
-  id: '/market',
-  path: '/market',
-  getParentRoute: () => TerminalRoute,
-} as any)
-const TerminalTokenizeRoute = TerminalTokenizeRouteImport.update({
-  id: '/tokenize',
-  path: '/tokenize',
-  getParentRoute: () => TerminalRoute,
-} as any)
-const TerminalSlugRoute = TerminalSlugRouteImport.update({
-  id: '/terminal_/$slug',
-  path: '/terminal/$slug',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerificarIndexRoute = VerificarIndexRouteImport.update({
@@ -484,20 +297,196 @@ const VerificarIndexRoute = VerificarIndexRouteImport.update({
   path: '/verificar/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RfqsIndexRoute = RfqsIndexRouteImport.update({
+  id: '/rfqs/',
+  path: '/rfqs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroIndexRoute = CatastroIndexRouteImport.update({
+  id: '/catastro/',
+  path: '/catastro/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaIndexRoute = AguaIndexRouteImport.update({
+  id: '/agua/',
+  path: '/agua/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VerificarRefRoute = VerificarRefRouteImport.update({
   id: '/verificar/$ref',
   path: '/verificar/$ref',
   getParentRoute: () => rootRouteImport,
 } as any)
-const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
-  id: '/.lovable/oauth/consent',
-  path: '/.lovable/oauth/consent',
+const TerminalSlugRoute = TerminalSlugRouteImport.update({
+  id: '/terminal_/$slug',
+  path: '/terminal/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const Char91DotmcpChar93InvokeToolToolRoute =
-  Char91DotmcpChar93InvokeToolToolRouteImport.update({
-    id: '/.mcp/invoke-tool/$tool',
-    path: '/.mcp/invoke-tool/$tool',
+const TerminalTokenizeRoute = TerminalTokenizeRouteImport.update({
+  id: '/tokenize',
+  path: '/tokenize',
+  getParentRoute: () => TerminalRoute,
+} as any)
+const TerminalMarketRoute = TerminalMarketRouteImport.update({
+  id: '/market',
+  path: '/market',
+  getParentRoute: () => TerminalRoute,
+} as any)
+const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
+  id: '/capital-raise',
+  path: '/capital-raise',
+  getParentRoute: () => TerminalRoute,
+} as any)
+const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
+  id: '/$listingId',
+  path: '/$listingId',
+  getParentRoute: () => ProyectosRoute,
+} as any)
+const ProyectoTokenRoute = ProyectoTokenRouteImport.update({
+  id: '/proyecto/$token',
+  path: '/proyecto/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProveedorTokenRoute = ProveedorTokenRouteImport.update({
+  id: '/proveedor/$token',
+  path: '/proveedor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OperacionTokenRoute = OperacionTokenRouteImport.update({
+  id: '/operacion/$token',
+  path: '/operacion/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingTokenRoute = OnboardingTokenRouteImport.update({
+  id: '/onboarding/$token',
+  path: '/onboarding/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceLotIdRoute = MarketplaceLotIdRouteImport.update({
+  id: '/marketplace/$lotId',
+  path: '/marketplace/$lotId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveTilamaRoute = LiveTilamaRouteImport.update({
+  id: '/live/tilama',
+  path: '/live/tilama',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LivePalmerasRoute = LivePalmerasRouteImport.update({
+  id: '/live/palmeras',
+  path: '/live/palmeras',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveLosverdesRoute = LiveLosverdesRouteImport.update({
+  id: '/live/losverdes',
+  path: '/live/losverdes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveFrancoRoute = LiveFrancoRouteImport.update({
+  id: '/live/franco',
+  path: '/live/franco',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LiveCholquiRoute = LiveCholquiRouteImport.update({
+  id: '/live/cholqui',
+  path: '/live/cholqui',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalTerminosRoute = LegalTerminosRouteImport.update({
+  id: '/legal/terminos',
+  path: '/legal/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LegalPrivacidadRoute = LegalPrivacidadRouteImport.update({
+  id: '/legal/privacidad',
+  path: '/legal/privacidad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
+  id: '/invitations/$token',
+  path: '/invitations/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InscripcionGraciasRoute = InscripcionGraciasRouteImport.update({
+  id: '/gracias',
+  path: '/gracias',
+  getParentRoute: () => InscripcionRoute,
+} as any)
+const HooksSyncPjudRoute = HooksSyncPjudRouteImport.update({
+  id: '/hooks/sync-pjud',
+  path: '/hooks/sync-pjud',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HooksSyncBoletinMineroRoute = HooksSyncBoletinMineroRouteImport.update({
+  id: '/hooks/sync-boletin-minero',
+  path: '/hooks/sync-boletin-minero',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirmarTokenRoute = FirmarTokenRouteImport.update({
+  id: '/firmar/$token',
+  path: '/firmar/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichaTokenRoute = FichaTokenRouteImport.update({
+  id: '/ficha/$token',
+  path: '/ficha/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FichaProveedorTokenRoute = FichaProveedorTokenRouteImport.update({
+  id: '/ficha-proveedor/$token',
+  path: '/ficha-proveedor/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
+  id: '/email/unsubscribe',
+  path: '/email/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroProyectoRoute = CatastroProyectoRouteImport.update({
+  id: '/catastro/proyecto',
+  path: '/catastro/proyecto',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPreciosRoute = CatastroPreciosRouteImport.update({
+  id: '/catastro/precios',
+  path: '/catastro/precios',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPeritosRoute = CatastroPeritosRouteImport.update({
+  id: '/catastro/peritos',
+  path: '/catastro/peritos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroMapaRoute = CatastroMapaRouteImport.update({
+  id: '/catastro/mapa',
+  path: '/catastro/mapa',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroGlobalRoute = CatastroGlobalRouteImport.update({
+  id: '/catastro/global',
+  path: '/catastro/global',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPanelRoute = AuthenticatedPanelRouteImport.update({
+  id: '/panel',
+  path: '/panel',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const Char91DotwellKnownChar93OauthProtectedResourceRoute =
+  Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
+    id: '/.well-known/oauth-protected-resource',
+    path: '/.well-known/oauth-protected-resource',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const Char91DotmcpChar93ListToolsRoute =
+  Char91DotmcpChar93ListToolsRouteImport.update({
+    id: '/.mcp/list-tools',
+    path: '/.mcp/list-tools',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedDashboardIndexRoute =
@@ -506,464 +495,14 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardAdminRoute =
-  AuthenticatedDashboardAdminRouteImport.update({
-    id: '/dashboard/admin',
-    path: '/dashboard/admin',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardAgentsRoute =
-  AuthenticatedDashboardAgentsRouteImport.update({
-    id: '/dashboard/agents',
-    path: '/dashboard/agents',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardAguaRoute =
-  AuthenticatedDashboardAguaRouteImport.update({
-    id: '/dashboard/agua',
-    path: '/dashboard/agua',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardAnalyticsRoute =
-  AuthenticatedDashboardAnalyticsRouteImport.update({
-    id: '/dashboard/analytics',
-    path: '/dashboard/analytics',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardAnticiposRoute =
-  AuthenticatedDashboardAnticiposRouteImport.update({
-    id: '/dashboard/anticipos',
-    path: '/dashboard/anticipos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardApiRoute =
-  AuthenticatedDashboardApiRouteImport.update({
-    id: '/dashboard/api',
-    path: '/dashboard/api',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardApprovalsRoute =
-  AuthenticatedDashboardApprovalsRouteImport.update({
-    id: '/dashboard/approvals',
-    path: '/dashboard/approvals',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardAuditRoute =
-  AuthenticatedDashboardAuditRouteImport.update({
-    id: '/dashboard/audit',
-    path: '/dashboard/audit',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardBoletinRoute =
-  AuthenticatedDashboardBoletinRouteImport.update({
-    id: '/dashboard/boletin',
-    path: '/dashboard/boletin',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCampaignsRoute =
-  AuthenticatedDashboardCampaignsRouteImport.update({
-    id: '/dashboard/campaigns',
-    path: '/dashboard/campaigns',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCatastroRoute =
-  AuthenticatedDashboardCatastroRouteImport.update({
-    id: '/dashboard/catastro',
-    path: '/dashboard/catastro',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCholquiRoute =
-  AuthenticatedDashboardCholquiRouteImport.update({
-    id: '/dashboard/cholqui',
-    path: '/dashboard/cholqui',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardClientesRoute =
-  AuthenticatedDashboardClientesRouteImport.update({
-    id: '/dashboard/clientes',
-    path: '/dashboard/clientes',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCobranzaRoute =
-  AuthenticatedDashboardCobranzaRouteImport.update({
-    id: '/dashboard/cobranza',
-    path: '/dashboard/cobranza',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardColateralDocumentosRoute =
-  AuthenticatedDashboardColateralDocumentosRouteImport.update({
-    id: '/dashboard/colateral-documentos',
-    path: '/dashboard/colateral-documentos',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardColateralLeadsRoute =
-  AuthenticatedDashboardColateralLeadsRouteImport.update({
-    id: '/dashboard/colateral-leads',
-    path: '/dashboard/colateral-leads',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCommandCenterRoute =
-  AuthenticatedDashboardCommandCenterRouteImport.update({
-    id: '/dashboard/command-center',
-    path: '/dashboard/command-center',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardCommodityLotsRoute =
-  AuthenticatedDashboardCommodityLotsRouteImport.update({
-    id: '/dashboard/commodity-lots',
-    path: '/dashboard/commodity-lots',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardDealsRoute =
-  AuthenticatedDashboardDealsRouteImport.update({
-    id: '/dashboard/deals',
-    path: '/dashboard/deals',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardDrillingRoute =
-  AuthenticatedDashboardDrillingRouteImport.update({
-    id: '/dashboard/drilling',
-    path: '/dashboard/drilling',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardDronesRoute =
-  AuthenticatedDashboardDronesRouteImport.update({
-    id: '/dashboard/drones',
-    path: '/dashboard/drones',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardEnviosRoute =
-  AuthenticatedDashboardEnviosRouteImport.update({
-    id: '/dashboard/envios',
-    path: '/dashboard/envios',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardEstimationRoute =
-  AuthenticatedDashboardEstimationRouteImport.update({
-    id: '/dashboard/estimation',
-    path: '/dashboard/estimation',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardExpedienteRoute =
-  AuthenticatedDashboardExpedienteRouteImport.update({
-    id: '/dashboard/expediente',
-    path: '/dashboard/expediente',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardFinanceRoute =
-  AuthenticatedDashboardFinanceRouteImport.update({
-    id: '/dashboard/finance',
-    path: '/dashboard/finance',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardFirmasRoute =
-  AuthenticatedDashboardFirmasRouteImport.update({
-    id: '/dashboard/firmas',
-    path: '/dashboard/firmas',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardFrancoRoute =
-  AuthenticatedDashboardFrancoRouteImport.update({
-    id: '/dashboard/franco',
-    path: '/dashboard/franco',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardGeology3dRoute =
-  AuthenticatedDashboardGeology3dRouteImport.update({
-    id: '/dashboard/geology3d',
-    path: '/dashboard/geology3d',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardGeophysicsRoute =
-  AuthenticatedDashboardGeophysicsRouteImport.update({
-    id: '/dashboard/geophysics',
-    path: '/dashboard/geophysics',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardHseRoute =
-  AuthenticatedDashboardHseRouteImport.update({
-    id: '/dashboard/hse',
-    path: '/dashboard/hse',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardInventoryRoute =
-  AuthenticatedDashboardInventoryRouteImport.update({
-    id: '/dashboard/inventory',
-    path: '/dashboard/inventory',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardInversionColateralRoute =
-  AuthenticatedDashboardInversionColateralRouteImport.update({
-    id: '/dashboard/inversion-colateral',
-    path: '/dashboard/inversion-colateral',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardInvestmentsRoute =
-  AuthenticatedDashboardInvestmentsRouteImport.update({
-    id: '/dashboard/investments',
-    path: '/dashboard/investments',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardListingsRoute =
-  AuthenticatedDashboardListingsRouteImport.update({
-    id: '/dashboard/listings',
-    path: '/dashboard/listings',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardLv5Page5Route =
-  AuthenticatedDashboardLv5Page5RouteImport.update({
-    id: '/dashboard/lv5-page5',
-    path: '/dashboard/lv5-page5',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardMagRevalidationsRoute =
-  AuthenticatedDashboardMagRevalidationsRouteImport.update({
-    id: '/dashboard/mag-revalidations',
-    path: '/dashboard/mag-revalidations',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardMapRoute =
-  AuthenticatedDashboardMapRouteImport.update({
-    id: '/dashboard/map',
-    path: '/dashboard/map',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardMarketplaceRoute =
-  AuthenticatedDashboardMarketplaceRouteImport.update({
-    id: '/dashboard/marketplace',
-    path: '/dashboard/marketplace',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardMissionRoute =
-  AuthenticatedDashboardMissionRouteImport.update({
-    id: '/dashboard/mission',
-    path: '/dashboard/mission',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardMyInquiriesRoute =
-  AuthenticatedDashboardMyInquiriesRouteImport.update({
-    id: '/dashboard/my-inquiries',
-    path: '/dashboard/my-inquiries',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardNi43101Route =
-  AuthenticatedDashboardNi43101RouteImport.update({
-    id: '/dashboard/ni43101',
-    path: '/dashboard/ni43101',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardOfferingsRoute =
-  AuthenticatedDashboardOfferingsRouteImport.update({
-    id: '/dashboard/offerings',
-    path: '/dashboard/offerings',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardOpportunitiesRoute =
-  AuthenticatedDashboardOpportunitiesRouteImport.update({
-    id: '/dashboard/opportunities',
-    path: '/dashboard/opportunities',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardPalmerasRoute =
-  AuthenticatedDashboardPalmerasRouteImport.update({
-    id: '/dashboard/palmeras',
-    path: '/dashboard/palmeras',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardPlanRoute =
-  AuthenticatedDashboardPlanRouteImport.update({
-    id: '/dashboard/plan',
-    path: '/dashboard/plan',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardPreciosRoute =
-  AuthenticatedDashboardPreciosRouteImport.update({
-    id: '/dashboard/precios',
-    path: '/dashboard/precios',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardProfileRoute =
-  AuthenticatedDashboardProfileRouteImport.update({
-    id: '/dashboard/profile',
-    path: '/dashboard/profile',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardProjectReportRoute =
-  AuthenticatedDashboardProjectReportRouteImport.update({
-    id: '/dashboard/project-report',
-    path: '/dashboard/project-report',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardProjectsRoute =
-  AuthenticatedDashboardProjectsRouteImport.update({
-    id: '/dashboard/projects',
-    path: '/dashboard/projects',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardProveedorRoute =
-  AuthenticatedDashboardProveedorRouteImport.update({
-    id: '/dashboard/proveedor',
-    path: '/dashboard/proveedor',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardQaqcRoute =
-  AuthenticatedDashboardQaqcRouteImport.update({
-    id: '/dashboard/qaqc',
-    path: '/dashboard/qaqc',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardQpsRoute =
-  AuthenticatedDashboardQpsRouteImport.update({
-    id: '/dashboard/qps',
-    path: '/dashboard/qps',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardReportsRoute =
-  AuthenticatedDashboardReportsRouteImport.update({
-    id: '/dashboard/reports',
-    path: '/dashboard/reports',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSamplingRoute =
-  AuthenticatedDashboardSamplingRouteImport.update({
-    id: '/dashboard/sampling',
-    path: '/dashboard/sampling',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSat3dRoute =
-  AuthenticatedDashboardSat3dRouteImport.update({
-    id: '/dashboard/sat3d',
-    path: '/dashboard/sat3d',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSatelliteIntelRoute =
-  AuthenticatedDashboardSatelliteIntelRouteImport.update({
-    id: '/dashboard/satellite-intel',
-    path: '/dashboard/satellite-intel',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSectionRoute =
-  AuthenticatedDashboardSectionRouteImport.update({
-    id: '/dashboard/section',
-    path: '/dashboard/section',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSourcingRoute =
-  AuthenticatedDashboardSourcingRouteImport.update({
-    id: '/dashboard/sourcing',
-    path: '/dashboard/sourcing',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardTargetsRoute =
-  AuthenticatedDashboardTargetsRouteImport.update({
-    id: '/dashboard/targets',
-    path: '/dashboard/targets',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardTeamRoute =
-  AuthenticatedDashboardTeamRouteImport.update({
-    id: '/dashboard/team',
-    path: '/dashboard/team',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardTradeBoardRoute =
-  AuthenticatedDashboardTradeBoardRouteImport.update({
-    id: '/dashboard/trade-board',
-    path: '/dashboard/trade-board',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardTradesRoute =
-  AuthenticatedDashboardTradesRouteImport.update({
-    id: '/dashboard/trades',
-    path: '/dashboard/trades',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardValidationRoute =
-  AuthenticatedDashboardValidationRouteImport.update({
-    id: '/dashboard/validation',
-    path: '/dashboard/validation',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPanelPrivacidadRoute =
-  AuthenticatedPanelPrivacidadRouteImport.update({
-    id: '/privacidad',
-    path: '/privacidad',
-    getParentRoute: () => AuthenticatedPanelRoute,
-  } as any)
-const AguaVerificarAssetIdRoute = AguaVerificarAssetIdRouteImport.update({
-  id: '/agua/verificar/$assetId',
-  path: '/agua/verificar/$assetId',
+const VerificarFichaTokenRoute = VerificarFichaTokenRouteImport.update({
+  id: '/verificar/ficha/$token',
+  path: '/verificar/ficha/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
-  id: '/api/public/health',
-  path: '/api/public/health',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicIngestPatentRematesRoute =
-  ApiPublicIngestPatentRematesRouteImport.update({
-    id: '/api/public/ingest-patent-remates',
-    path: '/api/public/ingest-patent-remates',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
-  id: '/api/public/stats',
-  path: '/api/public/stats',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSyncBulletinsRoute = ApiPublicSyncBulletinsRouteImport.update({
-  id: '/api/public/sync-bulletins',
-  path: '/api/public/sync-bulletins',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
-  id: '/api/public/sync-catastro',
-  path: '/api/public/sync-catastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiWebhooksMercadopagoRoute = ApiWebhooksMercadopagoRouteImport.update({
-  id: '/api/webhooks/mercadopago',
-  path: '/api/webhooks/mercadopago',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CatastroAppWatchlistRoute = CatastroAppWatchlistRouteImport.update({
-  id: '/catastro/app/watchlist',
-  path: '/catastro/app/watchlist',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
-  id: '/catastro/c/$code',
-  path: '/catastro/c/$code',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CatastroPaisCountryRoute = CatastroPaisCountryRouteImport.update({
-  id: '/catastro/pais/$country',
-  path: '/catastro/pais/$country',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FirmarOperacionTokenRoute = FirmarOperacionTokenRouteImport.update({
-  id: '/firmar/operacion/$token',
-  path: '/firmar/operacion/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
-  id: '/lovable/email/suppression',
-  path: '/lovable/email/suppression',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalBuyerTokenRoute = PortalBuyerTokenRouteImport.update({
-  id: '/portal/buyer/$token',
-  path: '/portal/buyer/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PortalSellerTokenRoute = PortalSellerTokenRouteImport.update({
-  id: '/portal/seller/$token',
-  path: '/portal/seller/$token',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ProyectosFichaSlugRoute = ProyectosFichaSlugRouteImport.update({
-  id: '/proyectos_/ficha/$slug',
-  path: '/proyectos/ficha/$slug',
+const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
+  id: '/share/targets/$projectId',
+  path: '/share/targets/$projectId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReportsLosverdesPre43101Route =
@@ -972,86 +511,481 @@ const ReportsLosverdesPre43101Route =
     path: '/reports/losverdes/pre43101',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ShareTargetsProjectIdRoute = ShareTargetsProjectIdRouteImport.update({
-  id: '/share/targets/$projectId',
-  path: '/share/targets/$projectId',
+const ProyectosFichaSlugRoute = ProyectosFichaSlugRouteImport.update({
+  id: '/proyectos_/ficha/$slug',
+  path: '/proyectos/ficha/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VerificarFichaTokenRoute = VerificarFichaTokenRouteImport.update({
-  id: '/verificar/ficha/$token',
-  path: '/verificar/ficha/$token',
+const PortalSellerTokenRoute = PortalSellerTokenRouteImport.update({
+  id: '/portal/seller/$token',
+  path: '/portal/seller/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedDashboardAdminInboxRoute =
-  AuthenticatedDashboardAdminInboxRouteImport.update({
-    id: '/inbox',
-    path: '/inbox',
-    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+const PortalBuyerTokenRoute = PortalBuyerTokenRouteImport.update({
+  id: '/portal/buyer/$token',
+  path: '/portal/buyer/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
+  id: '/lovable/email/suppression',
+  path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirmarOperacionTokenRoute = FirmarOperacionTokenRouteImport.update({
+  id: '/firmar/operacion/$token',
+  path: '/firmar/operacion/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroPaisCountryRoute = CatastroPaisCountryRouteImport.update({
+  id: '/catastro/pais/$country',
+  path: '/catastro/pais/$country',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroCCodeRoute = CatastroCCodeRouteImport.update({
+  id: '/catastro/c/$code',
+  path: '/catastro/c/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CatastroAppWatchlistRoute = CatastroAppWatchlistRouteImport.update({
+  id: '/catastro/app/watchlist',
+  path: '/catastro/app/watchlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWebhooksMercadopagoRoute = ApiWebhooksMercadopagoRouteImport.update({
+  id: '/api/webhooks/mercadopago',
+  path: '/api/webhooks/mercadopago',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSyncCatastroRoute = ApiPublicSyncCatastroRouteImport.update({
+  id: '/api/public/sync-catastro',
+  path: '/api/public/sync-catastro',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicSyncBulletinsRoute = ApiPublicSyncBulletinsRouteImport.update({
+  id: '/api/public/sync-bulletins',
+  path: '/api/public/sync-bulletins',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicStatsRoute = ApiPublicStatsRouteImport.update({
+  id: '/api/public/stats',
+  path: '/api/public/stats',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicIngestPatentRematesRoute =
+  ApiPublicIngestPatentRematesRouteImport.update({
+    id: '/api/public/ingest-patent-remates',
+    path: '/api/public/ingest-patent-remates',
+    getParentRoute: () => rootRouteImport,
   } as any)
-const AuthenticatedDashboardAdminInvestorsRoute =
-  AuthenticatedDashboardAdminInvestorsRouteImport.update({
-    id: '/investors',
-    path: '/investors',
-    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AguaVerificarAssetIdRoute = AguaVerificarAssetIdRouteImport.update({
+  id: '/agua/verificar/$assetId',
+  path: '/agua/verificar/$assetId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedPanelPrivacidadRoute =
+  AuthenticatedPanelPrivacidadRouteImport.update({
+    id: '/privacidad',
+    path: '/privacidad',
+    getParentRoute: () => AuthenticatedPanelRoute,
   } as any)
-const AuthenticatedDashboardClientesPartnerIdRoute =
-  AuthenticatedDashboardClientesPartnerIdRouteImport.update({
-    id: '/dashboard/clientes_/$partnerId',
-    path: '/dashboard/clientes/$partnerId',
+const AuthenticatedDashboardValidationRoute =
+  AuthenticatedDashboardValidationRouteImport.update({
+    id: '/dashboard/validation',
+    path: '/dashboard/validation',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardDocumentosIndexRoute =
-  AuthenticatedDashboardDocumentosIndexRouteImport.update({
-    id: '/dashboard/documentos/',
-    path: '/dashboard/documentos/',
+const AuthenticatedDashboardTradesRoute =
+  AuthenticatedDashboardTradesRouteImport.update({
+    id: '/dashboard/trades',
+    path: '/dashboard/trades',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardDocumentosTemplateIdRoute =
-  AuthenticatedDashboardDocumentosTemplateIdRouteImport.update({
-    id: '/dashboard/documentos/$templateId',
-    path: '/dashboard/documentos/$templateId',
+const AuthenticatedDashboardTradeBoardRoute =
+  AuthenticatedDashboardTradeBoardRouteImport.update({
+    id: '/dashboard/trade-board',
+    path: '/dashboard/trade-board',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardGeophysicsSurveyIdRoute =
-  AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
-    id: '/$surveyId',
-    path: '/$surveyId',
-    getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
-  } as any)
-const AuthenticatedDashboardListingsListingIdRoute =
-  AuthenticatedDashboardListingsListingIdRouteImport.update({
-    id: '/$listingId',
-    path: '/$listingId',
-    getParentRoute: () => AuthenticatedDashboardListingsRoute,
-  } as any)
-const AuthenticatedDashboardPipelineIndexRoute =
-  AuthenticatedDashboardPipelineIndexRouteImport.update({
-    id: '/dashboard/pipeline/',
-    path: '/dashboard/pipeline/',
+const AuthenticatedDashboardTeamRoute =
+  AuthenticatedDashboardTeamRouteImport.update({
+    id: '/dashboard/team',
+    path: '/dashboard/team',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardPipelineCodeRoute =
-  AuthenticatedDashboardPipelineCodeRouteImport.update({
-    id: '/dashboard/pipeline/$code',
-    path: '/dashboard/pipeline/$code',
+const AuthenticatedDashboardTargetsRoute =
+  AuthenticatedDashboardTargetsRouteImport.update({
+    id: '/dashboard/targets',
+    path: '/dashboard/targets',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardProjectsProjectIdRoute =
-  AuthenticatedDashboardProjectsProjectIdRouteImport.update({
-    id: '/dashboard/projects_/$projectId',
-    path: '/dashboard/projects/$projectId',
+const AuthenticatedDashboardSourcingRoute =
+  AuthenticatedDashboardSourcingRouteImport.update({
+    id: '/dashboard/sourcing',
+    path: '/dashboard/sourcing',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardProjectsCompararRoute =
-  AuthenticatedDashboardProjectsCompararRouteImport.update({
-    id: '/dashboard/projects_/comparar',
-    path: '/dashboard/projects/comparar',
+const AuthenticatedDashboardSectionRoute =
+  AuthenticatedDashboardSectionRouteImport.update({
+    id: '/dashboard/section',
+    path: '/dashboard/section',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardProjectsNuevoRoute =
-  AuthenticatedDashboardProjectsNuevoRouteImport.update({
-    id: '/dashboard/projects_/nuevo',
-    path: '/dashboard/projects/nuevo',
+const AuthenticatedDashboardSatelliteIntelRoute =
+  AuthenticatedDashboardSatelliteIntelRouteImport.update({
+    id: '/dashboard/satellite-intel',
+    path: '/dashboard/satellite-intel',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSat3dRoute =
+  AuthenticatedDashboardSat3dRouteImport.update({
+    id: '/dashboard/sat3d',
+    path: '/dashboard/sat3d',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardSamplingRoute =
+  AuthenticatedDashboardSamplingRouteImport.update({
+    id: '/dashboard/sampling',
+    path: '/dashboard/sampling',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardReportsRoute =
+  AuthenticatedDashboardReportsRouteImport.update({
+    id: '/dashboard/reports',
+    path: '/dashboard/reports',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardQpsRoute =
+  AuthenticatedDashboardQpsRouteImport.update({
+    id: '/dashboard/qps',
+    path: '/dashboard/qps',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardQaqcRoute =
+  AuthenticatedDashboardQaqcRouteImport.update({
+    id: '/dashboard/qaqc',
+    path: '/dashboard/qaqc',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProveedorRoute =
+  AuthenticatedDashboardProveedorRouteImport.update({
+    id: '/dashboard/proveedor',
+    path: '/dashboard/proveedor',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsRoute =
+  AuthenticatedDashboardProjectsRouteImport.update({
+    id: '/dashboard/projects',
+    path: '/dashboard/projects',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectReportRoute =
+  AuthenticatedDashboardProjectReportRouteImport.update({
+    id: '/dashboard/project-report',
+    path: '/dashboard/project-report',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProfileRoute =
+  AuthenticatedDashboardProfileRouteImport.update({
+    id: '/dashboard/profile',
+    path: '/dashboard/profile',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPreciosRoute =
+  AuthenticatedDashboardPreciosRouteImport.update({
+    id: '/dashboard/precios',
+    path: '/dashboard/precios',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPlanRoute =
+  AuthenticatedDashboardPlanRouteImport.update({
+    id: '/dashboard/plan',
+    path: '/dashboard/plan',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPalmerasRoute =
+  AuthenticatedDashboardPalmerasRouteImport.update({
+    id: '/dashboard/palmeras',
+    path: '/dashboard/palmeras',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardOpportunitiesRoute =
+  AuthenticatedDashboardOpportunitiesRouteImport.update({
+    id: '/dashboard/opportunities',
+    path: '/dashboard/opportunities',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardOfferingsRoute =
+  AuthenticatedDashboardOfferingsRouteImport.update({
+    id: '/dashboard/offerings',
+    path: '/dashboard/offerings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardNi43101Route =
+  AuthenticatedDashboardNi43101RouteImport.update({
+    id: '/dashboard/ni43101',
+    path: '/dashboard/ni43101',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMyInquiriesRoute =
+  AuthenticatedDashboardMyInquiriesRouteImport.update({
+    id: '/dashboard/my-inquiries',
+    path: '/dashboard/my-inquiries',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMissionRoute =
+  AuthenticatedDashboardMissionRouteImport.update({
+    id: '/dashboard/mission',
+    path: '/dashboard/mission',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMarketplaceRoute =
+  AuthenticatedDashboardMarketplaceRouteImport.update({
+    id: '/dashboard/marketplace',
+    path: '/dashboard/marketplace',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMapRoute =
+  AuthenticatedDashboardMapRouteImport.update({
+    id: '/dashboard/map',
+    path: '/dashboard/map',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardMagRevalidationsRoute =
+  AuthenticatedDashboardMagRevalidationsRouteImport.update({
+    id: '/dashboard/mag-revalidations',
+    path: '/dashboard/mag-revalidations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardLv5Page5Route =
+  AuthenticatedDashboardLv5Page5RouteImport.update({
+    id: '/dashboard/lv5-page5',
+    path: '/dashboard/lv5-page5',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardListingsRoute =
+  AuthenticatedDashboardListingsRouteImport.update({
+    id: '/dashboard/listings',
+    path: '/dashboard/listings',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardInvestmentsRoute =
+  AuthenticatedDashboardInvestmentsRouteImport.update({
+    id: '/dashboard/investments',
+    path: '/dashboard/investments',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardInversionColateralRoute =
+  AuthenticatedDashboardInversionColateralRouteImport.update({
+    id: '/dashboard/inversion-colateral',
+    path: '/dashboard/inversion-colateral',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardInventoryRoute =
+  AuthenticatedDashboardInventoryRouteImport.update({
+    id: '/dashboard/inventory',
+    path: '/dashboard/inventory',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardHseRoute =
+  AuthenticatedDashboardHseRouteImport.update({
+    id: '/dashboard/hse',
+    path: '/dashboard/hse',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardGeophysicsRoute =
+  AuthenticatedDashboardGeophysicsRouteImport.update({
+    id: '/dashboard/geophysics',
+    path: '/dashboard/geophysics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardGeology3dRoute =
+  AuthenticatedDashboardGeology3dRouteImport.update({
+    id: '/dashboard/geology3d',
+    path: '/dashboard/geology3d',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardFrancoRoute =
+  AuthenticatedDashboardFrancoRouteImport.update({
+    id: '/dashboard/franco',
+    path: '/dashboard/franco',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardFirmasRoute =
+  AuthenticatedDashboardFirmasRouteImport.update({
+    id: '/dashboard/firmas',
+    path: '/dashboard/firmas',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardFinanceRoute =
+  AuthenticatedDashboardFinanceRouteImport.update({
+    id: '/dashboard/finance',
+    path: '/dashboard/finance',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardExpedienteRoute =
+  AuthenticatedDashboardExpedienteRouteImport.update({
+    id: '/dashboard/expediente',
+    path: '/dashboard/expediente',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardEstimationRoute =
+  AuthenticatedDashboardEstimationRouteImport.update({
+    id: '/dashboard/estimation',
+    path: '/dashboard/estimation',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardEnviosRoute =
+  AuthenticatedDashboardEnviosRouteImport.update({
+    id: '/dashboard/envios',
+    path: '/dashboard/envios',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardDronesRoute =
+  AuthenticatedDashboardDronesRouteImport.update({
+    id: '/dashboard/drones',
+    path: '/dashboard/drones',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardDrillingRoute =
+  AuthenticatedDashboardDrillingRouteImport.update({
+    id: '/dashboard/drilling',
+    path: '/dashboard/drilling',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardDealsRoute =
+  AuthenticatedDashboardDealsRouteImport.update({
+    id: '/dashboard/deals',
+    path: '/dashboard/deals',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCommodityLotsRoute =
+  AuthenticatedDashboardCommodityLotsRouteImport.update({
+    id: '/dashboard/commodity-lots',
+    path: '/dashboard/commodity-lots',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCommandCenterRoute =
+  AuthenticatedDashboardCommandCenterRouteImport.update({
+    id: '/dashboard/command-center',
+    path: '/dashboard/command-center',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralLeadsRoute =
+  AuthenticatedDashboardColateralLeadsRouteImport.update({
+    id: '/dashboard/colateral-leads',
+    path: '/dashboard/colateral-leads',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardColateralDocumentosRoute =
+  AuthenticatedDashboardColateralDocumentosRouteImport.update({
+    id: '/dashboard/colateral-documentos',
+    path: '/dashboard/colateral-documentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCobranzaRoute =
+  AuthenticatedDashboardCobranzaRouteImport.update({
+    id: '/dashboard/cobranza',
+    path: '/dashboard/cobranza',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardClientesRoute =
+  AuthenticatedDashboardClientesRouteImport.update({
+    id: '/dashboard/clientes',
+    path: '/dashboard/clientes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCholquiRoute =
+  AuthenticatedDashboardCholquiRouteImport.update({
+    id: '/dashboard/cholqui',
+    path: '/dashboard/cholqui',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCatastroRoute =
+  AuthenticatedDashboardCatastroRouteImport.update({
+    id: '/dashboard/catastro',
+    path: '/dashboard/catastro',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardCampaignsRoute =
+  AuthenticatedDashboardCampaignsRouteImport.update({
+    id: '/dashboard/campaigns',
+    path: '/dashboard/campaigns',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardBoletinRoute =
+  AuthenticatedDashboardBoletinRouteImport.update({
+    id: '/dashboard/boletin',
+    path: '/dashboard/boletin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAuditRoute =
+  AuthenticatedDashboardAuditRouteImport.update({
+    id: '/dashboard/audit',
+    path: '/dashboard/audit',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardApprovalsRoute =
+  AuthenticatedDashboardApprovalsRouteImport.update({
+    id: '/dashboard/approvals',
+    path: '/dashboard/approvals',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardApiRoute =
+  AuthenticatedDashboardApiRouteImport.update({
+    id: '/dashboard/api',
+    path: '/dashboard/api',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAnticiposRoute =
+  AuthenticatedDashboardAnticiposRouteImport.update({
+    id: '/dashboard/anticipos',
+    path: '/dashboard/anticipos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAnalyticsRoute =
+  AuthenticatedDashboardAnalyticsRouteImport.update({
+    id: '/dashboard/analytics',
+    path: '/dashboard/analytics',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAguaRoute =
+  AuthenticatedDashboardAguaRouteImport.update({
+    id: '/dashboard/agua',
+    path: '/dashboard/agua',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAgentsRoute =
+  AuthenticatedDashboardAgentsRouteImport.update({
+    id: '/dashboard/agents',
+    path: '/dashboard/agents',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAdminRoute =
+  AuthenticatedDashboardAdminRouteImport.update({
+    id: '/dashboard/admin',
+    path: '/dashboard/admin',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const Char91DotmcpChar93InvokeToolToolRoute =
+  Char91DotmcpChar93InvokeToolToolRouteImport.update({
+    id: '/.mcp/invoke-tool/$tool',
+    path: '/.mcp/invoke-tool/$tool',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedDashboardRfqsIndexRoute =
+  AuthenticatedDashboardRfqsIndexRouteImport.update({
+    id: '/dashboard/rfqs/',
+    path: '/dashboard/rfqs/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedDashboardProveedoresIndexRoute =
@@ -1060,87 +994,22 @@ const AuthenticatedDashboardProveedoresIndexRoute =
     path: '/dashboard/proveedores/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardProveedoresIdRoute =
-  AuthenticatedDashboardProveedoresIdRouteImport.update({
-    id: '/dashboard/proveedores/$id',
-    path: '/dashboard/proveedores/$id',
+const AuthenticatedDashboardPipelineIndexRoute =
+  AuthenticatedDashboardPipelineIndexRouteImport.update({
+    id: '/dashboard/pipeline/',
+    path: '/dashboard/pipeline/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardRfqsIndexRoute =
-  AuthenticatedDashboardRfqsIndexRouteImport.update({
-    id: '/dashboard/rfqs/',
-    path: '/dashboard/rfqs/',
+const AuthenticatedDashboardDocumentosIndexRoute =
+  AuthenticatedDashboardDocumentosIndexRouteImport.update({
+    id: '/dashboard/documentos/',
+    path: '/dashboard/documentos/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedDashboardRfqsIdRoute =
-  AuthenticatedDashboardRfqsIdRouteImport.update({
-    id: '/dashboard/rfqs/$id',
-    path: '/dashboard/rfqs/$id',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardRfqsNuevoRoute =
-  AuthenticatedDashboardRfqsNuevoRouteImport.update({
-    id: '/dashboard/rfqs/nuevo',
-    path: '/dashboard/rfqs/nuevo',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardSourcingRequestIdRoute =
-  AuthenticatedDashboardSourcingRequestIdRouteImport.update({
-    id: '/dashboard/sourcing_/$requestId',
-    path: '/dashboard/sourcing/$requestId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedDashboardTargetsAiBriefRoute =
-  AuthenticatedDashboardTargetsAiBriefRouteImport.update({
-    id: '/ai-brief',
-    path: '/ai-brief',
-    getParentRoute: () => AuthenticatedDashboardTargetsRoute,
-  } as any)
-const AuthenticatedDashboardTradesTradeIdRoute =
-  AuthenticatedDashboardTradesTradeIdRouteImport.update({
-    id: '/dashboard/trades_/$tradeId',
-    path: '/dashboard/trades/$tradeId',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const ApiPublicHooksSignatureRemindersRoute =
-  ApiPublicHooksSignatureRemindersRouteImport.update({
-    id: '/api/public/hooks/signature-reminders',
-    path: '/api/public/hooks/signature-reminders',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicNotificationsCatastroExpirationsRoute =
-  ApiPublicNotificationsCatastroExpirationsRouteImport.update({
-    id: '/api/public/notifications/catastro-expirations',
-    path: '/api/public/notifications/catastro-expirations',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicNotificationsSatelliteAnomaliesRoute =
-  ApiPublicNotificationsSatelliteAnomaliesRouteImport.update({
-    id: '/api/public/notifications/satellite-anomalies',
-    path: '/api/public/notifications/satellite-anomalies',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicVerifyComplianceReportIdRoute =
-  ApiPublicVerifyComplianceReportIdRouteImport.update({
-    id: '/api/public/verify-compliance/$reportId',
-    path: '/api/public/verify-compliance/$reportId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiV1CadastreSearchRoute = ApiV1CadastreSearchRouteImport.update({
-  id: '/api/v1/cadastre/search',
-  path: '/api/v1/cadastre/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CatastroProyectoTitularesIdRoute =
-  CatastroProyectoTitularesIdRouteImport.update({
-    id: '/titulares/$id',
-    path: '/titulares/$id',
-    getParentRoute: () => CatastroProyectoRoute,
-  } as any)
-const LovableEmailQueueProcessRoute =
-  LovableEmailQueueProcessRouteImport.update({
-    id: '/lovable/email/queue/process',
-    path: '/lovable/email/queue/process',
+const LovableEmailTransactionalSendRoute =
+  LovableEmailTransactionalSendRouteImport.update({
+    id: '/lovable/email/transactional/send',
+    path: '/lovable/email/transactional/send',
     getParentRoute: () => rootRouteImport,
   } as any)
 const LovableEmailTransactionalPreviewRoute =
@@ -1149,10 +1018,158 @@ const LovableEmailTransactionalPreviewRoute =
     path: '/lovable/email/transactional/preview',
     getParentRoute: () => rootRouteImport,
   } as any)
-const LovableEmailTransactionalSendRoute =
-  LovableEmailTransactionalSendRouteImport.update({
-    id: '/lovable/email/transactional/send',
-    path: '/lovable/email/transactional/send',
+const LovableEmailQueueProcessRoute =
+  LovableEmailQueueProcessRouteImport.update({
+    id: '/lovable/email/queue/process',
+    path: '/lovable/email/queue/process',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const CatastroProyectoTitularesIdRoute =
+  CatastroProyectoTitularesIdRouteImport.update({
+    id: '/titulares/$id',
+    path: '/titulares/$id',
+    getParentRoute: () => CatastroProyectoRoute,
+  } as any)
+const ApiV1CadastreSearchRoute = ApiV1CadastreSearchRouteImport.update({
+  id: '/api/v1/cadastre/search',
+  path: '/api/v1/cadastre/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicVerifyComplianceReportIdRoute =
+  ApiPublicVerifyComplianceReportIdRouteImport.update({
+    id: '/api/public/verify-compliance/$reportId',
+    path: '/api/public/verify-compliance/$reportId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNotificationsSatelliteAnomaliesRoute =
+  ApiPublicNotificationsSatelliteAnomaliesRouteImport.update({
+    id: '/api/public/notifications/satellite-anomalies',
+    path: '/api/public/notifications/satellite-anomalies',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicNotificationsCatastroExpirationsRoute =
+  ApiPublicNotificationsCatastroExpirationsRouteImport.update({
+    id: '/api/public/notifications/catastro-expirations',
+    path: '/api/public/notifications/catastro-expirations',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksSignatureRemindersRoute =
+  ApiPublicHooksSignatureRemindersRouteImport.update({
+    id: '/api/public/hooks/signature-reminders',
+    path: '/api/public/hooks/signature-reminders',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AuthenticatedDashboardTradesTradeIdRoute =
+  AuthenticatedDashboardTradesTradeIdRouteImport.update({
+    id: '/dashboard/trades_/$tradeId',
+    path: '/dashboard/trades/$tradeId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardTargetsAiBriefRoute =
+  AuthenticatedDashboardTargetsAiBriefRouteImport.update({
+    id: '/ai-brief',
+    path: '/ai-brief',
+    getParentRoute: () => AuthenticatedDashboardTargetsRoute,
+  } as any)
+const AuthenticatedDashboardSourcingRequestIdRoute =
+  AuthenticatedDashboardSourcingRequestIdRouteImport.update({
+    id: '/dashboard/sourcing_/$requestId',
+    path: '/dashboard/sourcing/$requestId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRfqsNuevoRoute =
+  AuthenticatedDashboardRfqsNuevoRouteImport.update({
+    id: '/dashboard/rfqs/nuevo',
+    path: '/dashboard/rfqs/nuevo',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRfqsIdRoute =
+  AuthenticatedDashboardRfqsIdRouteImport.update({
+    id: '/dashboard/rfqs/$id',
+    path: '/dashboard/rfqs/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProveedoresIdRoute =
+  AuthenticatedDashboardProveedoresIdRouteImport.update({
+    id: '/dashboard/proveedores/$id',
+    path: '/dashboard/proveedores/$id',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsNuevoRoute =
+  AuthenticatedDashboardProjectsNuevoRouteImport.update({
+    id: '/dashboard/projects_/nuevo',
+    path: '/dashboard/projects/nuevo',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsCompararRoute =
+  AuthenticatedDashboardProjectsCompararRouteImport.update({
+    id: '/dashboard/projects_/comparar',
+    path: '/dashboard/projects/comparar',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardProjectsProjectIdRoute =
+  AuthenticatedDashboardProjectsProjectIdRouteImport.update({
+    id: '/dashboard/projects_/$projectId',
+    path: '/dashboard/projects/$projectId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardPipelineCodeRoute =
+  AuthenticatedDashboardPipelineCodeRouteImport.update({
+    id: '/dashboard/pipeline/$code',
+    path: '/dashboard/pipeline/$code',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardListingsListingIdRoute =
+  AuthenticatedDashboardListingsListingIdRouteImport.update({
+    id: '/$listingId',
+    path: '/$listingId',
+    getParentRoute: () => AuthenticatedDashboardListingsRoute,
+  } as any)
+const AuthenticatedDashboardGeophysicsSurveyIdRoute =
+  AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
+    id: '/$surveyId',
+    path: '/$surveyId',
+    getParentRoute: () => AuthenticatedDashboardGeophysicsRoute,
+  } as any)
+const AuthenticatedDashboardDocumentosTemplateIdRoute =
+  AuthenticatedDashboardDocumentosTemplateIdRouteImport.update({
+    id: '/dashboard/documentos/$templateId',
+    path: '/dashboard/documentos/$templateId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardClientesPartnerIdRoute =
+  AuthenticatedDashboardClientesPartnerIdRouteImport.update({
+    id: '/dashboard/clientes_/$partnerId',
+    path: '/dashboard/clientes/$partnerId',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardAdminInvestorsRoute =
+  AuthenticatedDashboardAdminInvestorsRouteImport.update({
+    id: '/investors',
+    path: '/investors',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
+const AuthenticatedDashboardAdminInboxRoute =
+  AuthenticatedDashboardAdminInboxRouteImport.update({
+    id: '/inbox',
+    path: '/inbox',
+    getParentRoute: () => AuthenticatedDashboardAdminRoute,
+  } as any)
+const ApiTerrainZXYRoute = ApiTerrainZXYRouteImport.update({
+  id: '/api/terrain/$z/$x/$y',
+  path: '/api/terrain/$z/$x/$y',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicLiveMapLosverdesVerifyRoute =
+  ApiPublicLiveMapLosverdesVerifyRouteImport.update({
+    id: '/api/public/live-map/losverdes/verify',
+    path: '/api/public/live-map/losverdes/verify',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicEmailPixelMessageIdRoute =
+  ApiPublicEmailPixelMessageIdRouteImport.update({
+    id: '/api/public/email/pixel/$messageId',
+    path: '/api/public/email/pixel/$messageId',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
@@ -1161,23 +1178,6 @@ const AuthenticatedDashboardGeophysicsSurveyIdFieldRoute =
     path: '/field',
     getParentRoute: () => AuthenticatedDashboardGeophysicsSurveyIdRoute,
   } as any)
-const ApiPublicEmailPixelMessageIdRoute =
-  ApiPublicEmailPixelMessageIdRouteImport.update({
-    id: '/api/public/email/pixel/$messageId',
-    path: '/api/public/email/pixel/$messageId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiPublicLiveMapLosverdesVerifyRoute =
-  ApiPublicLiveMapLosverdesVerifyRouteImport.update({
-    id: '/api/public/live-map/losverdes/verify',
-    path: '/api/public/live-map/losverdes/verify',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiTerrainZXYRoute = ApiTerrainZXYRouteImport.update({
-  id: '/api/terrain/$z/$x/$y',
-  path: '/api/terrain/$z/$x/$y',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -2349,137 +2349,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contacto': {
-      id: '/contacto'
-      path: '/contacto'
-      fullPath: '/contacto'
-      preLoaderRoute: typeof ContactoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/empresas': {
-      id: '/empresas'
-      path: '/empresas'
-      fullPath: '/empresas'
-      preLoaderRoute: typeof EmpresasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/en': {
-      id: '/en'
-      path: '/en'
-      fullPath: '/en'
-      preLoaderRoute: typeof EnRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inscripcion': {
-      id: '/inscripcion'
-      path: '/inscripcion'
-      fullPath: '/inscripcion'
-      preLoaderRoute: typeof InscripcionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inversion-colateral': {
-      id: '/inversion-colateral'
-      path: '/inversion-colateral'
-      fullPath: '/inversion-colateral'
-      preLoaderRoute: typeof InversionColateralRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/inversionistas': {
-      id: '/inversionistas'
-      path: '/inversionistas'
-      fullPath: '/inversionistas'
-      preLoaderRoute: typeof InversionistasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mcp': {
-      id: '/mcp'
-      path: '/mcp'
-      fullPath: '/mcp'
-      preLoaderRoute: typeof McpRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/metodologia': {
-      id: '/metodologia'
-      path: '/metodologia'
-      fullPath: '/metodologia'
-      preLoaderRoute: typeof MetodologiaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/oportunidades': {
-      id: '/oportunidades'
-      path: '/oportunidades'
-      fullPath: '/oportunidades'
-      preLoaderRoute: typeof OportunidadesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal-proveedor': {
-      id: '/portal-proveedor'
-      path: '/portal-proveedor'
-      fullPath: '/portal-proveedor'
-      preLoaderRoute: typeof PortalProveedorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proyectos': {
-      id: '/proyectos'
-      path: '/proyectos'
-      fullPath: '/proyectos'
-      preLoaderRoute: typeof ProyectosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/recursos': {
-      id: '/recursos'
-      path: '/recursos'
-      fullPath: '/recursos'
-      preLoaderRoute: typeof RecursosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reset-password': {
-      id: '/reset-password'
-      path: '/reset-password'
-      fullPath: '/reset-password'
-      preLoaderRoute: typeof ResetPasswordRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/satelital': {
-      id: '/satelital'
-      path: '/satelital'
-      fullPath: '/satelital'
-      preLoaderRoute: typeof SatelitalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terminal': {
-      id: '/terminal'
-      path: '/terminal'
-      fullPath: '/terminal'
-      preLoaderRoute: typeof TerminalRouteImport
+    '/visor-3d': {
+      id: '/visor-3d'
+      path: '/visor-3d'
+      fullPath: '/visor-3d'
+      preLoaderRoute: typeof Visor3dRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/unsubscribe': {
@@ -2489,270 +2363,137 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/visor-3d': {
-      id: '/visor-3d'
-      path: '/visor-3d'
-      fullPath: '/visor-3d'
-      preLoaderRoute: typeof Visor3dRouteImport
+    '/terminal': {
+      id: '/terminal'
+      path: '/terminal'
+      fullPath: '/terminal'
+      preLoaderRoute: typeof TerminalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/list-tools': {
-      id: '/.mcp/list-tools'
-      path: '/.mcp/list-tools'
-      fullPath: '/.mcp/list-tools'
-      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.well-known/oauth-protected-resource': {
-      id: '/.well-known/oauth-protected-resource'
-      path: '/.well-known/oauth-protected-resource'
-      fullPath: '/.well-known/oauth-protected-resource'
-      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+    '/satelital': {
+      id: '/satelital'
+      path: '/satelital'
+      fullPath: '/satelital'
+      preLoaderRoute: typeof SatelitalRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/panel': {
-      id: '/_authenticated/panel'
-      path: '/panel'
-      fullPath: '/panel'
-      preLoaderRoute: typeof AuthenticatedPanelRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/agua/': {
-      id: '/agua/'
-      path: '/agua'
-      fullPath: '/agua/'
-      preLoaderRoute: typeof AguaIndexRouteImport
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/': {
-      id: '/catastro/'
-      path: '/catastro'
-      fullPath: '/catastro/'
-      preLoaderRoute: typeof CatastroIndexRouteImport
+    '/recursos': {
+      id: '/recursos'
+      path: '/recursos'
+      fullPath: '/recursos'
+      preLoaderRoute: typeof RecursosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/global': {
-      id: '/catastro/global'
-      path: '/catastro/global'
-      fullPath: '/catastro/global'
-      preLoaderRoute: typeof CatastroGlobalRouteImport
+    '/proyectos': {
+      id: '/proyectos'
+      path: '/proyectos'
+      fullPath: '/proyectos'
+      preLoaderRoute: typeof ProyectosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/mapa': {
-      id: '/catastro/mapa'
-      path: '/catastro/mapa'
-      fullPath: '/catastro/mapa'
-      preLoaderRoute: typeof CatastroMapaRouteImport
+    '/portal-proveedor': {
+      id: '/portal-proveedor'
+      path: '/portal-proveedor'
+      fullPath: '/portal-proveedor'
+      preLoaderRoute: typeof PortalProveedorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/peritos': {
-      id: '/catastro/peritos'
-      path: '/catastro/peritos'
-      fullPath: '/catastro/peritos'
-      preLoaderRoute: typeof CatastroPeritosRouteImport
+    '/oportunidades': {
+      id: '/oportunidades'
+      path: '/oportunidades'
+      fullPath: '/oportunidades'
+      preLoaderRoute: typeof OportunidadesRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/precios': {
-      id: '/catastro/precios'
-      path: '/catastro/precios'
-      fullPath: '/catastro/precios'
-      preLoaderRoute: typeof CatastroPreciosRouteImport
+    '/metodologia': {
+      id: '/metodologia'
+      path: '/metodologia'
+      fullPath: '/metodologia'
+      preLoaderRoute: typeof MetodologiaRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/catastro/proyecto': {
-      id: '/catastro/proyecto'
-      path: '/catastro/proyecto'
-      fullPath: '/catastro/proyecto'
-      preLoaderRoute: typeof CatastroProyectoRouteImport
+    '/mcp': {
+      id: '/mcp'
+      path: '/mcp'
+      fullPath: '/mcp'
+      preLoaderRoute: typeof McpRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/email/unsubscribe': {
-      id: '/email/unsubscribe'
-      path: '/email/unsubscribe'
-      fullPath: '/email/unsubscribe'
-      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+    '/inversionistas': {
+      id: '/inversionistas'
+      path: '/inversionistas'
+      fullPath: '/inversionistas'
+      preLoaderRoute: typeof InversionistasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ficha-proveedor/$token': {
-      id: '/ficha-proveedor/$token'
-      path: '/ficha-proveedor/$token'
-      fullPath: '/ficha-proveedor/$token'
-      preLoaderRoute: typeof FichaProveedorTokenRouteImport
+    '/inversion-colateral': {
+      id: '/inversion-colateral'
+      path: '/inversion-colateral'
+      fullPath: '/inversion-colateral'
+      preLoaderRoute: typeof InversionColateralRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/ficha/$token': {
-      id: '/ficha/$token'
-      path: '/ficha/$token'
-      fullPath: '/ficha/$token'
-      preLoaderRoute: typeof FichaTokenRouteImport
+    '/inscripcion': {
+      id: '/inscripcion'
+      path: '/inscripcion'
+      fullPath: '/inscripcion'
+      preLoaderRoute: typeof InscripcionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/firmar/$token': {
-      id: '/firmar/$token'
-      path: '/firmar/$token'
-      fullPath: '/firmar/$token'
-      preLoaderRoute: typeof FirmarTokenRouteImport
+    '/en': {
+      id: '/en'
+      path: '/en'
+      fullPath: '/en'
+      preLoaderRoute: typeof EnRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hooks/sync-boletin-minero': {
-      id: '/hooks/sync-boletin-minero'
-      path: '/hooks/sync-boletin-minero'
-      fullPath: '/hooks/sync-boletin-minero'
-      preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
+    '/empresas': {
+      id: '/empresas'
+      path: '/empresas'
+      fullPath: '/empresas'
+      preLoaderRoute: typeof EmpresasRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/hooks/sync-pjud': {
-      id: '/hooks/sync-pjud'
-      path: '/hooks/sync-pjud'
-      fullPath: '/hooks/sync-pjud'
-      preLoaderRoute: typeof HooksSyncPjudRouteImport
+    '/contacto': {
+      id: '/contacto'
+      path: '/contacto'
+      fullPath: '/contacto'
+      preLoaderRoute: typeof ContactoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/inscripcion/gracias': {
-      id: '/inscripcion/gracias'
-      path: '/gracias'
-      fullPath: '/inscripcion/gracias'
-      preLoaderRoute: typeof InscripcionGraciasRouteImport
-      parentRoute: typeof InscripcionRoute
-    }
-    '/invitations/$token': {
-      id: '/invitations/$token'
-      path: '/invitations/$token'
-      fullPath: '/invitations/$token'
-      preLoaderRoute: typeof InvitationsTokenRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/legal/privacidad': {
-      id: '/legal/privacidad'
-      path: '/legal/privacidad'
-      fullPath: '/legal/privacidad'
-      preLoaderRoute: typeof LegalPrivacidadRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/legal/terminos': {
-      id: '/legal/terminos'
-      path: '/legal/terminos'
-      fullPath: '/legal/terminos'
-      preLoaderRoute: typeof LegalTerminosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/cholqui': {
-      id: '/live/cholqui'
-      path: '/live/cholqui'
-      fullPath: '/live/cholqui'
-      preLoaderRoute: typeof LiveCholquiRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/franco': {
-      id: '/live/franco'
-      path: '/live/franco'
-      fullPath: '/live/franco'
-      preLoaderRoute: typeof LiveFrancoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/losverdes': {
-      id: '/live/losverdes'
-      path: '/live/losverdes'
-      fullPath: '/live/losverdes'
-      preLoaderRoute: typeof LiveLosverdesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/palmeras': {
-      id: '/live/palmeras'
-      path: '/live/palmeras'
-      fullPath: '/live/palmeras'
-      preLoaderRoute: typeof LivePalmerasRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/live/tilama': {
-      id: '/live/tilama'
-      path: '/live/tilama'
-      fullPath: '/live/tilama'
-      preLoaderRoute: typeof LiveTilamaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace/': {
-      id: '/marketplace/'
-      path: '/marketplace'
-      fullPath: '/marketplace/'
-      preLoaderRoute: typeof MarketplaceIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/marketplace/$lotId': {
-      id: '/marketplace/$lotId'
-      path: '/marketplace/$lotId'
-      fullPath: '/marketplace/$lotId'
-      preLoaderRoute: typeof MarketplaceLotIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding/$token': {
-      id: '/onboarding/$token'
-      path: '/onboarding/$token'
-      fullPath: '/onboarding/$token'
-      preLoaderRoute: typeof OnboardingTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/operacion/$token': {
-      id: '/operacion/$token'
-      path: '/operacion/$token'
-      fullPath: '/operacion/$token'
-      preLoaderRoute: typeof OperacionTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proveedor/$token': {
-      id: '/proveedor/$token'
-      path: '/proveedor/$token'
-      fullPath: '/proveedor/$token'
-      preLoaderRoute: typeof ProveedorTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proyecto/$token': {
-      id: '/proyecto/$token'
-      path: '/proyecto/$token'
-      fullPath: '/proyecto/$token'
-      preLoaderRoute: typeof ProyectoTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proyectos/$listingId': {
-      id: '/proyectos/$listingId'
-      path: '/$listingId'
-      fullPath: '/proyectos/$listingId'
-      preLoaderRoute: typeof ProyectosListingIdRouteImport
-      parentRoute: typeof ProyectosRoute
-    }
-    '/rfqs/': {
-      id: '/rfqs/'
-      path: '/rfqs'
-      fullPath: '/rfqs/'
-      preLoaderRoute: typeof RfqsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/terminal/capital-raise': {
-      id: '/terminal/capital-raise'
-      path: '/capital-raise'
-      fullPath: '/terminal/capital-raise'
-      preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
-      parentRoute: typeof TerminalRoute
-    }
-    '/terminal/market': {
-      id: '/terminal/market'
-      path: '/market'
-      fullPath: '/terminal/market'
-      preLoaderRoute: typeof TerminalMarketRouteImport
-      parentRoute: typeof TerminalRoute
-    }
-    '/terminal/tokenize': {
-      id: '/terminal/tokenize'
-      path: '/tokenize'
-      fullPath: '/terminal/tokenize'
-      preLoaderRoute: typeof TerminalTokenizeRouteImport
-      parentRoute: typeof TerminalRoute
-    }
-    '/terminal_/$slug': {
-      id: '/terminal_/$slug'
-      path: '/terminal/$slug'
-      fullPath: '/terminal/$slug'
-      preLoaderRoute: typeof TerminalSlugRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verificar/': {
@@ -2762,6 +2503,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificarIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rfqs/': {
+      id: '/rfqs/'
+      path: '/rfqs'
+      fullPath: '/rfqs/'
+      preLoaderRoute: typeof RfqsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/': {
+      id: '/catastro/'
+      path: '/catastro'
+      fullPath: '/catastro/'
+      preLoaderRoute: typeof CatastroIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/': {
+      id: '/agua/'
+      path: '/agua'
+      fullPath: '/agua/'
+      preLoaderRoute: typeof AguaIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/verificar/$ref': {
       id: '/verificar/$ref'
       path: '/verificar/$ref'
@@ -2769,18 +2538,235 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VerificarRefRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.lovable/oauth/consent': {
-      id: '/.lovable/oauth/consent'
-      path: '/.lovable/oauth/consent'
-      fullPath: '/.lovable/oauth/consent'
-      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+    '/terminal_/$slug': {
+      id: '/terminal_/$slug'
+      path: '/terminal/$slug'
+      fullPath: '/terminal/$slug'
+      preLoaderRoute: typeof TerminalSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/.mcp/invoke-tool/$tool': {
-      id: '/.mcp/invoke-tool/$tool'
-      path: '/.mcp/invoke-tool/$tool'
-      fullPath: '/.mcp/invoke-tool/$tool'
-      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+    '/terminal/tokenize': {
+      id: '/terminal/tokenize'
+      path: '/tokenize'
+      fullPath: '/terminal/tokenize'
+      preLoaderRoute: typeof TerminalTokenizeRouteImport
+      parentRoute: typeof TerminalRoute
+    }
+    '/terminal/market': {
+      id: '/terminal/market'
+      path: '/market'
+      fullPath: '/terminal/market'
+      preLoaderRoute: typeof TerminalMarketRouteImport
+      parentRoute: typeof TerminalRoute
+    }
+    '/terminal/capital-raise': {
+      id: '/terminal/capital-raise'
+      path: '/capital-raise'
+      fullPath: '/terminal/capital-raise'
+      preLoaderRoute: typeof TerminalCapitalRaiseRouteImport
+      parentRoute: typeof TerminalRoute
+    }
+    '/proyectos/$listingId': {
+      id: '/proyectos/$listingId'
+      path: '/$listingId'
+      fullPath: '/proyectos/$listingId'
+      preLoaderRoute: typeof ProyectosListingIdRouteImport
+      parentRoute: typeof ProyectosRoute
+    }
+    '/proyecto/$token': {
+      id: '/proyecto/$token'
+      path: '/proyecto/$token'
+      fullPath: '/proyecto/$token'
+      preLoaderRoute: typeof ProyectoTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/proveedor/$token': {
+      id: '/proveedor/$token'
+      path: '/proveedor/$token'
+      fullPath: '/proveedor/$token'
+      preLoaderRoute: typeof ProveedorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/operacion/$token': {
+      id: '/operacion/$token'
+      path: '/operacion/$token'
+      fullPath: '/operacion/$token'
+      preLoaderRoute: typeof OperacionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/$token': {
+      id: '/onboarding/$token'
+      path: '/onboarding/$token'
+      fullPath: '/onboarding/$token'
+      preLoaderRoute: typeof OnboardingTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/$lotId': {
+      id: '/marketplace/$lotId'
+      path: '/marketplace/$lotId'
+      fullPath: '/marketplace/$lotId'
+      preLoaderRoute: typeof MarketplaceLotIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/tilama': {
+      id: '/live/tilama'
+      path: '/live/tilama'
+      fullPath: '/live/tilama'
+      preLoaderRoute: typeof LiveTilamaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/palmeras': {
+      id: '/live/palmeras'
+      path: '/live/palmeras'
+      fullPath: '/live/palmeras'
+      preLoaderRoute: typeof LivePalmerasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/losverdes': {
+      id: '/live/losverdes'
+      path: '/live/losverdes'
+      fullPath: '/live/losverdes'
+      preLoaderRoute: typeof LiveLosverdesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/franco': {
+      id: '/live/franco'
+      path: '/live/franco'
+      fullPath: '/live/franco'
+      preLoaderRoute: typeof LiveFrancoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/live/cholqui': {
+      id: '/live/cholqui'
+      path: '/live/cholqui'
+      fullPath: '/live/cholqui'
+      preLoaderRoute: typeof LiveCholquiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/terminos': {
+      id: '/legal/terminos'
+      path: '/legal/terminos'
+      fullPath: '/legal/terminos'
+      preLoaderRoute: typeof LegalTerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/legal/privacidad': {
+      id: '/legal/privacidad'
+      path: '/legal/privacidad'
+      fullPath: '/legal/privacidad'
+      preLoaderRoute: typeof LegalPrivacidadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invitations/$token': {
+      id: '/invitations/$token'
+      path: '/invitations/$token'
+      fullPath: '/invitations/$token'
+      preLoaderRoute: typeof InvitationsTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inscripcion/gracias': {
+      id: '/inscripcion/gracias'
+      path: '/gracias'
+      fullPath: '/inscripcion/gracias'
+      preLoaderRoute: typeof InscripcionGraciasRouteImport
+      parentRoute: typeof InscripcionRoute
+    }
+    '/hooks/sync-pjud': {
+      id: '/hooks/sync-pjud'
+      path: '/hooks/sync-pjud'
+      fullPath: '/hooks/sync-pjud'
+      preLoaderRoute: typeof HooksSyncPjudRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hooks/sync-boletin-minero': {
+      id: '/hooks/sync-boletin-minero'
+      path: '/hooks/sync-boletin-minero'
+      fullPath: '/hooks/sync-boletin-minero'
+      preLoaderRoute: typeof HooksSyncBoletinMineroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/firmar/$token': {
+      id: '/firmar/$token'
+      path: '/firmar/$token'
+      fullPath: '/firmar/$token'
+      preLoaderRoute: typeof FirmarTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ficha/$token': {
+      id: '/ficha/$token'
+      path: '/ficha/$token'
+      fullPath: '/ficha/$token'
+      preLoaderRoute: typeof FichaTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ficha-proveedor/$token': {
+      id: '/ficha-proveedor/$token'
+      path: '/ficha-proveedor/$token'
+      fullPath: '/ficha-proveedor/$token'
+      preLoaderRoute: typeof FichaProveedorTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email/unsubscribe': {
+      id: '/email/unsubscribe'
+      path: '/email/unsubscribe'
+      fullPath: '/email/unsubscribe'
+      preLoaderRoute: typeof EmailUnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/proyecto': {
+      id: '/catastro/proyecto'
+      path: '/catastro/proyecto'
+      fullPath: '/catastro/proyecto'
+      preLoaderRoute: typeof CatastroProyectoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/precios': {
+      id: '/catastro/precios'
+      path: '/catastro/precios'
+      fullPath: '/catastro/precios'
+      preLoaderRoute: typeof CatastroPreciosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/peritos': {
+      id: '/catastro/peritos'
+      path: '/catastro/peritos'
+      fullPath: '/catastro/peritos'
+      preLoaderRoute: typeof CatastroPeritosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/mapa': {
+      id: '/catastro/mapa'
+      path: '/catastro/mapa'
+      fullPath: '/catastro/mapa'
+      preLoaderRoute: typeof CatastroMapaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/global': {
+      id: '/catastro/global'
+      path: '/catastro/global'
+      fullPath: '/catastro/global'
+      preLoaderRoute: typeof CatastroGlobalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/panel': {
+      id: '/_authenticated/panel'
+      path: '/panel'
+      fullPath: '/panel'
+      preLoaderRoute: typeof AuthenticatedPanelRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/.well-known/oauth-protected-resource': {
+      id: '/.well-known/oauth-protected-resource'
+      path: '/.well-known/oauth-protected-resource'
+      fullPath: '/.well-known/oauth-protected-resource'
+      preLoaderRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.mcp/list-tools': {
+      id: '/.mcp/list-tools'
+      path: '/.mcp/list-tools'
+      fullPath: '/.mcp/list-tools'
+      preLoaderRoute: typeof Char91DotmcpChar93ListToolsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard/': {
@@ -2790,564 +2776,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/admin': {
-      id: '/_authenticated/dashboard/admin'
-      path: '/dashboard/admin'
-      fullPath: '/dashboard/admin'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/agents': {
-      id: '/_authenticated/dashboard/agents'
-      path: '/dashboard/agents'
-      fullPath: '/dashboard/agents'
-      preLoaderRoute: typeof AuthenticatedDashboardAgentsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/agua': {
-      id: '/_authenticated/dashboard/agua'
-      path: '/dashboard/agua'
-      fullPath: '/dashboard/agua'
-      preLoaderRoute: typeof AuthenticatedDashboardAguaRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/analytics': {
-      id: '/_authenticated/dashboard/analytics'
-      path: '/dashboard/analytics'
-      fullPath: '/dashboard/analytics'
-      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/anticipos': {
-      id: '/_authenticated/dashboard/anticipos'
-      path: '/dashboard/anticipos'
-      fullPath: '/dashboard/anticipos'
-      preLoaderRoute: typeof AuthenticatedDashboardAnticiposRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/api': {
-      id: '/_authenticated/dashboard/api'
-      path: '/dashboard/api'
-      fullPath: '/dashboard/api'
-      preLoaderRoute: typeof AuthenticatedDashboardApiRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/approvals': {
-      id: '/_authenticated/dashboard/approvals'
-      path: '/dashboard/approvals'
-      fullPath: '/dashboard/approvals'
-      preLoaderRoute: typeof AuthenticatedDashboardApprovalsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/audit': {
-      id: '/_authenticated/dashboard/audit'
-      path: '/dashboard/audit'
-      fullPath: '/dashboard/audit'
-      preLoaderRoute: typeof AuthenticatedDashboardAuditRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/boletin': {
-      id: '/_authenticated/dashboard/boletin'
-      path: '/dashboard/boletin'
-      fullPath: '/dashboard/boletin'
-      preLoaderRoute: typeof AuthenticatedDashboardBoletinRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/campaigns': {
-      id: '/_authenticated/dashboard/campaigns'
-      path: '/dashboard/campaigns'
-      fullPath: '/dashboard/campaigns'
-      preLoaderRoute: typeof AuthenticatedDashboardCampaignsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/catastro': {
-      id: '/_authenticated/dashboard/catastro'
-      path: '/dashboard/catastro'
-      fullPath: '/dashboard/catastro'
-      preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/cholqui': {
-      id: '/_authenticated/dashboard/cholqui'
-      path: '/dashboard/cholqui'
-      fullPath: '/dashboard/cholqui'
-      preLoaderRoute: typeof AuthenticatedDashboardCholquiRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/clientes': {
-      id: '/_authenticated/dashboard/clientes'
-      path: '/dashboard/clientes'
-      fullPath: '/dashboard/clientes'
-      preLoaderRoute: typeof AuthenticatedDashboardClientesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/cobranza': {
-      id: '/_authenticated/dashboard/cobranza'
-      path: '/dashboard/cobranza'
-      fullPath: '/dashboard/cobranza'
-      preLoaderRoute: typeof AuthenticatedDashboardCobranzaRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/colateral-documentos': {
-      id: '/_authenticated/dashboard/colateral-documentos'
-      path: '/dashboard/colateral-documentos'
-      fullPath: '/dashboard/colateral-documentos'
-      preLoaderRoute: typeof AuthenticatedDashboardColateralDocumentosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/colateral-leads': {
-      id: '/_authenticated/dashboard/colateral-leads'
-      path: '/dashboard/colateral-leads'
-      fullPath: '/dashboard/colateral-leads'
-      preLoaderRoute: typeof AuthenticatedDashboardColateralLeadsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/command-center': {
-      id: '/_authenticated/dashboard/command-center'
-      path: '/dashboard/command-center'
-      fullPath: '/dashboard/command-center'
-      preLoaderRoute: typeof AuthenticatedDashboardCommandCenterRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/commodity-lots': {
-      id: '/_authenticated/dashboard/commodity-lots'
-      path: '/dashboard/commodity-lots'
-      fullPath: '/dashboard/commodity-lots'
-      preLoaderRoute: typeof AuthenticatedDashboardCommodityLotsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/deals': {
-      id: '/_authenticated/dashboard/deals'
-      path: '/dashboard/deals'
-      fullPath: '/dashboard/deals'
-      preLoaderRoute: typeof AuthenticatedDashboardDealsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/drilling': {
-      id: '/_authenticated/dashboard/drilling'
-      path: '/dashboard/drilling'
-      fullPath: '/dashboard/drilling'
-      preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/drones': {
-      id: '/_authenticated/dashboard/drones'
-      path: '/dashboard/drones'
-      fullPath: '/dashboard/drones'
-      preLoaderRoute: typeof AuthenticatedDashboardDronesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/envios': {
-      id: '/_authenticated/dashboard/envios'
-      path: '/dashboard/envios'
-      fullPath: '/dashboard/envios'
-      preLoaderRoute: typeof AuthenticatedDashboardEnviosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/estimation': {
-      id: '/_authenticated/dashboard/estimation'
-      path: '/dashboard/estimation'
-      fullPath: '/dashboard/estimation'
-      preLoaderRoute: typeof AuthenticatedDashboardEstimationRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/expediente': {
-      id: '/_authenticated/dashboard/expediente'
-      path: '/dashboard/expediente'
-      fullPath: '/dashboard/expediente'
-      preLoaderRoute: typeof AuthenticatedDashboardExpedienteRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/finance': {
-      id: '/_authenticated/dashboard/finance'
-      path: '/dashboard/finance'
-      fullPath: '/dashboard/finance'
-      preLoaderRoute: typeof AuthenticatedDashboardFinanceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/firmas': {
-      id: '/_authenticated/dashboard/firmas'
-      path: '/dashboard/firmas'
-      fullPath: '/dashboard/firmas'
-      preLoaderRoute: typeof AuthenticatedDashboardFirmasRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/franco': {
-      id: '/_authenticated/dashboard/franco'
-      path: '/dashboard/franco'
-      fullPath: '/dashboard/franco'
-      preLoaderRoute: typeof AuthenticatedDashboardFrancoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/geology3d': {
-      id: '/_authenticated/dashboard/geology3d'
-      path: '/dashboard/geology3d'
-      fullPath: '/dashboard/geology3d'
-      preLoaderRoute: typeof AuthenticatedDashboardGeology3dRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/geophysics': {
-      id: '/_authenticated/dashboard/geophysics'
-      path: '/dashboard/geophysics'
-      fullPath: '/dashboard/geophysics'
-      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/hse': {
-      id: '/_authenticated/dashboard/hse'
-      path: '/dashboard/hse'
-      fullPath: '/dashboard/hse'
-      preLoaderRoute: typeof AuthenticatedDashboardHseRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/inventory': {
-      id: '/_authenticated/dashboard/inventory'
-      path: '/dashboard/inventory'
-      fullPath: '/dashboard/inventory'
-      preLoaderRoute: typeof AuthenticatedDashboardInventoryRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/inversion-colateral': {
-      id: '/_authenticated/dashboard/inversion-colateral'
-      path: '/dashboard/inversion-colateral'
-      fullPath: '/dashboard/inversion-colateral'
-      preLoaderRoute: typeof AuthenticatedDashboardInversionColateralRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/investments': {
-      id: '/_authenticated/dashboard/investments'
-      path: '/dashboard/investments'
-      fullPath: '/dashboard/investments'
-      preLoaderRoute: typeof AuthenticatedDashboardInvestmentsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/listings': {
-      id: '/_authenticated/dashboard/listings'
-      path: '/dashboard/listings'
-      fullPath: '/dashboard/listings'
-      preLoaderRoute: typeof AuthenticatedDashboardListingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/lv5-page5': {
-      id: '/_authenticated/dashboard/lv5-page5'
-      path: '/dashboard/lv5-page5'
-      fullPath: '/dashboard/lv5-page5'
-      preLoaderRoute: typeof AuthenticatedDashboardLv5Page5RouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/mag-revalidations': {
-      id: '/_authenticated/dashboard/mag-revalidations'
-      path: '/dashboard/mag-revalidations'
-      fullPath: '/dashboard/mag-revalidations'
-      preLoaderRoute: typeof AuthenticatedDashboardMagRevalidationsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/map': {
-      id: '/_authenticated/dashboard/map'
-      path: '/dashboard/map'
-      fullPath: '/dashboard/map'
-      preLoaderRoute: typeof AuthenticatedDashboardMapRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/marketplace': {
-      id: '/_authenticated/dashboard/marketplace'
-      path: '/dashboard/marketplace'
-      fullPath: '/dashboard/marketplace'
-      preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/mission': {
-      id: '/_authenticated/dashboard/mission'
-      path: '/dashboard/mission'
-      fullPath: '/dashboard/mission'
-      preLoaderRoute: typeof AuthenticatedDashboardMissionRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/my-inquiries': {
-      id: '/_authenticated/dashboard/my-inquiries'
-      path: '/dashboard/my-inquiries'
-      fullPath: '/dashboard/my-inquiries'
-      preLoaderRoute: typeof AuthenticatedDashboardMyInquiriesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/ni43101': {
-      id: '/_authenticated/dashboard/ni43101'
-      path: '/dashboard/ni43101'
-      fullPath: '/dashboard/ni43101'
-      preLoaderRoute: typeof AuthenticatedDashboardNi43101RouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/offerings': {
-      id: '/_authenticated/dashboard/offerings'
-      path: '/dashboard/offerings'
-      fullPath: '/dashboard/offerings'
-      preLoaderRoute: typeof AuthenticatedDashboardOfferingsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/opportunities': {
-      id: '/_authenticated/dashboard/opportunities'
-      path: '/dashboard/opportunities'
-      fullPath: '/dashboard/opportunities'
-      preLoaderRoute: typeof AuthenticatedDashboardOpportunitiesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/palmeras': {
-      id: '/_authenticated/dashboard/palmeras'
-      path: '/dashboard/palmeras'
-      fullPath: '/dashboard/palmeras'
-      preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/plan': {
-      id: '/_authenticated/dashboard/plan'
-      path: '/dashboard/plan'
-      fullPath: '/dashboard/plan'
-      preLoaderRoute: typeof AuthenticatedDashboardPlanRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/precios': {
-      id: '/_authenticated/dashboard/precios'
-      path: '/dashboard/precios'
-      fullPath: '/dashboard/precios'
-      preLoaderRoute: typeof AuthenticatedDashboardPreciosRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/profile': {
-      id: '/_authenticated/dashboard/profile'
-      path: '/dashboard/profile'
-      fullPath: '/dashboard/profile'
-      preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/project-report': {
-      id: '/_authenticated/dashboard/project-report'
-      path: '/dashboard/project-report'
-      fullPath: '/dashboard/project-report'
-      preLoaderRoute: typeof AuthenticatedDashboardProjectReportRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/projects': {
-      id: '/_authenticated/dashboard/projects'
-      path: '/dashboard/projects'
-      fullPath: '/dashboard/projects'
-      preLoaderRoute: typeof AuthenticatedDashboardProjectsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/proveedor': {
-      id: '/_authenticated/dashboard/proveedor'
-      path: '/dashboard/proveedor'
-      fullPath: '/dashboard/proveedor'
-      preLoaderRoute: typeof AuthenticatedDashboardProveedorRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/qaqc': {
-      id: '/_authenticated/dashboard/qaqc'
-      path: '/dashboard/qaqc'
-      fullPath: '/dashboard/qaqc'
-      preLoaderRoute: typeof AuthenticatedDashboardQaqcRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/qps': {
-      id: '/_authenticated/dashboard/qps'
-      path: '/dashboard/qps'
-      fullPath: '/dashboard/qps'
-      preLoaderRoute: typeof AuthenticatedDashboardQpsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/reports': {
-      id: '/_authenticated/dashboard/reports'
-      path: '/dashboard/reports'
-      fullPath: '/dashboard/reports'
-      preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/sampling': {
-      id: '/_authenticated/dashboard/sampling'
-      path: '/dashboard/sampling'
-      fullPath: '/dashboard/sampling'
-      preLoaderRoute: typeof AuthenticatedDashboardSamplingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/sat3d': {
-      id: '/_authenticated/dashboard/sat3d'
-      path: '/dashboard/sat3d'
-      fullPath: '/dashboard/sat3d'
-      preLoaderRoute: typeof AuthenticatedDashboardSat3dRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/satellite-intel': {
-      id: '/_authenticated/dashboard/satellite-intel'
-      path: '/dashboard/satellite-intel'
-      fullPath: '/dashboard/satellite-intel'
-      preLoaderRoute: typeof AuthenticatedDashboardSatelliteIntelRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/section': {
-      id: '/_authenticated/dashboard/section'
-      path: '/dashboard/section'
-      fullPath: '/dashboard/section'
-      preLoaderRoute: typeof AuthenticatedDashboardSectionRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/sourcing': {
-      id: '/_authenticated/dashboard/sourcing'
-      path: '/dashboard/sourcing'
-      fullPath: '/dashboard/sourcing'
-      preLoaderRoute: typeof AuthenticatedDashboardSourcingRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/targets': {
-      id: '/_authenticated/dashboard/targets'
-      path: '/dashboard/targets'
-      fullPath: '/dashboard/targets'
-      preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/team': {
-      id: '/_authenticated/dashboard/team'
-      path: '/dashboard/team'
-      fullPath: '/dashboard/team'
-      preLoaderRoute: typeof AuthenticatedDashboardTeamRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/trade-board': {
-      id: '/_authenticated/dashboard/trade-board'
-      path: '/dashboard/trade-board'
-      fullPath: '/dashboard/trade-board'
-      preLoaderRoute: typeof AuthenticatedDashboardTradeBoardRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/trades': {
-      id: '/_authenticated/dashboard/trades'
-      path: '/dashboard/trades'
-      fullPath: '/dashboard/trades'
-      preLoaderRoute: typeof AuthenticatedDashboardTradesRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/validation': {
-      id: '/_authenticated/dashboard/validation'
-      path: '/dashboard/validation'
-      fullPath: '/dashboard/validation'
-      preLoaderRoute: typeof AuthenticatedDashboardValidationRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/panel/privacidad': {
-      id: '/_authenticated/panel/privacidad'
-      path: '/privacidad'
-      fullPath: '/panel/privacidad'
-      preLoaderRoute: typeof AuthenticatedPanelPrivacidadRouteImport
-      parentRoute: typeof AuthenticatedPanelRoute
-    }
-    '/agua/verificar/$assetId': {
-      id: '/agua/verificar/$assetId'
-      path: '/agua/verificar/$assetId'
-      fullPath: '/agua/verificar/$assetId'
-      preLoaderRoute: typeof AguaVerificarAssetIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/health': {
-      id: '/api/public/health'
-      path: '/api/public/health'
-      fullPath: '/api/public/health'
-      preLoaderRoute: typeof ApiPublicHealthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/ingest-patent-remates': {
-      id: '/api/public/ingest-patent-remates'
-      path: '/api/public/ingest-patent-remates'
-      fullPath: '/api/public/ingest-patent-remates'
-      preLoaderRoute: typeof ApiPublicIngestPatentRematesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/stats': {
-      id: '/api/public/stats'
-      path: '/api/public/stats'
-      fullPath: '/api/public/stats'
-      preLoaderRoute: typeof ApiPublicStatsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/sync-bulletins': {
-      id: '/api/public/sync-bulletins'
-      path: '/api/public/sync-bulletins'
-      fullPath: '/api/public/sync-bulletins'
-      preLoaderRoute: typeof ApiPublicSyncBulletinsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/sync-catastro': {
-      id: '/api/public/sync-catastro'
-      path: '/api/public/sync-catastro'
-      fullPath: '/api/public/sync-catastro'
-      preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/webhooks/mercadopago': {
-      id: '/api/webhooks/mercadopago'
-      path: '/api/webhooks/mercadopago'
-      fullPath: '/api/webhooks/mercadopago'
-      preLoaderRoute: typeof ApiWebhooksMercadopagoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/catastro/app/watchlist': {
-      id: '/catastro/app/watchlist'
-      path: '/catastro/app/watchlist'
-      fullPath: '/catastro/app/watchlist'
-      preLoaderRoute: typeof CatastroAppWatchlistRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/catastro/c/$code': {
-      id: '/catastro/c/$code'
-      path: '/catastro/c/$code'
-      fullPath: '/catastro/c/$code'
-      preLoaderRoute: typeof CatastroCCodeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/catastro/pais/$country': {
-      id: '/catastro/pais/$country'
-      path: '/catastro/pais/$country'
-      fullPath: '/catastro/pais/$country'
-      preLoaderRoute: typeof CatastroPaisCountryRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/firmar/operacion/$token': {
-      id: '/firmar/operacion/$token'
-      path: '/firmar/operacion/$token'
-      fullPath: '/firmar/operacion/$token'
-      preLoaderRoute: typeof FirmarOperacionTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lovable/email/suppression': {
-      id: '/lovable/email/suppression'
-      path: '/lovable/email/suppression'
-      fullPath: '/lovable/email/suppression'
-      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal/buyer/$token': {
-      id: '/portal/buyer/$token'
-      path: '/portal/buyer/$token'
-      fullPath: '/portal/buyer/$token'
-      preLoaderRoute: typeof PortalBuyerTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/portal/seller/$token': {
-      id: '/portal/seller/$token'
-      path: '/portal/seller/$token'
-      fullPath: '/portal/seller/$token'
-      preLoaderRoute: typeof PortalSellerTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/proyectos_/ficha/$slug': {
-      id: '/proyectos_/ficha/$slug'
-      path: '/proyectos/ficha/$slug'
-      fullPath: '/proyectos/ficha/$slug'
-      preLoaderRoute: typeof ProyectosFichaSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/reports/losverdes/pre43101': {
-      id: '/reports/losverdes/pre43101'
-      path: '/reports/losverdes/pre43101'
-      fullPath: '/reports/losverdes/pre43101'
-      preLoaderRoute: typeof ReportsLosverdesPre43101RouteImport
+    '/verificar/ficha/$token': {
+      id: '/verificar/ficha/$token'
+      path: '/verificar/ficha/$token'
+      fullPath: '/verificar/ficha/$token'
+      preLoaderRoute: typeof VerificarFichaTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share/targets/$projectId': {
@@ -3357,95 +2790,585 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShareTargetsProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/verificar/ficha/$token': {
-      id: '/verificar/ficha/$token'
-      path: '/verificar/ficha/$token'
-      fullPath: '/verificar/ficha/$token'
-      preLoaderRoute: typeof VerificarFichaTokenRouteImport
+    '/reports/losverdes/pre43101': {
+      id: '/reports/losverdes/pre43101'
+      path: '/reports/losverdes/pre43101'
+      fullPath: '/reports/losverdes/pre43101'
+      preLoaderRoute: typeof ReportsLosverdesPre43101RouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard/admin/inbox': {
-      id: '/_authenticated/dashboard/admin/inbox'
-      path: '/inbox'
-      fullPath: '/dashboard/admin/inbox'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminInboxRouteImport
-      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    '/proyectos_/ficha/$slug': {
+      id: '/proyectos_/ficha/$slug'
+      path: '/proyectos/ficha/$slug'
+      fullPath: '/proyectos/ficha/$slug'
+      preLoaderRoute: typeof ProyectosFichaSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard/admin/investors': {
-      id: '/_authenticated/dashboard/admin/investors'
-      path: '/investors'
-      fullPath: '/dashboard/admin/investors'
-      preLoaderRoute: typeof AuthenticatedDashboardAdminInvestorsRouteImport
-      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    '/portal/seller/$token': {
+      id: '/portal/seller/$token'
+      path: '/portal/seller/$token'
+      fullPath: '/portal/seller/$token'
+      preLoaderRoute: typeof PortalSellerTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard/clientes_/$partnerId': {
-      id: '/_authenticated/dashboard/clientes_/$partnerId'
-      path: '/dashboard/clientes/$partnerId'
-      fullPath: '/dashboard/clientes/$partnerId'
-      preLoaderRoute: typeof AuthenticatedDashboardClientesPartnerIdRouteImport
+    '/portal/buyer/$token': {
+      id: '/portal/buyer/$token'
+      path: '/portal/buyer/$token'
+      fullPath: '/portal/buyer/$token'
+      preLoaderRoute: typeof PortalBuyerTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lovable/email/suppression': {
+      id: '/lovable/email/suppression'
+      path: '/lovable/email/suppression'
+      fullPath: '/lovable/email/suppression'
+      preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/firmar/operacion/$token': {
+      id: '/firmar/operacion/$token'
+      path: '/firmar/operacion/$token'
+      fullPath: '/firmar/operacion/$token'
+      preLoaderRoute: typeof FirmarOperacionTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/pais/$country': {
+      id: '/catastro/pais/$country'
+      path: '/catastro/pais/$country'
+      fullPath: '/catastro/pais/$country'
+      preLoaderRoute: typeof CatastroPaisCountryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/c/$code': {
+      id: '/catastro/c/$code'
+      path: '/catastro/c/$code'
+      fullPath: '/catastro/c/$code'
+      preLoaderRoute: typeof CatastroCCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/catastro/app/watchlist': {
+      id: '/catastro/app/watchlist'
+      path: '/catastro/app/watchlist'
+      fullPath: '/catastro/app/watchlist'
+      preLoaderRoute: typeof CatastroAppWatchlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/webhooks/mercadopago': {
+      id: '/api/webhooks/mercadopago'
+      path: '/api/webhooks/mercadopago'
+      fullPath: '/api/webhooks/mercadopago'
+      preLoaderRoute: typeof ApiWebhooksMercadopagoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sync-catastro': {
+      id: '/api/public/sync-catastro'
+      path: '/api/public/sync-catastro'
+      fullPath: '/api/public/sync-catastro'
+      preLoaderRoute: typeof ApiPublicSyncCatastroRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/sync-bulletins': {
+      id: '/api/public/sync-bulletins'
+      path: '/api/public/sync-bulletins'
+      fullPath: '/api/public/sync-bulletins'
+      preLoaderRoute: typeof ApiPublicSyncBulletinsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/stats': {
+      id: '/api/public/stats'
+      path: '/api/public/stats'
+      fullPath: '/api/public/stats'
+      preLoaderRoute: typeof ApiPublicStatsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/ingest-patent-remates': {
+      id: '/api/public/ingest-patent-remates'
+      path: '/api/public/ingest-patent-remates'
+      fullPath: '/api/public/ingest-patent-remates'
+      preLoaderRoute: typeof ApiPublicIngestPatentRematesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/agua/verificar/$assetId': {
+      id: '/agua/verificar/$assetId'
+      path: '/agua/verificar/$assetId'
+      fullPath: '/agua/verificar/$assetId'
+      preLoaderRoute: typeof AguaVerificarAssetIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/panel/privacidad': {
+      id: '/_authenticated/panel/privacidad'
+      path: '/privacidad'
+      fullPath: '/panel/privacidad'
+      preLoaderRoute: typeof AuthenticatedPanelPrivacidadRouteImport
+      parentRoute: typeof AuthenticatedPanelRoute
+    }
+    '/_authenticated/dashboard/validation': {
+      id: '/_authenticated/dashboard/validation'
+      path: '/dashboard/validation'
+      fullPath: '/dashboard/validation'
+      preLoaderRoute: typeof AuthenticatedDashboardValidationRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/documentos/': {
-      id: '/_authenticated/dashboard/documentos/'
-      path: '/dashboard/documentos'
-      fullPath: '/dashboard/documentos/'
-      preLoaderRoute: typeof AuthenticatedDashboardDocumentosIndexRouteImport
+    '/_authenticated/dashboard/trades': {
+      id: '/_authenticated/dashboard/trades'
+      path: '/dashboard/trades'
+      fullPath: '/dashboard/trades'
+      preLoaderRoute: typeof AuthenticatedDashboardTradesRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/documentos/$templateId': {
-      id: '/_authenticated/dashboard/documentos/$templateId'
-      path: '/dashboard/documentos/$templateId'
-      fullPath: '/dashboard/documentos/$templateId'
-      preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
+    '/_authenticated/dashboard/trade-board': {
+      id: '/_authenticated/dashboard/trade-board'
+      path: '/dashboard/trade-board'
+      fullPath: '/dashboard/trade-board'
+      preLoaderRoute: typeof AuthenticatedDashboardTradeBoardRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/geophysics/$surveyId': {
-      id: '/_authenticated/dashboard/geophysics/$surveyId'
-      path: '/$surveyId'
-      fullPath: '/dashboard/geophysics/$surveyId'
-      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
-    }
-    '/_authenticated/dashboard/listings/$listingId': {
-      id: '/_authenticated/dashboard/listings/$listingId'
-      path: '/$listingId'
-      fullPath: '/dashboard/listings/$listingId'
-      preLoaderRoute: typeof AuthenticatedDashboardListingsListingIdRouteImport
-      parentRoute: typeof AuthenticatedDashboardListingsRoute
-    }
-    '/_authenticated/dashboard/pipeline/': {
-      id: '/_authenticated/dashboard/pipeline/'
-      path: '/dashboard/pipeline'
-      fullPath: '/dashboard/pipeline/'
-      preLoaderRoute: typeof AuthenticatedDashboardPipelineIndexRouteImport
+    '/_authenticated/dashboard/team': {
+      id: '/_authenticated/dashboard/team'
+      path: '/dashboard/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof AuthenticatedDashboardTeamRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/pipeline/$code': {
-      id: '/_authenticated/dashboard/pipeline/$code'
-      path: '/dashboard/pipeline/$code'
-      fullPath: '/dashboard/pipeline/$code'
-      preLoaderRoute: typeof AuthenticatedDashboardPipelineCodeRouteImport
+    '/_authenticated/dashboard/targets': {
+      id: '/_authenticated/dashboard/targets'
+      path: '/dashboard/targets'
+      fullPath: '/dashboard/targets'
+      preLoaderRoute: typeof AuthenticatedDashboardTargetsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/projects_/$projectId': {
-      id: '/_authenticated/dashboard/projects_/$projectId'
-      path: '/dashboard/projects/$projectId'
-      fullPath: '/dashboard/projects/$projectId'
-      preLoaderRoute: typeof AuthenticatedDashboardProjectsProjectIdRouteImport
+    '/_authenticated/dashboard/sourcing': {
+      id: '/_authenticated/dashboard/sourcing'
+      path: '/dashboard/sourcing'
+      fullPath: '/dashboard/sourcing'
+      preLoaderRoute: typeof AuthenticatedDashboardSourcingRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/projects_/comparar': {
-      id: '/_authenticated/dashboard/projects_/comparar'
-      path: '/dashboard/projects/comparar'
-      fullPath: '/dashboard/projects/comparar'
-      preLoaderRoute: typeof AuthenticatedDashboardProjectsCompararRouteImport
+    '/_authenticated/dashboard/section': {
+      id: '/_authenticated/dashboard/section'
+      path: '/dashboard/section'
+      fullPath: '/dashboard/section'
+      preLoaderRoute: typeof AuthenticatedDashboardSectionRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/projects_/nuevo': {
-      id: '/_authenticated/dashboard/projects_/nuevo'
-      path: '/dashboard/projects/nuevo'
-      fullPath: '/dashboard/projects/nuevo'
-      preLoaderRoute: typeof AuthenticatedDashboardProjectsNuevoRouteImport
+    '/_authenticated/dashboard/satellite-intel': {
+      id: '/_authenticated/dashboard/satellite-intel'
+      path: '/dashboard/satellite-intel'
+      fullPath: '/dashboard/satellite-intel'
+      preLoaderRoute: typeof AuthenticatedDashboardSatelliteIntelRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/sat3d': {
+      id: '/_authenticated/dashboard/sat3d'
+      path: '/dashboard/sat3d'
+      fullPath: '/dashboard/sat3d'
+      preLoaderRoute: typeof AuthenticatedDashboardSat3dRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/sampling': {
+      id: '/_authenticated/dashboard/sampling'
+      path: '/dashboard/sampling'
+      fullPath: '/dashboard/sampling'
+      preLoaderRoute: typeof AuthenticatedDashboardSamplingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/reports': {
+      id: '/_authenticated/dashboard/reports'
+      path: '/dashboard/reports'
+      fullPath: '/dashboard/reports'
+      preLoaderRoute: typeof AuthenticatedDashboardReportsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/qps': {
+      id: '/_authenticated/dashboard/qps'
+      path: '/dashboard/qps'
+      fullPath: '/dashboard/qps'
+      preLoaderRoute: typeof AuthenticatedDashboardQpsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/qaqc': {
+      id: '/_authenticated/dashboard/qaqc'
+      path: '/dashboard/qaqc'
+      fullPath: '/dashboard/qaqc'
+      preLoaderRoute: typeof AuthenticatedDashboardQaqcRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/proveedor': {
+      id: '/_authenticated/dashboard/proveedor'
+      path: '/dashboard/proveedor'
+      fullPath: '/dashboard/proveedor'
+      preLoaderRoute: typeof AuthenticatedDashboardProveedorRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects': {
+      id: '/_authenticated/dashboard/projects'
+      path: '/dashboard/projects'
+      fullPath: '/dashboard/projects'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/project-report': {
+      id: '/_authenticated/dashboard/project-report'
+      path: '/dashboard/project-report'
+      fullPath: '/dashboard/project-report'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectReportRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/profile': {
+      id: '/_authenticated/dashboard/profile'
+      path: '/dashboard/profile'
+      fullPath: '/dashboard/profile'
+      preLoaderRoute: typeof AuthenticatedDashboardProfileRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/precios': {
+      id: '/_authenticated/dashboard/precios'
+      path: '/dashboard/precios'
+      fullPath: '/dashboard/precios'
+      preLoaderRoute: typeof AuthenticatedDashboardPreciosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/plan': {
+      id: '/_authenticated/dashboard/plan'
+      path: '/dashboard/plan'
+      fullPath: '/dashboard/plan'
+      preLoaderRoute: typeof AuthenticatedDashboardPlanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/palmeras': {
+      id: '/_authenticated/dashboard/palmeras'
+      path: '/dashboard/palmeras'
+      fullPath: '/dashboard/palmeras'
+      preLoaderRoute: typeof AuthenticatedDashboardPalmerasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/opportunities': {
+      id: '/_authenticated/dashboard/opportunities'
+      path: '/dashboard/opportunities'
+      fullPath: '/dashboard/opportunities'
+      preLoaderRoute: typeof AuthenticatedDashboardOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/offerings': {
+      id: '/_authenticated/dashboard/offerings'
+      path: '/dashboard/offerings'
+      fullPath: '/dashboard/offerings'
+      preLoaderRoute: typeof AuthenticatedDashboardOfferingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/ni43101': {
+      id: '/_authenticated/dashboard/ni43101'
+      path: '/dashboard/ni43101'
+      fullPath: '/dashboard/ni43101'
+      preLoaderRoute: typeof AuthenticatedDashboardNi43101RouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/my-inquiries': {
+      id: '/_authenticated/dashboard/my-inquiries'
+      path: '/dashboard/my-inquiries'
+      fullPath: '/dashboard/my-inquiries'
+      preLoaderRoute: typeof AuthenticatedDashboardMyInquiriesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/mission': {
+      id: '/_authenticated/dashboard/mission'
+      path: '/dashboard/mission'
+      fullPath: '/dashboard/mission'
+      preLoaderRoute: typeof AuthenticatedDashboardMissionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/marketplace': {
+      id: '/_authenticated/dashboard/marketplace'
+      path: '/dashboard/marketplace'
+      fullPath: '/dashboard/marketplace'
+      preLoaderRoute: typeof AuthenticatedDashboardMarketplaceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/map': {
+      id: '/_authenticated/dashboard/map'
+      path: '/dashboard/map'
+      fullPath: '/dashboard/map'
+      preLoaderRoute: typeof AuthenticatedDashboardMapRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/mag-revalidations': {
+      id: '/_authenticated/dashboard/mag-revalidations'
+      path: '/dashboard/mag-revalidations'
+      fullPath: '/dashboard/mag-revalidations'
+      preLoaderRoute: typeof AuthenticatedDashboardMagRevalidationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/lv5-page5': {
+      id: '/_authenticated/dashboard/lv5-page5'
+      path: '/dashboard/lv5-page5'
+      fullPath: '/dashboard/lv5-page5'
+      preLoaderRoute: typeof AuthenticatedDashboardLv5Page5RouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/listings': {
+      id: '/_authenticated/dashboard/listings'
+      path: '/dashboard/listings'
+      fullPath: '/dashboard/listings'
+      preLoaderRoute: typeof AuthenticatedDashboardListingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/investments': {
+      id: '/_authenticated/dashboard/investments'
+      path: '/dashboard/investments'
+      fullPath: '/dashboard/investments'
+      preLoaderRoute: typeof AuthenticatedDashboardInvestmentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/inversion-colateral': {
+      id: '/_authenticated/dashboard/inversion-colateral'
+      path: '/dashboard/inversion-colateral'
+      fullPath: '/dashboard/inversion-colateral'
+      preLoaderRoute: typeof AuthenticatedDashboardInversionColateralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/inventory': {
+      id: '/_authenticated/dashboard/inventory'
+      path: '/dashboard/inventory'
+      fullPath: '/dashboard/inventory'
+      preLoaderRoute: typeof AuthenticatedDashboardInventoryRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/hse': {
+      id: '/_authenticated/dashboard/hse'
+      path: '/dashboard/hse'
+      fullPath: '/dashboard/hse'
+      preLoaderRoute: typeof AuthenticatedDashboardHseRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/geophysics': {
+      id: '/_authenticated/dashboard/geophysics'
+      path: '/dashboard/geophysics'
+      fullPath: '/dashboard/geophysics'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/geology3d': {
+      id: '/_authenticated/dashboard/geology3d'
+      path: '/dashboard/geology3d'
+      fullPath: '/dashboard/geology3d'
+      preLoaderRoute: typeof AuthenticatedDashboardGeology3dRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/franco': {
+      id: '/_authenticated/dashboard/franco'
+      path: '/dashboard/franco'
+      fullPath: '/dashboard/franco'
+      preLoaderRoute: typeof AuthenticatedDashboardFrancoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/firmas': {
+      id: '/_authenticated/dashboard/firmas'
+      path: '/dashboard/firmas'
+      fullPath: '/dashboard/firmas'
+      preLoaderRoute: typeof AuthenticatedDashboardFirmasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/finance': {
+      id: '/_authenticated/dashboard/finance'
+      path: '/dashboard/finance'
+      fullPath: '/dashboard/finance'
+      preLoaderRoute: typeof AuthenticatedDashboardFinanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/expediente': {
+      id: '/_authenticated/dashboard/expediente'
+      path: '/dashboard/expediente'
+      fullPath: '/dashboard/expediente'
+      preLoaderRoute: typeof AuthenticatedDashboardExpedienteRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/estimation': {
+      id: '/_authenticated/dashboard/estimation'
+      path: '/dashboard/estimation'
+      fullPath: '/dashboard/estimation'
+      preLoaderRoute: typeof AuthenticatedDashboardEstimationRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/envios': {
+      id: '/_authenticated/dashboard/envios'
+      path: '/dashboard/envios'
+      fullPath: '/dashboard/envios'
+      preLoaderRoute: typeof AuthenticatedDashboardEnviosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/drones': {
+      id: '/_authenticated/dashboard/drones'
+      path: '/dashboard/drones'
+      fullPath: '/dashboard/drones'
+      preLoaderRoute: typeof AuthenticatedDashboardDronesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/drilling': {
+      id: '/_authenticated/dashboard/drilling'
+      path: '/dashboard/drilling'
+      fullPath: '/dashboard/drilling'
+      preLoaderRoute: typeof AuthenticatedDashboardDrillingRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/deals': {
+      id: '/_authenticated/dashboard/deals'
+      path: '/dashboard/deals'
+      fullPath: '/dashboard/deals'
+      preLoaderRoute: typeof AuthenticatedDashboardDealsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/commodity-lots': {
+      id: '/_authenticated/dashboard/commodity-lots'
+      path: '/dashboard/commodity-lots'
+      fullPath: '/dashboard/commodity-lots'
+      preLoaderRoute: typeof AuthenticatedDashboardCommodityLotsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/command-center': {
+      id: '/_authenticated/dashboard/command-center'
+      path: '/dashboard/command-center'
+      fullPath: '/dashboard/command-center'
+      preLoaderRoute: typeof AuthenticatedDashboardCommandCenterRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-leads': {
+      id: '/_authenticated/dashboard/colateral-leads'
+      path: '/dashboard/colateral-leads'
+      fullPath: '/dashboard/colateral-leads'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralLeadsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/colateral-documentos': {
+      id: '/_authenticated/dashboard/colateral-documentos'
+      path: '/dashboard/colateral-documentos'
+      fullPath: '/dashboard/colateral-documentos'
+      preLoaderRoute: typeof AuthenticatedDashboardColateralDocumentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/cobranza': {
+      id: '/_authenticated/dashboard/cobranza'
+      path: '/dashboard/cobranza'
+      fullPath: '/dashboard/cobranza'
+      preLoaderRoute: typeof AuthenticatedDashboardCobranzaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/clientes': {
+      id: '/_authenticated/dashboard/clientes'
+      path: '/dashboard/clientes'
+      fullPath: '/dashboard/clientes'
+      preLoaderRoute: typeof AuthenticatedDashboardClientesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/cholqui': {
+      id: '/_authenticated/dashboard/cholqui'
+      path: '/dashboard/cholqui'
+      fullPath: '/dashboard/cholqui'
+      preLoaderRoute: typeof AuthenticatedDashboardCholquiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/catastro': {
+      id: '/_authenticated/dashboard/catastro'
+      path: '/dashboard/catastro'
+      fullPath: '/dashboard/catastro'
+      preLoaderRoute: typeof AuthenticatedDashboardCatastroRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/campaigns': {
+      id: '/_authenticated/dashboard/campaigns'
+      path: '/dashboard/campaigns'
+      fullPath: '/dashboard/campaigns'
+      preLoaderRoute: typeof AuthenticatedDashboardCampaignsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/boletin': {
+      id: '/_authenticated/dashboard/boletin'
+      path: '/dashboard/boletin'
+      fullPath: '/dashboard/boletin'
+      preLoaderRoute: typeof AuthenticatedDashboardBoletinRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/audit': {
+      id: '/_authenticated/dashboard/audit'
+      path: '/dashboard/audit'
+      fullPath: '/dashboard/audit'
+      preLoaderRoute: typeof AuthenticatedDashboardAuditRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/approvals': {
+      id: '/_authenticated/dashboard/approvals'
+      path: '/dashboard/approvals'
+      fullPath: '/dashboard/approvals'
+      preLoaderRoute: typeof AuthenticatedDashboardApprovalsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/api': {
+      id: '/_authenticated/dashboard/api'
+      path: '/dashboard/api'
+      fullPath: '/dashboard/api'
+      preLoaderRoute: typeof AuthenticatedDashboardApiRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/anticipos': {
+      id: '/_authenticated/dashboard/anticipos'
+      path: '/dashboard/anticipos'
+      fullPath: '/dashboard/anticipos'
+      preLoaderRoute: typeof AuthenticatedDashboardAnticiposRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/analytics': {
+      id: '/_authenticated/dashboard/analytics'
+      path: '/dashboard/analytics'
+      fullPath: '/dashboard/analytics'
+      preLoaderRoute: typeof AuthenticatedDashboardAnalyticsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/agua': {
+      id: '/_authenticated/dashboard/agua'
+      path: '/dashboard/agua'
+      fullPath: '/dashboard/agua'
+      preLoaderRoute: typeof AuthenticatedDashboardAguaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/agents': {
+      id: '/_authenticated/dashboard/agents'
+      path: '/dashboard/agents'
+      fullPath: '/dashboard/agents'
+      preLoaderRoute: typeof AuthenticatedDashboardAgentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/admin': {
+      id: '/_authenticated/dashboard/admin'
+      path: '/dashboard/admin'
+      fullPath: '/dashboard/admin'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/.mcp/invoke-tool/$tool': {
+      id: '/.mcp/invoke-tool/$tool'
+      path: '/.mcp/invoke-tool/$tool'
+      fullPath: '/.mcp/invoke-tool/$tool'
+      preLoaderRoute: typeof Char91DotmcpChar93InvokeToolToolRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/rfqs/': {
+      id: '/_authenticated/dashboard/rfqs/'
+      path: '/dashboard/rfqs'
+      fullPath: '/dashboard/rfqs/'
+      preLoaderRoute: typeof AuthenticatedDashboardRfqsIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/dashboard/proveedores/': {
@@ -3455,102 +3378,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardProveedoresIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/proveedores/$id': {
-      id: '/_authenticated/dashboard/proveedores/$id'
-      path: '/dashboard/proveedores/$id'
-      fullPath: '/dashboard/proveedores/$id'
-      preLoaderRoute: typeof AuthenticatedDashboardProveedoresIdRouteImport
+    '/_authenticated/dashboard/pipeline/': {
+      id: '/_authenticated/dashboard/pipeline/'
+      path: '/dashboard/pipeline'
+      fullPath: '/dashboard/pipeline/'
+      preLoaderRoute: typeof AuthenticatedDashboardPipelineIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/rfqs/': {
-      id: '/_authenticated/dashboard/rfqs/'
-      path: '/dashboard/rfqs'
-      fullPath: '/dashboard/rfqs/'
-      preLoaderRoute: typeof AuthenticatedDashboardRfqsIndexRouteImport
+    '/_authenticated/dashboard/documentos/': {
+      id: '/_authenticated/dashboard/documentos/'
+      path: '/dashboard/documentos'
+      fullPath: '/dashboard/documentos/'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/dashboard/rfqs/$id': {
-      id: '/_authenticated/dashboard/rfqs/$id'
-      path: '/dashboard/rfqs/$id'
-      fullPath: '/dashboard/rfqs/$id'
-      preLoaderRoute: typeof AuthenticatedDashboardRfqsIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/rfqs/nuevo': {
-      id: '/_authenticated/dashboard/rfqs/nuevo'
-      path: '/dashboard/rfqs/nuevo'
-      fullPath: '/dashboard/rfqs/nuevo'
-      preLoaderRoute: typeof AuthenticatedDashboardRfqsNuevoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/sourcing_/$requestId': {
-      id: '/_authenticated/dashboard/sourcing_/$requestId'
-      path: '/dashboard/sourcing/$requestId'
-      fullPath: '/dashboard/sourcing/$requestId'
-      preLoaderRoute: typeof AuthenticatedDashboardSourcingRequestIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/dashboard/targets/ai-brief': {
-      id: '/_authenticated/dashboard/targets/ai-brief'
-      path: '/ai-brief'
-      fullPath: '/dashboard/targets/ai-brief'
-      preLoaderRoute: typeof AuthenticatedDashboardTargetsAiBriefRouteImport
-      parentRoute: typeof AuthenticatedDashboardTargetsRoute
-    }
-    '/_authenticated/dashboard/trades_/$tradeId': {
-      id: '/_authenticated/dashboard/trades_/$tradeId'
-      path: '/dashboard/trades/$tradeId'
-      fullPath: '/dashboard/trades/$tradeId'
-      preLoaderRoute: typeof AuthenticatedDashboardTradesTradeIdRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/api/public/hooks/signature-reminders': {
-      id: '/api/public/hooks/signature-reminders'
-      path: '/api/public/hooks/signature-reminders'
-      fullPath: '/api/public/hooks/signature-reminders'
-      preLoaderRoute: typeof ApiPublicHooksSignatureRemindersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/notifications/catastro-expirations': {
-      id: '/api/public/notifications/catastro-expirations'
-      path: '/api/public/notifications/catastro-expirations'
-      fullPath: '/api/public/notifications/catastro-expirations'
-      preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/notifications/satellite-anomalies': {
-      id: '/api/public/notifications/satellite-anomalies'
-      path: '/api/public/notifications/satellite-anomalies'
-      fullPath: '/api/public/notifications/satellite-anomalies'
-      preLoaderRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/public/verify-compliance/$reportId': {
-      id: '/api/public/verify-compliance/$reportId'
-      path: '/api/public/verify-compliance/$reportId'
-      fullPath: '/api/public/verify-compliance/$reportId'
-      preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/v1/cadastre/search': {
-      id: '/api/v1/cadastre/search'
-      path: '/api/v1/cadastre/search'
-      fullPath: '/api/v1/cadastre/search'
-      preLoaderRoute: typeof ApiV1CadastreSearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/catastro/proyecto/titulares/$id': {
-      id: '/catastro/proyecto/titulares/$id'
-      path: '/titulares/$id'
-      fullPath: '/catastro/proyecto/titulares/$id'
-      preLoaderRoute: typeof CatastroProyectoTitularesIdRouteImport
-      parentRoute: typeof CatastroProyectoRoute
-    }
-    '/lovable/email/queue/process': {
-      id: '/lovable/email/queue/process'
-      path: '/lovable/email/queue/process'
-      fullPath: '/lovable/email/queue/process'
-      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
+    '/lovable/email/transactional/send': {
+      id: '/lovable/email/transactional/send'
+      path: '/lovable/email/transactional/send'
+      fullPath: '/lovable/email/transactional/send'
+      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/transactional/preview': {
@@ -3560,25 +3406,172 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailTransactionalPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/lovable/email/transactional/send': {
-      id: '/lovable/email/transactional/send'
-      path: '/lovable/email/transactional/send'
-      fullPath: '/lovable/email/transactional/send'
-      preLoaderRoute: typeof LovableEmailTransactionalSendRouteImport
+    '/lovable/email/queue/process': {
+      id: '/lovable/email/queue/process'
+      path: '/lovable/email/queue/process'
+      fullPath: '/lovable/email/queue/process'
+      preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/dashboard/geophysics/$surveyId/field': {
-      id: '/_authenticated/dashboard/geophysics/$surveyId/field'
-      path: '/field'
-      fullPath: '/dashboard/geophysics/$surveyId/field'
-      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport
-      parentRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
+    '/catastro/proyecto/titulares/$id': {
+      id: '/catastro/proyecto/titulares/$id'
+      path: '/titulares/$id'
+      fullPath: '/catastro/proyecto/titulares/$id'
+      preLoaderRoute: typeof CatastroProyectoTitularesIdRouteImport
+      parentRoute: typeof CatastroProyectoRoute
     }
-    '/api/public/email/pixel/$messageId': {
-      id: '/api/public/email/pixel/$messageId'
-      path: '/api/public/email/pixel/$messageId'
-      fullPath: '/api/public/email/pixel/$messageId'
-      preLoaderRoute: typeof ApiPublicEmailPixelMessageIdRouteImport
+    '/api/v1/cadastre/search': {
+      id: '/api/v1/cadastre/search'
+      path: '/api/v1/cadastre/search'
+      fullPath: '/api/v1/cadastre/search'
+      preLoaderRoute: typeof ApiV1CadastreSearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/verify-compliance/$reportId': {
+      id: '/api/public/verify-compliance/$reportId'
+      path: '/api/public/verify-compliance/$reportId'
+      fullPath: '/api/public/verify-compliance/$reportId'
+      preLoaderRoute: typeof ApiPublicVerifyComplianceReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/notifications/satellite-anomalies': {
+      id: '/api/public/notifications/satellite-anomalies'
+      path: '/api/public/notifications/satellite-anomalies'
+      fullPath: '/api/public/notifications/satellite-anomalies'
+      preLoaderRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/notifications/catastro-expirations': {
+      id: '/api/public/notifications/catastro-expirations'
+      path: '/api/public/notifications/catastro-expirations'
+      fullPath: '/api/public/notifications/catastro-expirations'
+      preLoaderRoute: typeof ApiPublicNotificationsCatastroExpirationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/signature-reminders': {
+      id: '/api/public/hooks/signature-reminders'
+      path: '/api/public/hooks/signature-reminders'
+      fullPath: '/api/public/hooks/signature-reminders'
+      preLoaderRoute: typeof ApiPublicHooksSignatureRemindersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/trades_/$tradeId': {
+      id: '/_authenticated/dashboard/trades_/$tradeId'
+      path: '/dashboard/trades/$tradeId'
+      fullPath: '/dashboard/trades/$tradeId'
+      preLoaderRoute: typeof AuthenticatedDashboardTradesTradeIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/targets/ai-brief': {
+      id: '/_authenticated/dashboard/targets/ai-brief'
+      path: '/ai-brief'
+      fullPath: '/dashboard/targets/ai-brief'
+      preLoaderRoute: typeof AuthenticatedDashboardTargetsAiBriefRouteImport
+      parentRoute: typeof AuthenticatedDashboardTargetsRoute
+    }
+    '/_authenticated/dashboard/sourcing_/$requestId': {
+      id: '/_authenticated/dashboard/sourcing_/$requestId'
+      path: '/dashboard/sourcing/$requestId'
+      fullPath: '/dashboard/sourcing/$requestId'
+      preLoaderRoute: typeof AuthenticatedDashboardSourcingRequestIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/rfqs/nuevo': {
+      id: '/_authenticated/dashboard/rfqs/nuevo'
+      path: '/dashboard/rfqs/nuevo'
+      fullPath: '/dashboard/rfqs/nuevo'
+      preLoaderRoute: typeof AuthenticatedDashboardRfqsNuevoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/rfqs/$id': {
+      id: '/_authenticated/dashboard/rfqs/$id'
+      path: '/dashboard/rfqs/$id'
+      fullPath: '/dashboard/rfqs/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardRfqsIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/proveedores/$id': {
+      id: '/_authenticated/dashboard/proveedores/$id'
+      path: '/dashboard/proveedores/$id'
+      fullPath: '/dashboard/proveedores/$id'
+      preLoaderRoute: typeof AuthenticatedDashboardProveedoresIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects_/nuevo': {
+      id: '/_authenticated/dashboard/projects_/nuevo'
+      path: '/dashboard/projects/nuevo'
+      fullPath: '/dashboard/projects/nuevo'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsNuevoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects_/comparar': {
+      id: '/_authenticated/dashboard/projects_/comparar'
+      path: '/dashboard/projects/comparar'
+      fullPath: '/dashboard/projects/comparar'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsCompararRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/projects_/$projectId': {
+      id: '/_authenticated/dashboard/projects_/$projectId'
+      path: '/dashboard/projects/$projectId'
+      fullPath: '/dashboard/projects/$projectId'
+      preLoaderRoute: typeof AuthenticatedDashboardProjectsProjectIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/pipeline/$code': {
+      id: '/_authenticated/dashboard/pipeline/$code'
+      path: '/dashboard/pipeline/$code'
+      fullPath: '/dashboard/pipeline/$code'
+      preLoaderRoute: typeof AuthenticatedDashboardPipelineCodeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/listings/$listingId': {
+      id: '/_authenticated/dashboard/listings/$listingId'
+      path: '/$listingId'
+      fullPath: '/dashboard/listings/$listingId'
+      preLoaderRoute: typeof AuthenticatedDashboardListingsListingIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardListingsRoute
+    }
+    '/_authenticated/dashboard/geophysics/$surveyId': {
+      id: '/_authenticated/dashboard/geophysics/$surveyId'
+      path: '/$surveyId'
+      fullPath: '/dashboard/geophysics/$surveyId'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRouteImport
+      parentRoute: typeof AuthenticatedDashboardGeophysicsRoute
+    }
+    '/_authenticated/dashboard/documentos/$templateId': {
+      id: '/_authenticated/dashboard/documentos/$templateId'
+      path: '/dashboard/documentos/$templateId'
+      fullPath: '/dashboard/documentos/$templateId'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/clientes_/$partnerId': {
+      id: '/_authenticated/dashboard/clientes_/$partnerId'
+      path: '/dashboard/clientes/$partnerId'
+      fullPath: '/dashboard/clientes/$partnerId'
+      preLoaderRoute: typeof AuthenticatedDashboardClientesPartnerIdRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard/admin/investors': {
+      id: '/_authenticated/dashboard/admin/investors'
+      path: '/investors'
+      fullPath: '/dashboard/admin/investors'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminInvestorsRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/_authenticated/dashboard/admin/inbox': {
+      id: '/_authenticated/dashboard/admin/inbox'
+      path: '/inbox'
+      fullPath: '/dashboard/admin/inbox'
+      preLoaderRoute: typeof AuthenticatedDashboardAdminInboxRouteImport
+      parentRoute: typeof AuthenticatedDashboardAdminRoute
+    }
+    '/api/terrain/$z/$x/$y': {
+      id: '/api/terrain/$z/$x/$y'
+      path: '/api/terrain/$z/$x/$y'
+      fullPath: '/api/terrain/$z/$x/$y'
+      preLoaderRoute: typeof ApiTerrainZXYRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/live-map/losverdes/verify': {
@@ -3588,12 +3581,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicLiveMapLosverdesVerifyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/terrain/$z/$x/$y': {
-      id: '/api/terrain/$z/$x/$y'
-      path: '/api/terrain/$z/$x/$y'
-      fullPath: '/api/terrain/$z/$x/$y'
-      preLoaderRoute: typeof ApiTerrainZXYRouteImport
+    '/api/public/email/pixel/$messageId': {
+      id: '/api/public/email/pixel/$messageId'
+      path: '/api/public/email/pixel/$messageId'
+      fullPath: '/api/public/email/pixel/$messageId'
+      preLoaderRoute: typeof ApiPublicEmailPixelMessageIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/dashboard/geophysics/$surveyId/field': {
+      id: '/_authenticated/dashboard/geophysics/$surveyId/field'
+      path: '/field'
+      fullPath: '/dashboard/geophysics/$surveyId/field'
+      preLoaderRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdFieldRouteImport
+      parentRoute: typeof AuthenticatedDashboardGeophysicsSurveyIdRoute
     }
   }
 }
