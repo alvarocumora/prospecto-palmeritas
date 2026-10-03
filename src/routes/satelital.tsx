@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ProjectTerminalLinks } from "@/features/terminal/ProjectTerminalLinks";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useMemo, useState } from "react";
@@ -60,6 +61,7 @@ function SatelitalError({ error: rawError }: { error: unknown }) {
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />
+      <ProjectTerminalLinks label="Ver en la página del proyecto" />
       <div className="max-w-3xl mx-auto px-5 py-24 text-center">
         <h1 className="brand-display text-2xl mb-3">No pudimos cargar el monitoreo satelital</h1>
         <p className="text-content-subtle text-sm mb-6">{error.message}</p>
