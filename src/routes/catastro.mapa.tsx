@@ -21,6 +21,7 @@ import {
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
 import { SNGM_CONCESIONES_URL, SNGM_ELIMINADAS_POLY_URL } from "@/lib/sngm";
+import { searchGlobalCadastre } from "@/lib/cadastre.functions";
 import { featuresToCSV, featuresToGeoJSON, type ConcesionFeature } from "@/lib/catastroExport";
 
 const searchSchema = z.object({
@@ -31,6 +32,7 @@ const searchSchema = z.object({
   sit: z.enum(["all", "constituida", "tramite", "eliminada"]).optional().catch(undefined),
   base: z.enum(["satelite", "calles"]).optional().catch(undefined),
   elim: z.coerce.boolean().optional().catch(undefined),
+  pais: z.enum(["CL", "PE", "BR", "ZM", "MW"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/catastro/mapa")({
@@ -85,13 +87,47 @@ function buildWhere(tipo: TipoFilter, situacion: SituacionFilter): string {
   return clauses.length ? clauses.join(" AND ") : "1=1";
 }
 
+type Pais = "CL" | "PE" | "BR" | "ZM" | "MW";
+
+/** Jurisdicciones del visor universal: centro, zoom y capa oficial (MapServer). */
+const PAISES: Record<
+  Pais,
+  { label: string; flag: string; inst: string; center: [number, number]; zoom: number; mapServer?: string; layer?: number }
+> = {
+  CL: { label: "Chile", flag: "🇨🇱", inst: "SERNAGEOMIN", center: [-31.63, -71.17], zoom: 11 },
+  PE: {
+    label: "Perú", flag: "🇵🇪", inst: "INGEMMET", center: [-12.05, -76.2], zoom: 9,
+    mapServer: "https://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CATASTRO_MINERO_WGS84/MapServer", layer: 0,
+  },
+  BR: {
+    label: "Brasil", flag: "🇧🇷", inst: "ANM", center: [-19.92, -43.94], zoom: 9,
+    mapServer: "https://geo.anm.gov.br/arcgis/rest/services/SIGMINE/dados_anm/MapServer", layer: 0,
+  },
+  ZM: {
+    label: "Zambia", flag: "🇿🇲", inst: "Landfolio", center: [-12.8, 28.2], zoom: 9,
+    mapServer: "https://ags1.landfolio.com/arcgis/rest/services/ProdPortal/ZambiaPortal/MapServer", layer: 0,
+  },
+  MW: {
+    label: "Malawi", flag: "🇲🇼", inst: "Landfolio", center: [-13.9, 33.8], zoom: 8,
+    mapServer: "https://demo.landfolio.com/arcgis/rest/services/Malawi/MapPortal_ActiveLicenses/MapServer", layer: 1,
+  },
+};
+
+/** Paleta cartográfica institucional (Leaflet necesita valores literales). */
+const MAP_COLORS = {
+  constituida: "#1e7e58",
+  tramite: "#b47818",
+  eliminada: "#8a94a3",
+  otro: "#5b6b80",
+};
+
 /** Color por situación legal (señal de due-diligence). */
 function colorForSituacion(situacion: unknown): string {
   const s = String(situacion ?? "").toUpperCase();
-  if (s.includes("ELIMIN")) return "#ef4444";
-  if (s.includes("TRAMITE") || s.includes("TRÁMITE")) return "#f59e0b";
-  if (s.includes("CONSTITU")) return "#10b981";
-  return "#94a3b8";
+  if (s.includes("ELIMIN")) return MAP_COLORS.eliminada;
+  if (s.includes("TRAMITE") || s.includes("TRÁMITE")) return MAP_COLORS.tramite;
+  if (s.includes("CONSTITU")) return MAP_COLORS.constituida;
+  return MAP_COLORS.otro;
 }
 
 type SelectedProps = Record<string, unknown>;
@@ -125,11 +161,13 @@ function NationalCatastroMap() {
   const [showFilters, setShowFilters] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
   const [selected, setSelected] = useState<SelectedProps | null>(null);
+  const [pais, setPais] = useState<Pais>(search.pais ?? "CL");
+  const foreignLayerRef = useRef<unknown>(null);
   const [analysisSelection, setAnalysisSelection] = useState<SelectedProps[]>([]);
 
   // Espejo del estado para escribir la URL desde eventos del mapa sin closures viejos.
-  const stateRef = useRef({ tipo, situacion, basemap, showEliminadas, navigate });
-  stateRef.current = { tipo, situacion, basemap, showEliminadas, navigate };
+  const stateRef = useRef({ tipo, situacion, basemap, showEliminadas, navigate, pais });
+  stateRef.current = { tipo, situacion, basemap, showEliminadas, navigate, pais };
 
   const syncUrl = () => {
     const map = mapObjRef.current as {
@@ -149,6 +187,7 @@ function NationalCatastroMap() {
         sit: st.situacion === "all" ? undefined : st.situacion,
         base: st.basemap === "satelite" ? undefined : st.basemap,
         elim: st.showEliminadas ? true : undefined,
+        pais: st.pais === "CL" ? undefined : st.pais,
       },
       replace: true,
     });
@@ -161,6 +200,10 @@ function NationalCatastroMap() {
     mutationFn: (term: string) => search$({ data: { q: term, limit: 20 } }),
   });
   const hasResults = (mutation.data?.results.length ?? 0) > 0;
+  const global$ = useServerFn(searchGlobalCadastre);
+  const globalMutation = useMutation({
+    mutationFn: (term: string) => global$({ data: { country: pais, q: term } }),
+  });
 
   // Init del mapa (una sola vez).
   useEffect(() => {
@@ -173,8 +216,8 @@ function NationalCatastroMap() {
         const EL = await import("esri-leaflet");
         const hasCoords = search.lat != null && search.lng != null;
         const map = L.map(mapRef.current, {
-          center: hasCoords ? [search.lat!, search.lng!] : [-31.63, -71.17],
-          zoom: search.z ?? 11,
+          center: hasCoords ? [search.lat!, search.lng!] : PAISES[stateRef.current.pais].center,
+          zoom: search.z ?? PAISES[stateRef.current.pais].zoom,
           zoomControl: false,
         });
         mapObjRef.current = map;
@@ -194,7 +237,7 @@ function NationalCatastroMap() {
           where: buildWhere(stateRef.current.tipo, stateRef.current.situacion),
           style: (feature: { properties?: Record<string, unknown> }) => {
             const c = colorForSituacion(feature?.properties?.SITUACION_CONCESION);
-            return { color: c, weight: 1, fillColor: c, fillOpacity: 0.18 };
+            return { color: c, weight: 0.9, fillColor: c, fillOpacity: 0.12 };
           },
         });
         layerRef.current = concesiones;
@@ -225,7 +268,7 @@ function NationalCatastroMap() {
           setMapError(`SERNAGEOMIN no respondió: ${msg}. Reintenta al mover el mapa.`);
         });
         concesiones.on("requestsuccess", () => setMapError(null));
-        concesiones.addTo(map);
+        if (stateRef.current.pais === "CL") concesiones.addTo(map);
 
         cleanup = () => map.remove();
       } catch (e) {
@@ -243,6 +286,54 @@ function NationalCatastroMap() {
     layer?.setWhere?.(buildWhere(tipo, situacion));
     syncUrlRef.current();
   }, [tipo, situacion]);
+
+  // Cambio de jurisdicción: capa oficial del país + vuelo a su región minera.
+  const firstPais = useRef(true);
+  useEffect(() => {
+    const map = mapObjRef.current as {
+      flyTo: (c: [number, number], z: number, o?: object) => void;
+      hasLayer: (l: unknown) => boolean;
+      addLayer: (l: unknown) => void;
+      removeLayer: (l: unknown) => void;
+    } | null;
+    let cancelled = false;
+    (async () => {
+      // Espera a que el mapa exista (init asíncrono).
+      for (let i = 0; i < 40 && !mapObjRef.current; i++) await new Promise((r) => setTimeout(r, 100));
+      const m = (mapObjRef.current as typeof map) ?? map;
+      if (!m || cancelled) return;
+      const cfg = PAISES[pais];
+      (foreignLayerRef.current as { remove?: () => void } | null)?.remove?.();
+      foreignLayerRef.current = null;
+      const cl = layerRef.current;
+      if (pais === "CL") {
+        if (cl && !m.hasLayer(cl)) m.addLayer(cl);
+      } else {
+        if (cl && m.hasLayer(cl)) m.removeLayer(cl);
+        if (showEliminadas) setShowEliminadas(false);
+        const EL = await import("esri-leaflet");
+        if (cancelled || !cfg.mapServer) return;
+        const dyn = (EL as unknown as { dynamicMapLayer: (o: object) => { addTo: (m: unknown) => unknown; remove: () => void } }).dynamicMapLayer({
+          url: cfg.mapServer,
+          layers: [cfg.layer ?? 0],
+          opacity: 0.75,
+          f: "image",
+        });
+        dyn.addTo(m);
+        foreignLayerRef.current = dyn;
+      }
+      if (!firstPais.current) m.flyTo(cfg.center, cfg.zoom, { duration: 1.2 });
+      firstPais.current = false;
+      mutation.reset();
+      globalMutation.reset();
+      setSelected(null);
+      syncUrlRef.current();
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pais]);
 
   // Cambio de basemap.
   useEffect(() => {
@@ -280,10 +371,10 @@ function NationalCatastroMap() {
           simplifyFactor: 0.5,
           where: "1=1",
           style: () => ({
-            color: "#ef4444",
-            weight: 1,
+            color: MAP_COLORS.eliminada,
+            weight: 0.7,
             dashArray: "3,3",
-            fillColor: "#ef4444",
+            fillColor: MAP_COLORS.eliminada,
             fillOpacity: 0.08,
           }),
         });
@@ -348,6 +439,24 @@ function NationalCatastroMap() {
         {/* Panel flotante: búsqueda + filtros + resultados */}
         <div className="absolute top-2 left-2 right-2 sm:right-auto sm:w-[360px] z-[500] flex flex-col gap-2 max-h-[calc(100%-1rem)] print:hidden">
           <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg">
+            {/* Jurisdicción */}
+            <div className="px-2.5 pt-2.5 flex flex-wrap gap-1">
+              {(Object.keys(PAISES) as Pais[]).map((k) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setPais(k)}
+                  title={PAISES[k].inst}
+                  className={`px-2 py-1 rounded text-[10px] font-mono border transition-colors ${
+                    pais === k
+                      ? "border-primary text-foreground bg-primary/10"
+                      : "border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {PAISES[k].flag} {PAISES[k].label}
+                </button>
+              ))}
+            </div>
             {/* Búsqueda */}
             <div className="p-2.5 flex items-center gap-2">
               <form
@@ -355,7 +464,8 @@ function NationalCatastroMap() {
                 onSubmit={(e) => {
                   e.preventDefault();
                   if (q.trim().length >= 2) {
-                    mutation.mutate(q.trim());
+                    if (pais === "CL") mutation.mutate(q.trim());
+                    else globalMutation.mutate(q.trim());
                     setPanelOpen(true);
                   }
                 }}
@@ -364,7 +474,7 @@ function NationalCatastroMap() {
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder="Titular, RUT, código…"
+                  placeholder={pais === "CL" ? "Titular, RUT, código…" : `Titular o código · ${PAISES[pais].inst}`}
                   className="w-full pl-10 pr-8 py-2 rounded border border-border bg-background font-mono text-xs focus:outline-none focus:border-primary"
                 />
                 {q && (
@@ -373,6 +483,7 @@ function NationalCatastroMap() {
                     onClick={() => {
                       setQ("");
                       mutation.reset();
+                      globalMutation.reset();
                     }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground"
                   >
@@ -395,7 +506,7 @@ function NationalCatastroMap() {
             </div>
 
             {/* Filtros */}
-            {showFilters && (
+            {showFilters && pais === "CL" && (
               <div className="px-2.5 pb-2.5 space-y-2 border-t border-border pt-2.5">
                 <FilterRow label="Tipo">
                   {(
@@ -433,7 +544,7 @@ function NationalCatastroMap() {
                     onClick={() => setShowEliminadas((v) => !v)}
                     className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono border transition-colors ${
                       showEliminadas
-                        ? "border-red-500 text-red-500 bg-red-500/10"
+                        ? "border-primary text-primary bg-primary/10"
                         : "border-border text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -468,8 +579,37 @@ function NationalCatastroMap() {
             )}
           </div>
 
+          {/* Resultados otros países */}
+          {pais !== "CL" && (globalMutation.isPending || globalMutation.data) && (
+            <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg overflow-y-auto p-2 max-h-[38vh] sm:max-h-[50vh]">
+              <div className="px-1 pb-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+                {PAISES[pais].inst} · {globalMutation.data?.results.length ?? 0} resultados
+              </div>
+              {globalMutation.isPending && (
+                <div className="text-xs font-mono text-muted-foreground p-2">Consultando fuente oficial…</div>
+              )}
+              <ul className="space-y-1">
+                {globalMutation.data?.results.map((r) => (
+                  <li key={r.code} className="p-2.5 rounded border border-border">
+                    <div className="text-xs font-mono font-semibold truncate">{r.name ?? r.code}</div>
+                    <div className="text-[10px] font-mono text-muted-foreground truncate">{r.holder ?? "—"}</div>
+                    <div className="text-[10px] font-mono text-muted-foreground flex justify-between gap-2">
+                      <span className="truncate">{r.status ?? "—"}</span>
+                      <span>{r.areaHa ? `${Math.round(r.areaHa).toLocaleString("es-CL")} ha` : "—"}</span>
+                    </div>
+                    {r.sourceUrl && (
+                      <a href={r.sourceUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[10px] font-mono text-primary">
+                        Verificar en {r.source} <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {/* Resultados */}
-          {(mutation.isPending || mutation.data) && (
+          {pais === "CL" && (mutation.isPending || mutation.data) && (
             <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg overflow-hidden flex flex-col min-h-0">
               <button
                 type="button"
@@ -646,15 +786,23 @@ function NationalCatastroMap() {
 
         {/* Leyenda + stats + atribución (visible al imprimir) */}
         <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-2 rounded-lg bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur space-y-1">
-          <LegendRow color="#10b981" label="Constituida" />
-          <LegendRow color="#f59e0b" label="En trámite" />
-          <LegendRow color="#ef4444" label="Eliminada" />
-          {featureCount != null && !needsZoom && (
-            <div className="pt-1 border-t border-border/60 text-foreground">
-              {featureCount.toLocaleString("es-CL")} concesiones en vista
-            </div>
+          {pais === "CL" ? (
+            <>
+              <LegendRow color={MAP_COLORS.constituida} label="Constituida" />
+              <LegendRow color={MAP_COLORS.tramite} label="En trámite" />
+              <LegendRow color={MAP_COLORS.eliminada} label="Eliminada" />
+              {featureCount != null && !needsZoom && (
+                <div className="pt-1 border-t border-border/60 text-foreground">
+                  {featureCount.toLocaleString("es-CL")} concesiones en vista
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-foreground">Simbología oficial de {PAISES[pais].inst}</div>
           )}
-          <div className="text-muted-foreground/70">SERNAGEOMIN v2 · Esri</div>
+          <div className="text-muted-foreground/70">
+            {pais === "CL" ? "SERNAGEOMIN v2" : PAISES[pais].inst} · Esri
+          </div>
         </div>
       </div>
     </PublicCatastroShell>
