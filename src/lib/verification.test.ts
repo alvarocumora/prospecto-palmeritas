@@ -7,7 +7,7 @@ import {
 } from "./verification";
 
 describe("projectVerification", () => {
-  it("clasifica los proyectos demo", () => {
+  it("la lista demo está vacía: ningún proyecto se marca demo", () => {
     for (const id of DEMO_PROJECT_IDS) {
       expect(projectVerification(id)).toBe("demo");
     }

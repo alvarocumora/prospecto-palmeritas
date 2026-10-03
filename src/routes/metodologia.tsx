@@ -20,7 +20,7 @@ export const Route = createFileRoute("/metodologia")({
       {
         name: "description",
         content:
-          "Cómo Geocapitals clasifica y verifica los datos de cada proyecto minero: fuentes satelitales, catastro, sondajes y los tres niveles de verificación (demo, trazable, verificado QP).",
+          "Cómo Geocapitals clasifica y verifica los datos de cada proyecto minero: fuentes satelitales, catastro, sondajes y los tres niveles de verificación (trazable y verificado QP).",
       },
       { property: "og:title", content: "Metodología y verificación de datos — Geocapitals" },
       {
@@ -37,12 +37,6 @@ export const Route = createFileRoute("/metodologia")({
 });
 
 const LEVELS = [
-  {
-    level: "demo" as const,
-    icon: FlaskConical,
-    detail:
-      "Proyectos de muestra que usamos para demostrar las capacidades del terminal (por ejemplo, los sitios visibles en el monitoreo satelital público y el visor 3D). Sus datos geocientíficos pueden ser reales, pero el proyecto no representa una oportunidad de inversión activa y así se indica en toda la plataforma.",
-  },
   {
     level: "traceable" as const,
     icon: FileSearch,
@@ -196,8 +190,7 @@ function MetodologiaPage() {
         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
         <p className="leading-relaxed max-w-3xl">
           Geocapitals es una plataforma de información y conexión. No es un intermediario de valores
-          registrado y no custodia fondos de inversionistas. Los proyectos marcados como «demo»
-          existen únicamente para demostrar las capacidades del terminal.
+          registrado y no custodia fondos de inversionistas. Cada proyecto indica el origen y nivel de verificación de sus datos.
         </p>
       </section>
 
