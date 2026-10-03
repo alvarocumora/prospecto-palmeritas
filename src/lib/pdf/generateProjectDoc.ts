@@ -46,6 +46,7 @@ function guardText(doc: { text: (...args: never[]) => unknown }) {
 
 export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
   const { default: JsPDF } = await import("jspdf");
+  const { ensureBrandFonts } = await import("./brand/kit");
 
   if (kind === "deck") {
     const doc = new JsPDF({

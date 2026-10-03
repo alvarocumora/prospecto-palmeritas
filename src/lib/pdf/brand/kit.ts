@@ -20,13 +20,61 @@ export function ink(doc: jsPDF, c: RGB) {
   doc.setTextColor(c[0], c[1], c[2]);
 }
 
+/** Tipografías editoriales reales (Newsreader + IBM Plex Sans) incrustadas. */
+const BRAND_FONT_FILES: Array<[file: string, family: string, style: string]> = [
+  ["Newsreader-Regular.ttf", "GCSerif", "normal"],
+  ["Newsreader-SemiBold.ttf", "GCSerif", "bold"],
+  ["Newsreader-Italic.ttf", "GCSerif", "italic"],
+  ["PlexSans-Regular.ttf", "GCSans", "normal"],
+  ["PlexSans-SemiBold.ttf", "GCSans", "bold"],
+  ["PlexSans-Italic.ttf", "GCSans", "italic"],
+];
+let fontCache: Promise<Array<[string, string]> | null> | null = null;
+const branded = new WeakSet<jsPDF>();
+
+function loadBrandFonts() {
+  fontCache ??= (async () => {
+    try {
+      return await Promise.all(
+        BRAND_FONT_FILES.map(async ([file]) => {
+          const res = await fetch(`/fonts/pdf/${file}`);
+          if (!res.ok) throw new Error(file);
+          const bytes = new Uint8Array(await res.arrayBuffer());
+          let bin = "";
+          for (let i = 0; i < bytes.length; i += 0x8000)
+            bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+          return [file, btoa(bin)] as [string, string];
+        }),
+      );
+    } catch {
+      fontCache = null;
+      return null;
+    }
+  })();
+  return fontCache;
+}
+
+/** Incrusta las tipografías de marca en el documento. Si fallan, usa las nativas. */
+export async function ensureBrandFonts(doc: jsPDF): Promise<void> {
+  if (branded.has(doc)) return;
+  const data = await loadBrandFonts();
+  if (!data) return;
+  data.forEach(([file, b64], i) => {
+    const [, family, style] = BRAND_FONT_FILES[i];
+    doc.addFileToVFS(file, b64);
+    doc.addFont(file, family, style);
+  });
+  branded.add(doc);
+}
+
 export function font(
   doc: jsPDF,
   family: "display" | "body",
   style: "normal" | "bold" | "italic",
   size: number,
 ) {
-  doc.setFont(GC_FONT[family], style);
+  const name = branded.has(doc) ? (family === "display" ? "GCSerif" : "GCSans") : GC_FONT[family];
+  doc.setFont(name, style);
   doc.setFontSize(size);
 }
 
