@@ -29,6 +29,13 @@ const BRAND_FONT_FILES: Array<[file: string, family: string, style: string]> = [
   ["PlexSans-SemiBold.ttf", "GCSans", "bold"],
   ["PlexSans-Italic.ttf", "GCSans", "italic"],
 ];
+const FONT_URLS = import.meta.glob("@/assets/fonts/pdf/*.ttf", {
+  query: "?url",
+  import: "default",
+  eager: true,
+}) as Record<string, string>;
+const fontUrl = (file: string) =>
+  Object.entries(FONT_URLS).find(([k]) => k.endsWith(`/${file}`))?.[1];
 let fontCache: Promise<Array<[string, string]> | null> | null = null;
 const branded = new WeakSet<jsPDF>();
 
@@ -37,7 +44,9 @@ function loadBrandFonts() {
     try {
       return await Promise.all(
         BRAND_FONT_FILES.map(async ([file]) => {
-          const res = await fetch(`/fonts/pdf/${file}`);
+          const url = fontUrl(file);
+          if (!url) throw new Error(file);
+          const res = await fetch(url);
           if (!res.ok) throw new Error(file);
           const bytes = new Uint8Array(await res.arrayBuffer());
           let bin = "";
