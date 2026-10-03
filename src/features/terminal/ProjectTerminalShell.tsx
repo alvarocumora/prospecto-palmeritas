@@ -73,6 +73,10 @@ const LosVerdesStrategicMap = lazy(() =>
     default: m.LosVerdesStrategicMap,
   })),
 );
+const LosVerdesEngine3D = lazy(() =>
+  import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+);
+const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 const TrackminGeoIntel = lazy(() =>
   import("@/features/palmeras/TrackminDashboard").then((m) => ({ default: m.TrackminGeoIntel })),
 );
@@ -230,8 +234,34 @@ function MapaTab({ project }: { project: TerminalProject }) {
   if (project.slug === "losverdes") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
+        <div className="flex justify-end mb-4">
+          <div className="inline-flex rounded-full border border-hairline bg-white p-1">
+            {(
+              [
+                ["2d", "Planimétrico", MapIcon],
+                ["3d", "Modelo geológico 3D", Box],
+              ] as Array<["2d" | "3d", string, typeof MapIcon]>
+            ).map(([key, label, Icon]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setView(key)}
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+                  view === key ? "bg-accent-brand text-white" : "text-content-subtle hover:text-content"
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
-          <LosVerdesStrategicMap height={640} />
+          {view === "2d" ? (
+            <LosVerdesStrategicMap height={640} />
+          ) : (
+            <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
+          )}
         </div>
       </Suspense>
     );
