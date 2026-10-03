@@ -7,6 +7,10 @@ import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { ListingsMap } from "@/features/proyectos/ListingsMap";
 import { QueryError } from "@/components/ui/QueryError";
+import palmerasImg from "@/assets/project-palmeras.jpg.asset.json";
+import losverdesImg from "@/assets/project-losverdes.jpg.asset.json";
+import cholquiImg from "@/assets/project-gianfranco.jpg.asset.json";
+import colateralImg from "@/assets/colateral/hualane-satelite.jpg";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -35,6 +39,9 @@ const SHOWCASE = [
     name: "Prospecto Las Palmeras",
     region: "Illapel · Coquimbo",
     commodity: "Au-Ag",
+    image: palmerasImg.url,
+    stage: "Exploración avanzada",
+    stats: [["74", "concesiones"], ["12.807", "hectáreas"], ["16", "sondajes"]],
     bullets: ["74 concesiones · 12.807 ha", "16 sondajes · 4.426 m", "12 anomalías satelitales"],
   },
   {
@@ -43,6 +50,9 @@ const SHOWCASE = [
     name: "Los Verdes",
     region: "Petorca · Valparaíso",
     commodity: "Cu-Mo",
+    image: losverdesImg.url,
+    stage: "Pre NI 43-101",
+    stats: [["88", "concesiones"], ["34", "targets"], ["23", "anomalías MAG"]],
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
@@ -55,6 +65,9 @@ const SHOWCASE = [
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
+    image: cholquiImg.url,
+    stage: "Ronda de capital",
+    stats: [["14", "concesiones"], ["7", "ensayes"], ["15", "anomalías"]],
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",
@@ -78,38 +91,93 @@ function ProyectosPage() {
       title="Activos reales operando sobre Geocapitals"
       intro="Una muestra de los proyectos mineros que usan la plataforma para integrar catastro, exploración, monitoreo satelital y reporte NI 43-101."
     >
-      <div className="grid md:grid-cols-2 gap-5" id="publicar">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="publicar">
         {SHOWCASE.map((p) => (
-          <Link
+          <article
             key={p.code}
-            to="/terminal/$slug"
-            params={{ slug: p.slug }}
-            search={{ tab: "mapa" as const }}
-            className="group rounded-2xl border border-hairline bg-white p-6 hover:border-accent-brand hover:shadow-[0_20px_40px_-25px_rgba(11,42,91,0.35)] transition block"
+            className="group rounded-2xl border border-hairline bg-white overflow-hidden flex flex-col hover:border-accent-brand hover:shadow-[0_24px_48px_-28px_rgba(11,42,91,0.4)] transition"
           >
-            <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono uppercase tracking-wider text-accent-brand">
-                {p.code}
-              </span>
-              <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
+            <Link
+              to="/terminal/$slug"
+              params={{ slug: p.slug }}
+              search={{ tab: "mapa" as const }}
+              className="relative block aspect-[16/10] overflow-hidden bg-surface-muted"
+            >
+              <img
+                src={p.image}
+                alt={p.name}
+                loading="lazy"
+                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+              <div className="absolute top-3 left-3 flex gap-2">
+                <span className="px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-mono uppercase tracking-wider text-content">
+                  {p.commodity}
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-accent-brand text-[10px] font-mono uppercase tracking-wider text-white">
+                  {p.stage}
+                </span>
+              </div>
+              <div className="absolute bottom-3 left-4 right-4 text-white">
+                <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
+                  {p.region}
+                </div>
+                <div className="font-display text-2xl leading-tight mt-0.5">{p.name}</div>
+              </div>
+            </Link>
+            <div className="grid grid-cols-3 border-b border-hairline">
+              {p.stats.map(([v, l], i) => (
+                <div key={l} className={`px-4 py-3 ${i ? "border-l border-hairline" : ""}`}>
+                  <div className="font-display text-xl text-content">{v}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">{l}</div>
+                </div>
+              ))}
             </div>
-            <div className="mt-3 font-display text-xl text-content">{p.name}</div>
-            <div className="text-sm text-content-subtle mt-1">
-              {p.region} · {p.commodity}
-            </div>
-            <ul className="mt-5 space-y-1.5 text-[13px] text-content">
+            <ul className="px-5 pt-4 space-y-1.5 text-[13px] text-content flex-1">
               {p.bullets.map((b) => (
-                <li key={b} className="flex items-center gap-2">
-                  <span className="w-1 h-1 rounded-full bg-accent-brand" /> {b}
+                <li key={b} className="flex items-start gap-2">
+                  <span className="mt-2 w-1 h-1 rounded-full bg-accent-brand shrink-0" /> {b}
                 </li>
               ))}
             </ul>
-            <div className="mt-4 pt-3 border-t border-hairline text-[11px] font-mono uppercase tracking-wider text-accent-brand">
-              Terminal · mapa, ensayes, simulador y data room
+            <div className="p-5 pt-4 grid grid-cols-2 gap-2">
+              <Link
+                to="/terminal/$slug"
+                params={{ slug: p.slug }}
+                search={{ tab: "mapa" as const }}
+                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-brand text-white text-sm py-2.5 hover:opacity-90"
+              >
+                Abrir terminal <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                to="/terminal/$slug"
+                params={{ slug: p.slug }}
+                search={{ tab: "simulador" as const }}
+                className="inline-flex items-center justify-center rounded-md border border-hairline text-sm py-2.5 text-content hover:border-accent-brand hover:text-accent-brand"
+              >
+                Simular inversión
+              </Link>
             </div>
-          </Link>
+          </article>
         ))}
       </div>
+
+      <Link
+        to="/inversion-colateral"
+        className="group mt-6 grid md:grid-cols-[280px_1fr_auto] items-center gap-6 rounded-2xl border border-hairline bg-white overflow-hidden hover:border-accent-brand transition"
+      >
+        <img src={colateralImg} alt="Valle de Hualañé, imagen satelital" className="h-full w-full object-cover aspect-[16/10] md:aspect-auto" loading="lazy" />
+        <div className="p-5 md:p-0">
+          <Eyebrow className="mb-1">Inversión con colateral inmobiliario</Eyebrow>
+          <div className="font-display text-2xl text-content">Hualañé y Licantén · Región del Maule</div>
+          <p className="text-sm text-content-subtle mt-1 max-w-xl">
+            Desde $25 MM CLP, 12% anual en UF, respaldado por parcela con rol SII individual.
+          </p>
+        </div>
+        <span className="mx-5 mb-5 md:mb-0 inline-flex items-center gap-1.5 text-sm text-accent-brand">
+          Ver programa <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition" />
+        </span>
+      </Link>
 
       {/* Herramientas de inteligencia geológica */}
       <section className="mt-14 grid sm:grid-cols-2 gap-4">
@@ -123,7 +191,7 @@ function ProyectosPage() {
           <div className="flex-1">
             <div className="font-display text-[15px] text-content">Monitoreo satelital</div>
             <div className="text-xs text-content-subtle mt-0.5">
-              Anomalías multiespectrales e InSAR sobre los proyectos demo
+              Anomalías multiespectrales e InSAR sobre los proyectos de la cartera
             </div>
           </div>
           <ArrowRight className="w-4 h-4 text-content-subtle group-hover:text-accent-brand group-hover:translate-x-0.5 transition" />
