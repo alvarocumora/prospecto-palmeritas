@@ -1,0 +1,98 @@
+[
+  {
+    "name": "DESCRIPTION.en_us.html",
+    "path": "ofl/ibmplexsans/DESCRIPTION.en_us.html",
+    "sha": "fb5dd97b33f4775ee172ee01be916d14c60dcb75",
+    "size": 1068,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/DESCRIPTION.en_us.html?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/DESCRIPTION.en_us.html",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/fb5dd97b33f4775ee172ee01be916d14c60dcb75",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/DESCRIPTION.en_us.html",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/DESCRIPTION.en_us.html?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/fb5dd97b33f4775ee172ee01be916d14c60dcb75",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/DESCRIPTION.en_us.html"
+    }
+  },
+  {
+    "name": "IBMPlexSans-Italic[wdth,wght].ttf",
+    "path": "ofl/ibmplexsans/IBMPlexSans-Italic[wdth,wght].ttf",
+    "sha": "35722e5e79e3616407f479ece5c60c39c1efd68f",
+    "size": 599624,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/IBMPlexSans-Italic[wdth,wght].ttf?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/IBMPlexSans-Italic[wdth,wght].ttf",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/35722e5e79e3616407f479ece5c60c39c1efd68f",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/IBMPlexSans-Italic%5Bwdth%2Cwght%5D.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/IBMPlexSans-Italic[wdth,wght].ttf?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/35722e5e79e3616407f479ece5c60c39c1efd68f",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/IBMPlexSans-Italic[wdth,wght].ttf"
+    }
+  },
+  {
+    "name": "IBMPlexSans[wdth,wght].ttf",
+    "path": "ofl/ibmplexsans/IBMPlexSans[wdth,wght].ttf",
+    "sha": "30f837e8b02e8ecddce6cbebc425b1f422392515",
+    "size": 537244,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/IBMPlexSans[wdth,wght].ttf?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/IBMPlexSans[wdth,wght].ttf",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/30f837e8b02e8ecddce6cbebc425b1f422392515",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/IBMPlexSans%5Bwdth%2Cwght%5D.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/IBMPlexSans[wdth,wght].ttf?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/30f837e8b02e8ecddce6cbebc425b1f422392515",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/IBMPlexSans[wdth,wght].ttf"
+    }
+  },
+  {
+    "name": "METADATA.pb",
+    "path": "ofl/ibmplexsans/METADATA.pb",
+    "sha": "ccfb809905fe8f3133b5ea2937b8abdce1134f02",
+    "size": 1554,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/METADATA.pb?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/METADATA.pb",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/ccfb809905fe8f3133b5ea2937b8abdce1134f02",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/METADATA.pb",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/METADATA.pb?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/ccfb809905fe8f3133b5ea2937b8abdce1134f02",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/METADATA.pb"
+    }
+  },
+  {
+    "name": "OFL.txt",
+    "path": "ofl/ibmplexsans/OFL.txt",
+    "sha": "c35c4c618fab33da8695177b3a6cefe0810b7b28",
+    "size": 4456,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/OFL.txt?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/OFL.txt",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/c35c4c618fab33da8695177b3a6cefe0810b7b28",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/OFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/OFL.txt?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/c35c4c618fab33da8695177b3a6cefe0810b7b28",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/OFL.txt"
+    }
+  },
+  {
+    "name": "upstream_info.md",
+    "path": "ofl/ibmplexsans/upstream_info.md",
+    "sha": "5980bcd5f887dfd4edd94b67ed718f05fe0bda68",
+    "size": 4199,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/upstream_info.md?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/upstream_info.md",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/5980bcd5f887dfd4edd94b67ed718f05fe0bda68",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsans/upstream_info.md",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/ibmplexsans/upstream_info.md?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/5980bcd5f887dfd4edd94b67ed718f05fe0bda68",
+      "html": "https://github.com/google/fonts/blob/main/ofl/ibmplexsans/upstream_info.md"
+    }
+  }
+]

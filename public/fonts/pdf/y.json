@@ -1,0 +1,114 @@
+[
+  {
+    "name": "DESCRIPTION.en_us.html",
+    "path": "ofl/newsreader/DESCRIPTION.en_us.html",
+    "sha": "f1afea434ba675c9b006664fb58aaf1f1d0cd077",
+    "size": 284,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/DESCRIPTION.en_us.html?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/DESCRIPTION.en_us.html",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/f1afea434ba675c9b006664fb58aaf1f1d0cd077",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/DESCRIPTION.en_us.html",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/DESCRIPTION.en_us.html?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/f1afea434ba675c9b006664fb58aaf1f1d0cd077",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/DESCRIPTION.en_us.html"
+    }
+  },
+  {
+    "name": "METADATA.pb",
+    "path": "ofl/newsreader/METADATA.pb",
+    "sha": "4b527fcbf6751626bc42e850e924981eb749615a",
+    "size": 7076,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/METADATA.pb?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/METADATA.pb",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/4b527fcbf6751626bc42e850e924981eb749615a",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/METADATA.pb",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/METADATA.pb?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/4b527fcbf6751626bc42e850e924981eb749615a",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/METADATA.pb"
+    }
+  },
+  {
+    "name": "Newsreader-Italic[opsz,wght].ttf",
+    "path": "ofl/newsreader/Newsreader-Italic[opsz,wght].ttf",
+    "sha": "d25879656a601d44c49836f9e773d100190c62e1",
+    "size": 495684,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/Newsreader-Italic[opsz,wght].ttf?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/Newsreader-Italic[opsz,wght].ttf",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/d25879656a601d44c49836f9e773d100190c62e1",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader-Italic%5Bopsz%2Cwght%5D.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/Newsreader-Italic[opsz,wght].ttf?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/d25879656a601d44c49836f9e773d100190c62e1",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/Newsreader-Italic[opsz,wght].ttf"
+    }
+  },
+  {
+    "name": "Newsreader[opsz,wght].ttf",
+    "path": "ofl/newsreader/Newsreader[opsz,wght].ttf",
+    "sha": "ad4a9a8c44ec328c80b61c773f1ba02f6b5ed292",
+    "size": 451664,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/Newsreader[opsz,wght].ttf?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/Newsreader[opsz,wght].ttf",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/ad4a9a8c44ec328c80b61c773f1ba02f6b5ed292",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/Newsreader%5Bopsz%2Cwght%5D.ttf",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/Newsreader[opsz,wght].ttf?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/ad4a9a8c44ec328c80b61c773f1ba02f6b5ed292",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/Newsreader[opsz,wght].ttf"
+    }
+  },
+  {
+    "name": "OFL.txt",
+    "path": "ofl/newsreader/OFL.txt",
+    "sha": "d2d4f407109e9c74b8ab502fc79b912408ab8e41",
+    "size": 4394,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/OFL.txt?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/OFL.txt",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/d2d4f407109e9c74b8ab502fc79b912408ab8e41",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/OFL.txt",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/OFL.txt?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/d2d4f407109e9c74b8ab502fc79b912408ab8e41",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/OFL.txt"
+    }
+  },
+  {
+    "name": "config.yaml",
+    "path": "ofl/newsreader/config.yaml",
+    "sha": "28bf2bc3968a52e9976d5b32fe2892cb9053e4ce",
+    "size": 217,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/config.yaml?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/config.yaml",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/28bf2bc3968a52e9976d5b32fe2892cb9053e4ce",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/config.yaml",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/config.yaml?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/28bf2bc3968a52e9976d5b32fe2892cb9053e4ce",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/config.yaml"
+    }
+  },
+  {
+    "name": "upstream_info.md",
+    "path": "ofl/newsreader/upstream_info.md",
+    "sha": "b9549af2bd534771958a99fd174245ecd0435e51",
+    "size": 3009,
+    "url": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/upstream_info.md?ref=main",
+    "html_url": "https://github.com/google/fonts/blob/main/ofl/newsreader/upstream_info.md",
+    "git_url": "https://api.github.com/repos/google/fonts/git/blobs/b9549af2bd534771958a99fd174245ecd0435e51",
+    "download_url": "https://raw.githubusercontent.com/google/fonts/main/ofl/newsreader/upstream_info.md",
+    "type": "file",
+    "_links": {
+      "self": "https://api.github.com/repos/google/fonts/contents/ofl/newsreader/upstream_info.md?ref=main",
+      "git": "https://api.github.com/repos/google/fonts/git/blobs/b9549af2bd534771958a99fd174245ecd0435e51",
+      "html": "https://github.com/google/fonts/blob/main/ofl/newsreader/upstream_info.md"
+    }
+  }
+]
