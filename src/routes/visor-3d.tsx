@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { ProjectTerminalLinks } from "@/features/terminal/ProjectTerminalLinks";
 import { useQueries, useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
@@ -653,6 +654,7 @@ function Visor3DPage() {
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />
+      <ProjectTerminalLinks label="Modelo 3D completo por proyecto" />
 
       <section className="border-b border-hairline bg-accent-brand-subtle">
         <div className="max-w-7xl mx-auto px-5 py-14">

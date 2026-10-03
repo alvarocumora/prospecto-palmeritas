@@ -27,17 +27,8 @@ export function PublicCatastroShell({ children }: { children: ReactNode }) {
               className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors flex items-center gap-1.5"
               activeProps={{ className: "text-foreground bg-accent" }}
             >
-              <Map className="w-3.5 h-3.5" /> Mapa multipaís
+              <Map className="w-3.5 h-3.5" /> Catastro
             </Link>
-            {user && (
-              <Link
-                to="/catastro/proyecto"
-                className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"
-                activeProps={{ className: "text-foreground bg-accent" }}
-              >
-                Vista proyecto
-              </Link>
-            )}
             <Link
               to="/catastro/precios"
               className="px-3 py-1.5 rounded hover:bg-accent hover:text-foreground transition-colors"

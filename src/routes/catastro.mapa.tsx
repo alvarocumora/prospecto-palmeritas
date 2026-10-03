@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
+import { CatastroProjectPage } from "@/features/catastro-project/CatastroProjectPage";
+import { useAuth } from "@/hooks/useAuth";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
 import { SNGM_CONCESIONES_URL, SNGM_ELIMINADAS_POLY_URL } from "@/lib/sngm";
 import { searchGlobalCadastre } from "@/lib/cadastre.functions";
@@ -33,6 +35,7 @@ const searchSchema = z.object({
   base: z.enum(["satelite", "calles"]).optional().catch(undefined),
   elim: z.coerce.boolean().optional().catch(undefined),
   pais: z.enum(["CL", "PE", "BR", "ZM", "MW"]).optional().catch(undefined),
+  vista: z.enum(["explorar", "proyecto"]).optional().catch(undefined),
 });
 
 export const Route = createFileRoute("/catastro/mapa")({
@@ -54,8 +57,61 @@ export const Route = createFileRoute("/catastro/mapa")({
       { rel: "canonical", href: "/catastro/mapa" },
     ],
   }),
-  component: NationalCatastroMap,
+  component: CatastroUnificado,
 });
+
+/** Catastro único: un mismo módulo con dos vistas (explorar país / mis proyectos). */
+function CatastroUnificado() {
+  const { vista } = Route.useSearch();
+  return vista === "proyecto" ? <ProjectWorkspace /> : <NationalCatastroMap />;
+}
+
+function CatastroModeTabs({ active }: { active: "explorar" | "proyecto" }) {
+  const cls = (on: boolean) =>
+    `px-3 py-1 rounded text-[11px] font-mono transition-colors ${
+      on ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+    }`;
+  return (
+    <div className="inline-flex gap-1 rounded-md border border-border bg-background/95 p-1 shadow-sm">
+      <Link to="/catastro/mapa" search={{}} className={cls(active === "explorar")}>
+        Explorar países
+      </Link>
+      <Link to="/catastro/mapa" search={{ vista: "proyecto" }} className={cls(active === "proyecto")}>
+        Mis proyectos
+      </Link>
+    </div>
+  );
+}
+
+function ProjectWorkspace() {
+  const { user, loading } = useAuth();
+  return (
+    <PublicCatastroShell>
+      <div className="px-4 pt-3">
+        <CatastroModeTabs active="proyecto" />
+      </div>
+      {loading ? (
+        <p className="p-8 text-sm text-muted-foreground">Cargando…</p>
+      ) : user ? (
+        <CatastroProjectPage />
+      ) : (
+        <div className="mx-auto max-w-md p-10 text-center space-y-3">
+          <h2 className="font-serif text-2xl">Catastro de tus proyectos</h2>
+          <p className="text-sm text-muted-foreground">
+            Ingresa para ver tus concesiones, titulares, patentes, conflictos y vigilancia.
+          </p>
+          <Link
+            to="/auth"
+            search={{ redirect: "/catastro/mapa?vista=proyecto" } as never}
+            className="inline-block rounded bg-primary px-4 py-2 text-sm text-primary-foreground"
+          >
+            Ingresar
+          </Link>
+        </div>
+      )}
+    </PublicCatastroShell>
+  );
+}
 
 // La capa nacional tiene ~103.000 polígonos: solo se piden al servidor desde
 // este zoom. Bajo ese nivel mostramos un aviso en vez de un mapa "vacío".
@@ -115,8 +171,8 @@ const PAISES: Record<
 
 /** Paleta cartográfica institucional (Leaflet necesita valores literales). */
 const MAP_COLORS = {
-  constituida: "#1e7e58",
-  tramite: "#b47818",
+  constituida: "#0F69B4",
+  tramite: "#E0A21B",
   eliminada: "#8a94a3",
   otro: "#5b6b80",
 };
@@ -228,6 +284,12 @@ function NationalCatastroMap() {
           maxZoom: 19,
         }).addTo(map);
         baseLayerRef.current = base;
+        // Toponimia sobre el satélite (mismo estilo que la vista proyecto).
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap",
+          maxZoom: 19,
+          opacity: 0.35,
+        }).addTo(map);
 
         const concesiones = EL.featureLayer({
           url: SNGM_CONCESIONES_URL,
@@ -439,6 +501,9 @@ function NationalCatastroMap() {
         {/* Panel flotante: búsqueda + filtros + resultados */}
         <div className="absolute top-2 left-2 right-2 sm:right-auto sm:w-[360px] z-[500] flex flex-col gap-2 max-h-[calc(100%-1rem)] print:hidden">
           <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg">
+            <div className="px-2.5 pt-2.5">
+              <CatastroModeTabs active="explorar" />
+            </div>
             {/* Jurisdicción */}
             <div className="px-2.5 pt-2.5 flex flex-wrap gap-1">
               {(Object.keys(PAISES) as Pais[]).map((k) => (
