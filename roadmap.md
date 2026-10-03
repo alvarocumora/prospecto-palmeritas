@@ -17,5 +17,5 @@
   - [ ] Incorporar estados editoriales, trazabilidad y control previo a publicación.
 - [x] Portada simplificada a dos caminos (inversionistas / catastro).
 - [x] Fichas públicas /live/* redirigen al terminal único /terminal/$slug.
-- [ ] Reducir el menú interno del panel a 3 espacios (Catastro · Trade · Capital) y fusionar pantallas duplicadas.
-- [ ] Unificar visores 2D/3D restantes (visor-3d, geology3d, 3d-pro) en el terminal.
+- [x] Reducir el menú interno del panel a 3 espacios (Catastro · Trade · Capital) y fusionar pantallas duplicadas.
+- [x] Unificar visores 2D/3D restantes (visor-3d, geology3d, 3d-pro) en el terminal.
