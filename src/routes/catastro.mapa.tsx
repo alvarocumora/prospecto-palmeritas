@@ -544,7 +544,7 @@ function NationalCatastroMap() {
                     onClick={() => setShowEliminadas((v) => !v)}
                     className={`inline-flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-mono border transition-colors ${
                       showEliminadas
-                        ? "border-red-500 text-red-500 bg-red-500/10"
+                        ? "border-primary text-primary bg-primary/10"
                         : "border-border text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -786,9 +786,9 @@ function NationalCatastroMap() {
 
         {/* Leyenda + stats + atribución (visible al imprimir) */}
         <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-2 rounded-lg bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur space-y-1">
-          <LegendRow color="#10b981" label="Constituida" />
-          <LegendRow color="#f59e0b" label="En trámite" />
-          <LegendRow color="#ef4444" label="Eliminada" />
+          <LegendRow color={MAP_COLORS.constituida} label="Constituida" />
+          <LegendRow color={MAP_COLORS.tramite} label="En trámite" />
+          <LegendRow color={MAP_COLORS.eliminada} label="Eliminada" />
           {featureCount != null && !needsZoom && (
             <div className="pt-1 border-t border-border/60 text-foreground">
               {featureCount.toLocaleString("es-CL")} concesiones en vista
