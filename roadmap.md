@@ -12,6 +12,10 @@
   - [x] Consolidar el índice público en tres proyectos sin duplicar Los Verdes–Tilama.
   - [x] Añadir registro único y pruebas automáticas para enlaces públicos.
   - [x] Migrar los antecedentes de Cholqui a las tablas canónicas (código `CHOLQUI`, 7 ensayes certificados, coordenadas PSAD'56 declaradas, concesiones `CHQ-CONC-*`).
-  - [ ] Unificar la plataforma en un solo terminal de inversión con pestañas (mapa, tesis, simulador, data room).
+  - [x] Unificar la plataforma en un solo terminal de inversión con pestañas (mapa, tesis, simulador, data room).
   - [ ] Unificar el expediente técnico y el generador PDF de ambos proyectos.
   - [ ] Incorporar estados editoriales, trazabilidad y control previo a publicación.
+- [x] Portada simplificada a dos caminos (inversionistas / catastro).
+- [x] Fichas públicas /live/* redirigen al terminal único /terminal/$slug.
+- [ ] Reducir el menú interno del panel a 3 espacios (Catastro · Trade · Capital) y fusionar pantallas duplicadas.
+- [ ] Unificar visores 2D/3D restantes (visor-3d, geology3d, 3d-pro) en el terminal.

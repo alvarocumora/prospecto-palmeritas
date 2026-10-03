@@ -14,7 +14,7 @@ describe("catálogo canónico de proyectos", () => {
     expect(canonicalProjectSlug("franco")).toBe("cholqui");
     expect(canonicalProjectSlug("gianfranco")).toBe("cholqui");
     expect(canonicalProjectSlug("tilama")).toBe("losverdes");
-    expect(getPublicProject("franco")?.livePath).toBe("/live/cholqui");
-    expect(getPublicProject("tilama")?.livePath).toBe("/live/losverdes");
+    expect(getPublicProject("franco")?.livePath).toBe("/terminal/cholqui");
+    expect(getPublicProject("tilama")?.livePath).toBe("/terminal/losverdes");
   });
 });

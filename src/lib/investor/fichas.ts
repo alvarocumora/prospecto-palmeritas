@@ -76,7 +76,7 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     commodity: "Au-Ag",
     stage: "Exploración avanzada",
     stageDetail: "74 concesiones (12.807 ha), 16 sondajes (4.426 m) y 12 anomalías satelitales.",
-    liveTo: "/live/palmeras",
+    liveTo: "/terminal/palmeras",
     highlights: [
       "74 concesiones · 12.807 ha bajo control",
       "16 sondajes · 4.426 m perforados",
@@ -112,7 +112,7 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     stage: "Exploración avanzada · compliance en curso",
     stageDetail:
       "AOI 3D con satélite multi-índice, targets generados por IA y compliance NI 43-101 en curso.",
-    liveTo: "/live/losverdes",
+    liveTo: "/terminal/losverdes",
     reportTo: "/reports/losverdes/pre43101",
     highlights: [
       "Distrito cuprífero con vetas reconocidas",

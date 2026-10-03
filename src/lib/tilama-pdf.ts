@@ -7,7 +7,7 @@ import type { LosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { publicUrl } from "@/lib/publicUrl";
 
 export const LOS_VERDES_PDF_VERSION = "v2.0";
-export const LOS_VERDES_LIVE_URL = publicUrl("/live/losverdes");
+export const LOS_VERDES_LIVE_URL = publicUrl("/terminal/losverdes");
 
 function fmtNum(v: number | null | undefined, dec = 1): string {
   if (v == null || Number.isNaN(Number(v))) return "—";
@@ -101,7 +101,7 @@ export async function generateTilamaPdf(
   doc.addImage(qr, "PNG", pageW - MARGIN - 116, 70, 116, 116);
   doc.setFontSize(7);
   doc.text("ESCANEAR PARA VER LIVE MAP", pageW - MARGIN, 200, { align: "right" });
-  doc.text("geocapitals.com/live/losverdes", pageW - MARGIN, 213, { align: "right" });
+  doc.text("geocapitals.com/terminal/losverdes", pageW - MARGIN, 213, { align: "right" });
   y = 286;
 
   h1("Control documental");

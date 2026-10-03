@@ -1,27 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { DemoLiveBanner } from "@/features/marketing/DemoLiveBanner";
-import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Vista pública unificada: toda ficha de proyecto vive en el Terminal (/terminal/$slug).
 export const Route = createFileRoute("/live/palmeras")({
-  head: () => ({
-    meta: [
-      { title: "Demo · Prospecto Palmeras — Geocapitals" },
-      {
-        name: "description",
-        content:
-          "Live map público del Prospecto Palmeras (Alhué): mapa operacional, malla de sondaje y tablero de inteligencia geológica.",
-      },
-      { name: "robots", content: "noindex, nofollow" },
-    ],
-  }),
-  component: LiveMapPalmerasPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/terminal/$slug", params: { slug: "palmeras" }, search: { tab: "mapa" }, replace: true, statusCode: 301 });
+  },
 });
-
-function LiveMapPalmerasPage() {
-  return (
-    <div>
-      <DemoLiveBanner />
-      <TrackminGeoIntel publicMode />
-    </div>
-  );
-}
