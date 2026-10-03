@@ -3,7 +3,7 @@
  * Misma estructura institucional que el memorándum y el resto de documentos.
  */
 import { GC_BRAND, GC_COLOR, GC_PAGE } from "@/lib/pdf/brand/tokens";
-import { brandQr, fill, font, ink } from "@/lib/pdf/brand/kit";
+import { brandQr, ensureBrandFonts, fill, font, ink } from "@/lib/pdf/brand/kit";
 import {
   IM_NAVY,
   kvRow,
@@ -31,6 +31,7 @@ export async function downloadCollateralSimulation(
 ): Promise<void> {
   const { default: JsPDF } = await import("jspdf");
   const doc = new JsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
+  await ensureBrandFonts(doc);
   const qr = await brandQr(liveUrl, 360);
   const now = new Date();
   const issued = now.toLocaleDateString("es-CL", { dateStyle: "long" });
@@ -62,17 +63,18 @@ export async function downloadCollateralSimulation(
     ["Capital al vencimiento", `${fmtClp(amount)} + UF`],
   ];
   const kw = CW / 3;
+  rule(doc, F, y, IM_NAVY, 1.2);
   kpis.forEach(([k, v], i) => {
     const x = F.m + i * kw;
-    fill(doc, i === 0 ? [241, 244, 246] : GC_COLOR.white);
-    doc.rect(x, y, kw - 6, 54, "F");
-    font(doc, "body", "bold", 7);
+    if (i > 0) doc.line(x, y + 10, x, y + 54);
+    font(doc, "body", "bold", 6.6);
     ink(doc, GC_COLOR.slate);
-    doc.text(k.toUpperCase(), x + 10, y + 16);
-    font(doc, "display", "normal", 16);
+    doc.text(k.toUpperCase(), x + (i ? 12 : 0), y + 18, { charSpace: 0.5 });
+    font(doc, "display", "normal", 19);
     ink(doc, IM_NAVY);
-    doc.text(v, x + 10, y + 40);
+    doc.text(v, x + (i ? 12 : 0), y + 44);
   });
+  rule(doc, F, y + 62);
   y += 76;
 
   y = section(doc, F, y, "01", "Parámetros de la simulación");

@@ -6,7 +6,7 @@
  */
 import type jsPDF from "jspdf";
 import { GC_BRAND, GC_COLOR, GC_PAGE } from "@/lib/pdf/brand/tokens";
-import { brandQr, fill, font, ink, stroke } from "@/lib/pdf/brand/kit";
+import { brandQr, ensureBrandFonts, fill, font, ink, stroke } from "@/lib/pdf/brand/kit";
 import { letterhead } from "@/lib/pdf/brand/institutional";
 import {
   COLLATERAL_DISCLAIMERS,
@@ -73,6 +73,7 @@ function chrome(doc: jsPDF, page: number, total: number, issued: string) {
 export async function downloadCollateralMemo(liveUrl: string): Promise<void> {
   const { default: JsPDF } = await import("jspdf");
   const doc = new JsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
+  await ensureBrandFonts(doc);
   const qr = await brandQr(liveUrl, 360);
   const issued = new Date().toLocaleDateString("es-CL", { dateStyle: "long" });
   const t = COLLATERAL_TERMS;
