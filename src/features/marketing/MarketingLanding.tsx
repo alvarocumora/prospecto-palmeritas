@@ -82,52 +82,59 @@ export function MarketingLanding() {
               <span>{t("hero_eyebrow")}</span>
             </div>
 
-            <h1 className="brand-display text-[38px] sm:text-[56px] lg:text-[68px] leading-[0.98] tracking-tight text-white">
-              Proyectos mineros,{" "}
-              <span className="italic font-normal text-slate-400">catastro live</span> y{" "}
-              <span
-                className="bg-clip-text text-transparent"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(90deg, #ffffff 0%, #ffffff 40%, rgba(148,163,184,0.55) 100%)",
-                }}
-              >
-                trade de commodities
+            <h1 className="brand-display text-[36px] sm:text-[52px] lg:text-[60px] leading-[1.02] tracking-tight text-white">
+              Inversión estructurada en minería,{" "}
+              <span className="italic font-normal text-slate-400">
+                respaldada por catastro y activos reales
               </span>
               .
             </h1>
 
             <p className="mt-5 text-base sm:text-lg text-slate-400 max-w-xl font-light leading-relaxed">
-              Publica, valoriza y transaccionas activos mineros y lotes de metales verificados con
-              trazabilidad NI 43-101, catastro georreferenciado y firma electrónica.
+              Invierte en proyectos mineros verificados con garantía inmobiliaria, analiza
+              concesiones con imágenes satelitales y comercializa mineral con procedencia
+              documentada.
             </p>
 
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="#proyectos"
-                className="group inline-flex items-center gap-2 h-12 px-7 bg-white text-black text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-[color:var(--gold)] transition-colors"
-              >
-                Ver proyectos
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </a>
-              <a
-                href="#catastro"
-                className="group inline-flex items-center gap-2 h-12 px-6 border border-white/20 text-white text-[11px] font-semibold uppercase tracking-[0.22em] rounded-sm hover:bg-white/5 transition-colors"
-              >
-                <Radar className="w-4 h-4" />
-                Catastro live
-              </a>
-              <a
-                href="#commodities"
-                className="group flex items-center gap-2 text-[11px] font-semibold tracking-[0.22em] uppercase text-slate-300 hover:text-white transition-colors"
-              >
-                <Coins className="w-4 h-4" />
-                Marketplace de commodities
-              </a>
+            {/* 3 puertas de entrada por perfil */}
+            <div className="mt-8 grid sm:grid-cols-3 gap-px bg-white/[0.08] border border-white/10">
+              {[
+                {
+                  to: "/inversion-colateral" as const,
+                  k: "Soy inversionista",
+                  d: "Renta fija con colateral inmobiliario y proyectos para invertir.",
+                  icon: ShieldCheck,
+                },
+                {
+                  to: "/empresas" as const,
+                  k: "Soy titular o geólogo",
+                  d: "Certifica, visualiza en 3D y financia tu proyecto minero.",
+                  icon: Layers,
+                },
+                {
+                  to: "/marketplace" as const,
+                  k: "Compro o vendo mineral",
+                  d: "Lotes y requerimientos con procedencia trazable.",
+                  icon: Coins,
+                },
+              ].map((door) => (
+                <Link
+                  key={door.k}
+                  to={door.to}
+                  className="group bg-[#05070a] p-4 hover:bg-white/[0.04] transition-colors"
+                >
+                  <door.icon className="w-4 h-4 mb-2" style={{ color: "var(--gold)" }} />
+                  <div className="text-sm text-white font-medium flex items-center gap-1">
+                    {door.k}
+                    <ArrowRight className="w-3.5 h-3.5 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="text-xs text-slate-400 mt-1 leading-snug">{door.d}</div>
+                </Link>
+              ))}
             </div>
 
             {/* Trust strip */}
-            <div className="mt-10 pt-6 border-t border-white/5 flex items-center gap-6 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
+            <div className="mt-8 pt-6 border-t border-white/5 flex items-center gap-6 text-[11px] font-mono uppercase tracking-widest text-slate-500 flex-wrap">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> KYC /
                 AML
@@ -138,30 +145,39 @@ export function MarketingLanding() {
               <span className="flex items-center gap-2">
                 <Globe2 className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> LATAM
               </span>
+              <span className="flex items-center gap-2">
+                <MapPin className="w-4 h-4" style={{ color: "var(--accent-brand)" }} /> Garantía
+                inmobiliaria
+              </span>
             </div>
 
-            {/* KPI live bar */}
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden">
-              {[
+            {/* KPI live bar — solo cifras reales; se oculta si aún no cargan */}
+            {(() => {
+              const kpis = [
                 { v: live?.projects ?? 0, l: "Proyectos" },
-                {
-                  v: live?.concessionsManaged ?? 0,
-                  l: "Concesiones",
-                  compact: true,
-                },
+                { v: live?.concessionsManaged ?? 0, l: "Concesiones", compact: true },
                 { v: live?.satelliteAnomalies ?? 0, l: "Anomalías sat." },
                 { v: live?.mineralDeposits ?? 0, l: "Yacimientos", compact: true },
-              ].map((k, i) => (
-                <div key={i} className="bg-[#05070a] px-4 py-4">
-                  <div className="font-mono text-2xl text-white tracking-tight">
-                    <AnimatedCounter value={k.v} format={k.compact ? "compact" : "int"} />
-                  </div>
-                  <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
-                    {k.l}
-                  </div>
+              ].filter((k) => k.v > 0);
+              if (kpis.length === 0) return null;
+              return (
+                <div
+                  className="mt-6 grid gap-px bg-white/[0.06] border border-white/10 rounded-sm overflow-hidden"
+                  style={{ gridTemplateColumns: `repeat(${kpis.length}, minmax(0, 1fr))` }}
+                >
+                  {kpis.map((k, i) => (
+                    <div key={i} className="bg-[#05070a] px-4 py-4">
+                      <div className="font-mono text-2xl text-white tracking-tight">
+                        <AnimatedCounter value={k.v} format={k.compact ? "compact" : "int"} />
+                      </div>
+                      <div className="text-[10px] font-mono uppercase tracking-[0.18em] text-slate-500 mt-1">
+                        {k.l}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
+              );
+            })()}
           </div>
 
           {/* Live map wrapped in HUD frame */}
