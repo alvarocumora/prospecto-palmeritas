@@ -5,7 +5,7 @@ export type PublicProjectRecord = {
   code: string;
   name: string;
   aliases: readonly string[];
-  livePath: `/live/${string}`;
+  livePath: `/terminal/${string}`;
   investmentPath: `/proyectos/ficha/${string}`;
   privatePath?: `/dashboard/${string}`;
   status: "published" | "review" | "draft" | "archived";
