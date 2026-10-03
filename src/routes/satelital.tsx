@@ -61,7 +61,6 @@ function SatelitalError({ error: rawError }: { error: unknown }) {
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />
-      <ProjectTerminalLinks label="Ver en la página del proyecto" />
       <div className="max-w-3xl mx-auto px-5 py-24 text-center">
         <h1 className="brand-display text-2xl mb-3">No pudimos cargar el monitoreo satelital</h1>
         <p className="text-content-subtle text-sm mb-6">{error.message}</p>
@@ -180,6 +179,7 @@ function SatelitalPage() {
   return (
     <main className="min-h-screen bg-surface">
       <MarketingHeader />
+      <ProjectTerminalLinks label="Ver en la página del proyecto" />
 
       <section className="border-b border-hairline bg-accent-brand-subtle">
         <div className="max-w-7xl mx-auto px-5 py-16">
