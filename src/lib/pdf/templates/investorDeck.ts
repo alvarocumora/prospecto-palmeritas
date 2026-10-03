@@ -27,6 +27,7 @@ import {
   title,
 } from "../brand/kit";
 import type { ProjectDoc } from "../model";
+import { pleca } from "../brand/institutional";
 import { blockMetaLine, mainBlocks } from "../narrative";
 
 const { w: W, h: H, m: M } = GC_PAGE.deck;
@@ -42,6 +43,7 @@ export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise
     slide += 1;
     fill(doc, GC_COLOR.paper);
     doc.rect(0, 0, W, H, "F");
+    pleca(doc, W);
     const markW = drawMark(doc, M, 26, 16);
     font(doc, "body", "bold", 8);
     ink(doc, GC_COLOR.ink);

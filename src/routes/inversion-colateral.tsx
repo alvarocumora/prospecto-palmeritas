@@ -4,6 +4,7 @@ import { ArrowRight, CalendarClock, Landmark, Repeat, ShieldCheck } from "lucide
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
 import { CollateralLeadForm } from "@/features/investor/CollateralLeadForm";
 import { CollateralSimulator } from "@/features/investor/CollateralSimulator";
+import { CollateralOneClickPack } from "@/features/investor/CollateralOneClickPack";
 import {
   COLLATERAL_DISCLAIMERS,
   COLLATERAL_PROJECTS,
@@ -149,7 +150,10 @@ function PublicCollateralPage() {
             id="simulador"
             className="mt-16 grid gap-6 md:grid-cols-[1.1fr_1fr] scroll-mt-20"
           >
-            <CollateralSimulator onChange={(amount, months) => setSim({ amount, months })} />
+            <div className="space-y-3">
+              <CollateralSimulator onChange={(amount, months) => setSim({ amount, months })} />
+              <CollateralOneClickPack amount={sim.amount} months={sim.months} />
+            </div>
             <div className="border border-hairline p-6 bg-surface">
               <h3 className="font-serif text-2xl">Cómo funciona</h3>
               <ol className="mt-4 space-y-3">
