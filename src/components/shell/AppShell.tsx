@@ -15,18 +15,42 @@ import logoMark from "@/assets/geocapitals-mark.png";
  * Todos comparten: BrandMark, LangToggle y la capa de tokens semánticos.
  * ============================================================ */
 
-const NAV = [
-  { to: "/proyectos", key: "nav_projects" as const },
-  { to: "/marketplace", key: "nav_marketplace" as const },
-  { to: "/catastro", key: "nav_catastro" as const },
-  { to: "/catastro/precios", key: "nav_pricing" as const },
-  { to: "/inversionistas", key: "nav_investors" as const },
-  { to: "/empresas", key: "nav_companies" as const },
-  { to: "/recursos", key: "nav_resources" as const },
-  { to: "/rfqs", key: "nav_rfqs" as const },
-  { to: "/inscripcion", key: "nav_suppliers" as const },
-  { to: "/contacto", key: "nav_contact" as const },
-] as const;
+type NavItem = { to: string; label: string; desc: string };
+const PILLARS: { label: string; items: NavItem[] }[] = [
+  {
+    label: "Inversión & Capital",
+    items: [
+      { to: "/inversion-colateral", label: "Inversión con colateral", desc: "Renta fija respaldada por inmuebles" },
+      { to: "/proyectos", label: "Proyectos mineros", desc: "Oportunidades verificadas para invertir" },
+      { to: "/inversionistas", label: "Para inversionistas", desc: "Data room, memorándum y proceso" },
+    ],
+  },
+  {
+    label: "Catastro & Inteligencia",
+    items: [
+      { to: "/catastro", label: "Catastro minero", desc: "Concesiones de Chile y LATAM" },
+      { to: "/catastro/mapa", label: "Mapa interactivo", desc: "Concesiones, satélite y anomalías" },
+      { to: "/terminal", label: "Terminal de proyectos", desc: "Ficha técnica, 2D y 3D por activo" },
+    ],
+  },
+  {
+    label: "Trade de Minerales",
+    items: [
+      { to: "/marketplace", label: "Lotes disponibles", desc: "Mineral y concentrados a la venta" },
+      { to: "/rfqs", label: "Requerimientos", desc: "Compradores buscando mineral" },
+      { to: "/inscripcion", label: "Ser proveedor", desc: "Publica tu producción" },
+    ],
+  },
+  {
+    label: "Institucional",
+    items: [
+      { to: "/empresas", label: "Para empresas", desc: "Titulares mineros y geólogos" },
+      { to: "/catastro/precios", label: "Planes y precios", desc: "Membresías de la plataforma" },
+      { to: "/recursos", label: "Recursos", desc: "Guías y documentación" },
+      { to: "/contacto", label: "Contacto", desc: "Hablemos de tu proyecto" },
+    ],
+  },
+];
 
 export function BrandMark({
   className = "",
@@ -101,16 +125,30 @@ export function MarketingHeader() {
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur border-b border-hairline">
       <div className="max-w-7xl mx-auto h-16 px-5 flex items-center gap-4">
         <BrandMark />
-        <nav className="hidden lg:flex items-center gap-5 text-sm text-content/80 ml-4">
-          {NAV.map((n) => (
-            <Link
-              key={n.to}
-              to={n.to}
-              className="hover:text-accent-brand transition-colors whitespace-nowrap"
-              activeProps={{ className: "text-accent-brand font-medium" }}
-            >
-              {t(n.key)}
-            </Link>
+        <nav className="hidden xl:flex items-center gap-1 text-sm text-content/80 ml-4">
+          {PILLARS.map((p) => (
+            <div key={p.label} className="relative group">
+              <button
+                type="button"
+                className="px-3 py-2 hover:text-accent-brand transition-colors whitespace-nowrap"
+              >
+                {p.label}
+              </button>
+              <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full pt-2 z-50">
+                <div className="w-80 bg-white border border-hairline shadow-lg p-2">
+                  {p.items.map((n) => (
+                    <Link
+                      key={n.to}
+                      to={n.to}
+                      className="block px-3 py-2.5 hover:bg-surface"
+                    >
+                      <div className="text-sm text-content font-medium">{n.label}</div>
+                      <div className="text-xs text-content-subtle">{n.desc}</div>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
           ))}
         </nav>
         <div className="flex-1" />
@@ -118,11 +156,11 @@ export function MarketingHeader() {
           <LangToggle />
         </div>
         <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline">
-          {t("cta_login")}
+          Acceso clientes
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">
-          <Link to="/auth">
-            {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
+          <Link to="/inversion-colateral">
+            Simular inversión <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </BrandButton>
         <button
@@ -130,24 +168,30 @@ export function MarketingHeader() {
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={menuOpen}
-          className="lg:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-hairline text-content hover:border-accent-brand"
+          className="xl:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-hairline text-content hover:border-accent-brand"
         >
           {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
       </div>
       {menuOpen && (
-        <div className="lg:hidden border-t border-hairline bg-white">
+        <div className="xl:hidden border-t border-hairline bg-white max-h-[80vh] overflow-y-auto">
           <nav className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm">
-            {NAV.map((n) => (
-              <Link
-                key={n.to}
-                to={n.to}
-                onClick={() => setMenuOpen(false)}
-                className="py-2.5 border-b border-hairline last:border-0 text-content hover:text-accent-brand"
-                activeProps={{ className: "text-accent-brand font-medium" }}
-              >
-                {t(n.key)}
-              </Link>
+            {PILLARS.map((p) => (
+              <div key={p.label} className="py-2 border-b border-hairline last:border-0">
+                <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-subtle py-1">
+                  {p.label}
+                </div>
+                {p.items.map((n) => (
+                  <Link
+                    key={n.to}
+                    to={n.to}
+                    onClick={() => setMenuOpen(false)}
+                    className="block py-2 text-content hover:text-accent-brand"
+                  >
+                    {n.label}
+                  </Link>
+                ))}
+              </div>
             ))}
             <div className="pt-3 flex items-center gap-3 sm:hidden">
               <LangToggle />
@@ -156,11 +200,11 @@ export function MarketingHeader() {
                 onClick={() => setMenuOpen(false)}
                 className="text-sm text-content hover:text-accent-brand"
               >
-                {t("cta_login")}
+                Acceso clientes
               </Link>
               <BrandButton asChild size="sm">
-                <Link to="/auth" onClick={() => setMenuOpen(false)}>
-                  {t("cta_signup")} <ArrowRight className="w-3.5 h-3.5" />
+                <Link to="/inversion-colateral" onClick={() => setMenuOpen(false)}>
+                  Simular inversión <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </BrandButton>
             </div>
