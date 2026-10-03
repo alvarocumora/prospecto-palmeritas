@@ -91,7 +91,7 @@ export const CHOLQUI = {
   pedimentos: 20,
   pertenencias: 15,
   access: "~30 min de la Ruta 78; sin comunidades cercanas según antecedentes del titular",
-  liveUrl: "/live/cholqui",
+  liveUrl: "/terminal/cholqui",
   contact: {
     name: "GeoCapitals",
     email: "contacto@geocapitals.com",

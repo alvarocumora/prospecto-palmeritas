@@ -46,7 +46,7 @@ function CholquiLivePage() {
           </p>
         </div>
         <a
-          href="/live/cholqui"
+          href="/terminal/cholqui"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-2 text-[12px] border border-hairline rounded-lg px-3 py-2 hover:bg-surface-2"

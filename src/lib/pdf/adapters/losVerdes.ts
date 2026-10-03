@@ -31,7 +31,7 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
     commodity: project.commodity ?? "Cu",
     stage: "Exploración · muestreo de superficie",
     location: [project.region, project.country].filter(Boolean).join(", "),
-    liveUrl: publicUrl("/live/losverdes"),
+    liveUrl: publicUrl("/terminal/losverdes"),
     docVersion: LOS_VERDES_DOC_VERSION,
     tags: [
       project.commodity ?? "Cu",
