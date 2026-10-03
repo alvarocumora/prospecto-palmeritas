@@ -3,6 +3,6 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 // Vista pública unificada: toda ficha de proyecto vive en el Terminal (/terminal/$slug).
 export const Route = createFileRoute("/live/cholqui")({
   beforeLoad: () => {
-    throw redirect({ to: "/terminal/$slug", params: { slug: "cholqui" }, replace: true, statusCode: 301 });
+    throw redirect({ to: "/terminal/$slug", params: { slug: "cholqui" }, search: { tab: "mapa" }, replace: true, statusCode: 301 });
   },
 });
