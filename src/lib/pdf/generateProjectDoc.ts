@@ -46,6 +46,7 @@ function guardText(doc: { text: (...args: never[]) => unknown }) {
 
 export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
   const { default: JsPDF } = await import("jspdf");
+  const { ensureBrandFonts } = await import("./brand/kit");
 
   if (kind === "deck") {
     const doc = new JsPDF({
@@ -54,6 +55,7 @@ export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
       orientation: "landscape",
     });
     guardText(doc);
+    await ensureBrandFonts(doc);
     const { renderInvestorDeck } = await import("./templates/investorDeck");
     await renderInvestorDeck(doc, model);
     return doc;
@@ -61,6 +63,7 @@ export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
 
   const doc = new JsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
   guardText(doc);
+    await ensureBrandFonts(doc);
 
   if (kind === "onepager") {
     const { renderOnePager } = await import("./templates/onePager");
