@@ -61,7 +61,7 @@ export function InvestableProjects() {
         <SectionHeading
           eyebrow="Proyectos disponibles para invertir"
           title="Oportunidades con datos trazables en minería activa"
-          description="Cada proyecto lleva un sello visible con su nivel de verificación — demo, trazable o verificado QP — junto a modelo económico y múltiples modalidades de entrada."
+          description="Cada proyecto lleva un sello visible con su nivel de verificación — trazable o verificado QP — junto a modelo económico y múltiples modalidades de entrada."
           className="flex-1"
         />
         <BrandButton asChild variant="outline" className="shrink-0">

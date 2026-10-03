@@ -12,11 +12,7 @@
 export type VerificationLevel = "demo" | "traceable" | "qp_verified";
 
 /** Proyectos de muestra: se etiquetan "demo" en toda la superficie pública. */
-export const DEMO_PROJECT_IDS: readonly string[] = [
-  "7a499b02-ecdf-447b-8956-b106fe4ec087",
-  "e5360f13-1647-4e44-bb13-c0614e6f39fe",
-  "8dc8e288-b22c-4bd4-9626-bb7fb85d1745",
-];
+export const DEMO_PROJECT_IDS: readonly string[] = [];
 
 /** Proyectos con firma QP. Vacío hasta cerrar el convenio con la Qualified Person. */
 export const QP_VERIFIED_PROJECT_IDS: readonly string[] = [];

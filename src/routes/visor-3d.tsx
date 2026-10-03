@@ -680,7 +680,7 @@ function Visor3DPage() {
             <StatBox icon={AlertTriangle} label="Críticas" value={criticalCount} tone="danger" />
             <StatBox
               icon={Activity}
-              label={totalHoles > 0 ? "Sondajes" : "Sondajes demo"}
+              label={totalHoles > 0 ? "Sondajes" : "Sondajes propuestos"}
               value={totalHoles > 0 ? totalHoles : sites.length * 3}
             />
           </div>
@@ -691,7 +691,7 @@ function Visor3DPage() {
         <SectionHeading
           eyebrow="Escena 3D"
           title="Terreno, sondajes y anomalías en un solo canvas"
-          description="Sitios, anomalías, sondajes e intervalos de litología provienen de la base de datos productiva de Geocapitals; los collares se posicionan por coordenadas UTM reales con trazas inclinadas por azimuth/dip y coloreadas por litología. El terreno usa el pipeline DEM por proyecto (relieve demostrativo hasta conectar Copernicus)."
+          description="Sitios, anomalías, sondajes e intervalos de litología provienen de la base de datos productiva de Geocapitals; los collares se posicionan por coordenadas UTM reales con trazas inclinadas por azimuth/dip y coloreadas por litología. El terreno usa el pipeline DEM por proyecto (relieve referencial hasta conectar Copernicus)."
           className="mb-6"
         />
 
@@ -813,7 +813,7 @@ function Visor3DPage() {
                   <Satellite className="w-3 h-3" />
                   {demById.get(selectedSite.project.id)!.source === "copernicus"
                     ? "Terreno real · Copernicus GLO-30 · escala 1:1"
-                    : "Terreno demostrativo"}
+                    : "Terreno referencial"}
                 </span>
               </div>
             )}
@@ -854,7 +854,7 @@ function Visor3DPage() {
                   <MiniStat label="Críticas" value={selectedSite.criticalCount} />
                   <MiniStat
                     label="Sondajes"
-                    value={selectedSite.holes.length > 0 ? selectedSite.holes.length : "demo"}
+                    value={selectedSite.holes.length > 0 ? selectedSite.holes.length : "—"}
                   />
                   <MiniStat
                     label="Velocidad InSAR"
