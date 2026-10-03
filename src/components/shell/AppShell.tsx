@@ -155,7 +155,7 @@ export function MarketingHeader() {
         <div className="hidden sm:inline-flex">
           <LangToggle />
         </div>
-        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline">
+        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline whitespace-nowrap">
           Acceso clientes
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">
