@@ -328,6 +328,17 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   const contact = [model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ");
   if (contact) write(`Contacto del proyecto (no acredita rol QP/CP): ${contact}`, 8, GC_COLOR.slate);
 
+  // Remove the second reserved leaf when the actual index fits on one page.
+  font(doc, "body", "normal", 8);
+  const indexHeight = [{ label: "Control documental" }, ...contents].reduce((height, entry) =>
+    height + (doc.splitTextToSize(entry.label, CW - 40) as string[]).length * 12 + 10, 38);
+  const singleIndex = TOP + indexHeight <= BOTTOM;
+  if (singleIndex) {
+    doc.deletePage(indexStart + 1);
+    for (const entry of contents) {
+      if (entry.page > indexStart + 1) entry.page -= 1;
+    }
+  }
   const total = doc.getNumberOfPages();
   const allContents = [{ label: "Control documental", page: 1 }, ...contents];
   let indexPage = indexStart;
@@ -347,12 +358,6 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     ink(doc, GC_COLOR.inkSoft); doc.text(lines, M, iy);
     doc.text(String(entry.page), W - M, iy, { align: "right" });
     doc.link(M, iy - 9, CW, height, { pageNumber: entry.page }); iy += height;
-  }
-  if (indexPage === indexStart) {
-    doc.setPage(indexStart + 1);
-    title(doc, M, TOP, "Guía de lectura técnica", 20, CW);
-    paragraph(doc, M, TOP + 40, framework.positioning, CW, 10);
-    paragraph(doc, M, TOP + 110, "Los anexos conservan el detalle de tablas y coordenadas. Cada clase de evidencia conserva su significado: una interpretación derivada de datos certificados no se convierte en evidencia certificada. El QR no valida la exactitud del contenido ni sustituye revisión profesional.", CW, 10);
   }
   for (let p = 1; p <= total; p++) {
     doc.setPage(p);
