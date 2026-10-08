@@ -1,7 +1,8 @@
 # Roadmap
 
-- [ ] Actualizar el informe técnico compartido con membrete Geocapitals, índice paginado, control documental, procedencia y revisión NI 43-101/JORC.
-- [ ] Verificar descargas de informes técnicos y revisar visualmente los PDF generados.
+- [x] Actualizar el informe técnico compartido con membrete Geocapitals, índice paginado, control documental, procedencia y revisión NI 43-101/JORC.
+- [x] Verificar descargas NI 43-101/JORC de Nahuelbuta y Cholqui; revisar visualmente todas las páginas y eliminar la página de guía casi vacía.
+- [ ] Verificar exportación Los Verdes — bloqueada durante la comprobación por la carga de antecedentes del reporte; no generar resultados de sustitución.
 
 - [x] Incorporar las 190 muestras reales de Los Verdes a la fuente pública y al mapa.
 - [x] Mejorar la ficha pública `/live/losverdes` con resumen verificable y enlace copiable.
