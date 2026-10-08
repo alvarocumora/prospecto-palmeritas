@@ -69,9 +69,9 @@ const CholquiRoundPanel = lazy(() =>
     default: m.CholquiRoundPanel,
   })),
 );
-const LosVerdesStrategicMap = lazy(() =>
-  import("@/components/live/LosVerdesStrategicMap").then((m) => ({
-    default: m.LosVerdesStrategicMap,
+const LosVerdesMasterViewer = lazy(() =>
+  import("@/features/losverdes/LosVerdesMasterViewer").then((m) => ({
+    default: m.LosVerdesMasterViewer,
   })),
 );
 const LosVerdesEngine3D = lazy(() =>
@@ -284,13 +284,13 @@ function MapaTab({ project }: { project: TerminalProject }) {
             ))}
           </div>
         </div>
-        <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
-          {view === "2d" ? (
-            <LosVerdesStrategicMap height={typeof window !== "undefined" && window.innerWidth < 640 ? 460 : 640} />
-          ) : (
+        {view === "2d" ? (
+          <LosVerdesMasterViewer />
+        ) : (
+          <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
             <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
-          )}
-        </div>
+          </div>
+        )}
       </Suspense>
     );
   }
