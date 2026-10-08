@@ -6,10 +6,7 @@ export type ModuleEntitlements = {
 };
 
 /** Missing, failed or malformed entitlement lookups never grant module access. */
-export function parseModuleEntitlements(
-  data: unknown,
-  error: unknown,
-): ModuleEntitlements {
+export function parseModuleEntitlements(data: unknown, error: unknown): ModuleEntitlements {
   const denied: ModuleEntitlements = { unrestricted: false, modules: [] };
   if (error || !data || typeof data !== "object" || Array.isArray(data)) return denied;
   const payload = data as Record<string, unknown>;
