@@ -1,2 +1,3 @@
 - PDF documents share one institutional structure from src/lib/pdf/brand/institutional.ts (pleca, letterhead, numbered sections, QR verification seal) — keeps every deck, memo and certificate consistent.
 - PDF typography: every brand PDF calls ensureBrandFonts(doc) from src/lib/pdf/brand/kit.ts (embedded Newsreader + IBM Plex Sans from src/assets/fonts/pdf) — font() falls back to native fonts if loading fails.
+- Technical project PDFs use the shared renderer and disclosure framework helpers; NI 43-101/JORC selections indicate review structure only, never certified compliance, and source inventories derive from existing evidence metadata.
