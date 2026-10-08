@@ -65,5 +65,6 @@ export function terminalSlugForListing(listing: {
   if (title.includes("cholqui")) return "cholqui";
   if (title.includes("verdes") || title.includes("tilama")) return "losverdes";
   if (title.includes("palmeras")) return "palmeras";
+  if (title.includes("nahuelbuta") || title.includes("arcillas")) return "nahuelbuta";
   return null;
 }
