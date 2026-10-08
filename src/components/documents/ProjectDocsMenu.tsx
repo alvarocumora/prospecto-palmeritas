@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { DisclosureStandard } from "@/lib/reports/internationalStandards";
 import type { ProjectDoc, ProjectDocKind } from "@/lib/pdf/model";
 import { captureElement } from "@/lib/pdf/captureMap";
 import { downloadProjectDoc } from "@/lib/pdf/generateProjectDoc";
@@ -27,7 +28,7 @@ const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
     hint: "Presentación para comités y family offices",
   },
   { kind: "onepager", title: "Resumen de una página", hint: "Para enviar por correo o WhatsApp" },
-  { kind: "technical", title: "Dossier técnico", hint: "Antecedentes completos para revisión" },
+  { kind: "technical", title: "Informe técnico · NI 43-101", hint: "Preliminar · revisión QP pendiente" },
 ];
 
 export function ProjectDocsMenu({
@@ -47,12 +48,13 @@ export function ProjectDocsMenu({
   const [busy, setBusy] = useState<ProjectDocKind | null>(null);
   const navigate = useNavigate();
 
-  const run = async (kind: ProjectDocKind) => {
+  const run = async (kind: ProjectDocKind, standard?: DisclosureStandard) => {
     const model = build();
     if (!model) {
       toast.error("Los antecedentes del proyecto aún se están cargando");
       return;
     }
+    if (standard) model.disclosureStandard = standard;
     setBusy(kind);
     const id = toast.loading("Generando documento…");
     try {
@@ -99,6 +101,10 @@ export function ProjectDocsMenu({
         <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
           Exportación rápida · compatibilidad
         </DropdownMenuLabel>
+        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); void run("technical", "JORC_2012"); }} className="flex-col items-start gap-0.5 py-2.5">
+          <span className="text-sm font-medium">Informe técnico · JORC 2012</span>
+          <span className="text-xs text-muted-foreground">Preliminar · revisión CP pendiente</span>
+        </DropdownMenuItem>
         {OPTIONS.map((opt) => (
           <DropdownMenuItem
             key={opt.kind}

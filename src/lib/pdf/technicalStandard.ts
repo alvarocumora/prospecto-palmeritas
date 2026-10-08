@@ -19,7 +19,4 @@ export function reportSources(model: ProjectDoc): string[] {
   return [...sources];
 }
 
-export const TECHNICAL_REVIEW_NOTICE =
-  "Document de travail préliminaire";
-
 export const TECHNICAL_STANDARDS: readonly DisclosureStandard[] = ["NI_43_101", "JORC_2012"];
