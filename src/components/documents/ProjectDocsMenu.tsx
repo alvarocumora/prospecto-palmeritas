@@ -101,16 +101,15 @@ export function ProjectDocsMenu({
         <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
           Exportación rápida · compatibilidad
         </DropdownMenuLabel>
-        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); void run("technical", "JORC_2012"); }} className="flex-col items-start gap-0.5 py-2.5">
+        <DropdownMenuItem onSelect={() => { void run("technical", "JORC_2012"); }} className="flex-col items-start gap-0.5 py-2.5">
           <span className="text-sm font-medium">Informe técnico · JORC 2012</span>
           <span className="text-xs text-muted-foreground">Preliminar · revisión CP pendiente</span>
         </DropdownMenuItem>
         {OPTIONS.map((opt) => (
           <DropdownMenuItem
             key={opt.kind}
-            onSelect={(e) => {
-              e.preventDefault();
-              void run(opt.kind);
+            onSelect={() => {
+              void run(opt.kind, opt.kind === "technical" ? "NI_43_101" : undefined);
             }}
             className="flex-col items-start gap-0.5 py-2.5"
           >
