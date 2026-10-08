@@ -3,10 +3,16 @@ import { parseModuleEntitlements } from "./moduleEntitlements";
 
 describe("server module entitlements", () => {
   it("denies missing and malformed responses", () => {
-    for (const data of [null, undefined, {}, [], { unrestricted: true }, {
-      unrestricted: "true",
-      modules: [],
-    }, { unrestricted: true, modules: [{ key: "unknown" }] }]) {
+    const invalid = [
+      null,
+      undefined,
+      {},
+      [],
+      { unrestricted: true },
+      { unrestricted: "true", modules: [] },
+      { unrestricted: true, modules: [{ key: "unknown" }] },
+    ];
+    for (const data of invalid) {
       expect(parseModuleEntitlements(data, null)).toEqual({
         unrestricted: false,
         modules: [],
@@ -15,28 +21,36 @@ describe("server module entitlements", () => {
   });
 
   it("denies an RPC error even when data grants unrestricted access", () => {
-    expect(parseModuleEntitlements({
-      unrestricted: true,
+    const data = { unrestricted: true, modules: [] };
+    const error = { message: "lookup failed" };
+    expect(parseModuleEntitlements(data, error)).toEqual({
+      unrestricted: false,
       modules: [],
-    }, { message: "lookup failed" })).toEqual({ unrestricted: false, modules: [] });
+    });
   });
 
   it("preserves explicitly granted unrestricted access", () => {
-    expect(parseModuleEntitlements({ unrestricted: true, modules: [] }, null)).toEqual({
+    const data = { unrestricted: true, modules: [] };
+    expect(parseModuleEntitlements(data, null)).toEqual({
       unrestricted: true,
       modules: [],
     });
   });
 
   it("preserves restricted module grants without promoting other modules", () => {
-    expect(parseModuleEntitlements({
+    const data = {
       unrestricted: false,
       modules: [{ key: "capital" }, { key: "capital" }, { key: "catastro" }],
-    }, null)).toEqual({ unrestricted: false, modules: ["capital", "catastro"] });
+    };
+    expect(parseModuleEntitlements(data, null)).toEqual({
+      unrestricted: false,
+      modules: ["capital", "catastro"],
+    });
   });
 
   it("preserves an explicit denial", () => {
-    expect(parseModuleEntitlements({ unrestricted: false, modules: [] }, null)).toEqual({
+    const data = { unrestricted: false, modules: [] };
+    expect(parseModuleEntitlements(data, null)).toEqual({
       unrestricted: false,
       modules: [],
     });
