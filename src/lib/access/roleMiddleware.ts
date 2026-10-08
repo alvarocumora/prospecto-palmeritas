@@ -54,10 +54,7 @@ export async function resolveServerAccess(
 
   const isSuperAdmin = !!roleRes?.data;
   const accountType = (profileRes?.data?.account_type ?? null) as ServerAccess["accountType"];
-  const { unrestricted, modules } = parseModuleEntitlements(
-    modulesRes?.data,
-    modulesRes?.error,
-  );
+  const { unrestricted, modules } = parseModuleEntitlements(modulesRes?.data, modulesRes?.error);
 
   const roles = new Set<ServerAccessRole>();
   const isStaff = isSuperAdmin || accountType === "geocapitals_team";
