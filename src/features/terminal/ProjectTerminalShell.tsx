@@ -16,6 +16,7 @@ import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
 import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
+import { buildNahuelbutaDoc } from "@/lib/pdf/adapters/nahuelbuta";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import { TerminalSimulator } from "./TerminalSimulator";
 
@@ -75,6 +76,18 @@ const LosVerdesStrategicMap = lazy(() =>
 );
 const LosVerdesEngine3D = lazy(() =>
   import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+);
+const NahuelbutaMasterViewer = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({ default: m.NahuelbutaMasterViewer })),
+);
+const NahuelbutaSatellitePanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaSatellitePanel })),
+);
+const NahuelbutaTenurePanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaTenurePanel })),
+);
+const NahuelbutaThesisPanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaThesisPanel })),
 );
 const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 const TrackminGeoIntel = lazy(() =>
@@ -231,6 +244,18 @@ function MapaTab({ project }: { project: TerminalProject }) {
     );
   }
 
+  if (project.slug === "nahuelbuta") {
+    return (
+      <Suspense fallback={<Loading label="Cargando visor" />}>
+        <NahuelbutaMasterViewer />
+        <div className="mt-6 space-y-6">
+          <NahuelbutaSatellitePanel />
+          <NahuelbutaTenurePanel />
+        </div>
+      </Suspense>
+    );
+  }
+
   if (project.slug === "losverdes") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
@@ -321,6 +346,13 @@ function TesisTab({ project }: { project: TerminalProject }) {
         </section>
       </div>
 
+      {project.slug === "nahuelbuta" && (
+        <Suspense fallback={<Loading label="Cargando tesis" />}>
+          <div className="mt-6">
+            <NahuelbutaThesisPanel />
+          </div>
+        </Suspense>
+      )}
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando ensayes" />}>
           <div className="mt-6">
@@ -364,6 +396,7 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
         <div className="mt-5 flex flex-wrap gap-3">
           {project.slug === "cholqui" && <ProjectDocsMenu build={() => buildCholquiDoc()} />}
           {project.slug === "losverdes" && <LosVerdesDocsMenu />}
+          {project.slug === "nahuelbuta" && <ProjectDocsMenu build={() => buildNahuelbutaDoc()} />}
           <Link
             to="/contacto"
             className="inline-flex items-center justify-center gap-2 rounded-md border border-accent-brand px-5 py-2.5 text-sm text-accent-brand hover:bg-accent-brand-subtle"

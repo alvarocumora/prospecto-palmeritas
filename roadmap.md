@@ -19,3 +19,6 @@
 - [x] Fichas públicas /live/* redirigen al terminal único /terminal/$slug.
 - [x] Reducir el menú interno del panel a 3 espacios (Catastro · Trade · Capital) y fusionar pantallas duplicadas.
 - [x] Unificar visores 2D/3D restantes (visor-3d, geology3d, 3d-pro) en el terminal.
+
+- [x] Módulo live Nahuelbuta REE (paños Arcillas 1-34, satélite, informes) en /terminal/nahuelbuta
+- [ ] Nahuelbuta: términos de inversión reales (valorización, ticket, instrumento) — espera al usuario

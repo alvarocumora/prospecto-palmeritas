@@ -6,9 +6,10 @@
 // y están sujetos a due diligence, NDA y acuerdo definitivo. Este archivo es
 // la única fuente: editar aquí actualiza ficha, simulador y cards.
 
+import { NAHUELBUTA } from "@/features/nahuelbuta/data/nahuelbuta";
 import { CHOLQUI, CHOLQUI_HIGHLIGHTS, CHOLQUI_ROUND } from "@/features/franco/data/cholqui";
 
-export type FichaSlug = "palmeras" | "losverdes" | "cholqui";
+export type FichaSlug = "palmeras" | "losverdes" | "cholqui" | "nahuelbuta";
 
 export type InvestmentScenario = {
   key: "conservador" | "base" | "optimista";
@@ -167,6 +168,43 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     scenarios: SCENARIOS_STD,
     useOfFunds: CHOLQUI_ROUND.useOfFunds.map((u) => ({ label: u.label, pct: u.pct })),
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
+  },
+  // Nahuelbuta: sin términos de ronda definidos; la referencia es el
+  // presupuesto de Fase 1 del informe técnico (no es valorización).
+  nahuelbuta: {
+    slug: "nahuelbuta",
+    code: NAHUELBUTA.code,
+    name: NAHUELBUTA.name,
+    region: NAHUELBUTA.region,
+    country: NAHUELBUTA.country,
+    commodity: NAHUELBUTA.commodity,
+    stage: NAHUELBUTA.stage,
+    stageDetail:
+      "34 paños Arcillas en solicitud (10.200 ha) sobre el Complejo Metamórfico Nahuelbuta. Sin perforaciones ni muestras de laboratorio; sin recursos ni reservas.",
+    liveTo: NAHUELBUTA.liveUrl,
+    highlights: [
+      "34 paños Arcillas · 10.200 ha en solicitud",
+      "Saprolito arcilloso de 5 a 20 m descrito en el informe técnico",
+      "Fase 1 recomendada: US$ 380.000 en 18 meses",
+    ],
+    valuationUsd: {
+      low: NAHUELBUTA.fase1.budgetUsd,
+      high: NAHUELBUTA.fase1.budgetUsd,
+      method: "Por definir — se muestra el presupuesto de Fase 1, no una valorización",
+    },
+    roundSizeUsd: NAHUELBUTA.fase1.budgetUsd,
+    minTicketUsd: 25_000,
+    instrument: "Por definir",
+    equityOfferedPct: 0,
+    horizonYears: 2,
+    scenarios: SCENARIOS_STD,
+    useOfFunds: [
+      { label: "Geofísica aérea VTEM", pct: 45 },
+      { label: "Muestreo de saprolito (TREO, HREE)", pct: 30 },
+      { label: "Cartografía geológica de detalle", pct: 15 },
+      { label: "Patentes, títulos y consulta territorial", pct: 10 },
+    ],
+    milestones: NAHUELBUTA.milestones.map((m) => ({ when: m.when, what: m.what })),
   },
 };
 
