@@ -11,6 +11,7 @@ import palmerasImg from "@/assets/project-palmeras.jpg.asset.json";
 import losverdesImg from "@/assets/project-losverdes.jpg.asset.json";
 import cholquiImg from "@/assets/project-gianfranco.jpg.asset.json";
 import colateralImg from "@/assets/colateral/hualane-satelite.jpg";
+import nahuelbutaImg from "@/assets/project-nahuelbuta.jpg";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -72,6 +73,21 @@ const SHOWCASE = [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",
       "Colinda con pertenencias de Yamana Gold",
+    ],
+  },
+  {
+    code: "NHB-REE",
+    slug: "nahuelbuta" as const,
+    name: "Nahuelbuta REE",
+    region: "Arauco · Biobío / Malleco",
+    commodity: "REE",
+    image: nahuelbutaImg,
+    stage: "Prospección (TRL 1-2)",
+    stats: [["34", "paños"], ["10.200", "hectáreas"], ["US$ 380k", "Fase 1"]],
+    bullets: [
+      "Arcillas iónicas sobre el Complejo Metamórfico Nahuelbuta",
+      "Pedimentos en solicitud ante SERNAGEOMIN",
+      "Sin muestras de laboratorio aún: tesis exploratoria",
     ],
   },
 ];

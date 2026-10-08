@@ -279,6 +279,10 @@ export function ProjectMasterViewer({
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
   const [collapsed, setCollapsed] = useState(false);
+  // En celular el panel de capas tapa el mapa: arranca plegado.
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 639px)").matches) setCollapsed(true);
+  }, []);
   const [openSections, setOpenSections] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(LAYER_SECTIONS.map((s) => [s.title, Boolean(s.defaultOpen)])),
   );

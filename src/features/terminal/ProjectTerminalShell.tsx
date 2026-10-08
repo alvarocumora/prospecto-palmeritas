@@ -128,14 +128,14 @@ export function ProjectTerminalShell({
               Geocapitals · Terminal
             </Link>
 
-            <nav className="flex items-center gap-1.5">
+            <nav className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0">
               {projects.map((p) => (
                 <Link
                   key={p.slug}
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
                   search={{ tab }}
-                  className={`px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
+                  className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
                     p.slug === project.slug
                       ? "bg-white text-content border-white"
                       : "border-white/25 text-white/70 hover:text-white hover:border-white/60"
@@ -283,7 +283,7 @@ function MapaTab({ project }: { project: TerminalProject }) {
         </div>
         <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
           {view === "2d" ? (
-            <LosVerdesStrategicMap height={640} />
+            <LosVerdesStrategicMap height={typeof window !== "undefined" && window.innerWidth < 640 ? 460 : 640} />
           ) : (
             <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
           )}
