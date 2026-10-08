@@ -234,7 +234,12 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     module: "core",
     tabs: [
       { label: "Analítica", to: "/dashboard/analytics" },
-      { label: "Aprobaciones", to: "/dashboard/approvals", capability: "approvals", hideForInvestor: true },
+      {
+        label: "Aprobaciones",
+        to: "/dashboard/approvals",
+        capability: "approvals",
+        hideForInvestor: true,
+      },
       { label: "Costos", to: "/dashboard/finance", capability: "finance", hideForInvestor: true },
       { label: "HSE", to: "/dashboard/hse", capability: "hse", hideForInvestor: true },
       { label: "Equipo", to: "/dashboard/team", capability: "team", hideForInvestor: true },
@@ -265,7 +270,18 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
 
 /** Iconos usados solo para tipado/exports auxiliares (evita imports muertos). */
 export const WORKSPACE_ICONS = {
-  ClipboardCheck, ClipboardList, DollarSign, Droplets, FileSignature, FileText, KeyRound, Package, PackageSearch, Satellite, ShieldAlert, Sparkles,
+  ClipboardCheck,
+  ClipboardList,
+  DollarSign,
+  Droplets,
+  FileSignature,
+  FileText,
+  KeyRound,
+  Package,
+  PackageSearch,
+  Satellite,
+  ShieldAlert,
+  Sparkles,
   Drill,
   TestTube2,
   ShieldCheck,

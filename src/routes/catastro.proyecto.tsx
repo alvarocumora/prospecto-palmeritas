@@ -11,7 +11,10 @@ export const Route = createFileRoute("/catastro/proyecto")({
   head: () => ({
     meta: [
       { title: "Catastro · vista proyecto — Geocapitals" },
-      { name: "description", content: "Concesiones, titulares y vigilancia de tu proyecto minero." },
+      {
+        name: "description",
+        content: "Concesiones, titulares y vigilancia de tu proyecto minero.",
+      },
     ],
   }),
   component: Outlet,

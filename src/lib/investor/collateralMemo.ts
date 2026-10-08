@@ -60,14 +60,18 @@ function kvRow(doc: jsPDF, y: number, k: string, v: string, labelW = 150): numbe
 }
 
 function chrome(doc: jsPDF, page: number, total: number, issued: string) {
-  letterhead(doc, { w: W, h: H, m: M }, {
-    unit: "Estructuración de Capital",
-    ref: REF,
-    version: COLLATERAL_DOC_VERSION,
-    page,
-    total,
-    issued,
-  });
+  letterhead(
+    doc,
+    { w: W, h: H, m: M },
+    {
+      unit: "Estructuración de Capital",
+      ref: REF,
+      version: COLLATERAL_DOC_VERSION,
+      page,
+      total,
+      issued,
+    },
+  );
 }
 
 export async function downloadCollateralMemo(liveUrl: string): Promise<void> {

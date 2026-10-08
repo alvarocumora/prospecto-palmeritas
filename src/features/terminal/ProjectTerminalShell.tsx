@@ -247,7 +247,9 @@ function MapaTab({ project }: { project: TerminalProject }) {
                 type="button"
                 onClick={() => setView(key)}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-                  view === key ? "bg-accent-brand text-white" : "text-content-subtle hover:text-content"
+                  view === key
+                    ? "bg-accent-brand text-white"
+                    : "text-content-subtle hover:text-content"
                 }`}
               >
                 <Icon className="w-3.5 h-3.5" />

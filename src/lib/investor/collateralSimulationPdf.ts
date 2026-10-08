@@ -39,7 +39,13 @@ export async function downloadCollateralSimulation(
   const t = COLLATERAL_TERMS;
   const monthly = monthlyInterestClp(amount);
   const TOTAL = 2;
-  const head = { unit: "Estructuración de Capital", ref, version: COLLATERAL_DOC_VERSION, total: TOTAL, issued };
+  const head = {
+    unit: "Estructuración de Capital",
+    ref,
+    version: COLLATERAL_DOC_VERSION,
+    total: TOTAL,
+    issued,
+  };
 
   letterhead(doc, F, { ...head, page: 1 });
   let y = 92;
@@ -53,7 +59,11 @@ export async function downloadCollateralSimulation(
   y += 16;
   font(doc, "display", "italic", 11);
   ink(doc, GC_COLOR.inkSoft);
-  doc.text(`Monto ${fmtClp(amount)} · plazo ${months} meses · UF + ${t.annualRatePct} % anual`, F.m, y);
+  doc.text(
+    `Monto ${fmtClp(amount)} · plazo ${months} meses · UF + ${t.annualRatePct} % anual`,
+    F.m,
+    y,
+  );
   y += 26;
 
   // Cifras clave
@@ -83,7 +93,10 @@ export async function downloadCollateralSimulation(
     ["Plazo", `${months} meses (renovación cada ${t.reinvestEveryMonths} meses)`],
     ["Tasa", `UF + ${t.annualRatePct},00 % anual, cálculo nominal ${t.annualRatePct} % / 12`],
     ["Pago", `${t.interestPayment}, mes vencido`],
-    ["Garantía", `Parcela de ${t.collateralSizes.join(" o ")} en la ${t.collateralRegion}, con rol individual SII`],
+    [
+      "Garantía",
+      `Parcela de ${t.collateralSizes.join(" o ")} en la ${t.collateralRegion}, con rol individual SII`,
+    ],
     ["Forma del gravamen", "Hipoteca y prohibición de enajenar, sujeta a confirmación legal"],
   ] as Array<[string, string]>)
     y = kvRow(doc, F, y, k, v, 118);

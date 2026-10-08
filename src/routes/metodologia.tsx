@@ -190,7 +190,8 @@ function MetodologiaPage() {
         <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
         <p className="leading-relaxed max-w-3xl">
           Geocapitals es una plataforma de información y conexión. No es un intermediario de valores
-          registrado y no custodia fondos de inversionistas. Cada proyecto indica el origen y nivel de verificación de sus datos.
+          registrado y no custodia fondos de inversionistas. Cada proyecto indica el origen y nivel
+          de verificación de sus datos.
         </p>
       </section>
 

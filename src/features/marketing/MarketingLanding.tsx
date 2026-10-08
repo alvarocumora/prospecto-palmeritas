@@ -82,7 +82,12 @@ export function MarketingLanding() {
       {/* Franja de rigor */}
       <section className="border-b border-hairline bg-surface-2">
         <div className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
-          {["Datos SERNAGEOMIN", "Estándar NI 43-101 · CH 20235", "Ley N° 18.045 · NCG 336", "Documentos con QR verificable"].map((t) => (
+          {[
+            "Datos SERNAGEOMIN",
+            "Estándar NI 43-101 · CH 20235",
+            "Ley N° 18.045 · NCG 336",
+            "Documentos con QR verificable",
+          ].map((t) => (
             <div key={t} className="flex items-center gap-2">
               <Check className="w-3.5 h-3.5 text-accent-brand" /> {t}
             </div>
@@ -134,18 +139,36 @@ export function MarketingLanding() {
             </div>
             <CollateralDownloadButtons className="mt-3" />
             <p className="mt-4 text-[11px] text-content-muted">
-              Tasa pactada por contrato, no proyección minera. No constituye oferta pública de valores.
+              Tasa pactada por contrato, no proyección minera. No constituye oferta pública de
+              valores.
             </p>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <figure className="col-span-2 relative">
-              <img src={hualaneSat} alt="Vista satelital Hualañé" loading="lazy" className="w-full h-64 object-cover border border-hairline" />
-              <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">Imagen real · satelital</figcaption>
+              <img
+                src={hualaneSat}
+                alt="Vista satelital Hualañé"
+                loading="lazy"
+                className="w-full h-64 object-cover border border-hairline"
+              />
+              <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">
+                Imagen real · satelital
+              </figcaption>
             </figure>
-            {[{ s: velValle, l: "Valle · referencial" }, { s: colateralCover, l: "Maule · ilustrativa" }].map((x) => (
+            {[
+              { s: velValle, l: "Valle · referencial" },
+              { s: colateralCover, l: "Maule · ilustrativa" },
+            ].map((x) => (
               <figure key={x.l} className="relative">
-                <img src={x.s} alt={x.l} loading="lazy" className="w-full h-36 object-cover border border-hairline" />
-                <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">{x.l}</figcaption>
+                <img
+                  src={x.s}
+                  alt={x.l}
+                  loading="lazy"
+                  className="w-full h-36 object-cover border border-hairline"
+                />
+                <figcaption className="absolute left-2 top-2 bg-surface/90 px-2 py-1 font-mono text-[9px] uppercase tracking-widest">
+                  {x.l}
+                </figcaption>
               </figure>
             ))}
           </div>
@@ -245,7 +268,12 @@ function DoorCard(props: {
   const inner = (
     <>
       <div className="h-36 -mx-6 -mt-6 mb-5 overflow-hidden">
-        <img src={props.image} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+        <img
+          src={props.image}
+          alt=""
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
       </div>
       <div className="flex items-center gap-2 text-accent-brand">
         {props.icon}
@@ -254,11 +282,13 @@ function DoorCard(props: {
       <h3 className="mt-3 font-serif text-2xl">{props.title}</h3>
       <p className="mt-2 text-sm text-content-muted">{props.body}</p>
       <span className="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] group-hover:text-accent-brand">
-        {props.cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+        {props.cta}{" "}
+        <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
       </span>
     </>
   );
-  const cls = "group block overflow-hidden bg-surface text-content p-6 border border-hairline hover:border-accent-brand transition-colors";
+  const cls =
+    "group block overflow-hidden bg-surface text-content p-6 border border-hairline hover:border-accent-brand transition-colors";
   return props.to ? (
     <Link to={props.to} className={cls}>
       {inner}
@@ -303,7 +333,9 @@ function CatastroQuickSearch() {
         </button>
       </form>
       {m.isError && (
-        <p className="mt-3 text-xs text-content-muted">No pudimos consultar ahora. Intenta de nuevo.</p>
+        <p className="mt-3 text-xs text-content-muted">
+          No pudimos consultar ahora. Intenta de nuevo.
+        </p>
       )}
       {m.data && (
         <div className="mt-4 border border-hairline">
