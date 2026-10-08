@@ -69,9 +69,9 @@ const CholquiRoundPanel = lazy(() =>
     default: m.CholquiRoundPanel,
   })),
 );
-const LosVerdesStrategicMap = lazy(() =>
-  import("@/components/live/LosVerdesStrategicMap").then((m) => ({
-    default: m.LosVerdesStrategicMap,
+const LosVerdesMasterViewer = lazy(() =>
+  import("@/features/losverdes/LosVerdesMasterViewer").then((m) => ({
+    default: m.LosVerdesMasterViewer,
   })),
 );
 const LosVerdesEngine3D = lazy(() =>
