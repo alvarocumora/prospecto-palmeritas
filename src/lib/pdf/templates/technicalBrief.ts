@@ -5,32 +5,27 @@
  * advertencias. Sustituye el volcado de tablas por bloques legibles.
  */
 import type jsPDF from "jspdf";
-import { GC_BRAND, GC_COLOR, GC_PAGE } from "../brand/tokens";
+import { GC_COLOR, GC_PAGE } from "../brand/tokens";
 import {
   barChart,
   brandQr,
-  bullets,
   donutChart,
   donutLegend,
-  drawFooter,
-  drawHeader,
-  drawMark,
   editorialTable,
   eyebrow,
   fill,
   fitTableRows,
   font,
   ink,
-  kpiGrid,
-  noticeBox,
   paragraph,
-  qrBlock,
   scatterMap,
   stroke,
   title,
 } from "../brand/kit";
 import type { ProjectDoc } from "../model";
 import { appendixTables, blockMetaLine, mainBlocks } from "../narrative";
+import { letterhead, section as institutionalSection, verificationSeal } from "../brand/institutional";
+import { reportSources, technicalStandard } from "../technicalStandard";
 
 const { w: W, h: H, m: M } = GC_PAGE.a4;
 const CW = W - M * 2;
@@ -43,149 +38,94 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   let page = 1;
   let y = TOP;
 
-  const chrome = () => {
-    fill(doc, GC_COLOR.paper);
-    doc.rect(0, 0, W, H, "F");
-    drawHeader(doc, {
-      w: W,
-      m: M,
-      left: `${model.code} · ${model.name}`,
-      right: `Dossier técnico ${model.docVersion}`,
-    });
-    drawFooter(doc, { w: W, h: H, m: M, left: `${issued} · Documento confidencial`, page });
-  };
-
+  const frame = { w: W, h: H, m: M };
+  const framework = technicalStandard(model);
+  const contents: Array<{ label: string; page: number }> = [];
+  const chrome = () => letterhead(doc, frame, {
+    unit: "Informes técnicos de proyectos", ref: model.code,
+    version: model.docVersion, page, total: 0, issued,
+  });
   const nextPage = () => {
-    doc.addPage("a4", "portrait");
-    page += 1;
-    chrome();
-    y = TOP;
+    doc.addPage("a4", "portrait"); page += 1; chrome(); y = TOP;
   };
-
-  const need = (space: number) => {
-    if (y + space > BOTTOM) nextPage();
+  const need = (space: number) => { if (y + space > BOTTOM) nextPage(); };
+  const write = (text: string, size = 9, color = GC_COLOR.inkSoft) => {
+    font(doc, "body", "normal", size);
+    const lines = doc.splitTextToSize(text, CW) as string[];
+    const lh = size * 1.45;
+    for (const line of lines) {
+      need(lh + 4); font(doc, "body", "normal", size); ink(doc, color);
+      doc.text(line, M, y); y += lh;
+    }
+    y += 7;
   };
-
-  /** Dibuja una tabla cortándola entre páginas; devuelve el alto del último tramo. */
+  const heading = (num: string, label: string) => {
+    font(doc, "display", "bold", 16);
+    const lines = doc.splitTextToSize(label, CW) as string[];
+    need(42 + lines.length * 18);
+    contents.push({ label: `${num} · ${label}`, page });
+    y = institutionalSection(doc, frame, y, num, "Informe técnico");
+    y += title(doc, M, y, label, 16, CW) + 10;
+  };
   const pagedTable = (head: string[], rows: string[][], widths?: number[]): void => {
     let rest = rows;
-    let guard = 0;
-    while (rest.length && guard++ < 60) {
+    if (!rest.length) { write("Sin registros incorporados; información pendiente."); return; }
+    while (rest.length) {
+      font(doc, "body", "normal", 7.8);
       const fit = fitTableRows(doc, { head, rows: rest, widths, w: CW }, BOTTOM - y);
-      if (fit === 0) {
-        nextPage();
-        continue;
+      if (!fit) {
+        if (y === TOP) throw new Error("Una fila excede la página; divida su contenido antes de exportar.");
+        nextPage(); continue;
       }
       y += editorialTable(doc, { x: M, y, w: CW, head, rows: rest.slice(0, fit), widths });
-      rest = rest.slice(fit);
-      if (rest.length) nextPage();
+      rest = rest.slice(fit); if (rest.length) nextPage();
     }
   };
 
-  /* ---------- Portada ---------- */
-  fill(doc, GC_COLOR.paper);
-  doc.rect(0, 0, W, H, "F");
-  fill(doc, GC_COLOR.ink);
-  doc.rect(0, 0, W, 240, "F");
-  fill(doc, GC_COLOR.cobalt);
-  doc.rect(0, 240, W * 0.34, 5, "F");
+  /* Portada: identidad institucional y ficha de control, no tarjetas comerciales. */
+  chrome();
+  y = 110;
+  y += title(doc, M, y, "Informe técnico\npreliminar", 30, CW) + 16;
+  y += title(doc, M, y, model.name, 23, CW) + 10;
+  write(model.subtitle, 10);
+  write(`Marco de revisión: ${framework.name}`, 8, GC_COLOR.slate);
+  y += 8;
+  pagedTable(["CONTROL DOCUMENTAL", "ANTECEDENTE"], [
+    ["Proyecto / referencia", `${model.name} · ${model.code}`],
+    ["Ubicación", model.location], ["Etapa / mineral", `${model.stage} · ${model.commodity}`],
+    ["Versión / fecha de emisión", `${model.docVersion} · ${issued}`],
+    ["Preparación", "Geocapitals · compilación de antecedentes del proyecto"],
+    ["Fecha efectiva de los datos", "Según cada fuente; no equivale a la fecha de emisión"],
+    [framework.reviewerRole, "Revisión, credenciales y firma no acreditadas en esta exportación"],
+    ["Estado", "Preliminar · pendiente de revisión técnica independiente"],
+  ], [CW * 0.34, CW * 0.66]);
+  y += 22;
+  write(framework.positioning, 9);
+  write("No constituye una declaración de recursos o reservas ni acredita cumplimiento normativo. Las propuestas, analogías y escenarios no son resultados medidos.", 9);
+  need(120);
+  y = verificationSeal(doc, frame, y, { qr, title: "Expediente del proyecto",
+    body: "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
+    url: model.liveUrl, ref: model.code });
 
-  const markW = drawMark(doc, M, 44, 30);
-  font(doc, "body", "bold", 11);
-  ink(doc, GC_COLOR.paper);
-  doc.text(GC_BRAND.name, M + markW + 9, 64);
-  font(doc, "body", "normal", 7);
-  ink(doc, GC_COLOR.cobaltSoft);
-  doc.text(GC_BRAND.tagline, M + markW + 9, 75);
-
-  font(doc, "display", "bold", 30);
-  ink(doc, GC_COLOR.paper);
-  doc
-    .splitTextToSize(model.name, CW)
-    .forEach((l: string, i: number) => doc.text(l, M, 150 + i * 32));
-  font(doc, "body", "normal", 9);
-  ink(doc, GC_COLOR.cobaltSoft);
-  doc.text(doc.splitTextToSize(model.subtitle, CW)[0], M, 200);
-  font(doc, "body", "normal", 8);
-  ink(doc, GC_COLOR.slate);
-  doc.text(model.location, M, 218);
-
-  y = 280;
-  y +=
-    kpiGrid(doc, {
-      x: M,
-      y,
-      w: CW,
-      items: model.kpis.slice(0, 4),
-      cols: 2,
-      rowH: 66,
-      valueSize: 16,
-    }) + 28;
-  eyebrow(doc, M, y, "Alcance");
-  y += 14;
-  y +=
-    paragraph(
-      doc,
-      M,
-      y,
-      "Este documento reúne los antecedentes disponibles del proyecto, distinguiendo hechos verificados, resultados de muestreo, interpretación geológica, hipótesis y escenarios. No sustituye un informe bajo un estándar reconocido.",
-      CW,
-      9,
-    ) + 20;
-  qrBlock(doc, {
-    x: M,
-    y,
-    size: 96,
-    qr,
-    caption: "Live map público",
-    sub: model.liveUrl.replace(/^https?:\/\//, ""),
-  });
-  font(doc, "body", "normal", 7.4);
-  ink(doc, GC_COLOR.slate);
-  doc.text(`${model.docVersion} · emitido el ${issued}`, M + 120, y + 20);
-  doc.text(`${GC_BRAND.site} · ${GC_BRAND.email}`, M + 120, y + 34);
-  doc.text(`WhatsApp ${GC_BRAND.whatsapp}`, M + 120, y + 48);
-
-  /* ---------- Cuerpo ---------- */
-  nextPage();
-
-  eyebrow(doc, M, y, "01 · Resumen");
-  y += 16;
-  y += title(doc, M, y, "Tesis del proyecto", 17, CW) + 10;
-  y += bullets(doc, M, y, model.thesis, CW, 9) + 18;
-
-  if (model.dataQuality?.length) {
-    need(150);
-    eyebrow(doc, M, y, "02 · Evidence & Confidence");
-    y += 16;
-    y += title(doc, M, y, "Qué sabemos y con qué nivel de confianza", 17, CW) + 10;
-    y +=
-      editorialTable(doc, {
-        x: M,
-        y,
-        w: CW,
-        head: ["Evidencia", "Clase", "Estado", "Detalle"],
-        rows: model.dataQuality.map((item) => [
-          item.label,
-          item.provenance ?? item.status,
-          item.confidence?.toUpperCase() ?? "—",
-          item.detail,
-        ]),
-        widths: [CW * 0.2, CW * 0.16, CW * 0.12, CW * 0.52],
-        size: 7.4,
-      }) + 18;
-  }
+  /* Dos páginas reservadas para un índice con folios reales. */
+  nextPage(); const indexStart = page; nextPage(); nextPage();
+  heading("01", "Resumen y alcance");
+  write("Compilación de antecedentes para revisión técnica y diligencia. Se separan información documental, observaciones, resultados analíticos, interpretación y trabajo propuesto.");
+  for (const item of model.thesis) write(item);
+  heading("02", "Evidencia, procedencia y confianza");
+  pagedTable(["Evidencia", "Clase", "Confianza", "Detalle / fuente"],
+    model.dataQuality?.length ? model.dataQuality.map(item => [item.label,
+      item.provenance ?? item.status, item.confidence ?? "No evaluada",
+      [item.detail, item.source ? `Fuente: ${item.source}` : "Fuente específica pendiente"].join(" · ")
+    ]) : [["Inventario pendiente", "PENDING_DD", "No evaluada", "No se incorporó una matriz de evidencia al modelo del proyecto."]],
+    [CW * 0.19, CW * 0.17, CW * 0.13, CW * 0.51]);
+  y += 18;
+  write("OFFICIAL / CERTIFIED: fuente oficial o analítica acreditada. DOCUMENTARY / DECLARED: documento o declaración. OBSERVED: observación. DERIVED / INTERPRETED: cálculo o interpretación. PROPOSED / SCENARIO: propuesta o escenario, no evidencia medida. PENDING_DD: verificación pendiente.", 8, GC_COLOR.slate);
 
   if (model.map) {
     need(260);
-    eyebrow(
-      doc,
-      M,
-      y,
-      `${model.dataQuality?.length ? "03" : "02"} · Ubicación y puntos de control`,
-    );
-    y += 16;
-    y += title(doc, M, y, model.map.title, 17, CW) + 12;
+    heading("03", "Propiedad, ubicación y sistemas de coordenadas");
+    write(model.map.title, 9);
     if (model.map.imageDataUrl) {
       doc.addImage(model.map.imageDataUrl, "JPEG", M, y, CW, 220, undefined, "FAST");
       stroke(doc, GC_COLOR.hairline);
@@ -218,9 +158,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   if (model.chart) {
     need(260);
-    eyebrow(doc, M, y, `${model.dataQuality?.length ? "04" : "03"} · Evidencia analítica`);
-    y += 16;
-    y += title(doc, M, y, model.chart.title, 17, CW) + 12;
+    heading("04", "Resultados analíticos disponibles");
+    write(model.chart.title);
     barChart(doc, {
       x: M,
       y,
@@ -236,54 +175,53 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       y += paragraph(doc, M, y, model.chart.caption, CW, 8.2, GC_COLOR.slate) + 14;
   }
 
-  let n = model.dataQuality?.length ? 5 : 4;
+  if (!model.map) {
+    heading("03", "Propiedad, ubicación y sistemas de coordenadas");
+    write(model.location);
+    write("Cartografía y metadatos de coordenadas no incorporados a esta exportación; pendientes de verificación.");
+  }
+  if (!model.chart) {
+    heading("04", "Resultados analíticos disponibles");
+    write("No se incorporó un gráfico analítico al documento. Consultar el inventario y anexos; no implica ausencia de resultados en la propiedad.");
+  }
+  let n = 5;
   const technicalProfile = model.reportProfile ?? "technical";
   for (const section of model.sections.filter(
     (item) => !item.profiles || item.profiles.includes(technicalProfile),
   )) {
     need(120);
-    eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · ${section.eyebrow}`);
-    y += 16;
-    y += title(doc, M, y, section.title, 17, CW) + 10;
-    if (section.lead) y += paragraph(doc, M, y, section.lead, CW, 9) + 12;
+    heading(String(n).padStart(2, "0"), section.title);
+    if (section.lead) write(section.lead);
     for (const block of mainBlocks(section)) {
       if (block.kind === "narrative" || block.kind === "text") {
         need(50);
-        y += paragraph(doc, M, y, block.body, CW, 9) + 8;
+        write(block.body);
         const meta = blockMetaLine(block);
-        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+        if (meta) write(meta, 7, GC_COLOR.slate);
       }
       if (block.kind === "finding") {
         need(80);
-        y += noticeBox(doc, M, y, CW, [block.body], `Hallazgo · ${block.title}`) + 8;
+        write(`Hallazgo · ${block.title}`, 9); write(block.body);
         const meta = blockMetaLine(block);
-        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+        if (meta) write(meta, 7, GC_COLOR.slate);
       }
       if (block.kind === "evidence") {
         need(80);
-        y +=
-          noticeBox(
-            doc,
-            M,
-            y,
-            CW,
-            [block.body],
-            `Evidencia · ${block.label} · ${block.provenance}`,
-          ) + 8;
+        write(`Evidencia · ${block.label} · ${block.provenance}`, 9); write(block.body);
         const meta = blockMetaLine(block);
-        if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 8;
+        if (meta) write(meta, 7, GC_COLOR.slate);
       }
       if (block.kind === "gap") {
         need(80);
         const lines = block.action ? [block.body, `Acción: ${block.action}`] : [block.body];
-        y += noticeBox(doc, M, y, CW, lines, `Data gap · ${block.title}`) + 10;
+        write(`Brecha · ${block.title}`, 9); for (const line of lines) write(line);
       }
       if (block.kind === "recommendation") {
         need(80);
         const heading = block.priority
           ? `Recomendación · ${block.priority.toUpperCase()} · ${block.title}`
           : `Recomendación · ${block.title}`;
-        y += noticeBox(doc, M, y, CW, [block.body], heading) + 10;
+        write(heading, 9); write(block.body);
       }
       if (block.kind === "figure" || block.kind === "map") {
         need(260);
@@ -306,7 +244,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       }
       if (block.kind === "bullets") {
         need(50);
-        y += bullets(doc, M, y, block.items, CW, 9) + 10;
+        for (const item of block.items) write(`- ${item}`);
       }
       if (block.kind === "kv") {
         need(70);
@@ -366,59 +304,62 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     n += 1;
   }
 
+  heading(String(n++).padStart(2, "0"), "Cobertura del marco y asuntos pendientes");
+  write(`Matriz de preparación para ${framework.name}. La existencia de una sección no acredita revisión ni conformidad. Los criterios siguientes requieren comprobación por ${framework.reviewerRole}.`);
+  pagedTable(["Criterio", "Requisito de revisión"], framework.checklist.map(item =>
+    [item.title, `${item.description} Estado: no acreditado en esta exportación.`]), [CW * 0.32, CW * 0.68]);
+  y += 20;
+  heading(String(n++).padStart(2, "0"), "Referencias y fuentes documentales");
+  const sources = reportSources(model);
+  if (sources.length) sources.forEach((source, i) => write(`[${i + 1}] ${source}`));
+  else write("No se incorporaron referencias bibliográficas individualizadas. Completar autor, título, fecha y ubicación documental antes de la revisión.");
+  heading(String(n++).padStart(2, "0"), "Limitaciones y responsabilidad técnica");
+  for (const disclaimer of model.disclaimers) write(disclaimer);
+  write("La geofísica predictiva, las analogías regionales y los cuerpos interpretados no acreditan mineralización. Los resultados de otra propiedad no se trasladan a este proyecto.");
+  write(`Revisión por ${framework.reviewerRole}: pendiente de acreditar identidad, asociación profesional, experiencia pertinente, visita cuando corresponda, responsabilidades, consentimiento y firma. Esta exportación no genera un certificado de persona competente.`);
   const appendices = appendixTables(model);
   for (const [index, appendix] of appendices.entries()) {
-    need(130);
-    const letter = String.fromCharCode(65 + index);
-    eyebrow(doc, M, y, `Anexo ${letter} · ${appendix.sectionTitle}`);
-    y += 16;
-    y += title(doc, M, y, appendix.block.title, 16, CW) + 10;
+    heading(`Anexo ${String.fromCharCode(65 + index)}`, appendix.block.title);
     const meta = blockMetaLine(appendix.block);
-    if (meta) y += paragraph(doc, M, y, meta, CW, 6.8, GC_COLOR.slate) + 10;
-    pagedTable(
-      appendix.block.head,
-      appendix.block.rows,
-      appendix.block.widths?.map((p) => CW * p),
-    );
+    if (meta) write(meta, 7, GC_COLOR.slate);
+    pagedTable(appendix.block.head, appendix.block.rows, appendix.block.widths?.map(p => CW * p));
     y += 18;
   }
+  const contact = [model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ");
+  if (contact) write(`Contacto del proyecto (no acredita rol QP/CP): ${contact}`, 8, GC_COLOR.slate);
 
-  // El recuadro de advertencias y el bloque de contacto deben caber juntos.
-  const noticeH = 46 + model.disclaimers.length * 26;
-  need(60 + noticeH + 70);
-  eyebrow(doc, M, y, `${String(n).padStart(2, "0")} · Advertencias`);
-  y += 16;
-  y += title(doc, M, y, "Base de información y limitaciones", 17, CW) + 12;
-  const boxH = noticeBox(doc, M, y, CW, model.disclaimers, "Limitaciones materiales");
-  y += boxH + 18;
-
-  // El bloque de contacto se ancla al pie de la última página con contenido.
-  if (y > BOTTOM - 40) nextPage();
-  y = BOTTOM - 30;
-
-  stroke(doc, GC_COLOR.hairline);
-  doc.setLineWidth(0.6);
-  doc.line(M, y, W - M, y);
-  y += 12;
-
-  font(doc, "body", "normal", 8);
-  ink(doc, GC_COLOR.slate);
-  doc.text(
-    `Contacto: ${[model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ")}`,
-    M,
-    y,
-  );
-  doc.text(`${GC_BRAND.site} · ${GC_BRAND.email} · WhatsApp ${GC_BRAND.whatsapp}`, M, y + 13);
-
-  // Renumerar pies con el total real
   const total = doc.getNumberOfPages();
-  for (let p = 2; p <= total; p++) {
+  const allContents = [{ label: "Control documental", page: 1 }, ...contents];
+  let indexPage = indexStart;
+  let iy = TOP;
+  doc.setPage(indexPage);
+  title(doc, M, iy, "Índice del informe", 22, CW); iy += 38;
+  font(doc, "body", "normal", 8);
+  for (const entry of allContents) {
+    font(doc, "body", "normal", 8);
+    const lines = doc.splitTextToSize(entry.label, CW - 40) as string[];
+    const height = lines.length * 12 + 10;
+    if (iy + height > BOTTOM) {
+      indexPage += 1;
+      if (indexPage > indexStart + 1) throw new Error("El índice excede dos páginas; reduzca las secciones del documento.");
+      doc.setPage(indexPage); iy = TOP;
+    }
+    ink(doc, GC_COLOR.inkSoft); doc.text(lines, M, iy);
+    doc.text(String(entry.page), W - M, iy, { align: "right" });
+    doc.link(M, iy - 9, CW, height, { pageNumber: entry.page }); iy += height;
+  }
+  if (indexPage === indexStart) {
+    doc.setPage(indexStart + 1);
+    title(doc, M, TOP, "Guía de lectura técnica", 20, CW);
+    paragraph(doc, M, TOP + 40, framework.positioning, CW, 10);
+    paragraph(doc, M, TOP + 110, "Los anexos conservan el detalle de tablas y coordenadas. Cada clase de evidencia conserva su significado: una interpretación derivada de datos certificados no se convierte en evidencia certificada. El QR no valida la exactitud del contenido ni sustituye revisión profesional.", CW, 10);
+  }
+  for (let p = 1; p <= total; p++) {
     doc.setPage(p);
-    fill(doc, GC_COLOR.paper);
-    doc.rect(W - M - 60, H - 46, 60, 22, "F");
-    font(doc, "body", "normal", 7.5);
-    ink(doc, GC_COLOR.slate);
-    doc.text(`${p} / ${total}`, W - M, H - 21, { align: "right" });
+    fill(doc, GC_COLOR.white); doc.rect(M, H - 42, CW, 28, "F");
+    font(doc, "body", "normal", 6.6); ink(doc, GC_COLOR.slate);
+    doc.text(`${model.code} · ${model.docVersion} · ${issued}`, M, H - 31);
+    doc.text(`Página ${p} de ${total}`, W - M, H - 31, { align: "right" });
   }
   doc.setPage(total);
 }

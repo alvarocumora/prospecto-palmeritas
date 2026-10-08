@@ -5,6 +5,7 @@
 import type { GeoSnapshotManifest } from "@/lib/geospatial/snapshotManifest";
 import type { BarDatum, MapPoint, MapPolygon, Slice } from "./brand/kit";
 import type { EvidenceClass, ReportProfile } from "./architecture";
+import type { DisclosureStandard } from "@/lib/reports/internationalStandards";
 
 export type DocKpi = { label: string; value: string; note?: string };
 
@@ -85,6 +86,8 @@ export type DocSection = {
 export type ProjectDoc = {
   /** Narrative contract. Defaults to technical for backwards compatibility. */
   reportProfile?: ReportProfile;
+  /** Review framework only; never a certification or compliance claim. */
+  disclosureStandard?: DisclosureStandard;
   code: string;
   name: string;
   subtitle: string;
@@ -138,7 +141,7 @@ export type ProjectDocKind = "deck" | "onepager" | "technical";
 export const DOC_KIND_LABEL: Record<ProjectDocKind, string> = {
   deck: "Deck de inversión (16:9)",
   onepager: "Resumen de una página",
-  technical: "Dossier técnico",
+  technical: "Informe técnico preliminar",
 };
 
 export const DOC_KIND_FILE: Record<ProjectDocKind, string> = {

@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Actualizar el informe técnico compartido con membrete Geocapitals, índice paginado, control documental, procedencia y revisión NI 43-101/JORC.
+- [ ] Verificar descargas de informes técnicos y revisar visualmente los PDF generados.
+
 - [x] Incorporar las 190 muestras reales de Los Verdes a la fuente pública y al mapa.
 - [x] Mejorar la ficha pública `/live/losverdes` con resumen verificable y enlace copiable.
 - [x] Estandarizar el PDF Los Verdes con marca, QR, versión y tabla de muestreo.
