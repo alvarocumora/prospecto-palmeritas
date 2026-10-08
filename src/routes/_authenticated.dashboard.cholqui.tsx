@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink } from "lucide-react";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
+import { CholquiMasterViewer } from "@/features/franco/components/CholquiMasterViewer";
 import { CholquiSatellitePanel } from "@/features/franco/components/CholquiSatellitePanel";
 import { CholquiSpvPanel } from "@/features/franco/components/CholquiSpvPanel";
 
 const TABS = [
-  ["ficha", "Ficha & escenarios"],
+  ["ficha", "Mapa del proyecto"],
   ["satelite", "Satélite"],
   ["spv", "Inversionistas & SPV"],
 ] as const;
@@ -52,7 +52,7 @@ function CholquiLivePage() {
           className="inline-flex items-center gap-2 text-[12px] border border-hairline rounded-lg px-3 py-2 hover:bg-surface-2"
         >
           <ExternalLink className="w-3.5 h-3.5" />
-          Abrir enlace público para inversionistas
+          Abrir página completa del proyecto
         </a>
       </div>
 
@@ -73,7 +73,11 @@ function CholquiLivePage() {
         ))}
       </div>
 
-      {tab === "ficha" && <FrancoDashboard authenticated />}
+      {tab === "ficha" && (
+        <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8">
+          <CholquiMasterViewer />
+        </main>
+      )}
       {tab !== "ficha" && (
         <main className="max-w-[1200px] mx-auto px-4 md:px-6 py-8">
           {tab === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel />}

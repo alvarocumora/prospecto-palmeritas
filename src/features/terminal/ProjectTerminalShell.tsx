@@ -283,7 +283,7 @@ function MapaTab({ project }: { project: TerminalProject }) {
         </div>
         <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
           {view === "2d" ? (
-            <LosVerdesStrategicMap height={640} />
+            <LosVerdesStrategicMap height={typeof window !== "undefined" && window.innerWidth < 640 ? 460 : 640} />
           ) : (
             <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
           )}
