@@ -93,9 +93,6 @@ const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 const PalmerasMasterViewer = lazy(() =>
   import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({ default: m.PalmerasMasterViewer })),
 );
-const TrackminGeoIntel = lazy(() =>
-  import("@/features/palmeras/TrackminDashboard").then((m) => ({ default: m.TrackminGeoIntel })),
-);
 
 function Loading({ label }: { label: string }) {
   return (
@@ -297,9 +294,6 @@ function MapaTab({ project }: { project: TerminalProject }) {
   return (
     <Suspense fallback={<Loading label="Cargando visor" />}>
       <PalmerasMasterViewer />
-      <div className="mt-6">
-        <TrackminGeoIntel />
-      </div>
     </Suspense>
   );
 }

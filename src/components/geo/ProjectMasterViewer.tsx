@@ -382,25 +382,49 @@ export function ProjectMasterViewer({
 
       // --- Tenencia (catastro SERNAGEOMIN: tenencia del proyecto vs contexto oficial)
       if (concessions?.features?.length) {
+        const isOwn = (f?: Feature) => Boolean(f?.properties?.es_tenencia_proyecto);
+        const ownFeatures = concessions.features.filter((f) => isOwn(f as Feature));
+        // Halo de contraste bajo la tenencia propia: la despega del relieve satelital.
+        const halo = L.geoJSON(
+          { type: "FeatureCollection", features: ownFeatures } as never,
+          {
+            interactive: false,
+            style: () => ({ color: "#0b0a09", weight: 6, opacity: 0.55, fill: false }),
+          },
+        );
         const g = L.geoJSON(concessions as never, {
-          style: (f?: Feature) => {
-            const own = Boolean(f?.properties?.es_tenencia_proyecto);
-            return own
-              ? { color: "#e8a33d", weight: 1.6, fillOpacity: 0.06 }
+          style: (f?: Feature) =>
+            isOwn(f)
+              ? { color: "#f59e0b", weight: 3, opacity: 1, fillColor: "#f59e0b", fillOpacity: 0.24 }
               : {
                   color: "#94a3b8",
                   weight: 0.8,
-                  opacity: 0.6,
+                  opacity: 0.55,
                   dashArray: "3 3",
-                  fillOpacity: 0.02,
-                };
-          },
-          onEachFeature: (f: Feature, layer) =>
+                  fillOpacity: 0.03,
+                },
+          onEachFeature: (f: Feature, layer) => {
+            if (isOwn(f)) {
+              const p = (f.properties ?? {}) as Record<string, unknown>;
+              const name = String(p.nombre ?? p.name ?? p.NOMBRE ?? p.codigo ?? "").trim();
+              if (name) {
+                layer.bindTooltip(name, {
+                  permanent: true,
+                  direction: "center",
+                  className: "gc-own-concession-label",
+                });
+              }
+            }
             layer.on("click", () =>
               sel("tenencia", (f.properties ?? {}) as Record<string, unknown>),
-            ),
+            );
+          },
         });
-        groups.current.tenencia = L.layerGroup([g]).addTo(map);
+        groups.current.tenencia = L.layerGroup([halo, g]).addTo(map);
+        g.eachLayer((l) => {
+          const ft = (l as unknown as { feature?: Feature }).feature;
+          if (isOwn(ft)) (l as unknown as { bringToFront?: () => void }).bringToFront?.();
+        });
       }
 
       // --- Halos satelitales: núcleo nítido + anillos difusos concéntricos.
