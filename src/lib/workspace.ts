@@ -128,7 +128,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Proyectos", to: "/dashboard/projects" },
       { label: "Terminal 2D/3D", to: "/terminal" },
       { label: "Mission Control", to: "/dashboard/mission" },
-      { label: "Cholqui", to: "/dashboard/cholqui" },
+      { label: "Cholqui", to: "/terminal/cholqui" },
       { label: "Nuevo proyecto", to: "/dashboard/projects/nuevo" },
     ],
   },
