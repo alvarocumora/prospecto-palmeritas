@@ -31,6 +31,10 @@ jobs:
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run typecheck
 
+      - name: Report generated route changes
+        if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
+        run: git diff -- src/routeTree.gen.ts
+
       - name: Lint
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run lint

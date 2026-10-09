@@ -18,7 +18,7 @@ export function WorkspaceTabs({
   const location = useLocation();
   const { active: project } = useProjects();
   const entry = findWorkspaceEntry(pathname);
-  if (!entry?.tabs || entry.tabs.length < 2) return null;
+  if (pathname.startsWith("/projects/") || !entry?.tabs || entry.tabs.length < 2) return null;
 
   const tabs = filterTab ? entry.tabs.filter(filterTab) : entry.tabs;
   if (tabs.length < 2) return null;

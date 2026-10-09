@@ -115,7 +115,11 @@ function ProjectsPage() {
                 <button
                   type="button"
                   onClick={() => {
-                    void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
+                    void navigate({
+                      to: "/projects/$projectId/$section",
+                      params: { projectId: p.id, section: "overview" },
+                      search: { project: undefined },
+                    });
                   }}
                   className="flex-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
                 >

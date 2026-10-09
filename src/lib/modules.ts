@@ -1,3 +1,4 @@
+import { projectWorkspaceLegacyPath } from "@/lib/projects/workspace";
 import type { ModuleKey } from "@/hooks/useMyModules";
 
 /**
@@ -5,7 +6,7 @@ import type { ModuleKey } from "@/hooks/useMyModules";
  * Rutas "core" son transversales (siempre visibles).
  */
 export function moduleForRoute(path: string): ModuleKey | "core" {
-  const p = path.replace(/^\/dashboard\/?/, "");
+  const p = projectWorkspaceLegacyPath(path).replace(/^\/dashboard\/?/, "");
   if (!p || p === "") return "core";
   const seg = p.split("/")[0];
 

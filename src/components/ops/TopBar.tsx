@@ -1,3 +1,4 @@
+import { PROJECT_WORKSPACE_SECTIONS } from "@/lib/projects/workspace";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { ChevronDown, Plus, Command, LogOut, UserCircle, Menu } from "lucide-react";
@@ -11,6 +12,9 @@ import { findWorkspaceEntry } from "@/lib/workspace";
 import { cn } from "@/lib/utils";
 
 function breadcrumb(path: string): string {
+  if (path.startsWith("/projects/")) {
+    return PROJECT_WORKSPACE_SECTIONS.find((item) => item.id === path.split("/")[3])?.label ?? "Proyecto";
+  }
   const entry = findWorkspaceEntry(path);
   const tab = entry?.tabs
     ?.filter((item) =>
@@ -103,14 +107,18 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                   type="button"
                   onClick={() => {
                     setOpenProj(false);
-                    if (workspaceProjectId(location.pathname, undefined)) {
+                    if (location.pathname.startsWith("/dashboard/projects/") && workspaceProjectId(location.pathname, undefined)) {
                       void navigate({
                         to: "/dashboard/projects/$projectId",
                         params: { projectId: p.id },
                         search: { project: p.id },
                       });
                     } else if (/^\/dashboard\/(cholqui|franco|palmeras)$/.test(location.pathname)) {
-                      void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
+                      void navigate({
+                        to: "/projects/$projectId/$section",
+                        params: { projectId: p.id, section: "overview" },
+                        search: { project: undefined },
+                      });
                     } else {
                       void navigate({
                         href: projectNavigationHref(

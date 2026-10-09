@@ -150,8 +150,9 @@ function ProjectDetailPage() {
       </Link>
 
       <Link
-        to="/dashboard/project-report"
-        search={{ project: projectId }}
+        to="/projects/$projectId/$section"
+        params={{ projectId, section: "overview" }}
+        search={{ project: undefined }}
         className="inline-flex items-center text-xs text-primary hover:underline"
       >
         Mapa & exploración del proyecto →
