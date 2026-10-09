@@ -1,4 +1,4 @@
-export type CanonicalProjectSlug = "palmeras" | "losverdes" | "cholqui";
+export type CanonicalProjectSlug = "palmeras" | "losverdes" | "cholqui" | "nahuelbuta";
 
 export type PublicProjectRecord = {
   slug: CanonicalProjectSlug;
@@ -38,6 +38,15 @@ export const PUBLIC_PROJECTS: readonly PublicProjectRecord[] = [
     livePath: "/terminal/cholqui",
     investmentPath: "/proyectos/ficha/cholqui",
     privatePath: "/dashboard/cholqui",
+    status: "published",
+  },
+  {
+    slug: "nahuelbuta",
+    code: "NHB-REE",
+    name: "Nahuelbuta REE · Paños Arcillas",
+    aliases: ["losalamos", "arcillas", "bioenergy"],
+    livePath: "/terminal/nahuelbuta",
+    investmentPath: "/proyectos/ficha/nahuelbuta",
     status: "published",
   },
 ] as const;

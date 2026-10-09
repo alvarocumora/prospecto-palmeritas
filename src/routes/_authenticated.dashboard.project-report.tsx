@@ -1,13 +1,12 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import { useProjects } from "@/hooks/useProjects";
-import { TrackminGeoIntel } from "@/features/palmeras/TrackminDashboard";
-import { FrancoDashboard } from "@/features/franco/FrancoDashboard";
 import { FileText } from "lucide-react";
-import { CanonicalProjectViewer } from "@/components/geo/CanonicalProjectViewer";
 import { resolveProjectViewerProfile } from "@/lib/geospatial/projectViewerProfiles";
+import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
+import { canonicalProjectSlug } from "@/lib/projects/catalog";
 
-// Punto único de entrada a los reportes de proyecto piloto.
-// Detecta el proyecto activo y monta el feature correspondiente.
+// Punto único de entrada: cada proyecto con página publicada se abre en el
+// Terminal (/terminal/$slug), el mismo visor que ven los inversionistas.
 export const Route = createFileRoute("/_authenticated/dashboard/project-report")({
   head: () => ({
     meta: [
@@ -46,21 +45,12 @@ function ProjectReportPage() {
   }
 
   const profile = resolveProjectViewerProfile(active);
+  const slug =
+    (profile?.key ? canonicalProjectSlug(profile.key) : null) ??
+    terminalSlugForListing({ title: active.name });
 
-  if (profile?.key === "palmeras") {
-    return <TrackminGeoIntel />;
-  }
-
-  if (profile?.key === "cholqui") {
-    return <FrancoDashboard authenticated />;
-  }
-
-  if (profile?.key === "losverdes") {
-    return (
-      <div className="w-full p-4">
-        <CanonicalProjectViewer profileKey="losverdes" heightClassName="h-[calc(100vh-8rem)]" />
-      </div>
-    );
+  if (slug) {
+    return <Navigate to="/terminal/$slug" params={{ slug }} search={{ tab: "mapa" }} replace />;
   }
 
   return (

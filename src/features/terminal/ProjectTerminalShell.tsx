@@ -16,6 +16,7 @@ import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
 import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
+import { buildNahuelbutaDoc } from "@/lib/pdf/adapters/nahuelbuta";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import { TerminalSimulator } from "./TerminalSimulator";
 
@@ -68,17 +69,35 @@ const CholquiRoundPanel = lazy(() =>
     default: m.CholquiRoundPanel,
   })),
 );
-const LosVerdesStrategicMap = lazy(() =>
-  import("@/components/live/LosVerdesStrategicMap").then((m) => ({
-    default: m.LosVerdesStrategicMap,
+const LosVerdesMasterViewer = lazy(() =>
+  import("@/features/losverdes/LosVerdesMasterViewer").then((m) => ({
+    default: m.LosVerdesMasterViewer,
   })),
 );
 const LosVerdesEngine3D = lazy(() =>
   import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
 );
+const NahuelbutaMasterViewer = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({ default: m.NahuelbutaMasterViewer })),
+);
+const NahuelbutaSatellitePanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaSatellitePanel })),
+);
+const NahuelbutaTenurePanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaTenurePanel })),
+);
+const NahuelbutaThesisPanel = lazy(() =>
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaThesisPanel })),
+);
 const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
-const TrackminGeoIntel = lazy(() =>
-  import("@/features/palmeras/TrackminDashboard").then((m) => ({ default: m.TrackminGeoIntel })),
+const PalmerasMasterViewer = lazy(() =>
+  import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({ default: m.PalmerasMasterViewer })),
+);
+const Palmeras3D = lazy(() =>
+  import("@/features/palmeras/Palmeras3D").then((m) => ({ default: m.Palmeras3D })),
+);
+const Nahuelbuta3D = lazy(() =>
+  import("@/features/nahuelbuta/Nahuelbuta3D").then((m) => ({ default: m.Nahuelbuta3D })),
 );
 
 function Loading({ label }: { label: string }) {
@@ -115,14 +134,14 @@ export function ProjectTerminalShell({
               Geocapitals · Terminal
             </Link>
 
-            <nav className="flex items-center gap-1.5">
+            <nav className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0">
               {projects.map((p) => (
                 <Link
                   key={p.slug}
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
                   search={{ tab }}
-                  className={`px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
+                  className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
                     p.slug === project.slug
                       ? "bg-white text-content border-white"
                       : "border-white/25 text-white/70 hover:text-white hover:border-white/60"
@@ -231,47 +250,68 @@ function MapaTab({ project }: { project: TerminalProject }) {
     );
   }
 
+  if (project.slug === "nahuelbuta") {
+    return (
+      <Suspense fallback={<Loading label="Cargando visor" />}>
+        <ViewToggle view={view} onChange={setView} />
+        {view === "2d" ? <NahuelbutaMasterViewer /> : <Nahuelbuta3D />}
+        <div className="mt-6 space-y-6">
+          <NahuelbutaSatellitePanel />
+          <NahuelbutaTenurePanel />
+        </div>
+      </Suspense>
+    );
+  }
+
   if (project.slug === "losverdes") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
-        <div className="flex justify-end mb-4">
-          <div className="inline-flex rounded-full border border-hairline bg-white p-1">
-            {(
-              [
-                ["2d", "Planimétrico", MapIcon],
-                ["3d", "Modelo geológico 3D", Box],
-              ] as Array<["2d" | "3d", string, typeof MapIcon]>
-            ).map(([key, label, Icon]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setView(key)}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-                  view === key
-                    ? "bg-accent-brand text-white"
-                    : "text-content-subtle hover:text-content"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
-          {view === "2d" ? (
-            <LosVerdesStrategicMap height={640} />
-          ) : (
+        <ViewToggle view={view} onChange={setView} />
+        {view === "2d" ? (
+          <LosVerdesMasterViewer />
+        ) : (
+          <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
             <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
-          )}
-        </div>
+          </div>
+        )}
       </Suspense>
     );
   }
   return (
     <Suspense fallback={<Loading label="Cargando visor" />}>
-      <TrackminGeoIntel />
+      <ViewToggle view={view} onChange={setView} />
+      {view === "2d" ? <PalmerasMasterViewer /> : <Palmeras3D />}
     </Suspense>
+  );
+}
+
+/** Selector 2D/3D idéntico para todos los proyectos del terminal. */
+function ViewToggle({ view, onChange }: { view: "2d" | "3d"; onChange: (v: "2d" | "3d") => void }) {
+  return (
+    <div className="flex justify-end mb-4">
+      <div className="inline-flex rounded-full border border-hairline bg-white p-1">
+        {(
+          [
+            ["2d", "Planimétrico", MapIcon],
+            ["3d", "Relieve 3D", Box],
+          ] as Array<["2d" | "3d", string, typeof MapIcon]>
+        ).map(([key, label, Icon]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => onChange(key)}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
+              view === key
+                ? "bg-accent-brand text-white"
+                : "text-content-subtle hover:text-content"
+            }`}
+          >
+            <Icon className="w-3.5 h-3.5" />
+            {label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -323,6 +363,13 @@ function TesisTab({ project }: { project: TerminalProject }) {
         </section>
       </div>
 
+      {project.slug === "nahuelbuta" && (
+        <Suspense fallback={<Loading label="Cargando tesis" />}>
+          <div className="mt-6">
+            <NahuelbutaThesisPanel />
+          </div>
+        </Suspense>
+      )}
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando ensayes" />}>
           <div className="mt-6">
@@ -366,6 +413,7 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
         <div className="mt-5 flex flex-wrap gap-3">
           {project.slug === "cholqui" && <ProjectDocsMenu build={() => buildCholquiDoc()} />}
           {project.slug === "losverdes" && <LosVerdesDocsMenu />}
+          {project.slug === "nahuelbuta" && <ProjectDocsMenu build={() => buildNahuelbutaDoc()} />}
           <Link
             to="/contacto"
             className="inline-flex items-center justify-center gap-2 rounded-md border border-accent-brand px-5 py-2.5 text-sm text-accent-brand hover:bg-accent-brand-subtle"

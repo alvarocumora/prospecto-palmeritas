@@ -1,8 +1,14 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// Alias histórico: el nombre público y privado canónico es Cholqui.
+// Alias histórico de Cholqui → terminal canónico.
 export const Route = createFileRoute("/_authenticated/dashboard/franco")({
   beforeLoad: () => {
-    throw redirect({ to: "/dashboard/cholqui", replace: true, statusCode: 301 });
+    throw redirect({
+      to: "/terminal/$slug",
+      params: { slug: "cholqui" },
+      search: { tab: "mapa" },
+      replace: true,
+      statusCode: 301,
+    });
   },
 });
