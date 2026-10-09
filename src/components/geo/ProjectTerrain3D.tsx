@@ -100,7 +100,15 @@ function Terrain({ tile }: { tile: DemTile }) {
   );
 }
 
-function Outline({ points, color, width }: { points: THREE.Vector3[]; color: string; width: number }) {
+function Outline({
+  points,
+  color,
+  width,
+}: {
+  points: THREE.Vector3[];
+  color: string;
+  width: number;
+}) {
   const line = useMemo(() => {
     const geo = new THREE.BufferGeometry().setFromPoints(points);
     const mat = new THREE.LineBasicMaterial({ color, linewidth: width });
@@ -141,15 +149,17 @@ export function ProjectTerrain3D({
 
   const outlines = useMemo(() => {
     if (!tile || !concessions) return [];
-    return concessions.features.flatMap((f) => {
-      const own = Boolean(f.properties?.es_tenencia_proyecto);
-      return ringsOf(f).map((ring) => ({
-        own,
-        pts: ring
-          .map((p) => project(p[0], p[1], own ? 25 : 8))
-          .filter((v): v is THREE.Vector3 => v !== null),
-      }));
-    }).filter((o) => o.pts.length > 1);
+    return concessions.features
+      .flatMap((f) => {
+        const own = Boolean(f.properties?.es_tenencia_proyecto);
+        return ringsOf(f).map((ring) => ({
+          own,
+          pts: ring
+            .map((p) => project(p[0], p[1], own ? 25 : 8))
+            .filter((v): v is THREE.Vector3 => v !== null),
+        }));
+      })
+      .filter((o) => o.pts.length > 1);
   }, [tile, concessions, project]);
 
   const markers = (fc: FeatureCollection | null | undefined, lift: number) =>
@@ -169,7 +179,10 @@ export function ProjectTerrain3D({
   const camDist = extentMeters * SCALE * 0.75;
 
   return (
-    <div className="rounded-2xl border border-hairline bg-surface-inverse overflow-hidden relative" style={{ height }}>
+    <div
+      className="rounded-2xl border border-hairline bg-surface-inverse overflow-hidden relative"
+      style={{ height }}
+    >
       {dem.isLoading && (
         <div className="absolute inset-0 flex items-center justify-center text-xs font-mono text-white/70 gap-2">
           <Loader2 className="w-4 h-4 animate-spin" /> Cargando relieve Copernicus…
@@ -190,18 +203,37 @@ export function ProjectTerrain3D({
             <Terrain tile={tile} />
             {layers.tenencia &&
               outlines.map((o, i) => (
-                <Outline key={i} points={o.pts} color={o.own ? "#f59e0b" : "#94a3b8"} width={o.own ? 3 : 1} />
+                <Outline
+                  key={i}
+                  points={o.pts}
+                  color={o.own ? "#f59e0b" : "#94a3b8"}
+                  width={o.own ? 3 : 1}
+                />
               ))}
             {layers.anomalias &&
               anomalyPts.map((m, i) => (
-                <mesh key={`a${i}`} position={m.p} onPointerOver={() => setHover(m)} onPointerOut={() => setHover(null)}>
+                <mesh
+                  key={`a${i}`}
+                  position={m.p}
+                  onPointerOver={() => setHover(m)}
+                  onPointerOut={() => setHover(null)}
+                >
                   <sphereGeometry args={[1.6, 16, 16]} />
-                  <meshStandardMaterial color="#22b8cf" emissive="#22b8cf" emissiveIntensity={0.4} />
+                  <meshStandardMaterial
+                    color="#22b8cf"
+                    emissive="#22b8cf"
+                    emissiveIntensity={0.4}
+                  />
                 </mesh>
               ))}
             {layers.sondajes &&
               drillPts.map((m, i) => (
-                <mesh key={`d${i}`} position={m.p} onPointerOver={() => setHover(m)} onPointerOut={() => setHover(null)}>
+                <mesh
+                  key={`d${i}`}
+                  position={m.p}
+                  onPointerOver={() => setHover(m)}
+                  onPointerOut={() => setHover(null)}
+                >
                   <cylinderGeometry args={[0.5, 0.5, 4, 8]} />
                   <meshStandardMaterial color="#e5e7eb" />
                 </mesh>
@@ -232,7 +264,10 @@ export function ProjectTerrain3D({
                 checked={layers[k]}
                 onChange={() => setLayers((s) => ({ ...s, [k]: !s[k] }))}
               />
-              <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: color }} />
+              <span
+                className="inline-block w-2.5 h-2.5 rounded-full"
+                style={{ background: color }}
+              />
               {label}
             </label>
           ))}

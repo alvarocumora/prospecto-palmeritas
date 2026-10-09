@@ -78,20 +78,30 @@ const LosVerdesEngine3D = lazy(() =>
   import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
 );
 const NahuelbutaMasterViewer = lazy(() =>
-  import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({ default: m.NahuelbutaMasterViewer })),
+  import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({
+    default: m.NahuelbutaMasterViewer,
+  })),
 );
 const NahuelbutaSatellitePanel = lazy(() =>
-  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaSatellitePanel })),
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({
+    default: m.NahuelbutaSatellitePanel,
+  })),
 );
 const NahuelbutaTenurePanel = lazy(() =>
-  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaTenurePanel })),
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({
+    default: m.NahuelbutaTenurePanel,
+  })),
 );
 const NahuelbutaThesisPanel = lazy(() =>
-  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({ default: m.NahuelbutaThesisPanel })),
+  import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({
+    default: m.NahuelbutaThesisPanel,
+  })),
 );
 const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 const PalmerasMasterViewer = lazy(() =>
-  import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({ default: m.PalmerasMasterViewer })),
+  import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({
+    default: m.PalmerasMasterViewer,
+  })),
 );
 const Palmeras3D = lazy(() =>
   import("@/features/palmeras/Palmeras3D").then((m) => ({ default: m.Palmeras3D })),
@@ -301,9 +311,7 @@ function ViewToggle({ view, onChange }: { view: "2d" | "3d"; onChange: (v: "2d" 
             type="button"
             onClick={() => onChange(key)}
             className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-              view === key
-                ? "bg-accent-brand text-white"
-                : "text-content-subtle hover:text-content"
+              view === key ? "bg-accent-brand text-white" : "text-content-subtle hover:text-content"
             }`}
           >
             <Icon className="w-3.5 h-3.5" />

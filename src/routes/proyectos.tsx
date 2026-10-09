@@ -95,7 +95,11 @@ const SHOWCASE = [
     commodity: "REE",
     image: nahuelbutaImg,
     stage: "Prospección (TRL 1-2)",
-    stats: [["34", "paños"], ["10.200", "hectáreas"], ["US$ 380k", "Fase 1"]],
+    stats: [
+      ["34", "paños"],
+      ["10.200", "hectáreas"],
+      ["US$ 380k", "Fase 1"],
+    ],
     bullets: [
       "Arcillas iónicas sobre el Complejo Metamórfico Nahuelbuta",
       "Pedimentos en solicitud ante SERNAGEOMIN",

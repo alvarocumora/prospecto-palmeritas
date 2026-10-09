@@ -385,13 +385,10 @@ export function ProjectMasterViewer({
         const isOwn = (f?: Feature) => Boolean(f?.properties?.es_tenencia_proyecto);
         const ownFeatures = concessions.features.filter((f) => isOwn(f as Feature));
         // Halo de contraste bajo la tenencia propia: la despega del relieve satelital.
-        const halo = L.geoJSON(
-          { type: "FeatureCollection", features: ownFeatures } as never,
-          {
-            interactive: false,
-            style: () => ({ color: "#0b0a09", weight: 6, opacity: 0.55, fill: false }),
-          },
-        );
+        const halo = L.geoJSON({ type: "FeatureCollection", features: ownFeatures } as never, {
+          interactive: false,
+          style: () => ({ color: "#0b0a09", weight: 6, opacity: 0.55, fill: false }),
+        });
         const g = L.geoJSON(concessions as never, {
           style: (f?: Feature) =>
             isOwn(f)

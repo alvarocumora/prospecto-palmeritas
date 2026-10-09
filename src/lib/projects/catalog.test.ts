@@ -7,6 +7,7 @@ describe("catálogo canónico de proyectos", () => {
       "palmeras",
       "losverdes",
       "cholqui",
+      "nahuelbuta",
     ]);
   });
 
