@@ -1,14 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LegacyProjectEntry } from "@/features/projects/LegacyProjectEntry";
 
-// Ficha única: Cholqui vive en el terminal canónico (/terminal/cholqui).
 export const Route = createFileRoute("/_authenticated/dashboard/cholqui")({
-  beforeLoad: () => {
-    throw redirect({
-      to: "/terminal/$slug",
-      params: { slug: "cholqui" },
-      search: { tab: "mapa" },
-      replace: true,
-      statusCode: 301,
-    });
-  },
+  component: () => <LegacyProjectEntry profileKey="cholqui" />,
 });

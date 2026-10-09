@@ -1,4 +1,5 @@
 import { Link, useLocation } from "@tanstack/react-router";
+import { useProjects } from "@/hooks/useProjects";
 import { cn } from "@/lib/utils";
 import { findWorkspaceEntry, type WorkspaceTab } from "@/lib/workspace";
 
@@ -15,6 +16,7 @@ export function WorkspaceTabs({
   filterTab?: (tab: WorkspaceTab) => boolean;
 }) {
   const location = useLocation();
+  const { active: project } = useProjects();
   const entry = findWorkspaceEntry(pathname);
   if (!entry?.tabs || entry.tabs.length < 2) return null;
 
@@ -37,6 +39,7 @@ export function WorkspaceTabs({
             <Link
               key={t.to}
               to={t.to}
+              search={(previous) => ({ ...previous, project: project?.id })}
               className={cn(
                 "shrink-0 h-8 inline-flex items-center px-3 font-mono text-[11px] border-b-2 -mb-px transition-colors",
                 active

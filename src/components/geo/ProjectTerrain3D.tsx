@@ -26,6 +26,8 @@ type LatLng = { lat: number; lng: number };
 
 export type ProjectTerrain3DProps = {
   slug: string;
+  projectId?: string;
+  selectedFeatureId?: string;
   center: LatLng;
   extentMeters?: number;
   concessions?: FeatureCollection | null;
@@ -119,6 +121,8 @@ function Outline({
 
 export function ProjectTerrain3D({
   slug,
+  projectId = NIL_PROJECT,
+  selectedFeatureId,
   center,
   extentMeters = 10000,
   concessions,
@@ -131,11 +135,11 @@ export function ProjectTerrain3D({
   const [hover, setHover] = useState<{ p: THREE.Vector3; text: string } | null>(null);
 
   const dem = useQuery({
-    queryKey: ["project-dem", slug, DEM_SIZE, extentMeters],
+    queryKey: ["project-dem", projectId, slug, center.lat, center.lng, DEM_SIZE, extentMeters],
     queryFn: () =>
       demFn({
         data: {
-          projectId: NIL_PROJECT,
+          projectId,
           size: DEM_SIZE,
           extentMeters,
           centerLat: center.lat,
@@ -169,12 +173,14 @@ export function ProjectTerrain3D({
         const p = c ? project(c[0], c[1], lift) : null;
         const props = (f.properties ?? {}) as Record<string, unknown>;
         const text = String(props.name ?? props.nombre ?? props.index_code ?? props.id ?? "");
-        return p ? { p, text } : null;
+        return p
+          ? { p, text, selected: String(props.id ?? f.id ?? "") === selectedFeatureId }
+          : null;
       })
-      .filter((m): m is { p: THREE.Vector3; text: string } => m !== null);
+      .filter((m): m is { p: THREE.Vector3; text: string; selected: boolean } => m !== null);
 
-  const anomalyPts = useMemo(() => markers(anomalies, 60), [anomalies, project]); // eslint-disable-line react-hooks/exhaustive-deps
-  const drillPts = useMemo(() => markers(drillGrid, 40), [drillGrid, project]); // eslint-disable-line react-hooks/exhaustive-deps
+  const anomalyPts = useMemo(() => markers(anomalies, 60), [anomalies, project, selectedFeatureId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const drillPts = useMemo(() => markers(drillGrid, 40), [drillGrid, project, selectedFeatureId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const camDist = extentMeters * SCALE * 0.75;
 
@@ -218,10 +224,10 @@ export function ProjectTerrain3D({
                   onPointerOver={() => setHover(m)}
                   onPointerOut={() => setHover(null)}
                 >
-                  <sphereGeometry args={[1.6, 16, 16]} />
+                  <sphereGeometry args={[m.selected ? 3 : 1.6, 16, 16]} />
                   <meshStandardMaterial
-                    color="#22b8cf"
-                    emissive="#22b8cf"
+                    color={m.selected ? "#f59e0b" : "#22b8cf"}
+                    emissive={m.selected ? "#f59e0b" : "#22b8cf"}
                     emissiveIntensity={0.4}
                   />
                 </mesh>

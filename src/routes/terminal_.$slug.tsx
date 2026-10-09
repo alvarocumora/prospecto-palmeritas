@@ -6,11 +6,15 @@ import {
   type TerminalTabKey,
 } from "@/features/terminal/terminalProjects";
 import { ProjectTerminalShell } from "@/features/terminal/ProjectTerminalShell";
+import { projectView, type ProjectView } from "@/lib/projects/navigation";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 
 export const Route = createFileRoute("/terminal_/$slug")({
-  validateSearch: (search: Record<string, unknown>): { tab: TerminalTabKey } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { tab: TerminalTabKey; view?: ProjectView } => ({
     tab: isTerminalTab(search.tab) ? search.tab : "mapa",
+    view: search.view == null ? undefined : projectView(search.view),
   }),
   beforeLoad: ({ params, search }) => {
     const canonical = canonicalProjectSlug(params.slug);
@@ -48,7 +52,7 @@ export const Route = createFileRoute("/terminal_/$slug")({
 
 function TerminalPage() {
   const { slug } = Route.useParams();
-  const { tab } = Route.useSearch();
+  const { tab, view } = Route.useSearch();
   const project = getTerminalProject(slug);
 
   if (!project) {
@@ -67,5 +71,7 @@ function TerminalPage() {
     );
   }
 
-  return <ProjectTerminalShell key={project.slug} project={project} tab={tab} />;
+  return (
+    <ProjectTerminalShell key={project.slug} project={project} tab={tab} view={projectView(view)} />
+  );
 }

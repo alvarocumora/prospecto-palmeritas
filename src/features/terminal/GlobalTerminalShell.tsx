@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell, TerminalTopBar } from "@/components/shell/AppShell";
 import { TerminalSidebar } from "./TerminalSidebar";
@@ -11,7 +11,7 @@ import { getTerminalPortfolio } from "@/lib/terminal.functions";
 
 export function GlobalTerminalShell() {
   const { user } = useAuth();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const { activeId: selectedId, setActiveId: setSelectedId } = useProjects();
   const fetchPortfolio = useServerFn(getTerminalPortfolio);
 
   const { data, isLoading } = useQuery({

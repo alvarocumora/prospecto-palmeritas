@@ -18,15 +18,17 @@ import { Logo } from "@/components/Logo";
 import { moduleForRoute } from "@/lib/modules";
 import { WORKSPACE_NAV } from "@/lib/workspace";
 import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
+import { privateProjectSearch, workspaceProjectId } from "@/lib/projects/navigation";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
+  validateSearch: privateProjectSearch,
   component: AuthenticatedLayout,
 });
 
 function AuthenticatedLayout() {
   const { user, profile, loading, signOut } = useAuth();
-  const { active } = useProjects();
+  const { active, projects, setActiveId, loading: projectsLoading } = useProjects();
   const access = useWorkspaceAccess();
   const { total: catastroAlerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const { data: myModules } = useMyModules();
@@ -35,6 +37,9 @@ function AuthenticatedLayout() {
     (profile as { language?: string } | null)?.language === "en" ? "en" : "es";
   const navigate = useNavigate();
   const location = useLocation();
+  const { project } = Route.useSearch();
+  const requestedProject = workspaceProjectId(location.pathname, project);
+  const requestedMember = projects.find((item) => item.id === requestedProject);
   const [mounted, setMounted] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
 
@@ -46,6 +51,12 @@ function AuthenticatedLayout() {
     if (!mounted || loading) return;
     if (!user) navigate({ to: "/auth" });
   }, [mounted, loading, user, navigate]);
+
+  useEffect(() => {
+    if (!projectsLoading && requestedMember && active?.id !== requestedProject) {
+      setActiveId(requestedMember.id);
+    }
+  }, [active?.id, projectsLoading, requestedMember, requestedProject, setActiveId]);
 
   // El INICIO ya no exige proyecto: es el Centro de Negocios (cross-proyecto)
   // y maneja su propio empty state. Los inversionistas sin proyectos aterrizan
@@ -130,11 +141,26 @@ function AuthenticatedLayout() {
         className={cn("relative pt-9 pb-20 md:pb-8 md:pl-14 min-h-[100dvh]")}
         style={{ paddingBottom: "calc(env(safe-area-inset-bottom) + 4.5rem)" }}
       >
-        {/* key por ruta: cada vista entra con un fade-up sutil */}
+        {/* La shell permanece montada al cambiar de módulo. */}
         <WorkspaceTabs pathname={location.pathname} filterTab={access.canTab} />
-        <div key={location.pathname} className="animate-fade-up">
+        <div>
           <ModuleAccessGate pathname={location.pathname}>
-            <Outlet />
+            {requestedProject && (projectsLoading || active?.id !== requestedProject) ? (
+              <div className="p-6 text-sm">
+                {projectsLoading || requestedMember ? (
+                  "Activando proyecto…"
+                ) : (
+                  <>
+                    <p>Este proyecto no está disponible en tu workspace.</p>
+                    <Link to="/dashboard/projects" search={{ project: undefined }}>
+                      Volver a proyectos
+                    </Link>
+                  </>
+                )}
+              </div>
+            ) : (
+              <Outlet />
+            )}
           </ModuleAccessGate>
         </div>
       </main>

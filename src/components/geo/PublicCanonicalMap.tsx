@@ -151,6 +151,15 @@ export function PublicCanonicalMap({
   }, []);
 
   useEffect(() => {
+    if (!ready || !containerRef.current || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width > 0 && entry.contentRect.height > 0) mapRef.current?.resize();
+    });
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [ready]);
+
+  useEffect(() => {
     if (!ready || !mapRef.current) return;
     const map = mapRef.current;
     if (bundle.bbox) {

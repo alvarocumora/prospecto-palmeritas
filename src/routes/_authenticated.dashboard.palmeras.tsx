@@ -1,14 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LegacyProjectEntry } from "@/features/projects/LegacyProjectEntry";
 
-// Ficha única: Las Palmeras vive en el terminal canónico (/terminal/palmeras).
 export const Route = createFileRoute("/_authenticated/dashboard/palmeras")({
-  beforeLoad: () => {
-    throw redirect({
-      to: "/terminal/$slug",
-      params: { slug: "palmeras" },
-      search: { tab: "mapa" },
-      replace: true,
-      statusCode: 301,
-    });
-  },
+  component: () => <LegacyProjectEntry profileKey="palmeras" />,
 });

@@ -786,6 +786,17 @@ export function ProjectMasterViewer({
     };
   }, [geophysics]);
 
+  useEffect(() => {
+    if (!ready || !mapEl.current || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(([entry]) => {
+      if (entry.contentRect.width > 0 && entry.contentRect.height > 0) {
+        mapRef.current?.invalidateSize({ pan: false });
+      }
+    });
+    observer.observe(mapEl.current);
+    return () => observer.disconnect();
+  }, [ready]);
+
   // Conteo de datos reales por capa. Las capas sin datos NO se muestran en la
   // leyenda (evita el visor "recargado" con capas vacías, p.ej. geofísica en 0).
   const counts = useMemo<Record<LayerKey, number>>(

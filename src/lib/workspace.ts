@@ -118,17 +118,16 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
   },
   {
     to: "/dashboard/projects",
-    label: "Proyectos & Terminal",
+    label: "Proyectos",
     icon: FolderKanban,
     group: "CATASTRO & EXPLORACIÓN",
     module: "catastro",
     capability: "projects",
     requiresProjects: true,
     tabs: [
-      { label: "Proyectos", to: "/dashboard/projects" },
-      { label: "Terminal 2D/3D", to: "/terminal" },
+      { label: "Proyectos", to: "/dashboard/projects", exact: true },
+      { label: "Workspace 2D/3D", to: "/dashboard/project-report" },
       { label: "Mission Control", to: "/dashboard/mission" },
-      { label: "Cholqui", to: "/terminal/cholqui" },
       { label: "Nuevo proyecto", to: "/dashboard/projects/nuevo" },
     ],
   },
@@ -305,12 +304,14 @@ export function findWorkspaceEntry(pathname: string): WorkspaceEntry | null {
   let best: WorkspaceEntry | null = null;
   let bestLen = -1;
   for (const entry of WORKSPACE_NAV) {
-    const candidates = entry.tabs?.map((t) => t.to) ?? [entry.to];
-    for (const c of candidates) {
-      const match = pathname === c || pathname.startsWith(c + "/");
-      if (match && c.length > bestLen) {
+    const candidates = [{ to: entry.to, exact: entry.exact }, ...(entry.tabs ?? [])];
+    for (const candidate of candidates) {
+      const match = candidate.exact
+        ? pathname === candidate.to
+        : pathname === candidate.to || pathname.startsWith(candidate.to + "/");
+      if (match && candidate.to.length > bestLen) {
         best = entry;
-        bestLen = c.length;
+        bestLen = candidate.to.length;
       }
     }
   }

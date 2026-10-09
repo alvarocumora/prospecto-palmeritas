@@ -1,5 +1,5 @@
-import { lazy, Suspense, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getTilamaReport } from "@/lib/tilama.functions";
@@ -18,6 +18,7 @@ import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
 import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
 import { buildNahuelbutaDoc } from "@/lib/pdf/adapters/nahuelbuta";
 import { fmtUsd0 } from "@/lib/investor/fichas";
+import type { ProjectView } from "@/lib/projects/navigation";
 import { TerminalSimulator } from "./TerminalSimulator";
 
 import {
@@ -124,12 +125,27 @@ function Loading({ label }: { label: string }) {
 export function ProjectTerminalShell({
   project,
   tab,
+  view = "2d",
 }: {
   project: TerminalProject;
   tab: TerminalTabKey;
+  view?: ProjectView;
 }) {
   const projects = listTerminalProjects();
   const { ficha } = project;
+  const navigate = useNavigate();
+  const [mapVisited, setMapVisited] = useState(tab === "mapa");
+  useEffect(() => {
+    if (tab === "mapa") setMapVisited(true);
+  }, [tab]);
+  const setView = (nextView: ProjectView) => {
+    void navigate({
+      to: "/terminal/$slug",
+      params: { slug: project.slug },
+      search: { tab, view: nextView },
+      replace: true,
+    });
+  };
 
   return (
     <div data-theme="im-light" className="min-h-screen bg-surface text-content">
@@ -138,7 +154,7 @@ export function ProjectTerminalShell({
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
             <Link
-              to="/"
+              to="/proyectos"
               className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white"
             >
               Geocapitals · Terminal
@@ -150,7 +166,7 @@ export function ProjectTerminalShell({
                   key={p.slug}
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
-                  search={{ tab }}
+                  search={{ tab, view }}
                   className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
                     p.slug === project.slug
                       ? "bg-white text-content border-white"
@@ -184,7 +200,7 @@ export function ProjectTerminalShell({
                 key={t.key}
                 to="/terminal/$slug"
                 params={{ slug: project.slug }}
-                search={{ tab: t.key }}
+                search={{ tab: t.key, view }}
                 className={`whitespace-nowrap px-4 py-2.5 text-[12px] font-mono uppercase tracking-wider border-b-2 transition-colors ${
                   t.key === tab
                     ? "border-white text-white"
@@ -200,7 +216,11 @@ export function ProjectTerminalShell({
       </header>
 
       <main className="max-w-[1320px] mx-auto px-4 md:px-6 py-6 space-y-6">
-        {tab === "mapa" && <MapaTab project={project} />}
+        {mapVisited && (
+          <div hidden={tab !== "mapa"}>
+            <MapaTab project={project} view={view} setView={setView} />
+          </div>
+        )}
         {tab === "tesis" && <TesisTab project={project} />}
         {tab === "simulador" && <SimuladorTab project={project} />}
         {tab === "dataroom" && <DataRoomTab project={project} />}
@@ -215,9 +235,15 @@ export function ProjectTerminalShell({
   );
 }
 
-function MapaTab({ project }: { project: TerminalProject }) {
-  const [view, setView] = useState<"2d" | "3d">("2d");
-
+function MapaTab({
+  project,
+  view,
+  setView,
+}: {
+  project: TerminalProject;
+  view: ProjectView;
+  setView: (view: ProjectView) => void;
+}) {
   if (project.slug === "cholqui") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
