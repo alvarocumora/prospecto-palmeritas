@@ -22,7 +22,7 @@ function breadcrumb(path: string): string {
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   const { user, profile, signOut } = useAuth();
-  const { projects, active, setActiveId, loading } = useProjects();
+  const { projects, active, loading } = useProjects();
   const [openProj, setOpenProj] = useState(false);
   const [openUser, setOpenUser] = useState(false);
   const navigate = useNavigate();
@@ -112,7 +112,6 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                     } else if (/^\/dashboard\/(cholqui|franco|palmeras)$/.test(location.pathname)) {
                       void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
                     } else {
-                      setActiveId(p.id);
                       void navigate({
                         href: projectNavigationHref(
                           location.pathname,
