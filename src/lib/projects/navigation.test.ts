@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   findSatelliteProject,
   projectIdFromSearch,
+  privateProjectSearch,
   projectView,
   satelliteSelection,
   satelliteTerminalRedirect,
@@ -20,6 +21,10 @@ describe("project navigation", () => {
   it("never substitutes another asset for an unavailable explicit project", () => {
     expect(findSatelliteProject([{ id: first }], second)).toBeNull();
     expect(findSatelliteProject([{ id: first }])?.id).toBe(first);
+  });
+
+  it("resolves a selected published alias to its database UUID without guessing a name", () => {
+    expect(findSatelliteProject([{ id: first }, { id: second }], "tilama")?.id).toBe(second);
   });
 
   it("opens legacy slug links in 3D", () => {
@@ -44,6 +49,13 @@ describe("project navigation", () => {
     });
     expect(projectIdFromSearch("cholqui")).toBeUndefined();
     expect(projectIdFromSearch(first)).toBe(first);
+  });
+
+  it("rejects an invalid private URL instead of silently opening the stored project", () => {
+    expect(() => privateProjectSearch({ project: "invalid" })).toThrow(
+      "El identificador del proyecto no es válido.",
+    );
+    expect(privateProjectSearch({})).toEqual({ project: undefined });
   });
 
   it("makes a project URL authoritative over the stored project", () => {

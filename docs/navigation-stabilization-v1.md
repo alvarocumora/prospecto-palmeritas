@@ -58,7 +58,8 @@ La comprobación visual requiere un entorno de aplicación y estos recorridos:
 
 1. Crear el workspace por /projects/:projectId/:section conforme al documento de arquitectura,
    reutilizando esta resolución por UUID y migrando las secciones sin perder capacidades.
-2. Sustituir el adaptador histórico de perfiles por una relación persistida UUID–slug.
+2. Sustituir el adaptador histórico de perfiles y los UUID ya conocidos del catálogo por una
+   relación persistida UUID–slug; registrar Palmeras y Nahuelbuta sin inferir por nombre.
 3. Unificar los bundles públicos y privados mediante permisos de publicación y metadatos de
    procedencia; mantener las diferencias de acceso de ambas superficies.
 4. Integrar documentos, campañas, QA/QC, escenarios y validación dentro del workspace.

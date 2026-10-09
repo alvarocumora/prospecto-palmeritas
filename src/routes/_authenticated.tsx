@@ -18,13 +18,11 @@ import { Logo } from "@/components/Logo";
 import { moduleForRoute } from "@/lib/modules";
 import { WORKSPACE_NAV } from "@/lib/workspace";
 import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
-import { projectIdFromSearch, workspaceProjectId } from "@/lib/projects/navigation";
+import { privateProjectSearch, workspaceProjectId } from "@/lib/projects/navigation";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated")({
-  validateSearch: (search: Record<string, unknown>): { project?: string } => ({
-    project: projectIdFromSearch(search.project),
-  }),
+  validateSearch: privateProjectSearch,
   component: AuthenticatedLayout,
 });
 

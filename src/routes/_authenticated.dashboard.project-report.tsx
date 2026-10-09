@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { ProjectWorkspaceViewer } from "@/components/geo/ProjectWorkspaceViewer";
-import { resolveProjectViewerProfile } from "@/lib/geospatial/projectViewerProfiles";
+import { getPublicProjectById } from "@/lib/projects/catalog";
 import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
 import { projectView, type ProjectView } from "@/lib/projects/navigation";
 
@@ -37,9 +37,10 @@ function ProjectReportPage() {
   const navigate = Route.useNavigate();
   const view = projectView(search.view);
   const panel = search.panel ?? "mapa";
-  const profile = resolveProjectViewerProfile(active);
+  const publishedProject = active ? getPublicProjectById(active.id) : null;
+  const isCholqui = publishedProject?.slug === "cholqui";
   const publicSlug = active
-    ? terminalSlugForListing({ code: active.code, title: active.name })
+    ? publishedProject?.slug ?? terminalSlugForListing({ code: active.code })
     : null;
 
   useEffect(() => {
@@ -90,7 +91,7 @@ function ProjectReportPage() {
           )}
         </div>
       </header>
-      {profile?.key === "cholqui" && (
+      {isCholqui && (
         <nav className="flex gap-2 text-xs">
           {(["mapa", "satelite", "spv"] as const).map((key) => (
             <Link
@@ -107,7 +108,7 @@ function ProjectReportPage() {
           ))}
         </nav>
       )}
-      {profile?.key !== "cholqui" || panel === "mapa" ? (
+      {!isCholqui || panel === "mapa" ? (
         <ProjectWorkspaceViewer
           key={active.id}
           projectId={active.id}
@@ -121,7 +122,7 @@ function ProjectReportPage() {
         />
       ) : (
         <Suspense fallback={<p className="text-sm">Cargando módulo…</p>}>
-          {panel === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel />}
+          {panel === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel projectCode={active.code} projectName={active.name} />}
         </Suspense>
       )}
     </div>

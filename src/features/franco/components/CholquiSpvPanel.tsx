@@ -8,21 +8,25 @@ import { downloadSpvCertificate } from "../spvCertificatePdf";
 import { CHOLQUI } from "../data/cholqui";
 import { CholquiStagePanel } from "./CholquiStagePanel";
 
-const PROJECT_CODE = "CHOLQUI";
-
 function pctOf(shares: number, total: number): string {
   if (!total) return "—";
   return `${((shares / total) * 100).toFixed(4)} %`;
 }
 
-export function CholquiSpvPanel() {
+export function CholquiSpvPanel({
+  projectCode = "CHOLQUI",
+  projectName = CHOLQUI.name,
+}: {
+  projectCode?: string;
+  projectName?: string;
+} = {}) {
   const qc = useQueryClient();
   const overviewFn = useServerFn(getSpvOverview);
   const saveFn = useServerFn(saveSpvPosition);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["spv-overview", PROJECT_CODE],
-    queryFn: () => overviewFn({ data: { projectCode: PROJECT_CODE } }),
+    queryKey: ["spv-overview", projectCode],
+    queryFn: () => overviewFn({ data: { projectCode: projectCode } }),
   });
 
   const [form, setForm] = useState({
@@ -40,7 +44,7 @@ export function CholquiSpvPanel() {
     mutationFn: () =>
       saveFn({
         data: {
-          projectCode: PROJECT_CODE,
+          projectCode: projectCode,
           investorName: form.investorName.trim(),
           investorEmail: form.investorEmail.trim() || null,
           investorUserId: form.investorUserId.trim() || null,
@@ -56,7 +60,7 @@ export function CholquiSpvPanel() {
     onSuccess: () => {
       toast.success("Posición registrada");
       setForm((f) => ({ ...f, investorName: "", investorEmail: "", shares: "", amountPaid: "" }));
-      qc.invalidateQueries({ queryKey: ["spv-overview", PROJECT_CODE] });
+      qc.invalidateQueries({ queryKey: ["spv-overview", projectCode] });
     },
     onError: (e) => toast.error(e instanceof Error ? e.message : "No se pudo registrar"),
   });
@@ -76,7 +80,7 @@ export function CholquiSpvPanel() {
       await downloadSpvCertificate({
         spv: data.spv,
         position: p,
-        projectName: CHOLQUI.name,
+        projectName,
         verifyPath: CHOLQUI.liveUrl,
       });
     } catch (e) {

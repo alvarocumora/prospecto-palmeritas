@@ -1,4 +1,4 @@
-import { canonicalProjectSlug } from "./catalog";
+import { canonicalProjectSlug, getPublicProject } from "./catalog";
 
 export type ProjectView = "2d" | "3d";
 
@@ -12,6 +12,13 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export function projectIdFromSearch(value: unknown): string | undefined {
   return typeof value === "string" && UUID.test(value) ? value : undefined;
+}
+
+export function privateProjectSearch(search: Record<string, unknown>): { project?: string } {
+  if (search.project == null) return { project: undefined };
+  const project = projectIdFromSearch(search.project);
+  if (!project) throw new Error("El identificador del proyecto no es válido.");
+  return { project };
 }
 
 export function workspaceProjectId(pathname: string, searchProject: unknown): string | undefined {
@@ -41,6 +48,9 @@ export function findSatelliteProject<T extends { id: string }>(
   projects: readonly T[],
   requestedId?: string,
 ): T | null {
-  if (requestedId) return projects.find((project) => project.id === requestedId) ?? null;
+  if (requestedId) {
+    const id = getPublicProject(requestedId)?.projectId ?? requestedId;
+    return projects.find((project) => project.id === id) ?? null;
+  }
   return projects[0] ?? null;
 }
