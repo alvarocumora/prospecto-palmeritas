@@ -10,10 +10,11 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "npm run routes:generate && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "validate": "npm run typecheck && npm run lint && npm run test && npm run build"
+    "validate": "npm run typecheck && npm run lint && npm run test && npm run build",
+    "routes:generate": "node scripts/generate-routes.mjs"
   },
   "dependencies": {
     "@ai-sdk/openai-compatible": "^2.0.48",
@@ -142,7 +143,8 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
-    "vitest": "^3.0.5"
+    "vitest": "^3.0.5",
+    "@tanstack/router-generator": "1.167.40"
   },
   "overrides": {
     "seroval": "^1.6.8"

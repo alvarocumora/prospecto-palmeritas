@@ -1,3 +1,4 @@
+import { projectWorkspaceLegacyPath } from "@/lib/projects/workspace";
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
@@ -301,6 +302,7 @@ export const WORKSPACE_ICONS = {
 
 /** Devuelve la entrada canónica (y sus pestañas) para un pathname dado. */
 export function findWorkspaceEntry(pathname: string): WorkspaceEntry | null {
+  pathname = projectWorkspaceLegacyPath(pathname);
   let best: WorkspaceEntry | null = null;
   let bestLen = -1;
   for (const entry of WORKSPACE_NAV) {

@@ -24,5 +24,12 @@ export function LegacyProjectEntry({ profileKey }: { profileKey: CanonicalProjec
       </div>
     );
   }
-  return <Navigate to="/dashboard/project-report" search={{ project: project.id }} replace />;
+  return (
+    <Navigate
+      to="/projects/$projectId/$section"
+      params={{ projectId: project.id, section: "overview" }}
+      search={{ project: undefined }}
+      replace
+    />
+  );
 }

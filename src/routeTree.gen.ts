@@ -174,6 +174,7 @@ import { Route as AuthenticatedDashboardRfqsNuevoRouteImport } from './routes/_a
 import { Route as AuthenticatedDashboardSourcingRequestIdRouteImport } from './routes/_authenticated.dashboard.sourcing_.$requestId'
 import { Route as AuthenticatedDashboardTargetsAiBriefRouteImport } from './routes/_authenticated.dashboard.targets.ai-brief'
 import { Route as AuthenticatedDashboardTradesTradeIdRouteImport } from './routes/_authenticated.dashboard.trades_.$tradeId'
+import { Route as AuthenticatedProjectsProjectIdSectionRouteImport } from './routes/_authenticated.projects.$projectId.$section'
 import { Route as ApiPublicHooksSignatureRemindersRouteImport } from './routes/api/public/hooks/signature-reminders'
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
@@ -1102,6 +1103,12 @@ const AuthenticatedDashboardTradesTradeIdRoute =
     path: '/dashboard/trades/$tradeId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedProjectsProjectIdSectionRoute =
+  AuthenticatedProjectsProjectIdSectionRouteImport.update({
+    id: '/projects/$projectId/$section',
+    path: '/projects/$projectId/$section',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const ApiPublicHooksSignatureRemindersRoute =
   ApiPublicHooksSignatureRemindersRouteImport.update({
     id: '/api/public/hooks/signature-reminders',
@@ -1340,6 +1347,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/projects/$projectId/$section': typeof AuthenticatedProjectsProjectIdSectionRoute
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
@@ -1519,6 +1527,7 @@ export interface FileRoutesByTo {
   '/dashboard/sourcing/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/dashboard/trades/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/projects/$projectId/$section': typeof AuthenticatedProjectsProjectIdSectionRoute
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
@@ -1700,6 +1709,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/sourcing_/$requestId': typeof AuthenticatedDashboardSourcingRequestIdRoute
   '/_authenticated/dashboard/targets/ai-brief': typeof AuthenticatedDashboardTargetsAiBriefRoute
   '/_authenticated/dashboard/trades_/$tradeId': typeof AuthenticatedDashboardTradesTradeIdRoute
+  '/_authenticated/projects/$projectId/$section': typeof AuthenticatedProjectsProjectIdSectionRoute
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
@@ -1881,6 +1891,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
+    | '/projects/$projectId/$section'
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
@@ -2060,6 +2071,7 @@ export interface FileRouteTypes {
     | '/dashboard/sourcing/$requestId'
     | '/dashboard/targets/ai-brief'
     | '/dashboard/trades/$tradeId'
+    | '/projects/$projectId/$section'
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
@@ -2240,6 +2252,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/sourcing_/$requestId'
     | '/_authenticated/dashboard/targets/ai-brief'
     | '/_authenticated/dashboard/trades_/$tradeId'
+    | '/_authenticated/projects/$projectId/$section'
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
@@ -3504,6 +3517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardTradesTradeIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/projects/$projectId/$section': {
+      id: '/_authenticated/projects/$projectId/$section'
+      path: '/projects/$projectId/$section'
+      fullPath: '/projects/$projectId/$section'
+      preLoaderRoute: typeof AuthenticatedProjectsProjectIdSectionRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/api/public/hooks/signature-reminders': {
       id: '/api/public/hooks/signature-reminders'
       path: '/api/public/hooks/signature-reminders'
@@ -3764,6 +3784,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardRfqsNuevoRoute: typeof AuthenticatedDashboardRfqsNuevoRoute
   AuthenticatedDashboardSourcingRequestIdRoute: typeof AuthenticatedDashboardSourcingRequestIdRoute
   AuthenticatedDashboardTradesTradeIdRoute: typeof AuthenticatedDashboardTradesTradeIdRoute
+  AuthenticatedProjectsProjectIdSectionRoute: typeof AuthenticatedProjectsProjectIdSectionRoute
   AuthenticatedDashboardDocumentosIndexRoute: typeof AuthenticatedDashboardDocumentosIndexRoute
   AuthenticatedDashboardPipelineIndexRoute: typeof AuthenticatedDashboardPipelineIndexRoute
   AuthenticatedDashboardProveedoresIndexRoute: typeof AuthenticatedDashboardProveedoresIndexRoute
@@ -3872,6 +3893,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardSourcingRequestIdRoute,
   AuthenticatedDashboardTradesTradeIdRoute:
     AuthenticatedDashboardTradesTradeIdRoute,
+  AuthenticatedProjectsProjectIdSectionRoute:
+    AuthenticatedProjectsProjectIdSectionRoute,
   AuthenticatedDashboardDocumentosIndexRoute:
     AuthenticatedDashboardDocumentosIndexRoute,
   AuthenticatedDashboardPipelineIndexRoute:

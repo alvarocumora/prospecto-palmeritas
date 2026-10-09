@@ -1,3 +1,4 @@
+import { projectWorkspaceLegacyPath } from "@/lib/projects/workspace";
 // Control de acceso por rol del SISTEMA MAESTRO.
 // Única fuente de verdad usada por: rail (puerta de acceso), pestañas de cada
 // pantalla canónica y el gate de ruta del layout autenticado. Así la puerta y
@@ -108,6 +109,7 @@ export function canEnterTab(tab: WorkspaceTab, ctx: AccessContext): boolean {
 
 /** ¿Puede entrar a un pathname interno? (gate de ruta y de contenido) */
 export function canEnterPath(pathname: string, ctx: AccessContext): AccessDecision {
+  pathname = projectWorkspaceLegacyPath(pathname);
   const entry = findWorkspaceEntry(pathname);
   if (!entry) return { allowed: true };
   const decision = canEnterEntry(entry, ctx);

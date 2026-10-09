@@ -22,7 +22,7 @@ export function privateProjectSearch(search: Record<string, unknown>): { project
 }
 
 export function workspaceProjectId(pathname: string, searchProject: unknown): string | undefined {
-  const match = /^\/dashboard\/projects\/([^/]+)\/?$/.exec(pathname);
+  const match = /^(?:\/dashboard)?\/projects\/([^/]+)(?:\/[^/]+)?\/?$/.exec(pathname);
   return projectIdFromSearch(match?.[1]) ?? projectIdFromSearch(searchProject);
 }
 
@@ -62,7 +62,13 @@ export function projectNavigationHref(
   projectId: string,
 ): string {
   const search = new URLSearchParams(searchStr);
-  search.set("project", projectId);
+  const workspace = /^\/projects\/([^/]+)\/([^/]+)\/?$/.exec(pathname);
+  if (workspace) {
+    pathname = `/projects/${projectId}/${workspace[2]}`;
+    search.delete("project");
+  } else {
+    search.set("project", projectId);
+  }
   const fragment = hash.replace(/^#/, "");
   return `${pathname}?${search.toString()}${fragment ? `#${fragment}` : ""}`;
 }

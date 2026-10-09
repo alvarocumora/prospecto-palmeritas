@@ -114,6 +114,10 @@ function FieldMode() {
     );
   }
 
+  if (survey.project_id !== active.id) {
+    return <div className="p-6 text-sm">La campaña no pertenece al proyecto seleccionado.</div>;
+  }
+
   const accuracy = position?.accuracy ?? null;
   const accColor =
     accuracy == null
@@ -182,6 +186,7 @@ function FieldMode() {
         <div className="flex items-center justify-between gap-2">
           <Link
             to="/dashboard/geophysics/$surveyId"
+            search={{ project: active.id }}
             params={{ surveyId: survey.id }}
             className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-gold"
           >
