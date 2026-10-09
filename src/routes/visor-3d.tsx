@@ -3,8 +3,12 @@ import { canonicalProjectSlug } from "@/lib/projects/catalog";
 
 // Visor 3D unificado: el relieve 3D de cada proyecto vive en su terminal (/terminal/$slug).
 export const Route = createFileRoute("/visor-3d")({
-  validateSearch: (search: Record<string, unknown>): { project?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { project?: string; anomaly?: string; insar?: string } => ({
     project: typeof search.project === "string" ? search.project : undefined,
+    anomaly: typeof search.anomaly === "string" ? search.anomaly : undefined,
+    insar: typeof search.insar === "string" ? search.insar : undefined,
   }),
   beforeLoad: ({ search }) => {
     const slug = search.project ? canonicalProjectSlug(search.project) : null;
