@@ -235,12 +235,15 @@ export function ProjectTerminalShell({
   );
 }
 
-function MapaTab({ project, view, setView }: {
+function MapaTab({
+  project,
+  view,
+  setView,
+}: {
   project: TerminalProject;
   view: ProjectView;
   setView: (view: ProjectView) => void;
 }) {
-
   if (project.slug === "cholqui") {
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>

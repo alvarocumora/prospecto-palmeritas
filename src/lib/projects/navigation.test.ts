@@ -4,6 +4,7 @@ import {
   projectIdFromSearch,
   privateProjectSearch,
   projectView,
+  projectNavigationHref,
   satelliteSelection,
   satelliteTerminalRedirect,
   workspaceProjectId,
@@ -62,6 +63,18 @@ describe("project navigation", () => {
     expect(workspaceProjectId(`/dashboard/projects/${second}`, first)).toBe(second);
     expect(workspaceProjectId("/dashboard/drilling", first)).toBe(first);
     expect(workspaceProjectId("/dashboard/projects/nuevo", undefined)).toBeUndefined();
+  });
+
+  it("changes project without losing module filters, 3D mode or the current anchor", () => {
+    const href = projectNavigationHref(
+      "/dashboard/project-report",
+      `?project=${first}&view=3d&panel=satelite`,
+      "evidence",
+      second,
+    );
+    expect(href).toBe(
+      `/dashboard/project-report?project=${second}&view=3d&panel=satelite#evidence`,
+    );
   });
 
   it("normalizes the shareable 2D/3D mode", () => {

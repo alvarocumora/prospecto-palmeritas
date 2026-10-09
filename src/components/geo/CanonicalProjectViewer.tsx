@@ -28,7 +28,9 @@ export function CanonicalProjectViewer({
 
   if (loading || !project) {
     return (
-      <div className={`${heightClassName} grid place-items-center rounded border border-border p-6`}>
+      <div
+        className={`${heightClassName} grid place-items-center rounded border border-border p-6`}
+      >
         {loading ? "Cargando proyecto…" : "Este proyecto no está disponible en tu workspace."}
       </div>
     );

@@ -54,3 +54,15 @@ export function findSatelliteProject<T extends { id: string }>(
   }
   return projects[0] ?? null;
 }
+
+export function projectNavigationHref(
+  pathname: string,
+  searchStr: string,
+  hash: string,
+  projectId: string,
+): string {
+  const search = new URLSearchParams(searchStr);
+  search.set("project", projectId);
+  const fragment = hash.replace(/^#/, "");
+  return `${pathname}?${search.toString()}${fragment ? `#${fragment}` : ""}`;
+}

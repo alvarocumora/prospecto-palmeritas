@@ -304,12 +304,14 @@ export function findWorkspaceEntry(pathname: string): WorkspaceEntry | null {
   let best: WorkspaceEntry | null = null;
   let bestLen = -1;
   for (const entry of WORKSPACE_NAV) {
-    const candidates = entry.tabs?.map((t) => t.to) ?? [entry.to];
-    for (const c of candidates) {
-      const match = pathname === c || pathname.startsWith(c + "/");
-      if (match && c.length > bestLen) {
+    const candidates = [{ to: entry.to, exact: entry.exact }, ...(entry.tabs ?? [])];
+    for (const candidate of candidates) {
+      const match = candidate.exact
+        ? pathname === candidate.to
+        : pathname === candidate.to || pathname.startsWith(candidate.to + "/");
+      if (match && candidate.to.length > bestLen) {
         best = entry;
-        bestLen = c.length;
+        bestLen = candidate.to.length;
       }
     }
   }

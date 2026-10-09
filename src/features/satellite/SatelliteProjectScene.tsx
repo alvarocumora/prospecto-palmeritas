@@ -25,17 +25,19 @@ export function SatelliteProjectScene({
       features: project.anomalies.flatMap((item) =>
         item.lat == null || item.lng == null
           ? []
-          : [{
-              type: "Feature" as const,
-              id: item.id,
-              geometry: { type: "Point" as const, coordinates: [item.lng, item.lat] },
-              properties: {
+          : [
+              {
+                type: "Feature" as const,
                 id: item.id,
-                name: item.index_code ?? item.id,
-                score: item.score,
-                severity: item.severity,
+                geometry: { type: "Point" as const, coordinates: [item.lng, item.lat] },
+                properties: {
+                  id: item.id,
+                  name: item.index_code ?? item.id,
+                  score: item.score,
+                  severity: item.severity,
+                },
               },
-            }],
+            ],
       ),
     }),
     [project.anomalies],
@@ -48,14 +50,16 @@ export function SatelliteProjectScene({
           {selectedAnomaly && (
             <p>
               Anomalía seleccionada: {selectedAnomaly.index_code ?? selectedAnomaly.id}
-              {" · "}{selectedAnomaly.severity ?? "Sin severidad"}
+              {" · "}
+              {selectedAnomaly.severity ?? "Sin severidad"}
               {" · "}Puntaje {selectedAnomaly.score ?? "—"}
             </p>
           )}
           {selectedInsar && (
             <p>
               InSAR seleccionado: {selectedInsar.asset_name ?? selectedInsar.id}
-              {" · "}{selectedInsar.velocity_mm_year ?? "—"} mm/año
+              {" · "}
+              {selectedInsar.velocity_mm_year ?? "—"} mm/año
             </p>
           )}
           {selection.anomaly && !selectedAnomaly && (

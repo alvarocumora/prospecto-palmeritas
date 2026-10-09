@@ -20,7 +20,9 @@ const CholquiSpvPanel = lazy(() =>
 );
 
 export const Route = createFileRoute("/_authenticated/dashboard/project-report")({
-  validateSearch: (search: Record<string, unknown>): {
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
     view?: ProjectView;
     panel?: ProjectPanel;
   } => ({
@@ -40,7 +42,7 @@ function ProjectReportPage() {
   const publishedProject = active ? getPublicProjectById(active.id) : null;
   const isCholqui = publishedProject?.slug === "cholqui";
   const publicSlug = active
-    ? publishedProject?.slug ?? terminalSlugForListing({ code: active.code })
+    ? (publishedProject?.slug ?? terminalSlugForListing({ code: active.code }))
     : null;
 
   useEffect(() => {
@@ -69,7 +71,9 @@ function ProjectReportPage() {
           <p className="text-xs text-muted-foreground">{active.code} · Workspace privado</p>
         </div>
         <div className="flex flex-wrap gap-3 text-xs">
-          <Link to="/dashboard/projects" className="text-primary">Proyectos</Link>
+          <Link to="/dashboard/projects" className="text-primary">
+            Proyectos
+          </Link>
           <Link
             to="/dashboard/projects/$projectId"
             params={{ projectId: active.id }}
@@ -103,7 +107,9 @@ function ProjectReportPage() {
             >
               {key === "mapa"
                 ? "Mapa & exploración"
-                : key === "satelite" ? "Satélite" : "Inversionistas & SPV"}
+                : key === "satelite"
+                  ? "Satélite"
+                  : "Inversionistas & SPV"}
             </Link>
           ))}
         </nav>
@@ -122,7 +128,11 @@ function ProjectReportPage() {
         />
       ) : (
         <Suspense fallback={<p className="text-sm">Cargando módulo…</p>}>
-          {panel === "satelite" ? <CholquiSatellitePanel /> : <CholquiSpvPanel projectCode={active.code} projectName={active.name} />}
+          {panel === "satelite" ? (
+            <CholquiSatellitePanel />
+          ) : (
+            <CholquiSpvPanel projectCode={active.code} projectName={active.name} />
+          )}
         </Suspense>
       )}
     </div>

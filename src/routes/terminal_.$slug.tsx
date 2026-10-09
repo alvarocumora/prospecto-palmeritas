@@ -10,7 +10,9 @@ import { projectView, type ProjectView } from "@/lib/projects/navigation";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 
 export const Route = createFileRoute("/terminal_/$slug")({
-  validateSearch: (search: Record<string, unknown>): { tab: TerminalTabKey; view?: ProjectView } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { tab: TerminalTabKey; view?: ProjectView } => ({
     tab: isTerminalTab(search.tab) ? search.tab : "mapa",
     view: search.view == null ? undefined : projectView(search.view),
   }),
@@ -69,5 +71,7 @@ function TerminalPage() {
     );
   }
 
-  return <ProjectTerminalShell key={project.slug} project={project} tab={tab} view={projectView(view)} />;
+  return (
+    <ProjectTerminalShell key={project.slug} project={project} tab={tab} view={projectView(view)} />
+  );
 }

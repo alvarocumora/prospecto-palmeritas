@@ -88,7 +88,6 @@ export function GeologicalMapPanel({ projects, selectedId, onSelect }: Props) {
         .on("click", () => onSelect(p.id));
       markers.set(p.id, marker);
     });
-
   }, [projects, selectedId, onSelect, ready]);
 
   useEffect(() => {

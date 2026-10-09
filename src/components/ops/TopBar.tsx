@@ -6,14 +6,16 @@ import { useProjects } from "@/hooks/useProjects";
 import { Logo } from "@/components/Logo";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { GlobalGeoCopilot } from "@/components/ops/GlobalGeoCopilot";
-import { workspaceProjectId } from "@/lib/projects/navigation";
+import { projectNavigationHref, workspaceProjectId } from "@/lib/projects/navigation";
 import { findWorkspaceEntry } from "@/lib/workspace";
 import { cn } from "@/lib/utils";
 
 function breadcrumb(path: string): string {
   const entry = findWorkspaceEntry(path);
   const tab = entry?.tabs
-    ?.filter((item) => item.exact ? path === item.to : path === item.to || path.startsWith(item.to + "/"))
+    ?.filter((item) =>
+      item.exact ? path === item.to : path === item.to || path.startsWith(item.to + "/"),
+    )
     .sort((a, b) => b.to.length - a.to.length)[0];
   return tab?.label ?? entry?.label ?? "Workspace";
 }
@@ -111,7 +113,14 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                       void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
                     } else {
                       setActiveId(p.id);
-                      void navigate({ search: (previous) => ({ ...previous, project: p.id }) });
+                      void navigate({
+                        href: projectNavigationHref(
+                          location.pathname,
+                          location.searchStr,
+                          location.hash,
+                          p.id,
+                        ),
+                      });
                     }
                   }}
                   className={cn(
