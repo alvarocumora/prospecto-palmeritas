@@ -10,7 +10,8 @@ export function LegacyWorkspaceEntry({ section }: { section: ProjectWorkspaceSec
   const { active, loading } = useProjects();
   const location = useLocation();
   const search = projectWorkspaceSearch(location.search);
-  const destination = section === "overview" && search.view === "3d" ? "model" : section;
+  const destination =
+    section === "overview" && search.view === "3d" && !search.panel ? "model" : section;
   const legacyPath = PROJECT_WORKSPACE_SECTIONS.find((item) => item.id === section)?.legacyPath;
 
   if (location.pathname.replace(/\/$/, "") !== legacyPath) return <Outlet />;

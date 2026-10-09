@@ -99,8 +99,8 @@ export function ProjectWorkspacePage({
         </div>
       </header>
       <nav aria-label="Secciones del proyecto" className="flex gap-2 overflow-x-auto text-xs">
-        {PROJECT_WORKSPACE_SECTIONS.filter((item) =>
-          access.canPath(projectWorkspacePath(projectId, item.id)).allowed,
+        {PROJECT_WORKSPACE_SECTIONS.filter(
+          (item) => access.canPath(projectWorkspacePath(projectId, item.id)).allowed,
         ).map((item) => (
           <Link
             key={item.id}

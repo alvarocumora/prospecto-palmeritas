@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useLocation, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   ArrowLeft,
@@ -40,6 +40,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/geophysics/$surv
 function SurveyDetail() {
   const { surveyId } = Route.useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { active } = useProjects();
   const { survey, lines, stations, loading, refresh } = useSurvey(surveyId);
   const { updateSurvey } = useGeophysicsMutations();
@@ -51,6 +52,8 @@ function SurveyDetail() {
   const [creatingLine, setCreatingLine] = useState(false);
   const [importingCsv, setImportingCsv] = useState(false);
   const [phaseBusy, setPhaseBusy] = useState(false);
+
+  if (location.pathname.endsWith("/field")) return <Outlet />;
 
   if (loading) {
     return (
@@ -74,17 +77,24 @@ function SurveyDetail() {
     );
   }
 
+  if (!active || survey.project_id !== active.id) {
+    return <div className="p-6 text-sm">La campaña no pertenece al proyecto seleccionado.</div>;
+  }
+
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto pb-20 md:pb-8">
       <div className="flex items-center justify-between mb-3 gap-2">
         <Link
-          to="/dashboard/geophysics"
+          to="/projects/$projectId/$section"
+          params={{ projectId: active.id, section: "exploration" }}
+          search={{ project: undefined }}
           className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-gold"
         >
           <ArrowLeft className="w-3 h-3" /> Volver a campañas
         </Link>
         <Link
           to="/dashboard/geophysics/$surveyId/field"
+          search={{ project: active.id }}
           params={{ surveyId: survey.id }}
           className="inline-flex items-center gap-1.5 text-xs font-mono bg-gold text-background px-3 py-1.5 rounded hover:opacity-90"
         >

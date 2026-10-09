@@ -140,7 +140,7 @@ export function GeophysicsModule({ projectId }: { projectId: string }) {
                     <div className="inline-flex items-center gap-1">
                       <Link
                         to="/dashboard/geophysics/$surveyId"
-                      search={{ project: projectId }}
+                        search={{ project: projectId }}
                         params={{ surveyId: s.id }}
                         className="p-1.5 text-muted-foreground hover:text-gold"
                         title="Ver detalle"

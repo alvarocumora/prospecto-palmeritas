@@ -49,9 +49,8 @@ export function TargetsPage({ projectId }: { projectId: string }) {
   const { projects } = useProjects();
   const active = projects.find((project) => project.id === projectId);
   const role = useProjectRole();
-  const { targets, loading, addTarget, updateStage, deleteTarget } = useExplorationTargets(
-    projectId,
-  );
+  const { targets, loading, addTarget, updateStage, deleteTarget } =
+    useExplorationTargets(projectId);
   const [showForm, setShowForm] = useState(false);
   const [view, setView] = useState<"kanban" | "map" | "ranking">("kanban");
   const [exporting, setExporting] = useState(false);

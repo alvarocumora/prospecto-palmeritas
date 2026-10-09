@@ -99,6 +99,7 @@ function AITargetBriefPage() {
         <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
           <Link
             to="/dashboard/targets"
+            search={{ project: active?.id }}
             className="inline-flex items-center gap-1 hover:text-foreground"
           >
             <ArrowLeft className="w-3 h-3" /> Targets

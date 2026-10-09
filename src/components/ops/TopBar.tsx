@@ -13,7 +13,9 @@ import { cn } from "@/lib/utils";
 
 function breadcrumb(path: string): string {
   if (path.startsWith("/projects/")) {
-    return PROJECT_WORKSPACE_SECTIONS.find((item) => item.id === path.split("/")[3])?.label ?? "Proyecto";
+    return (
+      PROJECT_WORKSPACE_SECTIONS.find((item) => item.id === path.split("/")[3])?.label ?? "Proyecto"
+    );
   }
   const entry = findWorkspaceEntry(path);
   const tab = entry?.tabs
@@ -107,7 +109,10 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                   type="button"
                   onClick={() => {
                     setOpenProj(false);
-                    if (location.pathname.startsWith("/dashboard/projects/") && workspaceProjectId(location.pathname, undefined)) {
+                    if (
+                      location.pathname.startsWith("/dashboard/projects/") &&
+                      workspaceProjectId(location.pathname, undefined)
+                    ) {
                       void navigate({
                         to: "/dashboard/projects/$projectId",
                         params: { projectId: p.id },

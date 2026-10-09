@@ -27,7 +27,8 @@ export function projectWorkspaceSearch(search: Record<string, unknown>): Project
 }
 
 export function projectWorkspacePath(projectId: string, section: ProjectWorkspaceSection): string {
-  if (!projectIdFromSearch(projectId)) throw new Error("El identificador del proyecto no es válido.");
+  if (!projectIdFromSearch(projectId))
+    throw new Error("El identificador del proyecto no es válido.");
   return `/projects/${projectId}/${section}`;
 }
 
