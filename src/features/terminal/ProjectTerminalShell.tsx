@@ -297,9 +297,6 @@ function MapaTab({ project }: { project: TerminalProject }) {
   return (
     <Suspense fallback={<Loading label="Cargando visor" />}>
       <PalmerasMasterViewer />
-      <div className="mt-6">
-        <TrackminGeoIntel />
-      </div>
     </Suspense>
   );
 }
