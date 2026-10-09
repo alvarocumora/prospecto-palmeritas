@@ -14,6 +14,8 @@ export default tseslint.config(
       ".vinxi",
       "src/routeTree.gen.ts",
       "src/integrations/supabase/types.ts",
+      // Lovable-generated auth broker; formatting is owned by its generator.
+      "src/integrations/supabase/previewAuthStorage.ts",
     ],
   },
   {

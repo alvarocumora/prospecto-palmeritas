@@ -20,17 +20,37 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
   {
     label: "Inversión & Capital",
     items: [
-      { to: "/inversion-colateral", label: "Inversión con colateral", desc: "Renta fija respaldada por inmuebles" },
-      { to: "/proyectos", label: "Proyectos mineros", desc: "Oportunidades verificadas para invertir" },
-      { to: "/inversionistas", label: "Para inversionistas", desc: "Data room, memorándum y proceso" },
+      {
+        to: "/inversion-colateral",
+        label: "Inversión con colateral",
+        desc: "Renta fija respaldada por inmuebles",
+      },
+      {
+        to: "/proyectos",
+        label: "Proyectos mineros",
+        desc: "Oportunidades verificadas para invertir",
+      },
+      {
+        to: "/inversionistas",
+        label: "Para inversionistas",
+        desc: "Data room, memorándum y proceso",
+      },
     ],
   },
   {
     label: "Catastro & Inteligencia",
     items: [
       { to: "/catastro", label: "Catastro minero", desc: "Concesiones de Chile y LATAM" },
-      { to: "/catastro/mapa", label: "Mapa interactivo", desc: "Concesiones, satélite y anomalías" },
-      { to: "/terminal", label: "Terminal de proyectos", desc: "Ficha técnica, 2D y 3D por activo" },
+      {
+        to: "/catastro/mapa",
+        label: "Mapa interactivo",
+        desc: "Concesiones, satélite y anomalías",
+      },
+      {
+        to: "/terminal",
+        label: "Terminal de proyectos",
+        desc: "Ficha técnica, 2D y 3D por activo",
+      },
     ],
   },
   {
@@ -137,11 +157,7 @@ export function MarketingHeader() {
               <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100 transition absolute left-0 top-full pt-2 z-50">
                 <div className="w-80 bg-white border border-hairline shadow-lg p-2">
                   {p.items.map((n) => (
-                    <Link
-                      key={n.to}
-                      to={n.to}
-                      className="block px-3 py-2.5 hover:bg-surface"
-                    >
+                    <Link key={n.to} to={n.to} className="block px-3 py-2.5 hover:bg-surface">
                       <div className="text-sm text-content font-medium">{n.label}</div>
                       <div className="text-xs text-content-subtle">{n.desc}</div>
                     </Link>
@@ -155,7 +171,10 @@ export function MarketingHeader() {
         <div className="hidden sm:inline-flex">
           <LangToggle />
         </div>
-        <Link to="/auth" className="text-sm text-content hover:text-accent-brand hidden md:inline whitespace-nowrap">
+        <Link
+          to="/auth"
+          className="text-sm text-content hover:text-accent-brand hidden md:inline whitespace-nowrap"
+        >
           Acceso clientes
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">

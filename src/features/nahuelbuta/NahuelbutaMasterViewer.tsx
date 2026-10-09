@@ -32,7 +32,10 @@ export function NahuelbutaMasterViewer() {
       pedimentos={panos}
       pedimentosPendientes={
         panosNuevos && pedimentos
-          ? { type: "FeatureCollection", features: [...pedimentos.features, ...panosNuevos.features] }
+          ? {
+              type: "FeatureCollection",
+              features: [...pedimentos.features, ...panosNuevos.features],
+            }
           : panosNuevos
       }
       franjas={franjas}

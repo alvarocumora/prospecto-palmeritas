@@ -3,10 +3,15 @@ import { z } from "zod";
 import { searchSentinel2Scenes } from "@/lib/remote-sensing/sceneCatalog";
 
 /** AOI de los paños Arcillas (igual que geocapitals-remote/configs/losalamos_aoi.yaml). */
-export const NAHUELBUTA_BBOX: [number, number, number, number] = [-73.325, -37.695, -73.07, -37.585];
+export const NAHUELBUTA_BBOX: [number, number, number, number] = [
+  -73.325, -37.695, -73.07, -37.585,
+];
 
 const Input = z
-  .object({ monthsBack: z.number().min(1).max(36).default(12), maxCloud: z.number().min(1).max(100).default(25) })
+  .object({
+    monthsBack: z.number().min(1).max(36).default(12),
+    maxCloud: z.number().min(1).max(100).default(25),
+  })
   .default({ monthsBack: 12, maxCloud: 25 });
 
 export const getNahuelbutaScenes = createServerFn({ method: "GET" })

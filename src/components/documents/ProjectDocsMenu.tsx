@@ -28,7 +28,11 @@ const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
     hint: "Presentación para comités y family offices",
   },
   { kind: "onepager", title: "Resumen de una página", hint: "Para enviar por correo o WhatsApp" },
-  { kind: "technical", title: "Informe técnico · NI 43-101", hint: "Preliminar · revisión QP pendiente" },
+  {
+    kind: "technical",
+    title: "Informe técnico · NI 43-101",
+    hint: "Preliminar · revisión QP pendiente",
+  },
 ];
 
 export function ProjectDocsMenu({
@@ -101,7 +105,12 @@ export function ProjectDocsMenu({
         <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
           Exportación rápida · compatibilidad
         </DropdownMenuLabel>
-        <DropdownMenuItem onSelect={() => { void run("technical", "JORC_2012"); }} className="flex-col items-start gap-0.5 py-2.5">
+        <DropdownMenuItem
+          onSelect={() => {
+            void run("technical", "JORC_2012");
+          }}
+          className="flex-col items-start gap-0.5 py-2.5"
+        >
           <span className="text-sm font-medium">Informe técnico · JORC 2012</span>
           <span className="text-xs text-muted-foreground">Preliminar · revisión CP pendiente</span>
         </DropdownMenuItem>

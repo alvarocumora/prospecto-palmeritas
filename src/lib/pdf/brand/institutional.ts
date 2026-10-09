@@ -14,7 +14,15 @@ export const IM_RULE: RGB = [199, 208, 216];
 
 export type Frame = { w: number; h: number; m: number };
 
-export function rule(doc: jsPDF, f: Frame, y: number, c: RGB = IM_RULE, lw = 0.5, x1?: number, x2?: number) {
+export function rule(
+  doc: jsPDF,
+  f: Frame,
+  y: number,
+  c: RGB = IM_RULE,
+  lw = 0.5,
+  x1?: number,
+  x2?: number,
+) {
   stroke(doc, c);
   doc.setLineWidth(lw);
   doc.line(x1 ?? f.m, y, x2 ?? f.w - f.m, y);
@@ -46,7 +54,10 @@ export function letterhead(
   font(doc, "body", "normal", 7);
   ink(doc, GC_COLOR.slate);
   doc.text(o.unit, f.m + mw + 7, 47);
-  doc.text("ESTRICTAMENTE PRIVADO Y CONFIDENCIAL", f.w - f.m, 38, { align: "right", charSpace: 0.4 });
+  doc.text("ESTRICTAMENTE PRIVADO Y CONFIDENCIAL", f.w - f.m, 38, {
+    align: "right",
+    charSpace: 0.4,
+  });
   doc.text(`Ref. ${o.ref} · ${o.version}`, f.w - f.m, 47, { align: "right" });
   rule(doc, f, 58);
   rule(doc, f, f.h - 44);

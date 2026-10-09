@@ -42,7 +42,11 @@ const SHOWCASE = [
     commodity: "Au-Ag",
     image: palmerasImg.url,
     stage: "Exploración avanzada",
-    stats: [["74", "concesiones"], ["12.807", "hectáreas"], ["16", "sondajes"]],
+    stats: [
+      ["74", "concesiones"],
+      ["12.807", "hectáreas"],
+      ["16", "sondajes"],
+    ],
     bullets: ["74 concesiones · 12.807 ha", "16 sondajes · 4.426 m", "12 anomalías satelitales"],
   },
   {
@@ -53,7 +57,11 @@ const SHOWCASE = [
     commodity: "Cu-Mo",
     image: losverdesImg.url,
     stage: "Pre NI 43-101",
-    stats: [["88", "concesiones"], ["34", "targets"], ["23", "anomalías MAG"]],
+    stats: [
+      ["88", "concesiones"],
+      ["34", "targets"],
+      ["23", "anomalías MAG"],
+    ],
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
@@ -68,7 +76,11 @@ const SHOWCASE = [
     commodity: "Cu-Au-Ag",
     image: cholquiImg.url,
     stage: "Ronda de capital",
-    stats: [["14", "concesiones"], ["7", "ensayes"], ["15", "anomalías"]],
+    stats: [
+      ["14", "concesiones"],
+      ["7", "ensayes"],
+      ["15", "anomalías"],
+    ],
     bullets: [
       "Cu-Au-Ag con buenas leyes",
       "~5.000 ha rodeando a Mina Las Minitas en producción",
@@ -83,7 +95,11 @@ const SHOWCASE = [
     commodity: "REE",
     image: nahuelbutaImg,
     stage: "Prospección (TRL 1-2)",
-    stats: [["34", "paños"], ["10.200", "hectáreas"], ["US$ 380k", "Fase 1"]],
+    stats: [
+      ["34", "paños"],
+      ["10.200", "hectáreas"],
+      ["US$ 380k", "Fase 1"],
+    ],
     bullets: [
       "Arcillas iónicas sobre el Complejo Metamórfico Nahuelbuta",
       "Pedimentos en solicitud ante SERNAGEOMIN",
@@ -148,7 +164,9 @@ function ProyectosPage() {
               {p.stats.map(([v, l], i) => (
                 <div key={l} className={`px-4 py-3 ${i ? "border-l border-hairline" : ""}`}>
                   <div className="font-display text-xl text-content">{v}</div>
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">{l}</div>
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
+                    {l}
+                  </div>
                 </div>
               ))}
             </div>
@@ -185,10 +203,17 @@ function ProyectosPage() {
         to="/inversion-colateral"
         className="group mt-6 grid md:grid-cols-[280px_1fr_auto] items-center gap-6 rounded-2xl border border-hairline bg-white overflow-hidden hover:border-accent-brand transition"
       >
-        <img src={colateralImg} alt="Valle de Hualañé, imagen satelital" className="h-full w-full object-cover aspect-[16/10] md:aspect-auto" loading="lazy" />
+        <img
+          src={colateralImg}
+          alt="Valle de Hualañé, imagen satelital"
+          className="h-full w-full object-cover aspect-[16/10] md:aspect-auto"
+          loading="lazy"
+        />
         <div className="p-5 md:p-0">
           <Eyebrow className="mb-1">Inversión con colateral inmobiliario</Eyebrow>
-          <div className="font-display text-2xl text-content">Hualañé y Licantén · Región del Maule</div>
+          <div className="font-display text-2xl text-content">
+            Hualañé y Licantén · Región del Maule
+          </div>
           <p className="text-sm text-content-subtle mt-1 max-w-xl">
             Desde $25 MM CLP, 12% anual en UF, respaldado por parcela con rol SII individual.
           </p>

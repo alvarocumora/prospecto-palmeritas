@@ -2,7 +2,13 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/live/franco")({
   beforeLoad: () => {
-    throw redirect({ to: "/terminal/$slug", params: { slug: "cholqui" }, search: { tab: "mapa" }, replace: true, statusCode: 301 });
+    throw redirect({
+      to: "/terminal/$slug",
+      params: { slug: "cholqui" },
+      search: { tab: "mapa" },
+      replace: true,
+      statusCode: 301,
+    });
   },
   head: () => ({
     meta: [

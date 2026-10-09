@@ -76,7 +76,11 @@ function CatastroModeTabs({ active }: { active: "explorar" | "proyecto" }) {
       <Link to="/catastro/mapa" search={{}} className={cls(active === "explorar")}>
         Explorar países
       </Link>
-      <Link to="/catastro/mapa" search={{ vista: "proyecto" }} className={cls(active === "proyecto")}>
+      <Link
+        to="/catastro/mapa"
+        search={{ vista: "proyecto" }}
+        className={cls(active === "proyecto")}
+      >
         Mis proyectos
       </Link>
     </div>
@@ -148,24 +152,54 @@ type Pais = "CL" | "PE" | "BR" | "ZM" | "MW";
 /** Jurisdicciones del visor universal: centro, zoom y capa oficial (MapServer). */
 const PAISES: Record<
   Pais,
-  { label: string; flag: string; inst: string; center: [number, number]; zoom: number; mapServer?: string; layer?: number }
+  {
+    label: string;
+    flag: string;
+    inst: string;
+    center: [number, number];
+    zoom: number;
+    mapServer?: string;
+    layer?: number;
+  }
 > = {
   CL: { label: "Chile", flag: "🇨🇱", inst: "SERNAGEOMIN", center: [-31.63, -71.17], zoom: 11 },
   PE: {
-    label: "Perú", flag: "🇵🇪", inst: "INGEMMET", center: [-12.05, -76.2], zoom: 9,
-    mapServer: "https://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CATASTRO_MINERO_WGS84/MapServer", layer: 0,
+    label: "Perú",
+    flag: "🇵🇪",
+    inst: "INGEMMET",
+    center: [-12.05, -76.2],
+    zoom: 9,
+    mapServer:
+      "https://geocatmin.ingemmet.gob.pe/arcgis/rest/services/SERV_CATASTRO_MINERO_WGS84/MapServer",
+    layer: 0,
   },
   BR: {
-    label: "Brasil", flag: "🇧🇷", inst: "ANM", center: [-19.92, -43.94], zoom: 9,
-    mapServer: "https://geo.anm.gov.br/arcgis/rest/services/SIGMINE/dados_anm/MapServer", layer: 0,
+    label: "Brasil",
+    flag: "🇧🇷",
+    inst: "ANM",
+    center: [-19.92, -43.94],
+    zoom: 9,
+    mapServer: "https://geo.anm.gov.br/arcgis/rest/services/SIGMINE/dados_anm/MapServer",
+    layer: 0,
   },
   ZM: {
-    label: "Zambia", flag: "🇿🇲", inst: "Landfolio", center: [-12.8, 28.2], zoom: 9,
-    mapServer: "https://ags1.landfolio.com/arcgis/rest/services/ProdPortal/ZambiaPortal/MapServer", layer: 0,
+    label: "Zambia",
+    flag: "🇿🇲",
+    inst: "Landfolio",
+    center: [-12.8, 28.2],
+    zoom: 9,
+    mapServer: "https://ags1.landfolio.com/arcgis/rest/services/ProdPortal/ZambiaPortal/MapServer",
+    layer: 0,
   },
   MW: {
-    label: "Malawi", flag: "🇲🇼", inst: "Landfolio", center: [-13.9, 33.8], zoom: 8,
-    mapServer: "https://demo.landfolio.com/arcgis/rest/services/Malawi/MapPortal_ActiveLicenses/MapServer", layer: 1,
+    label: "Malawi",
+    flag: "🇲🇼",
+    inst: "Landfolio",
+    center: [-13.9, 33.8],
+    zoom: 8,
+    mapServer:
+      "https://demo.landfolio.com/arcgis/rest/services/Malawi/MapPortal_ActiveLicenses/MapServer",
+    layer: 1,
   },
 };
 
@@ -361,7 +395,8 @@ function NationalCatastroMap() {
     let cancelled = false;
     (async () => {
       // Espera a que el mapa exista (init asíncrono).
-      for (let i = 0; i < 40 && !mapObjRef.current; i++) await new Promise((r) => setTimeout(r, 100));
+      for (let i = 0; i < 40 && !mapObjRef.current; i++)
+        await new Promise((r) => setTimeout(r, 100));
       const m = (mapObjRef.current as typeof map) ?? map;
       if (!m || cancelled) return;
       const cfg = PAISES[pais];
@@ -375,7 +410,11 @@ function NationalCatastroMap() {
         if (showEliminadas) setShowEliminadas(false);
         const EL = await import("esri-leaflet");
         if (cancelled || !cfg.mapServer) return;
-        const dyn = (EL as unknown as { dynamicMapLayer: (o: object) => { addTo: (m: unknown) => unknown; remove: () => void } }).dynamicMapLayer({
+        const dyn = (
+          EL as unknown as {
+            dynamicMapLayer: (o: object) => { addTo: (m: unknown) => unknown; remove: () => void };
+          }
+        ).dynamicMapLayer({
           url: cfg.mapServer,
           layers: [cfg.layer ?? 0],
           opacity: 0.75,
@@ -539,7 +578,11 @@ function NationalCatastroMap() {
                 <input
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
-                  placeholder={pais === "CL" ? "Titular, RUT, código…" : `Titular o código · ${PAISES[pais].inst}`}
+                  placeholder={
+                    pais === "CL"
+                      ? "Titular, RUT, código…"
+                      : `Titular o código · ${PAISES[pais].inst}`
+                  }
                   className="w-full pl-10 pr-8 py-2 rounded border border-border bg-background font-mono text-xs focus:outline-none focus:border-primary"
                 />
                 {q && (
@@ -651,19 +694,32 @@ function NationalCatastroMap() {
                 {PAISES[pais].inst} · {globalMutation.data?.results.length ?? 0} resultados
               </div>
               {globalMutation.isPending && (
-                <div className="text-xs font-mono text-muted-foreground p-2">Consultando fuente oficial…</div>
+                <div className="text-xs font-mono text-muted-foreground p-2">
+                  Consultando fuente oficial…
+                </div>
               )}
               <ul className="space-y-1">
                 {globalMutation.data?.results.map((r) => (
                   <li key={r.code} className="p-2.5 rounded border border-border">
-                    <div className="text-xs font-mono font-semibold truncate">{r.name ?? r.code}</div>
-                    <div className="text-[10px] font-mono text-muted-foreground truncate">{r.holder ?? "—"}</div>
+                    <div className="text-xs font-mono font-semibold truncate">
+                      {r.name ?? r.code}
+                    </div>
+                    <div className="text-[10px] font-mono text-muted-foreground truncate">
+                      {r.holder ?? "—"}
+                    </div>
                     <div className="text-[10px] font-mono text-muted-foreground flex justify-between gap-2">
                       <span className="truncate">{r.status ?? "—"}</span>
-                      <span>{r.areaHa ? `${Math.round(r.areaHa).toLocaleString("es-CL")} ha` : "—"}</span>
+                      <span>
+                        {r.areaHa ? `${Math.round(r.areaHa).toLocaleString("es-CL")} ha` : "—"}
+                      </span>
                     </div>
                     {r.sourceUrl && (
-                      <a href={r.sourceUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 text-[10px] font-mono text-primary">
+                      <a
+                        href={r.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-1 inline-flex items-center gap-1 text-[10px] font-mono text-primary"
+                      >
                         Verificar en {r.source} <ExternalLink className="w-3 h-3" />
                       </a>
                     )}

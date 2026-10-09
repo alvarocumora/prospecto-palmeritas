@@ -63,7 +63,7 @@ export async function buildProjectDoc(model: ProjectDoc, kind: ProjectDocKind) {
 
   const doc = new JsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
   guardText(doc);
-    await ensureBrandFonts(doc);
+  await ensureBrandFonts(doc);
 
   if (kind === "onepager") {
     const { renderOnePager } = await import("./templates/onePager");
