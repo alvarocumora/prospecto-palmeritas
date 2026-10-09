@@ -149,6 +149,14 @@ function ProjectDetailPage() {
         <ArrowLeft className="w-3.5 h-3.5" /> Proyectos
       </Link>
 
+      <Link
+        to="/dashboard/project-report"
+        search={{ project: projectId }}
+        className="inline-flex items-center text-xs text-primary hover:underline"
+      >
+        Mapa & exploración del proyecto →
+      </Link>
+
       {/* Cabecera del proyecto */}
       <div className="rounded-md border border-border bg-bg-secondary/20 p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">

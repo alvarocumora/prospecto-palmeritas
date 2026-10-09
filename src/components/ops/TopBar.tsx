@@ -6,45 +6,16 @@ import { useProjects } from "@/hooks/useProjects";
 import { Logo } from "@/components/Logo";
 import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { GlobalGeoCopilot } from "@/components/ops/GlobalGeoCopilot";
+import { workspaceProjectId } from "@/lib/projects/navigation";
+import { findWorkspaceEntry } from "@/lib/workspace";
 import { cn } from "@/lib/utils";
 
-const ROUTE_LABELS: Record<string, string> = {
-  "/dashboard": "Inicio",
-  "/dashboard/map": "Mapa Táctico",
-  "/dashboard/documentos": "Documentos",
-  "/catastro/proyecto": "Catastro",
-  "/dashboard/boletin": "Boletín Minero",
-  "/dashboard/geophysics": "Geofísica",
-  "/dashboard/drones": "Drones",
-  "/dashboard/drilling": "Sondajes",
-  "/dashboard/sampling": "Muestreo",
-  "/dashboard/qaqc": "QA/QC",
-  "/dashboard/approvals": "Aprobaciones",
-  "/dashboard/targets": "Targets",
-  "/dashboard/inventory": "Inventario",
-  "/dashboard/finance": "Costos",
-  "/dashboard/hse": "HSE",
-  "/dashboard/reports": "Reportes",
-  "/dashboard/team": "Equipo",
-  "/dashboard/audit": "Auditoría",
-  "/dashboard/marketplace": "Capas GIS",
-  "/dashboard/projects": "Proyectos",
-  "/dashboard/profile": "Perfil",
-  "/dashboard/admin": "Admin",
-  "/dashboard/campaigns": "Campañas",
-  "/dashboard/satellite-intel": "Inteligencia Satelital",
-};
-
 function breadcrumb(path: string): string {
-  const exact = ROUTE_LABELS[path];
-  if (exact) return exact;
-  const parts = path.split("/").filter(Boolean);
-  while (parts.length > 0) {
-    const p = "/" + parts.join("/");
-    if (ROUTE_LABELS[p]) return ROUTE_LABELS[p];
-    parts.pop();
-  }
-  return "Dashboard";
+  const entry = findWorkspaceEntry(path);
+  const tab = entry?.tabs
+    ?.filter((item) => item.exact ? path === item.to : path === item.to || path.startsWith(item.to + "/"))
+    .sort((a, b) => b.to.length - a.to.length)[0];
+  return tab?.label ?? entry?.label ?? "Workspace";
 }
 
 export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
@@ -87,7 +58,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             <Menu className="w-4 h-4" />
           </button>
         )}
-        <Link to="/" className="inline-flex items-center gap-1.5 shrink-0">
+        <Link to="/dashboard" className="inline-flex items-center gap-1.5 shrink-0">
           <Logo size={14} textClassName="text-[11px] tracking-[0.12em]" />
         </Link>
       </div>
@@ -129,8 +100,19 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                   key={p.id}
                   type="button"
                   onClick={() => {
-                    setActiveId(p.id);
                     setOpenProj(false);
+                    if (workspaceProjectId(location.pathname, undefined)) {
+                      void navigate({
+                        to: "/dashboard/projects/$projectId",
+                        params: { projectId: p.id },
+                        search: { project: p.id },
+                      });
+                    } else if (/^\/dashboard\/(cholqui|franco|palmeras)$/.test(location.pathname)) {
+                      void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
+                    } else {
+                      setActiveId(p.id);
+                      void navigate({ search: (previous) => ({ ...previous, project: p.id }) });
+                    }
                   }}
                   className={cn(
                     "w-full text-left px-3 py-1.5 font-mono text-[11px] border-b border-border/40 last:border-b-0 hover:bg-bg-elevated transition-colors flex items-baseline gap-2",

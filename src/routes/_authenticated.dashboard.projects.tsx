@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -15,6 +15,7 @@ export const Route = createFileRoute("/_authenticated/dashboard/projects")({
 function ProjectsPage() {
   const { projects, refresh, setActiveId, loading } = useProjects();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
@@ -113,10 +114,12 @@ function ProjectsPage() {
               <div className="mt-3 flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setActiveId(p.id)}
+                  onClick={() => {
+                    void navigate({ to: "/dashboard/project-report", search: { project: p.id } });
+                  }}
                   className="flex-1 text-[11px] font-mono px-2 py-1 rounded border border-border hover:bg-accent"
                 >
-                  Activar
+                  Abrir workspace
                 </button>
                 <Link
                   to="/dashboard/projects/$projectId"

@@ -71,7 +71,16 @@ export function PortfolioPanel({ projects, loading, authed, selectedId, onSelect
                 )}
               >
                 <td className="px-3 py-1.5 text-gold">{p.code}</td>
-                <td className="px-2 py-1.5 text-foreground truncate max-w-[160px]">{p.name}</td>
+                <td className="px-2 py-1.5 text-foreground truncate max-w-[160px]">
+                  <Link
+                    to="/dashboard/project-report"
+                    search={{ project: p.id }}
+                    onClick={(event) => event.stopPropagation()}
+                    className="hover:underline"
+                  >
+                    {p.name} →
+                  </Link>
+                </td>
                 <td className="px-2 py-1.5 text-muted-foreground uppercase">
                   {p.commodity ?? "—"}
                 </td>

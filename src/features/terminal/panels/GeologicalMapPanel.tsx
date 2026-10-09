@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PortfolioProject } from "@/lib/terminal.functions";
 
 type Props = {
@@ -9,6 +9,7 @@ type Props = {
 
 export function GeologicalMapPanel({ projects, selectedId, onSelect }: Props) {
   const ref = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
   const mapInstance = useRef<{
     L: typeof import("leaflet");
     map: import("leaflet").Map;
@@ -53,6 +54,7 @@ export function GeologicalMapPanel({ projects, selectedId, onSelect }: Props) {
       }
 
       mapInstance.current = { L, map, markers: new Map() };
+      setReady(true);
     })();
     return () => {
       cleanup = true;
@@ -87,13 +89,26 @@ export function GeologicalMapPanel({ projects, selectedId, onSelect }: Props) {
       markers.set(p.id, marker);
     });
 
+  }, [projects, selectedId, onSelect, ready]);
+
+  useEffect(() => {
+    const inst = mapInstance.current;
+    if (!ready || !inst) return;
+    const { L, map } = inst;
+    const valid = projects.filter((p) => p.center_lat != null && p.center_lng != null);
     if (valid.length > 0) {
       const bounds = L.latLngBounds(
         valid.map((p) => [p.center_lat!, p.center_lng!] as [number, number]),
       );
       map.fitBounds(bounds.pad(0.4), { maxZoom: 9, animate: false });
     }
-  }, [projects, selectedId, onSelect]);
+  }, [projects, ready]);
+
+  useEffect(() => {
+    const project = projects.find((item) => item.id === selectedId);
+    if (!ready || project?.center_lat == null || project.center_lng == null) return;
+    mapInstance.current?.map.flyTo([project.center_lat, project.center_lng], 11);
+  }, [projects, selectedId, ready]);
 
   return (
     <div className="relative h-full w-full bg-background">

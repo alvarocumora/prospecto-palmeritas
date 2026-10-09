@@ -1,14 +1,6 @@
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { LegacyProjectEntry } from "@/features/projects/LegacyProjectEntry";
 
-// Alias histórico de Cholqui → terminal canónico.
 export const Route = createFileRoute("/_authenticated/dashboard/franco")({
-  beforeLoad: () => {
-    throw redirect({
-      to: "/terminal/$slug",
-      params: { slug: "cholqui" },
-      search: { tab: "mapa" },
-      replace: true,
-      statusCode: 301,
-    });
-  },
+  component: () => <LegacyProjectEntry profileKey="cholqui" />,
 });

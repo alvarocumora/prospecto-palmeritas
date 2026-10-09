@@ -4,14 +4,14 @@ import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { label: "Overview", to: "/", icon: Map, hash: undefined as string | undefined },
+  { label: "Overview", to: "/terminal", icon: Map, hash: undefined as string | undefined },
   {
     label: "Market",
     to: "/terminal/market",
     icon: TrendingUp,
     hash: undefined as string | undefined,
   },
-  { label: "Portfolio", to: "/", icon: Briefcase, hash: "portfolio" as string | undefined },
+  { label: "Portfolio", to: "/terminal", icon: Briefcase, hash: "portfolio" as string | undefined },
   {
     label: "Tokenize",
     to: "/terminal/tokenize",
@@ -27,18 +27,18 @@ const items = [
 ] as const;
 
 export function TerminalSidebar() {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const location = useRouterState({ select: (s) => s.location });
   return (
     <aside className="hidden md:flex w-14 lg:w-48 shrink-0 border-r border-border bg-card/30 flex-col">
       <div className="h-10 flex items-center px-3 border-b border-border">
-        <Link to="/" className="block">
+        <Link to="/terminal" className="block">
           <Logo size={18} textClassName="text-[11px] hidden lg:inline" />
         </Link>
       </div>
       <nav className="flex-1 py-2">
         {items.map((it) => {
           const Icon = it.icon;
-          const active = pathname === it.to;
+          const active = location.pathname === it.to && (location.hash || undefined) === it.hash;
           return (
             <Link
               key={it.label}
