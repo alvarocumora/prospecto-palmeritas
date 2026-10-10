@@ -47,7 +47,7 @@ const BY_ROLE: Record<AccessRole, Action[]> = {
   ],
   catastro: [
     {
-      to: "/catastro/proyecto",
+      to: "/catastro/mapa",
       label: "Catastro del proyecto",
       detail: "Concesiones, patentes y alertas del boletín.",
       icon: MapIcon,

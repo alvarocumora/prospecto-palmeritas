@@ -81,7 +81,7 @@ export function HolderProfile({
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex items-start gap-3 min-w-0">
             <Link
-              to="/catastro/proyecto"
+              to="/catastro/mapa"
               className="p-1.5 rounded border border-border hover:bg-accent shrink-0"
               title="Volver"
             >
