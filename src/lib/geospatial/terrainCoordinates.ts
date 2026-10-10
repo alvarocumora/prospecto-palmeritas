@@ -23,7 +23,8 @@ export function localTerrainMeters(
     Math.abs(lat) >= 90 ||
     Math.abs(centerLng) > 180 ||
     Math.abs(centerLat) >= 90
-  ) return null;
+  )
+    return null;
   const cosine = Math.cos((centerLat * Math.PI) / 180);
   return [
     (lng - centerLng) * TERRAIN_METERS_PER_DEGREE * cosine,
@@ -62,7 +63,8 @@ export function projectTerrainPoint(
     tile.heights.length !== tile.size * tile.size ||
     !Number.isFinite(tile.extentMeters) ||
     tile.extentMeters <= 0
-  ) return null;
+  )
+    return null;
   const local = localTerrainMeters(lng, lat, tile.centerLng, tile.centerLat);
   if (!local) return null;
   const [east, north] = local;
@@ -72,8 +74,10 @@ export function projectTerrainPoint(
   if (u < -epsilon || u > 1 + epsilon || v < -epsilon || v > 1 + epsilon) return null;
   const x = Math.min(1, Math.max(0, u)) * (tile.size - 1);
   const y = Math.min(1, Math.max(0, v)) * (tile.size - 1);
-  const x0 = Math.floor(x), y0 = Math.floor(y);
-  const x1 = Math.min(tile.size - 1, x0 + 1), y1 = Math.min(tile.size - 1, y0 + 1);
+  const x0 = Math.floor(x),
+    y0 = Math.floor(y);
+  const x1 = Math.min(tile.size - 1, x0 + 1),
+    y1 = Math.min(tile.size - 1, y0 + 1);
   const values = [
     tile.heights[y0 * tile.size + x0],
     tile.heights[y0 * tile.size + x1],
@@ -81,20 +85,28 @@ export function projectTerrainPoint(
     tile.heights[y1 * tile.size + x1],
   ];
   if (!values.every(Number.isFinite)) return null;
-  const fx = x - x0, fy = y - y0;
-  const h = (values[0] * (1 - fx) + values[1] * fx) * (1 - fy) +
+  const fx = x - x0,
+    fy = y - y0;
+  const h =
+    (values[0] * (1 - fx) + values[1] * fx) * (1 - fy) +
     (values[2] * (1 - fx) + values[3] * fx) * fy;
   return [east, h, -north];
 }
 
 function geometryPaths(geometry: Geometry): Position[][] {
   switch (geometry.type) {
-    case "Polygon": return geometry.coordinates;
-    case "MultiPolygon": return geometry.coordinates.flat();
-    case "LineString": return [geometry.coordinates];
-    case "MultiLineString": return geometry.coordinates;
-    case "GeometryCollection": return geometry.geometries.flatMap(geometryPaths);
-    default: return [];
+    case "Polygon":
+      return geometry.coordinates;
+    case "MultiPolygon":
+      return geometry.coordinates.flat();
+    case "LineString":
+      return [geometry.coordinates];
+    case "MultiLineString":
+      return geometry.coordinates;
+    case "GeometryCollection":
+      return geometry.geometries.flatMap(geometryPaths);
+    default:
+      return [];
   }
 }
 
@@ -113,11 +125,18 @@ export function terrainFootprintPaths(
       segment = [];
     };
     for (let i = 0; i < ring.length - 1; i++) {
-      const a = ring[i], b = ring[i + 1];
+      const a = ring[i],
+        b = ring[i + 1];
       const start = localTerrainMeters(a[0], a[1], tile.centerLng, tile.centerLat);
       const end = localTerrainMeters(b[0], b[1], tile.centerLng, tile.centerLat);
-      if (!start || !end) { flush(); continue; }
-      const steps = Math.min(4096, Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / spacing)));
+      if (!start || !end) {
+        flush();
+        continue;
+      }
+      const steps = Math.min(
+        4096,
+        Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / spacing)),
+      );
       for (let step = 0; step <= steps; step++) {
         const t = step / steps;
         const point = projectTerrainPoint(tile, a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t);
@@ -138,8 +157,11 @@ export function proposedTraceEnd(
 ): [number, number, number] | null {
   if (
     ![...collar, azimuthDeg, dipDeg, depthM].every(Number.isFinite) ||
-    depthM <= 0 || dipDeg > 0 || dipDeg < -90
-  ) return null;
+    depthM <= 0 ||
+    dipDeg > 0 ||
+    dipDeg < -90
+  )
+    return null;
   const az = (azimuthDeg * Math.PI) / 180;
   const dip = (-dipDeg * Math.PI) / 180;
   const horizontal = depthM * Math.cos(dip);

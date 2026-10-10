@@ -25,7 +25,10 @@ export function applyLayerOpacity(layer: Layer, factor: number): void {
   }
   const amount = Number.isFinite(factor) ? Math.max(0, Math.min(1, factor)) : 1;
   if (styled.setStyle) {
-    styled.setStyle({ opacity: baseline.opacity * amount, fillOpacity: baseline.fillOpacity * amount });
+    styled.setStyle({
+      opacity: baseline.opacity * amount,
+      fillOpacity: baseline.fillOpacity * amount,
+    });
   } else if (styled.setOpacity) {
     styled.setOpacity(baseline.opacity * amount);
   }

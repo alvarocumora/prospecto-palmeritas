@@ -5,14 +5,24 @@ import { PublicGeoLayerControls } from "./PublicGeoLayerControls";
 import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 
 afterEach(cleanup);
-const manifest = buildPublicGeoManifest({ id: "cholqui", name: "Cholqui", center_lat: -33.8, center_lng: -71 },
-  ["territory.cadastre", "remote_sensing.sentinel2_alteration"]);
+const manifest = buildPublicGeoManifest(
+  { id: "cholqui", name: "Cholqui", center_lat: -33.8, center_lng: -71 },
+  ["territory.cadastre", "remote_sensing.sentinel2_alteration"],
+);
 const available = new Set(manifest.layers.map((layer) => layer.id));
 
 describe("public layer controls", () => {
   it("keeps the map unobstructed until the layer panel is expanded", () => {
-    render(<PublicGeoLayerControls manifest={manifest} available={available} visible={available}
-      certificationMode={false} onToggleLayer={vi.fn()} onToggleCertification={vi.fn()} />);
+    render(
+      <PublicGeoLayerControls
+        manifest={manifest}
+        available={available}
+        visible={available}
+        certificationMode={false}
+        onToggleLayer={vi.fn()}
+        onToggleCertification={vi.fn()}
+      />,
+    );
     expect(screen.queryByRole("searchbox")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: /Capas de evidencia/ }));
     expect(screen.getByRole("searchbox")).toBeTruthy();
@@ -22,12 +32,27 @@ describe("public layer controls", () => {
 
   it("blocks derived layers in primary-evidence mode, including their opacity sliders", () => {
     const onOpacity = vi.fn();
-    render(<PublicGeoLayerControls manifest={manifest} available={available} visible={available}
-      certificationMode onToggleLayer={vi.fn()} onToggleCertification={vi.fn()} onOpacity={onOpacity} />);
+    render(
+      <PublicGeoLayerControls
+        manifest={manifest}
+        available={available}
+        visible={available}
+        certificationMode
+        onToggleLayer={vi.fn()}
+        onToggleCertification={vi.fn()}
+        onOpacity={onOpacity}
+      />,
+    );
     fireEvent.click(screen.getByRole("button", { name: /Capas de evidencia/ }));
-    const label = manifest.layers.find((layer) => layer.id === "remote_sensing.sentinel2_alteration")!.label;
-    expect((screen.getByRole("slider", { name: "Opacidad de " + label }) as HTMLInputElement).disabled).toBe(true);
-    const official = screen.getByRole("slider", { name: "Opacidad de " + manifest.layers[0].label });
+    const label = manifest.layers.find(
+      (layer) => layer.id === "remote_sensing.sentinel2_alteration",
+    )!.label;
+    expect(
+      (screen.getByRole("slider", { name: "Opacidad de " + label }) as HTMLInputElement).disabled,
+    ).toBe(true);
+    const official = screen.getByRole("slider", {
+      name: "Opacidad de " + manifest.layers[0].label,
+    });
     fireEvent.change(official, { target: { value: "0.4" } });
     expect(onOpacity).toHaveBeenCalledWith("territory.cadastre", 0.4);
   });

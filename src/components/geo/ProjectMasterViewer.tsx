@@ -198,8 +198,9 @@ const ANOMALY_GRADIENT_STOPS: ReadonlyArray<[number, string]> = [
   [1, anomalyIntensityColor(1)],
 ];
 
-type ProvKind = "certificado" | "declarado" | "derivado" | "conceptual" | "contexto";
+type ProvKind = "certificado" | "medido" | "declarado" | "derivado" | "conceptual" | "contexto";
 const PROV: Record<ProvKind, { label: string; bg: string }> = {
+  medido: { label: "MEDIDO EN TERRENO", bg: "#0369a1" },
   declarado: { label: "OBSERVACIÓN DOCUMENTAL", bg: "#64748b" },
   certificado: { label: "CERTIFICADO", bg: "#15803d" },
   derivado: { label: "DERIVADO", bg: "#0369a1" },
@@ -272,28 +273,29 @@ export function ProjectMasterViewer({
   const basesRef = useRef<{ sat?: TileLayer; topo?: TileLayer }>({});
   const [ready, setReady] = useState(false);
   const { visible, setVisible, opacity, setOpacity } = useGeoLayerPreferences<LayerKey>(
-    enableLayerTools ? reportMapId ?? projectName : null, {
-
-    tenencia: true,
-    pedimentosPendientes: true,
-    mojones: false,
-    halos: true,
-    halosIntensidad: false,
-    magneticaRegional: !enableLayerTools,
-    gravedadRegional: false,
-    geofisicaProyecto: true,
-    magSurfaceProject: true,
-    ipChargeSurfaceProject: false,
-    ipResSurfaceProject: false,
-    relieve: false,
-    franjas: false,
-    yacimientos: true,
-    geoquimica: true,
-    estructuras: true,
-    sondajes: true,
-    ensayes: true,
-    pedimentos: true,
-  });
+    enableLayerTools ? (reportMapId ?? projectName) : null,
+    {
+      tenencia: true,
+      pedimentosPendientes: true,
+      mojones: false,
+      halos: true,
+      halosIntensidad: false,
+      magneticaRegional: !enableLayerTools,
+      gravedadRegional: false,
+      geofisicaProyecto: true,
+      magSurfaceProject: true,
+      ipChargeSurfaceProject: false,
+      ipResSurfaceProject: false,
+      relieve: false,
+      franjas: false,
+      yacimientos: true,
+      geoquimica: true,
+      estructuras: true,
+      sondajes: true,
+      ensayes: true,
+      pedimentos: true,
+    },
+  );
   const [layerSearch, setLayerSearch] = useState("");
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
@@ -570,11 +572,24 @@ export function ProjectMasterViewer({
           const az = Number(p.azimuth_deg ?? 0);
           const a = (az * Math.PI) / 180;
           const planned = enableLayerTools
-            ? proposedTraceEnd([0, 0, 0], az, Number(p.dip_deg), Number(p.depth_m)) : null;
+            ? proposedTraceEnd([0, 0, 0], az, Number(p.dip_deg), Number(p.depth_m))
+            : null;
           if (enableLayerTools && !planned) continue;
-          const endLat = planned ? lat - planned[2] / TERRAIN_METERS_PER_DEGREE : lat + 0.004 * Math.cos(a);
-          const endLng = planned ? lng + planned[0] / (TERRAIN_METERS_PER_DEGREE * Math.cos(lat * Math.PI / 180)) : lng + 0.004 * Math.sin(a);
-          items.push(L.polyline([[lat, lng], [endLat, endLng]], { color: "#1f6feb", weight: 2 }));
+          const endLat = planned
+            ? lat - planned[2] / TERRAIN_METERS_PER_DEGREE
+            : lat + 0.004 * Math.cos(a);
+          const endLng = planned
+            ? lng + planned[0] / (TERRAIN_METERS_PER_DEGREE * Math.cos((lat * Math.PI) / 180))
+            : lng + 0.004 * Math.sin(a);
+          items.push(
+            L.polyline(
+              [
+                [lat, lng],
+                [endLat, endLng],
+              ],
+              { color: "#1f6feb", weight: 2 },
+            ),
+          );
         }
         groups.current.sondajes = L.layerGroup(items).addTo(map);
       }
@@ -779,7 +794,9 @@ export function ProjectMasterViewer({
   }, [opacity, ready]);
 
   const fitToLayer = (key: LayerKey) => {
-    const map = mapRef.current, L = leafletRef.current, layer = groups.current[key];
+    const map = mapRef.current,
+      L = leafletRef.current,
+      layer = groups.current[key];
     if (!map || !L || !layer) return;
     const bounds = L.latLngBounds([]);
     const collect = (item: Layer) => {
@@ -788,8 +805,10 @@ export function ProjectMasterViewer({
         getLatLng?: () => import("leaflet").LatLng;
         eachLayer?: (visit: (child: Layer) => void) => void;
       };
-      if (geo.getBounds) { const child = geo.getBounds(); if (child.isValid()) bounds.extend(child); }
-      else if (geo.getLatLng) bounds.extend(geo.getLatLng());
+      if (geo.getBounds) {
+        const child = geo.getBounds();
+        if (child.isValid()) bounds.extend(child);
+      } else if (geo.getLatLng) bounds.extend(geo.getLatLng());
       else geo.eachLayer?.(collect);
     };
     collect(layer);
@@ -850,7 +869,8 @@ export function ProjectMasterViewer({
       halos: anomalies?.features?.length ?? 0,
       halosIntensidad:
         !anomalyIntensityDisabledReason && (anomalies?.features?.length ?? 0) >= 4
-          ? (anomalies?.features.length ?? 0) : 0,
+          ? (anomalies?.features.length ?? 0)
+          : 0,
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
       pedimentos: pedimentos?.features?.length ?? 0,
@@ -903,8 +923,13 @@ export function ProjectMasterViewer({
     () =>
       LAYER_SECTIONS.map((s) => ({
         ...s,
-        layers: s.layers.filter(([k, label]) => counts[k] > 0 &&
-          (label + " " + s.title).toLocaleLowerCase("es").includes(layerSearch.toLocaleLowerCase("es"))),
+        layers: s.layers.filter(
+          ([k, label]) =>
+            counts[k] > 0 &&
+            (label + " " + s.title)
+              .toLocaleLowerCase("es")
+              .includes(layerSearch.toLocaleLowerCase("es")),
+        ),
       })).filter((s) => s.layers.length > 0),
     [counts, layerSearch],
   );
@@ -999,9 +1024,14 @@ export function ProjectMasterViewer({
           {!collapsed && (
             <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
               {enableLayerTools && (
-                <input type="search" value={layerSearch} onChange={(e) => setLayerSearch(e.target.value)}
-                  aria-label="Buscar capas" placeholder="Buscar capas"
-                  className="mb-2 w-full rounded border border-hairline bg-surface px-2 py-1.5 text-[11px]" />
+                <input
+                  type="search"
+                  value={layerSearch}
+                  onChange={(e) => setLayerSearch(e.target.value)}
+                  aria-label="Buscar capas"
+                  placeholder="Buscar capas"
+                  className="mb-2 w-full rounded border border-hairline bg-surface px-2 py-1.5 text-[11px]"
+                />
               )}
               {visibleSections.map((section, index) => {
                 const open = openSections[section.title] ?? false;
@@ -1045,46 +1075,71 @@ export function ProjectMasterViewer({
                         )}
                         {section.layers.map(([k, label]) => (
                           <div key={k} className="mb-1">
-                          <label
-                            className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 hover:bg-surface-2"
-                          >
-                            <input
-                              className="mt-0.5"
-                              type="checkbox"
-                              checked={visible[k]}
-                              onChange={(e) =>
-                                setVisible((state) => ({ ...state, [k]: e.target.checked }))
-                              }
-                            />
-                            <span className="min-w-0 flex-1 text-content-muted">
-                              <span className="flex items-center gap-1">
-                                <span className="truncate">{k === "halos" && spectralFootprintsOnly ? "Huellas espectrales · Sentinel-2" : k === "ensayes" && assays.some((a) => a.certified === false) ? "Ensayes y observaciones" : label}</span>
-                                {COUNTED.includes(k) && (
-                                  <span className="shrink-0 text-content-subtle">
-                                    · {counts[k]}
+                            <label className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 hover:bg-surface-2">
+                              <input
+                                className="mt-0.5"
+                                type="checkbox"
+                                checked={visible[k]}
+                                onChange={(e) =>
+                                  setVisible((state) => ({ ...state, [k]: e.target.checked }))
+                                }
+                              />
+                              <span className="min-w-0 flex-1 text-content-muted">
+                                <span className="flex items-center gap-1">
+                                  <span className="truncate">
+                                    {k === "halos" && spectralFootprintsOnly
+                                      ? "Huellas espectrales · Sentinel-2"
+                                      : k === "ensayes" && assays.some((a) => a.certified === false)
+                                        ? "Ensayes y observaciones"
+                                        : label}
                                   </span>
+                                  {COUNTED.includes(k) && (
+                                    <span className="shrink-0 text-content-subtle">
+                                      · {counts[k]}
+                                    </span>
+                                  )}
+                                </span>
+                                {k === "ensayes" && assays.some((a) => a.certified === false) ? (
+                                  <span className="mt-0.5 block text-[9px] text-content-subtle">
+                                    {assays.filter((a) => a.certified !== false).length} ensayes certificados · {assays.filter((a) => a.certified === false).length} observaciones documentales
+                                  </span>
+                                ) : (
+                                  <EvidenceBadge kind={LAYER_META[k].evidence} scale={LAYER_META[k].scale}
+                                    size="xs" className="mt-0.5" />
                                 )}
                               </span>
-                              <EvidenceBadge
-                                kind={k === "ensayes" && assays.some((a) => a.certified === false) ? "DECLARADO" : LAYER_META[k].evidence}
-                                scale={LAYER_META[k].scale}
-                                size="xs"
-                                className="mt-0.5"
-                              />
-                            </span>
-                          </label>
-                          {enableLayerTools && (
-                            <div className="ml-6 flex items-center gap-2 pb-1">
-                              <input type="range" min={0} max={1} step={0.05}
-                                value={opacity[k] ?? 1} disabled={!visible[k]}
-                                aria-label={`Opacidad de ${label}`}
-                                onChange={(e) => setOpacity((state) => ({ ...state, [k]: Number(e.target.value) }))}
-                                className="min-w-0 flex-1 accent-gold" />
-                              <span className="w-7 text-right text-[9px] tabular-nums">{Math.round((opacity[k] ?? 1) * 100)}%</span>
-                              <button type="button" onClick={() => fitToLayer(k)} aria-label={`Encuadrar ${label}`}
-                                className="rounded p-1 hover:bg-surface-2"><Maximize className="h-3 w-3" /></button>
-                            </div>
-                          )}
+                            </label>
+                            {enableLayerTools && (
+                              <div className="ml-6 flex items-center gap-2 pb-1">
+                                <input
+                                  type="range"
+                                  min={0}
+                                  max={1}
+                                  step={0.05}
+                                  value={opacity[k] ?? 1}
+                                  disabled={!visible[k]}
+                                  aria-label={`Opacidad de ${label}`}
+                                  onChange={(e) =>
+                                    setOpacity((state) => ({
+                                      ...state,
+                                      [k]: Number(e.target.value),
+                                    }))
+                                  }
+                                  className="min-w-0 flex-1 accent-gold"
+                                />
+                                <span className="w-7 text-right text-[9px] tabular-nums">
+                                  {Math.round((opacity[k] ?? 1) * 100)}%
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() => fitToLayer(k)}
+                                  aria-label={`Encuadrar ${label}`}
+                                  className="rounded p-1 hover:bg-surface-2"
+                                >
+                                  <Maximize className="h-3 w-3" />
+                                </button>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -1258,7 +1313,7 @@ function Inspector({
     ];
   } else if (selected.kind === "estructuras") {
     title = `Veta ${p.code ?? ""}`;
-    prov = "certificado";
+    prov = "medido";
     rows = [
       ["Descripción", p.name],
       ["Rumbo", `N${p.strikeDeg}°`],

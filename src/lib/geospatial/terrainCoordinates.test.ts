@@ -8,8 +8,12 @@ import {
 } from "./terrainCoordinates";
 
 const tile: TerrainGrid = {
-  size: 3, extentMeters: 200, centerLng: -71.043, centerLat: -33.8543,
-  heights: [0, 10, 20, 20, 30, 40, 40, 50, 60], source: "copernicus",
+  size: 3,
+  extentMeters: 200,
+  centerLng: -71.043,
+  centerLat: -33.8543,
+  heights: [0, 10, 20, 20, 30, 40, 40, 50, 60],
+  source: "copernicus",
 };
 
 describe("terrain projection", () => {
@@ -29,12 +33,17 @@ describe("terrain projection", () => {
   });
 
   it("preserves polygon holes and multipart footprints without joining them", () => {
-    const ring = (column: number) => [column, column + 0.1, column + 0.2, column].map((x, i) =>
-      terrainGridCoordinate(-33.8543, -71.043, 3, 200, x, i === 1 ? 0.8 : 1));
-    const paths = terrainFootprintPaths({
-      type: "MultiPolygon",
-      coordinates: [[ring(0.2), ring(0.5)], [ring(1.2)]],
-    }, tile);
+    const ring = (column: number) =>
+      [column, column + 0.1, column + 0.2, column].map((x, i) =>
+        terrainGridCoordinate(-33.8543, -71.043, 3, 200, x, i === 1 ? 0.8 : 1),
+      );
+    const paths = terrainFootprintPaths(
+      {
+        type: "MultiPolygon",
+        coordinates: [[ring(0.2), ring(0.5)], [ring(1.2)]],
+      },
+      tile,
+    );
     expect(paths).toHaveLength(3);
     expect(paths.every((path) => path.length >= 2)).toBe(true);
   });

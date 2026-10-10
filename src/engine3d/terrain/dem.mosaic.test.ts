@@ -18,11 +18,11 @@ function sourceImage(lng: number, value: number) {
 }
 
 describe("Copernicus DEM mosaic", () => {
-  beforeEach(() => fromUrl.mockReset());
+  beforeEach(() => { fromUrl.mockReset(); });
 
   it("keeps both sides of Cholqui's degree boundary in their correct grid positions", async () => {
     fromUrl.mockImplementation(async (url: string) => ({
-      getImage: async () => url.includes("W072") ? sourceImage(-72, 100) : sourceImage(-71, 200),
+      getImage: async () => (url.includes("W072") ? sourceImage(-72, 100) : sourceImage(-71, 200)),
     }));
     const tile = await fetchCopernicusDem(-33.8543, -71.043, 65, 14000);
     expect(fromUrl).toHaveBeenCalledTimes(2);

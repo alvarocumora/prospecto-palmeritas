@@ -20,8 +20,10 @@ export function parseLayerPreferences(raw: string | null): GeoLayerPreferences {
         typeof entry.visible !== "boolean" ||
         typeof entry.opacity !== "number" ||
         !Number.isFinite(entry.opacity) ||
-        entry.opacity < 0 || entry.opacity > 1
-      ) continue;
+        entry.opacity < 0 ||
+        entry.opacity > 1
+      )
+        continue;
       result[preferenceLayerId(id)] = { visible: entry.visible, opacity: entry.opacity };
     }
     return result;

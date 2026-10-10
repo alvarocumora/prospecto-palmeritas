@@ -25,12 +25,13 @@ describe("Cholqui canonical public geo bundle", () => {
     expect(bundle.layers["territory.proposed_pedimentos"]).toBeDefined();
   });
 
-
   it("preserves all candidate footprints without interpolating incompatible background populations", () => {
     const bundle = buildCholquiPublicGeoBundle();
     expect(bundle.layers["remote_sensing.sentinel2_alteration"]?.features).toHaveLength(57);
     expect(bundle.layers["remote_sensing.anomaly_intensity"]).toBeUndefined();
-    expect(bundle.manifest.layers.some((layer) => layer.id === "remote_sensing.anomaly_intensity")).toBe(false);
+    expect(
+      bundle.manifest.layers.some((layer) => layer.id === "remote_sensing.anomaly_intensity"),
+    ).toBe(false);
     expect(bundle.layers["drilling.proposed"]?.features).toHaveLength(7);
   });
 });

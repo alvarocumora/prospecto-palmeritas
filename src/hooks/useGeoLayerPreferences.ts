@@ -21,14 +21,22 @@ export function useGeoLayerPreferences<T extends string>(
   const [loadedNamespace, setLoadedNamespace] = useState<string | null>();
   useEffect(() => {
     const saved = read(namespace);
-    setVisible(Object.fromEntries(
-      Object.entries(initialRef.current).map(([key, value]) =>
-        [key, saved[preferenceLayerId(key)]?.visible ?? value]),
-    ) as Record<T, boolean>);
-    setOpacity(Object.fromEntries(
-      Object.keys(initialRef.current).map((key) =>
-        [key, saved[preferenceLayerId(key)]?.opacity ?? 1]),
-    ) as Partial<Record<T, number>>);
+    setVisible(
+      Object.fromEntries(
+        Object.entries(initialRef.current).map(([key, value]) => [
+          key,
+          saved[preferenceLayerId(key)]?.visible ?? value,
+        ]),
+      ) as Record<T, boolean>,
+    );
+    setOpacity(
+      Object.fromEntries(
+        Object.keys(initialRef.current).map((key) => [
+          key,
+          saved[preferenceLayerId(key)]?.opacity ?? 1,
+        ]),
+      ) as Partial<Record<T, number>>,
+    );
     setLoadedNamespace(namespace);
   }, [namespace]);
   useEffect(() => {
