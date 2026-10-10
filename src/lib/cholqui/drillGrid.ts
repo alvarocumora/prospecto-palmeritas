@@ -208,30 +208,54 @@ export function parsePublishedDrillGrid(raw: unknown): PublishedCollar[] {
     } | null;
     const p = f?.properties;
     const coords = f?.geometry?.coordinates;
-    if (f?.geometry?.type !== "Point" || !Array.isArray(coords) || !p ||
-        typeof p.code !== "string" || !p.code.trim() || codes.has(p.code) ||
-        typeof p.index_code !== "string" ||
-        ![coords[0], coords[1], p.azimuth_deg, p.dip_deg, p.depth_m, p.score].every(
-          (value) => typeof value === "number" && Number.isFinite(value),
-        )) throw new Error("PUBLISHED_DRILL_COLLAR_INVALID");
+    if (
+      f?.geometry?.type !== "Point" ||
+      !Array.isArray(coords) ||
+      !p ||
+      typeof p.code !== "string" ||
+      !p.code.trim() ||
+      codes.has(p.code) ||
+      typeof p.index_code !== "string" ||
+      ![coords[0], coords[1], p.azimuth_deg, p.dip_deg, p.depth_m, p.score].every(
+        (value) => typeof value === "number" && Number.isFinite(value),
+      )
+    )
+      throw new Error("PUBLISHED_DRILL_COLLAR_INVALID");
     const [lng, lat] = coords as number[];
     const azimuthDeg = p.azimuth_deg as number;
     const dipDeg = p.dip_deg as number;
     const depthM = p.depth_m as number;
     const score = p.score as number;
-    if (Math.abs(lng) > 180 || Math.abs(lat) >= 90 || azimuthDeg < 0 ||
-        azimuthDeg >= 360 || dipDeg > 0 || dipDeg < -90 || depthM <= 0 ||
-        score < 0 || score > 1 ||
-        !["Alta", "Media", "Baja"].includes(String(p.priority))) {
+    if (
+      Math.abs(lng) > 180 ||
+      Math.abs(lat) >= 90 ||
+      azimuthDeg < 0 ||
+      azimuthDeg >= 360 ||
+      dipDeg > 0 ||
+      dipDeg < -90 ||
+      depthM <= 0 ||
+      score < 0 ||
+      score > 1 ||
+      !["Alta", "Media", "Baja"].includes(String(p.priority))
+    ) {
       throw new Error("PUBLISHED_DRILL_COLLAR_INVALID");
     }
     codes.add(p.code);
     return {
-      code: p.code, anomalyId: null, indexCode: p.index_code,
-      lat, lng, azimuthDeg, dipDeg, depthM, score,
+      code: p.code,
+      anomalyId: null,
+      indexCode: p.index_code,
+      lat,
+      lng,
+      azimuthDeg,
+      dipDeg,
+      depthM,
+      score,
       priority: p.priority as ProposedCollar["priority"],
-      objective: typeof p.objetivo === "string"
-        ? p.objetivo : "Objetivo no informado en la propuesta publicada",
+      objective:
+        typeof p.objetivo === "string"
+          ? p.objetivo
+          : "Objetivo no informado en la propuesta publicada",
     };
   });
 }

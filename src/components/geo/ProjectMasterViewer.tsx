@@ -1101,11 +1101,18 @@ export function ProjectMasterViewer({
                                 </span>
                                 {k === "ensayes" && assays.some((a) => a.certified === false) ? (
                                   <span className="mt-0.5 block text-[9px] text-content-subtle">
-                                    {assays.filter((a) => a.certified !== false).length} ensayes certificados · {assays.filter((a) => a.certified === false).length} observaciones documentales
+                                    {assays.filter((a) => a.certified !== false).length} ensayes
+                                    certificados ·{" "}
+                                    {assays.filter((a) => a.certified === false).length}{" "}
+                                    observaciones documentales
                                   </span>
                                 ) : (
-                                  <EvidenceBadge kind={LAYER_META[k].evidence} scale={LAYER_META[k].scale}
-                                    size="xs" className="mt-0.5" />
+                                  <EvidenceBadge
+                                    kind={LAYER_META[k].evidence}
+                                    scale={LAYER_META[k].scale}
+                                    size="xs"
+                                    className="mt-0.5"
+                                  />
                                 )}
                               </span>
                             </label>

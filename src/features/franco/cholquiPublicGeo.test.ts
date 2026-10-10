@@ -41,7 +41,11 @@ describe("Cholqui canonical public geo bundle", () => {
     const map = buildCholquiPublicGeoBundle().layers["drilling.proposed"]!;
     expect(totalMeters(collars)).toBe(1070);
     expect(collars[0]).toMatchObject({
-      code: "CHO-DDH-01", azimuthDeg: 285, dipDeg: -60, depthM: 170, anomalyId: null,
+      code: "CHO-DDH-01",
+      azimuthDeg: 285,
+      dipDeg: -60,
+      depthM: 170,
+      anomalyId: null,
     });
     expect(collars).toHaveLength(map.features.length);
     for (let i = 0; i < collars.length; i++) {
@@ -57,5 +61,4 @@ describe("Cholqui canonical public geo bundle", () => {
     delete raw.features[0].properties.depth_m;
     expect(() => parsePublishedDrillGrid(raw)).toThrow("PUBLISHED_DRILL_COLLAR_INVALID");
   });
-
 });

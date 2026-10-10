@@ -18,7 +18,9 @@ function sourceImage(lng: number, value: number) {
 }
 
 describe("Copernicus DEM mosaic", () => {
-  beforeEach(() => { fromUrl.mockReset(); });
+  beforeEach(() => {
+    fromUrl.mockReset();
+  });
 
   it("keeps both sides of Cholqui's degree boundary in their correct grid positions", async () => {
     fromUrl.mockImplementation(async (url: string) => ({
