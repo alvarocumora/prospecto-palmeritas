@@ -439,7 +439,7 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Propuesta",
         title: "Malla de sondajes de fase 1",
         deck: true,
-        lead: `${collars.length} plataformas por ${num(summary.totalMeters)} m de sondaje diamantino, con inclinación -60° y azimut perpendicular al rumbo dominante N20E.`,
+        lead: `${collars.length} plataformas por ${num(summary.totalMeters)} m de sondaje diamantino, según los azimuts, inclinaciones y profundidades de la propuesta publicada.`,
         blocks: [
           {
             kind: "table",

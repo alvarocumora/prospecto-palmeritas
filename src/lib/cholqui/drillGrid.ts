@@ -28,7 +28,8 @@ export type SatelliteAnomaly = {
 
 export type ProposedCollar = {
   code: string;
-  anomalyId: string;
+  /** Null when the published source has no explicit anomaly link. */
+  anomalyId: string | null;
   indexCode: string;
   lat: number;
   lng: number;
