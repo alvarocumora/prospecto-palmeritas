@@ -321,7 +321,7 @@ function DashboardHome() {
             ]}
             links={[
               {
-                to: "/dashboard/geology3d",
+                to: "/proyectos",
                 icon: <Box className="w-3.5 h-3.5" />,
                 label: "Visor 3D",
               },
@@ -341,7 +341,7 @@ function DashboardHome() {
                 label: "Estimación",
               },
             ]}
-            primary={{ to: "/dashboard/geology3d", label: "Abrir visor 3D" }}
+            primary={{ to: "/proyectos", label: "Abrir visor 3D" }}
           />
 
           <Pillar
@@ -435,7 +435,7 @@ function DashboardHome() {
               </h2>
             </div>
             <Link
-              to="/dashboard/geology3d"
+              to="/proyectos"
               className="text-[10px] font-mono text-gold hover:underline"
             >
               Pantalla completa →
@@ -468,7 +468,7 @@ function DashboardHome() {
               title="Mapa táctico"
             />
             <Shortcut
-              to="/dashboard/geology3d"
+              to="/proyectos"
               icon={<Box className="w-4 h-4 text-signal-violet" />}
               title="Visor 3D"
             />
