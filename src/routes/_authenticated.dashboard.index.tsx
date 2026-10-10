@@ -421,16 +421,16 @@ function BusinessHome() {
                   <div className="font-semibold text-sm">{active?.name ?? "—"}</div>
                   <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
                     <Link
-                      to="/dashboard/mission"
+                      to="/terminal"
                       className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
                     >
-                      <Compass className="w-3.5 h-3.5" /> Mission Control
+                      <Compass className="w-3.5 h-3.5" /> Terminal 2D/3D
                     </Link>
                     <Link
-                      to="/dashboard/project-report"
+                      to="/catastro/mapa"
                       className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border hover:bg-accent"
                     >
-                      <FileText className="w-3.5 h-3.5" /> Reporte
+                      <FileText className="w-3.5 h-3.5" /> Catastro
                     </Link>
                     <Link
                       to="/dashboard/projects"
