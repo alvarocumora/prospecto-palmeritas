@@ -49,8 +49,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     profile === "investment"
       ? "Memorando de inversión\npreliminar"
       : profile === "targeting"
-        ? "Informe de targets\npreliminar"
-        : "Informe técnico\npreliminar";
+      ? "Informe de targets\npreliminar"
+      : "Informe técnico\npreliminar";
   const contents: Array<{ label: string; page: number }> = [];
   const chrome = () =>
     letterhead(doc, frame, {
@@ -144,7 +144,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y = verificationSeal(doc, frame, y, {
     qr,
     title: "Expediente del proyecto",
-    body: "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
+    body:
+      "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
     url: model.liveUrl,
     ref: model.code,
   });
@@ -226,7 +227,10 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   if (model.chart) {
     need(260);
-    heading("04", profile === "targeting" ? "Indicadores de screening" : "Resultados analíticos disponibles");
+    heading(
+      "04",
+      profile === "targeting" ? "Indicadores de screening" : "Resultados analíticos disponibles",
+    );
     write(model.chart.title);
     barChart(doc, {
       x: M,

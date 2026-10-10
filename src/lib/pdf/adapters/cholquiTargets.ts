@@ -13,7 +13,8 @@ import {
   CHOLQUI_POINTS,
   LAS_MINITAS,
 } from "@/features/franco/data/cholqui";
-import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
+import { indexLabel } from "@/lib/cholqui/drillGrid";
+import type { ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "@/features/franco/data/cholquiStructures";
 import type { ProjectDoc } from "../model";
@@ -210,8 +211,24 @@ export function buildCholquiTargetsDoc(
     ],
     thesis: [
       `Se detectaron ${summary.anomalies} anomalías espectrales reales sobre el AOI de Cholqui (${data.coverage.sensor}), agrupadas en ${summary.indexes.length} índices de alteración (incluidos Al-OH, óxidos de hierro y alteración hidrotermal combinada).`,
-      `${summary.withinTenure} candidatos tienen bandera dentro_concesion en el set de 29 concesiones del archivo. Se conserva una propuesta independiente de ${summary.collars} collares por ${num(summary.totalMeters)} m; no existe enlace de anomalía informado para cada collar. Las ${summary.outsideTenure} anomalías restantes son contexto regional.`,
-      `Superficie interpretable sin cubierta vegetal: ${data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"} típico y ${data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"} en el mejor escenario del AOI.`,
+      `${
+        summary.withinTenure
+      } candidatos tienen bandera dentro_concesion en el set de 29 concesiones del archivo. Se conserva una propuesta independiente de ${
+        summary.collars
+      } collares por ${num(
+        summary.totalMeters,
+      )} m; no existe enlace de anomalía informado para cada collar. Las ${
+        summary.outsideTenure
+      } anomalías restantes son contexto regional.`,
+      `Superficie interpretable sin cubierta vegetal: ${
+        data.coverage.typicalPct != null
+          ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+          : "s/d"
+      } típico y ${
+        data.coverage.bestCasePct != null
+          ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %`
+          : "s/d"
+      } en el mejor escenario del AOI.`,
       "Los azimuts son los de cada collar publicado (105°/285° en el archivo actual). Su coherencia con los rumbos de terreno debe revisarse; no se fuerza una orientación única ni se infiere el objetivo por proximidad.",
       "Una anomalía espectral es un indicio, no mineralización: ningún target sustituye mapeo, canaleta ni ensaye de laboratorio.",
     ],
@@ -233,7 +250,7 @@ export function buildCholquiTargetsDoc(
       captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
       crs: "WGS84",
-      imagery: "Sentinel-2 L2A",
+      imagery: "Esri World Imagery al capturar el visor; candidatos derivados de Sentinel-2",
       polygons: tenure,
       points: [
         ...anomalies.map((a) => ({
@@ -256,7 +273,9 @@ export function buildCholquiTargetsDoc(
         status: "DERIVED",
         provenance: "DERIVED",
         label: "Anomalías espectrales",
-        detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
+        detail: `Derivadas de razones de banda ${data.coverage.sensor}${
+          data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""
+        }. Indicio de alteración, sin verificación de terreno.`,
       },
       {
         status: "PENDING_DD",
@@ -288,14 +307,18 @@ export function buildCholquiTargetsDoc(
     sections: [
       ...cholquiGeoscienceSections().map((section) => ({
         ...section,
-        blocks: section.blocks.filter((block) => block.kind !== "appendixTable" || block.title !== "Collares de la propuesta publicada"),
+        blocks: section.blocks.filter(
+          (block) =>
+            block.kind !== "appendixTable" || block.title !== "Collares de la propuesta publicada",
+        ),
       })),
       ...(agentNotes.length
         ? [
             {
               eyebrow: "Interpretación IA",
               title: "Notas del agente geológico-geofísico",
-              lead: "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
+              lead:
+                "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
               blocks: [
                 {
                   kind: "table" as const,
@@ -395,7 +418,8 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Detección",
         title: "Anomalías espectrales sobre el AOI",
         deck: true,
-        lead: "Selección documental por score publicado; se conservan IDs estables según el orden original del archivo. Campañas e índices distintos no son comparables como ranking geológico.",
+        lead:
+          "Selección documental por score publicado; se conservan IDs estables según el orden original del archivo. Campañas e índices distintos no son comparables como ranking geológico.",
         blocks: [
           {
             kind: "appendixTable",
@@ -418,7 +442,8 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body: "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
+            body:
+              "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
           },
           {
             kind: "text",
@@ -449,7 +474,9 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Propuesta",
         title: "Malla de sondajes de fase 1",
         deck: true,
-        lead: `${collars.length} plataformas por ${num(summary.totalMeters)} m de sondaje diamantino, según los azimuts, inclinaciones y profundidades de la propuesta publicada.`,
+        lead: `${collars.length} plataformas por ${num(
+          summary.totalMeters,
+        )} m de sondaje diamantino, según los azimuts, inclinaciones y profundidades de la propuesta publicada.`,
         blocks: [
           {
             kind: "table",
@@ -492,7 +519,8 @@ export function buildCholquiTargetsDoc(
       {
         eyebrow: "Contexto estructural",
         title: "Vetas con rumbo/manteo de terreno",
-        lead: "Los rumbos y manteos documentados se presentan para revisar la orientación de cada collar; no acreditan continuidad en profundidad.",
+        lead:
+          "Los rumbos y manteos documentados se presentan para revisar la orientación de cada collar; no acreditan continuidad en profundidad.",
         blocks: [
           {
             kind: "table",
@@ -517,7 +545,8 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body: "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
+            body:
+              "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
           },
         ],
       },

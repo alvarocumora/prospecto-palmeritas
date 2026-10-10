@@ -10,7 +10,8 @@
 import { publicUrl } from "@/lib/publicUrl";
 import { CHOLQUI, CHOLQUI_ASSAYS } from "@/features/franco/data/cholqui";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
-import { buildFieldProgram, type FieldProgram } from "@/lib/cholqui/fieldProgram";
+import { buildFieldProgram } from "@/lib/cholqui/fieldProgram";
+import type { FieldProgram } from "@/lib/cholqui/fieldProgram";
 import { cholquiTenurePolygons, tenureAt } from "./cholquiTargets";
 import type { ProjectDoc } from "../model";
 import { cholquiGeoscienceSections } from "./cholquiGeoscience";
@@ -71,7 +72,10 @@ export function buildCholquiFieldMemoDoc(
       {
         label: "Muestras de canaleta",
         value: num(p.channel.samples),
-        note: `${p.channel.sites} sitios, tramos de ${String(p.channel.sampleLengthM).replace(".", ",")} m`,
+        note: `${p.channel.sites} sitios, tramos de ${String(p.channel.sampleLengthM).replace(
+          ".",
+          ",",
+        )} m`,
       },
       {
         label: "Control QA/QC",
@@ -111,7 +115,7 @@ export function buildCholquiFieldMemoDoc(
       captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
       crs: "WGS84",
-      imagery: "Sentinel-2 L2A",
+      imagery: "Esri World Imagery al capturar el visor; candidatos derivados de Sentinel-2",
       polygons: tenure,
       points: [
         ...targets.map((t) => ({
@@ -163,7 +167,8 @@ export function buildCholquiFieldMemoDoc(
         eyebrow: "Alcance",
         title: "Qué se valida y qué no",
         deck: true,
-        lead: "La Fase 0 busca evidencia de terreno sobre indicios satelitales. No produce estimaciones de recursos ni resultados económicos.",
+        lead:
+          "La Fase 0 busca evidencia de terreno sobre indicios satelitales. No produce estimaciones de recursos ni resultados económicos.",
         blocks: [
           {
             kind: "bullets",
@@ -181,7 +186,8 @@ export function buildCholquiFieldMemoDoc(
         eyebrow: "Targets",
         title: "Prioridad, concesión y acciones por target",
         deck: true,
-        lead: "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas últimas no se ejecuta trabajo sin verificación registral ni acuerdo escrito previo.",
+        lead:
+          "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas últimas no se ejecuta trabajo sin verificación registral ni acuerdo escrito previo.",
         blocks: [
           {
             kind: "table",
@@ -205,11 +211,16 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body: "El score conserva el valor publicado; campañas e índices distintos no se comparan como ranking geológico o económico. La prioridad es una regla de planificación pendiente de revisión de terreno.",
+            body:
+              "El score conserva el valor publicado; campañas e índices distintos no se comparan como ranking geológico o económico. La prioridad es una regla de planificación pendiente de revisión de terreno.",
           },
           {
             kind: "text",
-            body: `Titularidad verificada sobre el catastro cargado: ${ownCount} de ${targets.length} targets caen dentro de la tenencia analizada (TOKI 2 / PALLOCABE 8 / DOS MARÍAS) y ${targets.length - ownCount} caen en concesiones inscritas a terceros. Antes de cualquier trabajo en estas últimas se requiere verificar vigencia y titular en el registro, y obtener acuerdo escrito o servidumbre.`,
+            body: `Titularidad verificada sobre el catastro cargado: ${ownCount} de ${
+              targets.length
+            } targets caen dentro de la tenencia analizada (TOKI 2 / PALLOCABE 8 / DOS MARÍAS) y ${
+              targets.length - ownCount
+            } caen en concesiones inscritas a terceros. Antes de cualquier trabajo en estas últimas se requiere verificar vigencia y titular en el registro, y obtener acuerdo escrito o servidumbre.`,
           },
         ],
       },
@@ -264,7 +275,8 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body: "Toda muestra se registra con coordenada UTM 19S, datum declarado, fotografía del sitio y ficha de terreno. Sin cadena de custodia completa la muestra no se incorpora a la base de datos del proyecto.",
+            body:
+              "Toda muestra se registra con coordenada UTM 19S, datum declarado, fotografía del sitio y ficha de terreno. Sin cadena de custodia completa la muestra no se incorpora a la base de datos del proyecto.",
           },
         ],
       },
@@ -285,12 +297,16 @@ export function buildCholquiFieldMemoDoc(
               ],
               ["Arreglo IP", p.geophysics.ipArray],
               ["Orientación", "Transversal al rumbo estructural dominante N20E"],
-              ["Producto propuesto", "Inversión IP 2D con topografía, electrodos y error de medida"],
+              [
+                "Producto propuesto",
+                "Inversión IP 2D con topografía, electrodos y error de medida",
+              ],
             ],
           },
           {
             kind: "text",
-            body: "La geofísica regional disponible (EMAG2 y WGM2012) tiene resolución kilométrica y sirve sólo como contexto. Las decisiones de perforación requieren datos de terreno a escala de prospecto como los de esta campaña.",
+            body:
+              "La geofísica regional disponible (EMAG2 y WGM2012) tiene resolución kilométrica y sirve sólo como contexto. Las decisiones de perforación requieren datos de terreno a escala de prospecto como los de esta campaña.",
           },
         ],
       },

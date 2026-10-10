@@ -39,8 +39,12 @@ describe("Cholqui field geophysics on terrain", () => {
         station("wrong-campaign", { survey_id: "unknown" }),
       ],
     };
-    expect(cholquiFieldGeophysics(data, "cholqui").stations.map((item) => item.id)).toEqual(["field"]);
-    expect(cholquiFieldGeophysics(data, "other").stations.map((item) => item.id)).toEqual(["other"]);
+    expect(cholquiFieldGeophysics(data, "cholqui").stations.map((item) => item.id)).toEqual([
+      "field",
+    ]);
+    expect(cholquiFieldGeophysics(data, "other").stations.map((item) => item.id)).toEqual([
+      "other",
+    ]);
     expect(cholquiFieldGeophysics(null, "cholqui").stations).toEqual([]);
   });
 
@@ -72,7 +76,11 @@ describe("Cholqui field geophysics on terrain", () => {
     const surface = buildFieldGeophysicsSurface(field, "mag_residual_nt", { gridSize: 8 })!;
     const triangles = geophysicsTerrainTriangles(surface, grid);
     expect(triangles.length).toBeGreaterThan(0);
-    expect(triangles.every((triangle) => triangle.points.every((point) => Math.abs(point[1] - 12) < 1e-8))).toBe(true);
+    expect(
+      triangles.every((triangle) =>
+        triangle.points.every((point) => Math.abs(point[1] - 12) < 1e-8),
+      ),
+    ).toBe(true);
     expect(triangles.every((triangle) => Number.isFinite(triangle.value))).toBe(true);
     expect(geophysicsTerrainTriangles(surface, { ...grid, source: "synthetic" })).toEqual([]);
     expect(geophysicsTerrainTriangles(surface, { ...grid, centerLng: 10 })).toEqual([]);

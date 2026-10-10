@@ -1,5 +1,6 @@
 import type { FeatureCollection } from "geojson";
-import { ProjectMasterViewer, type AssayPoint } from "@/components/geo/ProjectMasterViewer";
+import { ProjectMasterViewer } from "@/components/geo/ProjectMasterViewer";
+import type { AssayPoint } from "@/components/geo/ProjectMasterViewer";
 import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
 import { useProjects } from "@/hooks/useProjects";
 import { cholquiFieldGeophysics } from "@/lib/cholqui/geophysicsTerrain";

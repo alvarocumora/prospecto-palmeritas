@@ -1,7 +1,9 @@
 import type { GeophysicsStation } from "@/types/geophysics";
 
 export type GeophysicsSurfaceMetric =
-  "mag_residual_nt" | "ip_chargeability_mvv" | "ip_resistivity_ohmm";
+  | "mag_residual_nt"
+  | "ip_chargeability_mvv"
+  | "ip_resistivity_ohmm";
 
 export type GeophysicsSurfaceCell = {
   lat: number;
@@ -80,7 +82,9 @@ export function buildFieldGeophysicsSurface(
       Math.abs(station.lng) <= 180,
   );
   // A residual baseline cannot mix campaigns or project coordinate frames.
-  const campaigns = new Set(field.map((station) => JSON.stringify([station.project_id, station.survey_id])));
+  const campaigns = new Set(
+    field.map((station) => JSON.stringify([station.project_id, station.survey_id])),
+  );
   if (campaigns.size > 1) return null;
   const magneticValues = field
     .map((station) => station.mag_nt)

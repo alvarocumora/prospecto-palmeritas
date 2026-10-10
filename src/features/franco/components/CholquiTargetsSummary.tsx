@@ -14,11 +14,8 @@ import { Button } from "@/components/ui/button";
 import { generateCholquiTargetNotes } from "@/lib/cholqui/targetNotes.functions";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { getCholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
-import {
-  buildCholquiTargetsDoc,
-  concessionAt,
-  type AgentNote,
-} from "@/lib/pdf/adapters/cholquiTargets";
+import { buildCholquiTargetsDoc, concessionAt } from "@/lib/pdf/adapters/cholquiTargets";
+import type { AgentNote } from "@/lib/pdf/adapters/cholquiTargets";
 import { indexLabel } from "@/lib/cholqui/drillGrid";
 
 function num(value: number, digits = 0): string {
@@ -49,7 +46,11 @@ export function CholquiTargetsSummary() {
           label: a.id,
           kind: "anomalia" as const,
           concession: concessionAt(a.lat, a.lng),
-          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${a.zScore ?? "s/d"}; area ${a.areaHa ?? "s/d"} ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E.`,
+          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${
+            a.zScore ?? "s/d"
+          }; area ${
+            a.areaHa ?? "s/d"
+          } ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E.`,
         })),
         ...data.collars.map((c) => ({
           label: c.code,
@@ -139,7 +140,8 @@ export function CholquiTargetsSummary() {
 
       {data && data.collars.length === 0 && !isLoading && (
         <div className="px-6 py-10 text-sm text-content-subtle">
-          El archivo publicado no contiene collares propuestos. La ausencia de una propuesta no implica ausencia de mineralización.
+          El archivo publicado no contiene collares propuestos. La ausencia de una propuesta no
+          implica ausencia de mineralización.
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import type { GeophysicsData, GeophysicsStation } from "@/types/geophysics";
 import type { GeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
-import { projectTerrainPoint, type TerrainGrid } from "@/lib/geospatial/terrainCoordinates";
+import { projectTerrainPoint } from "@/lib/geospatial/terrainCoordinates";
+import type { TerrainGrid } from "@/lib/geospatial/terrainCoordinates";
 
 function validPosition(lng: number, lat: number): boolean {
   return Number.isFinite(lng) && Number.isFinite(lat) && Math.abs(lng) <= 180 && Math.abs(lat) < 90;
@@ -70,7 +71,10 @@ export function geophysicsTerrainTriangles(
             cell.west + ((col + x) / steps) * (cell.east - cell.west),
             cell.south + ((row + y) / steps) * (cell.north - cell.south),
           );
-        const a = point(0, 0), b = point(1, 0), c = point(1, 1), d = point(0, 1);
+        const a = point(0, 0),
+          b = point(1, 0),
+          c = point(1, 1),
+          d = point(0, 1);
         if (!a || !b || !c || !d) continue;
         triangles.push(
           { points: [a, b, c], value: cell.value, normalized: cell.normalized },

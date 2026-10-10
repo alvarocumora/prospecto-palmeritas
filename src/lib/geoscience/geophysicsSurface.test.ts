@@ -50,13 +50,16 @@ describe("field geophysics surface", () => {
 
   it("rejects mixed campaigns rather than combining acquisition baselines", () => {
     const mixed = field.map((item, index) => ({
-      ...item, survey_id: index === 0 ? "other-survey" : item.survey_id,
+      ...item,
+      survey_id: index === 0 ? "other-survey" : item.survey_id,
     }));
     expect(buildFieldGeophysicsSurface(mixed, "mag_residual_nt")).toBeNull();
   });
 
   it("requires acquisition QA for repeated positions", () => {
-    expect(buildFieldGeophysicsSurface([...field, { ...field[0], id: "repeat" }], "mag_residual_nt")).toBeNull();
+    expect(
+      buildFieldGeophysicsSurface([...field, { ...field[0], id: "repeat" }], "mag_residual_nt"),
+    ).toBeNull();
   });
 
   it("requires enough field measurements", () => {

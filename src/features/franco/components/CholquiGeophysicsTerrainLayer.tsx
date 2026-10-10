@@ -23,6 +23,7 @@ export function CholquiGeophysicsTerrainLayer({
   lines,
   surface,
   showStations,
+  stationOpacity,
   opacity,
   onHover,
 }: {
@@ -31,6 +32,7 @@ export function CholquiGeophysicsTerrainLayer({
   lines: GeophysicsLine[];
   surface: GeophysicsSurface | null;
   showStations: boolean;
+  stationOpacity: number;
   opacity: number;
   onHover: (hover: Hover) => void;
 }) {
@@ -38,10 +40,10 @@ export function CholquiGeophysicsTerrainLayer({
     () => lines.flatMap((line) => terrainFootprintPaths(line.geometry_geojson, tile)),
     [lines, tile],
   );
-  const triangles = useMemo(
-    () => surface ? geophysicsTerrainTriangles(surface, tile) : [],
-    [surface, tile],
-  );
+  const triangles = useMemo(() => (surface ? geophysicsTerrainTriangles(surface, tile) : []), [
+    surface,
+    tile,
+  ]);
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     const vertices: number[] = [];
@@ -93,39 +95,50 @@ export function CholquiGeophysicsTerrainLayer({
           />
         </mesh>
       )}
-      {showStations && projectedLines.map((points, index) => (
-        <Line key={index} points={points.map(position)} color="#f472b6" lineWidth={1.5} />
-      ))}
-      {showStations && stations.map((station) => {
-        const point = projectTerrainPoint(tile, station.lng, station.lat);
-        if (!point) return null;
-        const p = position(point);
-        const values = [
-          station.mag_nt != null ? "TMI medida: " + station.mag_nt + " nT" : null,
-          station.ip_chargeability_mvv != null
-            ? "Cargabilidad: " + station.ip_chargeability_mvv + " mV/V" : null,
-          station.ip_resistivity_ohmm != null
-            ? "Resistividad: " + station.ip_resistivity_ohmm + " Ω·m" : null,
-        ].filter((value): value is string => value !== null);
-        return (
-          <mesh
-            key={station.id}
-            position={p}
-            onPointerOver={(event) => {
-              event.stopPropagation();
-              onHover({
-                position: p,
-                title: station.station_id,
-                lines: ["MEDIDO · estación de campo de Cholqui", ...values],
-              });
-            }}
-            onPointerOut={() => onHover(null)}
-          >
-            <sphereGeometry args={[0.65, 10, 10]} />
-            <meshBasicMaterial color="#f472b6" />
-          </mesh>
-        );
-      })}
+      {showStations &&
+        projectedLines.map((points, index) => (
+          <Line
+            key={index}
+            points={points.map(position)}
+            color="#f472b6"
+            lineWidth={1.5}
+            transparent
+            opacity={stationOpacity}
+          />
+        ))}
+      {showStations &&
+        stations.map((station) => {
+          const point = projectTerrainPoint(tile, station.lng, station.lat);
+          if (!point) return null;
+          const p = position(point);
+          const values = [
+            station.mag_nt != null ? "TMI medida: " + station.mag_nt + " nT" : null,
+            station.ip_chargeability_mvv != null
+              ? "Cargabilidad: " + station.ip_chargeability_mvv + " mV/V"
+              : null,
+            station.ip_resistivity_ohmm != null
+              ? "Resistividad: " + station.ip_resistivity_ohmm + " Ω·m"
+              : null,
+          ].filter((value): value is string => value !== null);
+          return (
+            <mesh
+              key={station.id}
+              position={p}
+              onPointerOver={(event) => {
+                event.stopPropagation();
+                onHover({
+                  position: p,
+                  title: station.station_id,
+                  lines: ["MEDIDO · estación de campo de Cholqui", ...values],
+                });
+              }}
+              onPointerOut={() => onHover(null)}
+            >
+              <sphereGeometry args={[0.65, 10, 10]} />
+              <meshBasicMaterial color="#f472b6" transparent opacity={stationOpacity} />
+            </mesh>
+          );
+        })}
     </group>
   );
 }

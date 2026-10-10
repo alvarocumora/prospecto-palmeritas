@@ -34,13 +34,17 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
       eyebrow: "Economía preliminar",
       title: "Escenarios separados de la evidencia mineral",
       deck: true,
-      lead: "Las toneladas y leyes de estos escenarios son supuestos de sensibilidad; la disponibilidad de inventario y la aceptación comercial siguen pendientes.",
+      lead:
+        "Las toneladas y leyes de estos escenarios son supuestos de sensibilidad; la disponibilidad de inventario y la aceptación comercial siguen pendientes.",
       blocks: [
         {
           kind: "narrative",
-          body: "Se distinguen el plan entregado de " + num(CHOLQUI_BASE_CASE.tonnes) +
+          body:
+            "Se distinguen el plan entregado de " +
+            num(CHOLQUI_BASE_CASE.tonnes) +
             " t y las rampas escalables del modelo operativo. No se mezclan sus resultados. La tarifa corresponde a " +
-            CHOLQUI_ENAMI.circular + "; no se presenta como una cotización vigente ni liquidación efectiva.",
+            CHOLQUI_ENAMI.circular +
+            "; no se presenta como una cotización vigente ni liquidación efectiva.",
           provenance: "SCENARIO",
           source: "CHOLQUI_BASE_CASE / CHOLQUI_ENAMI / projectCashflow",
           confidence: "low",
@@ -63,8 +67,10 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
         {
           kind: "gap",
           title: "Retorno de inversión pendiente",
-          body: "El payback matemático de un escenario no acredita retorno invertible. No se publican VAN/TIR ni payback de decisión hasta validar inventario, metalurgia, aceptación ENAMI, distancia, flete, liquidación, impuestos, financiamiento y cierre.",
-          action: "Cerrar la matriz comercial y revisar un flujo financiero auditable antes de comprometer capital.",
+          body:
+            "El payback matemático de un escenario no acredita retorno invertible. No se publican VAN/TIR ni payback de decisión hasta validar inventario, metalurgia, aceptación ENAMI, distancia, flete, liquidación, impuestos, financiamiento y cierre.",
+          action:
+            "Cerrar la matriz comercial y revisar un flujo financiero auditable antes de comprometer capital.",
         },
       ],
     },
@@ -74,8 +80,10 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
       blocks: [
         {
           kind: "narrative",
-          body: "La ingeniería preliminar dimensiona unidades operativas y respaldo según capacidad efectiva. Considera contingencia de " +
-            CONTINGENCY_PCT + " %. La meseta de 20.000 t/mes requiere revisión de permisos y regulación; arriendos y productividad no son cotizaciones cerradas.",
+          body:
+            "La ingeniería preliminar dimensiona unidades operativas y respaldo según capacidad efectiva. Considera contingencia de " +
+            CONTINGENCY_PCT +
+            " %. La meseta de 20.000 t/mes requiere revisión de permisos y regulación; arriendos y productividad no son cotizaciones cerradas.",
           provenance: "SCENARIO",
           source: "GeoCapitals · minePlan.ts",
         },
@@ -96,22 +104,24 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
             ];
           }),
         },
-        ...plans.map((plan): Extract<DocSection["blocks"][number], { kind: "appendixTable" }> => ({
-          kind: "appendixTable",
-          title: "Flujo mensual de escenario · " + num(plan.params.plateau) + " t/mes",
-          head: ["Mes", "t/mes", "Ingresos CLP", "Costos CLP", "Margen CLP", "Caja CLP"],
-          widths: [0.08, 0.12, 0.2, 0.2, 0.2, 0.2],
-          provenance: "SCENARIO",
-          source: "projectCashflow · 24 meses / 1,5 % Cu soluble",
-          rows: plan.months.map((month) => [
-            String(month.month),
-            num(month.rate),
-            fmtClpM(month.revenueClp),
-            fmtClpM(month.costClp),
-            fmtClpM(month.marginClp),
-            fmtClpM(month.cumulativeCashflowClp),
-          ]),
-        })),
+        ...plans.map(
+          (plan): Extract<DocSection["blocks"][number], { kind: "appendixTable" }> => ({
+            kind: "appendixTable",
+            title: "Flujo mensual de escenario · " + num(plan.params.plateau) + " t/mes",
+            head: ["Mes", "t/mes", "Ingresos CLP", "Costos CLP", "Margen CLP", "Caja CLP"],
+            widths: [0.08, 0.12, 0.2, 0.2, 0.2, 0.2],
+            provenance: "SCENARIO",
+            source: "projectCashflow · 24 meses / 1,5 % Cu soluble",
+            rows: plan.months.map((month) => [
+              String(month.month),
+              num(month.rate),
+              fmtClpM(month.revenueClp),
+              fmtClpM(month.costClp),
+              fmtClpM(month.marginClp),
+              fmtClpM(month.cumulativeCashflowClp),
+            ]),
+          }),
+        ),
         {
           kind: "appendixTable",
           title: "Sensibilidad del modelo escalable",
@@ -143,12 +153,20 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
       blocks: [
         {
           kind: "narrative",
-          body: "Ronda " + fmtUsd(CHOLQUI_ROUND.roundSizeUsd) + " por " +
-            CHOLQUI_ROUND.equityOfferedPct + " %; ticket mínimo " +
-            fmtUsd(CHOLQUI_ROUND.minTicketUsd) + ". Instrumento: " +
-            CHOLQUI_ROUND.instrument + ". Valorización referencial " +
-            fmtUsd(CHOLQUI_ROUND.valuationLowUsd) + "–" +
-            fmtUsd(CHOLQUI_ROUND.valuationHighUsd) + ".",
+          body:
+            "Ronda " +
+            fmtUsd(CHOLQUI_ROUND.roundSizeUsd) +
+            " por " +
+            CHOLQUI_ROUND.equityOfferedPct +
+            " %; ticket mínimo " +
+            fmtUsd(CHOLQUI_ROUND.minTicketUsd) +
+            ". Instrumento: " +
+            CHOLQUI_ROUND.instrument +
+            ". Valorización referencial " +
+            fmtUsd(CHOLQUI_ROUND.valuationLowUsd) +
+            "–" +
+            fmtUsd(CHOLQUI_ROUND.valuationHighUsd) +
+            ".",
           provenance: "DECLARED",
           source: "CHOLQUI_ROUND · términos de conversación, no oferta pública",
         },
@@ -177,11 +195,17 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
         },
         {
           kind: "narrative",
-          body: "Avalúo documentado " + fmtClp(CHOLQUI_GUARANTEE_TOTALS.documentedClp) +
-            "; libre de embargo " + fmtClp(CHOLQUI_GUARANTEE_TOTALS.freeOfLiensClp) +
+          body:
+            "Avalúo documentado " +
+            fmtClp(CHOLQUI_GUARANTEE_TOTALS.documentedClp) +
+            "; libre de embargo " +
+            fmtClp(CHOLQUI_GUARANTEE_TOTALS.freeOfLiensClp) +
             ". No equivale a tasación comercial ni valor de realización. Contrato de áridos: " +
-            num(CHOLQUI_ARIDOS.minVolumeM3Month) + " m³/mes a " +
-            fmtClp(CHOLQUI_ARIDOS.priceClpM3) + "/m³ + IVA. " + CHOLQUI_ARIDOS.caveat,
+            num(CHOLQUI_ARIDOS.minVolumeM3Month) +
+            " m³/mes a " +
+            fmtClp(CHOLQUI_ARIDOS.priceClpM3) +
+            "/m³ + IVA. " +
+            CHOLQUI_ARIDOS.caveat,
           provenance: "DOCUMENTARY",
           source: "Antecedentes de garantías y contrato complementario del titular",
         },
@@ -193,7 +217,11 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
           provenance: "DOCUMENTARY",
           source: "CHOLQUI_FACTS",
           rows: CHOLQUI_FACTS.map((item) => [
-            item.section, item.label, item.value, item.provenance, item.source,
+            item.section,
+            item.label,
+            item.value,
+            item.provenance,
+            item.source,
           ]),
         },
       ],
