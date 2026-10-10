@@ -24,8 +24,9 @@ import {
 } from "@/features/franco/data/cholqui";
 import { getToki2ReportContext } from "@/lib/cholqui/toki2ReportContext";
 import type { ProjectDoc } from "../model";
+import { cholquiGeoscienceSections } from "./cholquiGeoscience";
 
-export const CHOLQUI_DOC_VERSION = "v4.0";
+export const CHOLQUI_DOC_VERSION = "v4.1";
 
 export function buildCholquiDoc(): ProjectDoc {
   const cuMax = Math.max(...CHOLQUI_ASSAYS.map((a) => a.cuTotalPct));
@@ -179,6 +180,7 @@ export function buildCholquiDoc(): ProjectDoc {
     ],
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
     sections: [
+      ...cholquiGeoscienceSections(),
       {
         eyebrow: "Geología",
         title: "Modelo geológico y mineralización",

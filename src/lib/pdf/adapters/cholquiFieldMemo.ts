@@ -13,8 +13,9 @@ import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.fun
 import { buildFieldProgram, type FieldProgram } from "@/lib/cholqui/fieldProgram";
 import { cholquiTenurePolygons, tenureAt } from "./cholquiTargets";
 import type { ProjectDoc } from "../model";
+import { cholquiGeoscienceSections } from "./cholquiGeoscience";
 
-export const CHOLQUI_FIELD_MEMO_VERSION = "v1.0";
+export const CHOLQUI_FIELD_MEMO_VERSION = "v1.1";
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
@@ -120,7 +121,7 @@ export function buildCholquiFieldMemoDoc(
           value: t.score ?? undefined,
         })),
         ...data.collars.map((c) => ({
-          label: c.code.replace("CHQ-DDH-", "DDH"),
+          label: c.code,
           lat: c.lat,
           lng: c.lng,
           highlight: true,
@@ -157,6 +158,7 @@ export function buildCholquiFieldMemoDoc(
     ],
     milestones: p.schedule.map((s) => ({ when: s.week, what: s.activity })),
     sections: [
+      ...cholquiGeoscienceSections(),
       {
         eyebrow: "Alcance",
         title: "Qué se valida y qué no",
@@ -168,7 +170,7 @@ export function buildCholquiFieldMemoDoc(
             items: [
               "Se verifica si cada anomalía espectral tiene expresión geológica real en superficie.",
               "Se mide contenido metálico mediante canaleta continua con protocolo QA/QC en laboratorio acreditado.",
-              "Se define la continuidad estructural en profundidad con magnetometría y polarización inducida.",
+              "Se contrasta la hipótesis de continuidad con magnetometría/IP e inversión condicionada por topografía, adquisición y geología.",
               "Se confirma, reubica o descarta cada collar propuesto antes de comprometer metros de sondaje.",
               "No se estiman tonelajes, leyes medias, recursos ni reservas en ninguna etapa de esta fase.",
             ],
@@ -203,7 +205,7 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body: "El puntaje es un realce relativo al fondo del area de interes. No es ley, no es concentracion y no ordena por valor economico: ordena por intensidad de la anomalia.",
+            body: "El score conserva el valor publicado; campañas e índices distintos no se comparan como ranking geológico o económico. La prioridad es una regla de planificación pendiente de revisión de terreno.",
           },
           {
             kind: "text",
@@ -283,7 +285,7 @@ export function buildCholquiFieldMemoDoc(
               ],
               ["Arreglo IP", p.geophysics.ipArray],
               ["Orientación", "Transversal al rumbo estructural dominante N20E"],
-              ["Producto", "Inversión 2D de cargabilidad y resistividad por línea"],
+              ["Producto propuesto", "Inversión IP 2D con topografía, electrodos y error de medida"],
             ],
           },
           {

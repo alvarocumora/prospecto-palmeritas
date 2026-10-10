@@ -27,6 +27,15 @@ jobs:
         id: dependencies
         run: npm ci
 
+      - name: Prepare formatting diagnostics
+        run: |
+          npx --no-install prettier --write src/lib/pdf/adapters/cholquiGeoscience.ts src/lib/pdf/adapters/cholqui.ts src/lib/pdf/adapters/cholquiTargets.ts src/lib/pdf/adapters/cholquiFieldMemo.ts src/features/franco/components/CholquiTargetsSummary.tsx src/lib/pdf/adapters/cholquiInvestment.ts src/features/franco/cholquiPdf.ts src/lib/pdf/templates/technicalBrief.ts src/lib/cholqui/geophysicsTerrain.ts src/components/map/geophysicsLayers.ts src/lib/geoscience/geophysicsSurface.ts src/features/franco/components/CholquiMasterViewer.tsx src/features/franco/components/CholquiGeophysicsTerrainLayer.tsx src/features/franco/components/CholquiTerrain3D.tsx src/lib/cholqui/geophysicsTerrain.test.ts src/lib/geoscience/geophysicsSurface.test.ts src/lib/pdf/adapters/cholquiReports.test.ts docs/cholqui-geoscience-data-and-reports-v2.md
+          node --input-type=module <<'NODE'
+          import { readFileSync } from 'node:fs';
+          for (const path of ["src/lib/pdf/adapters/cholquiGeoscience.ts","src/lib/pdf/adapters/cholqui.ts","src/lib/pdf/adapters/cholquiTargets.ts","src/lib/pdf/adapters/cholquiFieldMemo.ts","src/features/franco/components/CholquiTargetsSummary.tsx","src/lib/pdf/adapters/cholquiInvestment.ts","src/features/franco/cholquiPdf.ts","src/lib/pdf/templates/technicalBrief.ts","src/lib/cholqui/geophysicsTerrain.ts","src/components/map/geophysicsLayers.ts","src/lib/geoscience/geophysicsSurface.ts","src/features/franco/components/CholquiMasterViewer.tsx","src/features/franco/components/CholquiGeophysicsTerrainLayer.tsx","src/features/franco/components/CholquiTerrain3D.tsx","src/lib/cholqui/geophysicsTerrain.test.ts","src/lib/geoscience/geophysicsSurface.test.ts","src/lib/pdf/adapters/cholquiReports.test.ts","docs/cholqui-geoscience-data-and-reports-v2.md"]) {
+            console.log('FORMAT_FILE ' + JSON.stringify({path, base64: readFileSync(path).toString('base64')}));
+          }
+          NODE
       - name: Typecheck
         if: ${{ !cancelled() && steps.dependencies.outcome == 'success' }}
         run: npm run typecheck

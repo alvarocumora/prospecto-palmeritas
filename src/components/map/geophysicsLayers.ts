@@ -175,7 +175,7 @@ export function fitToGeophysics(
   if (pts.length) map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
 }
 
-function surfaceColor(surface: GeophysicsSurface, normalized: number, value: number): string {
+export function geophysicsSurfaceColor(surface: GeophysicsSurface, normalized: number, value: number): string {
   if (surface.metric === "mag_residual_nt") {
     const span = Math.max(Math.abs(surface.min), Math.abs(surface.max), 1);
     return magColor(value, span);
@@ -208,7 +208,7 @@ export function buildGeophysicsSurfaceLayer(L: LeafletNS, surface: GeophysicsSur
       ],
       {
         stroke: false,
-        fillColor: surfaceColor(surface, cell.normalized, cell.value),
+        fillColor: geophysicsSurfaceColor(surface, cell.normalized, cell.value),
         fillOpacity: 0.42,
         interactive: true,
       },
