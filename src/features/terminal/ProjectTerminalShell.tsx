@@ -155,7 +155,7 @@ export function ProjectTerminalShell({
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
             <Link
-              to="/proyectos"
+              to="/terminal"
               className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white"
             >
               Geocapitals · Terminal

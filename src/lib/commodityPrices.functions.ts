@@ -39,7 +39,8 @@ async function fetchOne(sym: string): Promise<{ price: number; updatedAt: string
     });
     if (!res.ok) return null;
     const j = (await res.json()) as { price?: number; updatedAt?: string; error?: string };
-    if (typeof j.price !== "number" || !Number.isFinite(j.price) || j.price <= 0 || j.error) return null;
+    if (typeof j.price !== "number" || !Number.isFinite(j.price) || j.price <= 0 || j.error)
+      return null;
     return { price: j.price, updatedAt: j.updatedAt ?? "" };
   } catch {
     return null;
@@ -48,7 +49,9 @@ async function fetchOne(sym: string): Promise<{ price: number; updatedAt: string
 
 async function fetchUsdClp(): Promise<number | null> {
   try {
-    const res = await fetch("https://open.er-api.com/v6/latest/USD", { signal: AbortSignal.timeout(8_000) });
+    const res = await fetch("https://open.er-api.com/v6/latest/USD", {
+      signal: AbortSignal.timeout(8_000),
+    });
     if (!res.ok) return null;
     const j = (await res.json()) as { rates?: Record<string, number> };
     const clp = j.rates?.CLP;

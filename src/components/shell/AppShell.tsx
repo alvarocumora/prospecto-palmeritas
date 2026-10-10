@@ -370,7 +370,7 @@ export function MarketingFooter() {
 
 export function TerminalTopBar({
   eyebrow = "Geocapitals Terminal",
-  subtitle = "Mining Investment Desk · CL",
+  subtitle = "Inversión y exploración · Chile",
   right,
 }: {
   eyebrow?: string;
@@ -380,7 +380,7 @@ export function TerminalTopBar({
   const { user } = useAuth();
   return (
     <div className="h-11 border-b border-hairline flex items-center px-4 gap-4 bg-surface/95 text-content backdrop-blur">
-      <Link to="/" className="inline-flex items-center gap-2">
+      <Link to="/terminal" className="inline-flex items-center gap-2">
         <BrandMark size={18} showText={false} />
         <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-accent-brand">
           {eyebrow}
@@ -398,14 +398,14 @@ export function TerminalTopBar({
             to="/dashboard"
             className="text-[11px] font-mono text-content-muted hover:text-content"
           >
-            Workspace →
+            Mi espacio →
           </Link>
         ) : (
           <Link
             to="/auth"
             className="text-[11px] font-mono px-2.5 py-1.5 rounded-brand-sm bg-accent-brand text-accent-brand-contrast hover:bg-im-cobalt-deep"
           >
-            Sign in
+            Ingresar
           </Link>
         ))}
     </div>

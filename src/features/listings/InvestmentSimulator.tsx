@@ -8,15 +8,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
 import { useServerFn } from "@tanstack/react-start";
-import { calculateInvestmentReturn, readSimulationSearch, simulationReturnPath } from "@/lib/investor/simulation";
+import {
+  calculateInvestmentReturn,
+  readSimulationSearch,
+  simulationReturnPath,
+} from "@/lib/investor/simulation";
 import { fmtUSD } from "@/modules/deals/domain/format";
 
 type Scenario = "conservative" | "base" | "optimistic";
 
-const SCENARIOS: Record<
-  Scenario,
-  { label: string; color: string }
-> = {
+const SCENARIOS: Record<Scenario, { label: string; color: string }> = {
   conservative: { label: "Conservador", color: "text-slate-600" },
   base: { label: "Base", color: "text-accent-brand" },
   optimistic: { label: "Optimista", color: "text-emerald-600" },
@@ -58,7 +59,12 @@ export function InvestmentSimulator({
   const maxTicket = Math.max(minTicket * 4, baseTicket);
 
   const search = useSearch({ strict: false }) as Record<string, unknown>;
-  const initial = readSimulationSearch(search, Math.max(minTicket, Math.round(baseTicket * 0.1)), minTicket, maxTicket);
+  const initial = readSimulationSearch(
+    search,
+    Math.max(minTicket, Math.round(baseTicket * 0.1)),
+    minTicket,
+    maxTicket,
+  );
   const [amount, setAmount] = useState(initial.amount);
   const [years, setYears] = useState(initial.years);
   const [scenario, setScenario] = useState<Scenario>(initial.scenario);
@@ -85,7 +91,8 @@ export function InvestmentSimulator({
   const handleSave = async () => {
     if (!user) {
       // Redirect to auth, preserving listing for return
-      window.location.href = "/auth?intent=investor&mode=signup&next=" + encodeURIComponent(returnPath);
+      window.location.href =
+        "/auth?intent=investor&mode=signup&next=" + encodeURIComponent(returnPath);
       return;
     }
     setSaving(true);
@@ -242,8 +249,10 @@ export function InvestmentSimulator({
           {commodity ?? "—"}
           {modality === "royalty" && royaltyPct ? `, royalty ${royaltyPct}% NSR` : ""}). No
           constituye una oferta, recomendación de inversión ni promesa de retorno. Los retornos
-          reales dependen de variables geológicas, regulatorias y de mercado, y pueden implicar pérdida de capital. La tasa supone un aporte inicial y un cobro final; no modela distribuciones ni dilución. Geocapitals actúa como
-          facilitador del deal, no como gestor de capital.
+          reales dependen de variables geológicas, regulatorias y de mercado, y pueden implicar
+          pérdida de capital. La tasa supone un aporte inicial y un cobro final; no modela
+          distribuciones ni dilución. Geocapitals actúa como facilitador del deal, no como gestor de
+          capital.
         </p>
       </div>
 

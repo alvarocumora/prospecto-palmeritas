@@ -191,15 +191,33 @@ async function assertRoomManager(sb: Admin, room: RoomContext, userId: string) {
 }
 
 async function readRoomAccess(sb: Admin, room: RoomContext, userId: string) {
-  const manager = room.ownerUserId === userId || isProjectPrivileged(await projectRole(sb, room.projectId, userId));
+  const manager =
+    room.ownerUserId === userId ||
+    isProjectPrivileged(await projectRole(sb, room.projectId, userId));
   if (manager) return { manager: true, ndaSigned: true, grants: [] as DataRoomGrant[] };
   if (!room.published) throw new Error("Este expediente no está publicado.");
   const [inquiry, grants] = await Promise.all([
-    sb.from("property_deal_inquiries").select("nda_signed_at").eq("listing_id", room.listingId).eq("inquirer_user_id", userId).maybeSingle(),
-    sb.from("data_room_access_grants").select("id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at").eq("data_room_id", room.roomId).eq("grantee_user_id", userId),
+    sb
+      .from("property_deal_inquiries")
+      .select("nda_signed_at")
+      .eq("listing_id", room.listingId)
+      .eq("inquirer_user_id", userId)
+      .maybeSingle(),
+    sb
+      .from("data_room_access_grants")
+      .select(
+        "id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at",
+      )
+      .eq("data_room_id", room.roomId)
+      .eq("grantee_user_id", userId),
   ]);
-  if (inquiry.error || grants.error) throw new Error("No se pudo verificar el permiso del expediente.");
-  return { manager: false, ndaSigned: !!inquiry.data?.nda_signed_at, grants: (grants.data ?? []) as DataRoomGrant[] };
+  if (inquiry.error || grants.error)
+    throw new Error("No se pudo verificar el permiso del expediente.");
+  return {
+    manager: false,
+    ndaSigned: !!inquiry.data?.nda_signed_at,
+    grants: (grants.data ?? []) as DataRoomGrant[],
+  };
 }
 
 async function logAccess(
@@ -343,13 +361,22 @@ export const listDataRoomFiles = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    const allowed = (rows ?? []).filter((file) => access.manager || roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned));
-    await logAccess(sb, { roomId: room.roomId, actorUserId: context.userId, action: "view", allowed: true });
+    const allowed = (rows ?? []).filter(
+      (file) =>
+        access.manager ||
+        roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned),
+    );
+    await logAccess(sb, {
+      roomId: room.roomId,
+      actorUserId: context.userId,
+      action: "view",
+      allowed: true,
+    });
     return allowed.map((r) => ({
       id: r.id as string,
       listing_id: data.listingId,
       file_name: r.file_name as string,
-      file_path: access.manager ? r.storage_path as string : "",
+      file_path: access.manager ? (r.storage_path as string) : "",
       file_size_bytes: r.size_bytes != null ? Number(r.size_bytes) : null,
       mime_type: (r.mime_type as string | null) ?? null,
       category: r.folder_id ? (byId.get(r.folder_id as string) ?? null) : null,
@@ -432,13 +459,24 @@ export const signNdaAndGrantAccess = createServerFn({ method: "POST" })
     const sb = await admin();
     const room = await resolveRoom(sb, data.listingId, false);
     if (!room.published) throw new Error("Esta oportunidad no está publicada.");
-    const { data: grantRows, error: grantError } = await sb.from("data_room_access_grants")
-      .select("id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at")
-      .eq("data_room_id", room.roomId).eq("grantee_user_id", context.userId);
+    const { data: grantRows, error: grantError } = await sb
+      .from("data_room_access_grants")
+      .select(
+        "id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at",
+      )
+      .eq("data_room_id", room.roomId)
+      .eq("grantee_user_id", context.userId);
     if (grantError) throw new Error("No se pudo verificar el acceso al expediente.");
     const existingGrants = (grantRows ?? []) as DataRoomGrant[];
-    if (existingGrants.length && !existingGrants.some((grant) => activeRoomGrant(grant, context.userId, room.roomId, Date.now()))) {
-      throw new Error("Tu permiso de acceso fue revocado o venció. Contacta al equipo para solicitar una revisión.");
+    if (
+      existingGrants.length &&
+      !existingGrants.some((grant) =>
+        activeRoomGrant(grant, context.userId, room.roomId, Date.now()),
+      )
+    ) {
+      throw new Error(
+        "Tu permiso de acceso fue revocado o venció. Contacta al equipo para solicitar una revisión.",
+      );
     }
     const now = new Date().toISOString();
 
@@ -510,8 +548,18 @@ export const getDataRoomDownloadUrl = createServerFn({ method: "POST" })
     if (!file || file.data_room_id !== room.roomId) throw new Error("Archivo no encontrado");
 
     const access = await readRoomAccess(sb, room, context.userId);
-    if (!access.manager && !roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned)) {
-      await logAccess(sb, { roomId: room.roomId, fileId: file.id, actorUserId: context.userId, action: "download", allowed: false, reason: "NDA o permiso vigente insuficiente" });
+    if (
+      !access.manager &&
+      !roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned)
+    ) {
+      await logAccess(sb, {
+        roomId: room.roomId,
+        fileId: file.id,
+        actorUserId: context.userId,
+        action: "download",
+        allowed: false,
+        reason: "NDA o permiso vigente insuficiente",
+      });
       throw new Error("Este documento requiere NDA y un permiso de acceso vigente.");
     }
 

@@ -29,7 +29,11 @@ export const Route = createFileRoute("/proyectos")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: () => <PublicRouteEntry path="/proyectos"><ProyectosPage /></PublicRouteEntry>,
+  component: () => (
+    <PublicRouteEntry path="/proyectos">
+      <ProyectosPage />
+    </PublicRouteEntry>
+  ),
 });
 
 // Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,

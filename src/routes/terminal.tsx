@@ -18,5 +18,9 @@ export const Route = createFileRoute("/terminal")({
       },
     ],
   }),
-  component: () => <PublicRouteEntry path="/terminal"><GlobalTerminalShell /></PublicRouteEntry>,
+  component: () => (
+    <PublicRouteEntry path="/terminal">
+      <GlobalTerminalShell />
+    </PublicRouteEntry>
+  ),
 });

@@ -11,7 +11,12 @@ const items = [
     icon: TrendingUp,
     hash: undefined as string | undefined,
   },
-  { label: "Portafolio", to: "/terminal", icon: Briefcase, hash: "portfolio" as string | undefined },
+  {
+    label: "Portafolio",
+    to: "/terminal",
+    icon: Briefcase,
+    hash: "portfolio" as string | undefined,
+  },
   {
     label: "Participaciones",
     to: "/terminal/tokenize",

@@ -80,7 +80,12 @@ function BusinessHome() {
     refetchInterval: 60_000,
   });
 
-  if (isInvestor) return <InvestorHome name={name}>{needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}</InvestorHome>;
+  if (isInvestor)
+    return (
+      <InvestorHome name={name}>
+        {needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
+      </InvestorHome>
+    );
 
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">

@@ -30,7 +30,8 @@ export const VERIFICATION_META: Record<
   pending: {
     label: "Evidencia por revisar",
     short: "En revisión",
-    description: "La procedencia y la revisión técnica deben comprobarse en las evidencias del activo. Esta etiqueta no acredita verificación por Qualified Person.",
+    description:
+      "La procedencia y la revisión técnica deben comprobarse en las evidencias del activo. Esta etiqueta no acredita verificación por Qualified Person.",
   },
   demo: {
     label: "Datos demo",

@@ -65,7 +65,9 @@ export function PublicDataRoomSection({
       }
     } catch (error) {
       setFiles([]);
-      toast.error(error instanceof Error ? error.message : "No se pudo verificar el acceso al expediente.");
+      toast.error(
+        error instanceof Error ? error.message : "No se pudo verificar el acceso al expediente.",
+      );
     } finally {
       setChecking(false);
     }
@@ -150,7 +152,8 @@ export function PublicDataRoomSection({
       ) : (
         <div className="mt-4">
           <div className="text-xs text-teal mb-3 inline-flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> NDA firmado · documentos según tu permiso vigente
+            <ShieldCheck className="w-3.5 h-3.5" /> NDA firmado · documentos según tu permiso
+            vigente
           </div>
           {filesLoading ? (
             <div className="text-xs text-content-subtle">
@@ -158,7 +161,8 @@ export function PublicDataRoomSection({
             </div>
           ) : files.length === 0 ? (
             <p className="text-sm text-content-subtle">
-              No hay documentos disponibles con tu permiso actual. Contacta al equipo para revisar el acceso o el estado del expediente.
+              No hay documentos disponibles con tu permiso actual. Contacta al equipo para revisar
+              el acceso o el estado del expediente.
             </p>
           ) : (
             <ul className="space-y-1.5">
