@@ -25,29 +25,12 @@ describe("Cholqui canonical public geo bundle", () => {
     expect(bundle.layers["territory.proposed_pedimentos"]).toBeDefined();
   });
 
-  it("publishes the IDW intensity surface reinterpolated from the same satellite anomalies", () => {
-    const bundle = buildCholquiPublicGeoBundle();
-    const ids = bundle.manifest.layers.map((layer) => layer.id);
-    expect(ids).toContain("remote_sensing.anomaly_intensity");
 
-    const intensity = bundle.layers["remote_sensing.anomaly_intensity"];
-    const discrete = bundle.layers["remote_sensing.sentinel2_alteration"];
-    expect(intensity?.features.length).toBeGreaterThan(0);
-    // Reinterpola las mismas anomalías: no es una fuente de datos distinta.
-    expect(discrete?.features.length).toBeGreaterThan(0);
-    for (const feature of intensity?.features ?? []) {
-      expect(typeof feature.properties.value).toBe("number");
-      expect(feature.properties.normalized as number).toBeGreaterThanOrEqual(0);
-      expect(feature.properties.normalized as number).toBeLessThanOrEqual(1);
-    }
-  });
-
-  it("renders the intensity surface before the discrete anomalies (so it stays underneath)", () => {
+  it("preserves all candidate footprints without interpolating incompatible background populations", () => {
     const bundle = buildCholquiPublicGeoBundle();
-    const ids = bundle.manifest.layers.map((layer) => layer.id);
-    const intensityIndex = ids.indexOf("remote_sensing.anomaly_intensity");
-    const discreteIndex = ids.indexOf("remote_sensing.sentinel2_alteration");
-    expect(intensityIndex).toBeGreaterThanOrEqual(0);
-    expect(intensityIndex).toBeLessThan(discreteIndex);
+    expect(bundle.layers["remote_sensing.sentinel2_alteration"]?.features).toHaveLength(57);
+    expect(bundle.layers["remote_sensing.anomaly_intensity"]).toBeUndefined();
+    expect(bundle.manifest.layers.some((layer) => layer.id === "remote_sensing.anomaly_intensity")).toBe(false);
+    expect(bundle.layers["drilling.proposed"]?.features).toHaveLength(7);
   });
 });

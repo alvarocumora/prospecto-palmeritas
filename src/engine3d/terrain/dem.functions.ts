@@ -9,6 +9,7 @@ import { createClient } from "@supabase/supabase-js";
 import { fromUrl } from "geotiff";
 import { z } from "zod";
 import type { Database } from "@/integrations/supabase/types";
+import { terrainGridCoordinate } from "@/lib/geospatial/terrainCoordinates";
 
 const InputSchema = z.object({
   projectId: z.string().uuid(),
@@ -53,68 +54,88 @@ export function copernicusTileUrl(lat: number, lng: number): string {
   return `https://copernicus-dem-30m.s3.amazonaws.com/${name}/${name}.tif`;
 }
 
-async function fetchCopernicusDem(
+/** Read every source tile touched by the requested grid; never stretch a cropped tile. */
+export async function fetchCopernicusDem(
   lat: number,
   lng: number,
   size: number,
   extentMeters: number,
 ): Promise<DemTile | null> {
   try {
-    const tiff = await fromUrl(copernicusTileUrl(lat, lng));
-    const image = await tiff.getImage();
-    const [west, south, east, north] = image.getBoundingBox();
-    const imgW = image.getWidth();
-    const imgH = image.getHeight();
-
-    // bbox del parche solicitado en grados
-    const halfLat = extentMeters / 2 / 111_320;
-    const halfLng = extentMeters / 2 / (111_320 * Math.cos((lat * Math.PI) / 180));
-
-    const px = (x: number) => ((x - west) / (east - west)) * imgW;
-    const py = (y: number) => ((north - y) / (north - south)) * imgH;
-
-    // Ventana clampeada al tile (si el parche cruza el borde de 1°, se recorta)
-    const x0 = Math.max(0, Math.floor(px(lng - halfLng)));
-    const x1 = Math.min(imgW, Math.ceil(px(lng + halfLng)));
-    const y0 = Math.max(0, Math.floor(py(lat + halfLat)));
-    const y1 = Math.min(imgH, Math.ceil(py(lat - halfLat)));
-    if (x1 - x0 < 8 || y1 - y0 < 8) return null;
-
-    const rasters = await image.readRasters({
-      window: [x0, y0, x1, y1],
-      width: size,
-      height: size,
-      resampleMethod: "bilinear",
-      samples: [0],
-      fillValue: 0,
-    });
-    const band = rasters[0];
-    if (typeof band === "number" || band.length !== size * size) return null;
-
-    // Alturas relativas al centro del parche
-    const centerH = Number(band[Math.floor(size / 2) * size + Math.floor(size / 2)]) || 0;
-    const heights: number[] = new Array(size * size);
-    let minH = Infinity,
-      maxH = -Infinity;
-    for (let i = 0; i < size * size; i++) {
-      const h = (Number(band[i]) || 0) - centerH;
-      heights[i] = h;
-      if (h < minH) minH = h;
-      if (h > maxH) maxH = h;
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) >= 85) return null;
+    type Patch = { lat: number; lng: number; minI: number; maxI: number; minJ: number; maxJ: number };
+    const patches = new Map<string, Patch>();
+    for (let j = 0; j < size; j++) {
+      for (let i = 0; i < size; i++) {
+        const [x, y] = terrainGridCoordinate(lat, lng, size, extentMeters, i, j);
+        if (Math.abs(x) > 180 || Math.abs(y) >= 90) return null;
+        const tileLng = Math.floor(x), tileLat = Math.floor(y);
+        const key = `${tileLat}:${tileLng}`;
+        const patch = patches.get(key);
+        if (patch) {
+          patch.minI = Math.min(patch.minI, i); patch.maxI = Math.max(patch.maxI, i);
+          patch.minJ = Math.min(patch.minJ, j); patch.maxJ = Math.max(patch.maxJ, j);
+        } else {
+          patches.set(key, { lat: tileLat, lng: tileLng, minI: i, maxI: i, minJ: j, maxJ: j });
+        }
+      }
     }
-    // Sanity check: un DEM real en zona cordillerana no debería ser plano perfecto
-    if (!Number.isFinite(minH) || !Number.isFinite(maxH)) return null;
-
+    if (patches.size > 9) return null;
+    const absolute = new Float64Array(size * size).fill(NaN);
+    // Sequential source reads bound memory when a grid crosses multiple tiles.
+    for (const patch of patches.values()) {
+      const tiff = await fromUrl(copernicusTileUrl(patch.lat + 0.5, patch.lng + 0.5));
+      const image = await tiff.getImage();
+      const keys = image.getGeoKeys();
+      if (Number(keys.GeographicTypeGeoKey) !== 4326) return null;
+      const [ox, oy] = image.getOrigin();
+      const [rx, ry] = image.getResolution();
+      if (!(rx > 0 && ry < 0)) return null;
+      const pixelOffset = Number(keys.GTRasterTypeGeoKey) === 2 ? 0 : 0.5;
+      const [west, north] = terrainGridCoordinate(lat, lng, size, extentMeters, patch.minI, patch.minJ);
+      const [east, south] = terrainGridCoordinate(lat, lng, size, extentMeters, patch.maxI, patch.maxJ);
+      const pixelX = (x: number) => (x - ox) / rx - pixelOffset;
+      const pixelY = (y: number) => (y - oy) / ry - pixelOffset;
+      const x0 = Math.max(0, Math.floor(pixelX(west)));
+      const y0 = Math.max(0, Math.floor(pixelY(north)));
+      const x1 = Math.min(image.getWidth(), Math.floor(pixelX(east)) + 2);
+      const y1 = Math.min(image.getHeight(), Math.floor(pixelY(south)) + 2);
+      const width = x1 - x0, height = y1 - y0;
+      if (width < 1 || height < 1 || width * height > 4_000_000) return null;
+      const rasters = await image.readRasters({ window: [x0, y0, x1, y1], samples: [0] });
+      const band = rasters[0];
+      if (typeof band === "number" || band.length !== width * height) return null;
+      const nodata = image.getGDALNoData();
+      for (let j = patch.minJ; j <= patch.maxJ; j++) {
+        for (let i = patch.minI; i <= patch.maxI; i++) {
+          const [x, y] = terrainGridCoordinate(lat, lng, size, extentMeters, i, j);
+          const px = Math.max(0, Math.min(image.getWidth() - 1, pixelX(x))) - x0;
+          const py = Math.max(0, Math.min(image.getHeight() - 1, pixelY(y))) - y0;
+          const a = Math.floor(px), b = Math.floor(py);
+          const c = Math.min(width - 1, a + 1), d = Math.min(height - 1, b + 1);
+          const values = [
+            Number(band[b * width + a]), Number(band[b * width + c]),
+            Number(band[d * width + a]), Number(band[d * width + c]),
+          ];
+          if (!values.every((v) => Number.isFinite(v) && (nodata == null || v !== nodata))) return null;
+          const fx = px - a, fy = py - b;
+          absolute[j * size + i] =
+            (values[0] * (1 - fx) + values[1] * fx) * (1 - fy) +
+            (values[2] * (1 - fx) + values[3] * fx) * fy;
+        }
+      }
+    }
+    const centerH = absolute[Math.floor(size / 2) * size + Math.floor(size / 2)];
+    if (!Number.isFinite(centerH)) return null;
+    const heights = Array.from(absolute, (h) => h - centerH);
+    let minH = Infinity, maxH = -Infinity;
+    for (const h of heights) {
+      if (!Number.isFinite(h)) return null;
+      minH = Math.min(minH, h); maxH = Math.max(maxH, h);
+    }
     return {
-      heights,
-      size,
-      extentMeters,
-      minH,
-      maxH,
-      centerLat: lat,
-      centerLng: lng,
-      centerElevationM: centerH,
-      source: "copernicus",
+      heights, size, extentMeters, minH, maxH, centerLat: lat, centerLng: lng,
+      centerElevationM: centerH, source: "copernicus",
     };
   } catch {
     return null;
@@ -242,6 +263,6 @@ export const getDemTile = createServerFn({ method: "POST" })
       tile = syntheticDem(data.projectId, size, extent, center);
     }
 
-    demCache.set(cacheKey, tile);
+    if (tile.source === "copernicus") demCache.set(cacheKey, tile);
     return tile;
   });

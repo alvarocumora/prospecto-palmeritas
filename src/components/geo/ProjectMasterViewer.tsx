@@ -25,6 +25,9 @@ import { buildAnomalySurface, anomalyIntensityColor } from "@/lib/geoscience/ano
 import type { GeophysicsData } from "@/types/geophysics";
 import { EvidenceBadge, type Evidence } from "@/components/ui-system";
 import { resolveGeoLayer } from "@/lib/geospatial/layerRegistry";
+import { useGeoLayerPreferences } from "@/hooks/useGeoLayerPreferences";
+import { applyLayerOpacity } from "@/lib/geospatial/leafletOpacity";
+import { proposedTraceEnd, TERRAIN_METERS_PER_DEGREE } from "@/lib/geospatial/terrainCoordinates";
 
 /**
  * Visor geoespacial maestro, genérico por proyecto. Reemplaza los mapas apilados
@@ -49,6 +52,10 @@ export type AssayPoint = {
   cuSolublePct?: number;
   auGpt?: number;
   agPpm?: number;
+  certified?: boolean;
+  lab?: string;
+  reportId?: string;
+  reportDate?: string;
 };
 
 export type MasterViewerProps = {
@@ -71,6 +78,10 @@ export type MasterViewerProps = {
   pedimentosPendientes?: FeatureCollection | null; // pedimentos del titular no publicados aún en catastro oficial
   mojones?: FeatureCollection | null; // hitos de mensura (HM) reportados por el titular
   height?: number;
+  enableLayerTools?: boolean;
+  anomalyIntensityDisabledReason?: string;
+  spectralFootprintsOnly?: boolean;
+  coordinateNotice?: string;
 };
 
 const ALTERATION_COLOR: Record<string, string> = {
@@ -133,7 +144,7 @@ const LAYER_SECTIONS: ReadonlyArray<{
     note: "Derivado de sensores remotos; requiere validación en terreno.",
     layers: [
       ["halos", "Halos espectrales · Sentinel-2"],
-      ["halosIntensidad", "Mapa de intensidad · IDW (tipo kriging)"],
+      ["halosIntensidad", "Mapa de intensidad · IDW"],
     ],
   },
   {
@@ -187,8 +198,9 @@ const ANOMALY_GRADIENT_STOPS: ReadonlyArray<[number, string]> = [
   [1, anomalyIntensityColor(1)],
 ];
 
-type ProvKind = "certificado" | "derivado" | "conceptual" | "contexto";
+type ProvKind = "certificado" | "declarado" | "derivado" | "conceptual" | "contexto";
 const PROV: Record<ProvKind, { label: string; bg: string }> = {
+  declarado: { label: "OBSERVACIÓN DOCUMENTAL", bg: "#64748b" },
   certificado: { label: "CERTIFICADO", bg: "#15803d" },
   derivado: { label: "DERIVADO", bg: "#0369a1" },
   conceptual: { label: "PROPUESTO / CONCEPTUAL", bg: "#a16207" },
@@ -249,19 +261,25 @@ export function ProjectMasterViewer({
   pedimentosPendientes = null,
   mojones = null,
   height = 620,
+  enableLayerTools = false,
+  anomalyIntensityDisabledReason,
+  spectralFootprintsOnly = false,
+  coordinateNotice,
 }: MasterViewerProps) {
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const groups = useRef<Partial<Record<LayerKey, Layer>>>({});
   const basesRef = useRef<{ sat?: TileLayer; topo?: TileLayer }>({});
   const [ready, setReady] = useState(false);
-  const [visible, setVisible] = useState<Record<LayerKey, boolean>>({
+  const { visible, setVisible, opacity, setOpacity } = useGeoLayerPreferences<LayerKey>(
+    enableLayerTools ? reportMapId ?? projectName : null, {
+
     tenencia: true,
     pedimentosPendientes: true,
     mojones: false,
     halos: true,
     halosIntensidad: false,
-    magneticaRegional: true,
+    magneticaRegional: !enableLayerTools,
     gravedadRegional: false,
     geofisicaProyecto: true,
     magSurfaceProject: true,
@@ -276,6 +294,7 @@ export function ProjectMasterViewer({
     ensayes: true,
     pedimentos: true,
   });
+  const [layerSearch, setLayerSearch] = useState("");
   const [base, setBase] = useState<"sat" | "topo">("sat");
   const [selected, setSelected] = useState<Selected>(null);
   const [collapsed, setCollapsed] = useState(false);
@@ -313,6 +332,8 @@ export function ProjectMasterViewer({
   // Construcción imperativa del mapa (client-only; leaflet toca window).
   useEffect(() => {
     let disposed = false;
+    setReady(false);
+    groups.current = {};
     void (async () => {
       const L = (await import("leaflet")).default;
       if (disposed || !mapEl.current || mapRef.current) return;
@@ -447,7 +468,7 @@ export function ProjectMasterViewer({
           };
           walk((f.geometry as { coordinates?: unknown })?.coordinates);
 
-          if (coords.length) {
+          if (coords.length && !spectralFootprintsOnly) {
             const lngs = coords.map((c) => c[0]);
             const lats = coords.map((c) => c[1]);
             const cLng = (Math.min(...lngs) + Math.max(...lngs)) / 2;
@@ -498,7 +519,7 @@ export function ProjectMasterViewer({
       // de polígonos discretos por firma, interpola el z-score sobre una grilla
       // continua — mismo lenguaje visual que un mapa de kriging (azul→magenta).
       // Es visualización derivada, no reemplaza el detalle por firma de "halos".
-      if (anomalies?.features?.length) {
+      if (!anomalyIntensityDisabledReason && anomalies?.features?.length) {
         const points: Array<{ lat: number; lng: number; value: number }> = [];
         for (const f of anomalies.features) {
           const p = (f.properties ?? {}) as Record<string, unknown>;
@@ -547,17 +568,13 @@ export function ProjectMasterViewer({
           }).on("click", () => sel("sondajes", p));
           items.push(m);
           const az = Number(p.azimuth_deg ?? 0);
-          const d = 0.004;
           const a = (az * Math.PI) / 180;
-          items.push(
-            L.polyline(
-              [
-                [lat, lng],
-                [lat + d * Math.cos(a), lng + d * Math.sin(a)],
-              ],
-              { color: "#1f6feb", weight: 2 },
-            ),
-          );
+          const planned = enableLayerTools
+            ? proposedTraceEnd([0, 0, 0], az, Number(p.dip_deg), Number(p.depth_m)) : null;
+          if (enableLayerTools && !planned) continue;
+          const endLat = planned ? lat - planned[2] / TERRAIN_METERS_PER_DEGREE : lat + 0.004 * Math.cos(a);
+          const endLng = planned ? lng + planned[0] / (TERRAIN_METERS_PER_DEGREE * Math.cos(lat * Math.PI / 180)) : lng + 0.004 * Math.sin(a);
+          items.push(L.polyline([[lat, lng], [endLat, endLng]], { color: "#1f6feb", weight: 2 }));
         }
         groups.current.sondajes = L.layerGroup(items).addTo(map);
       }
@@ -571,7 +588,7 @@ export function ProjectMasterViewer({
               radius: 6,
               color: "#052e16",
               weight: 1,
-              fillColor: "#22c55e",
+              fillColor: a.certified === false ? "#64748b" : "#22c55e",
               fillOpacity: 1,
             }).on("click", () => sel("ensayes", a as unknown as Record<string, unknown>)),
           );
@@ -753,6 +770,32 @@ export function ProjectMasterViewer({
     });
   }, [visible, ready]);
 
+  useEffect(() => {
+    if (!ready) return;
+    for (const key of Object.keys(opacity) as LayerKey[]) {
+      const layer = groups.current[key];
+      if (layer) applyLayerOpacity(layer, opacity[key] ?? 1);
+    }
+  }, [opacity, ready]);
+
+  const fitToLayer = (key: LayerKey) => {
+    const map = mapRef.current, L = leafletRef.current, layer = groups.current[key];
+    if (!map || !L || !layer) return;
+    const bounds = L.latLngBounds([]);
+    const collect = (item: Layer) => {
+      const geo = item as Layer & {
+        getBounds?: () => import("leaflet").LatLngBounds;
+        getLatLng?: () => import("leaflet").LatLng;
+        eachLayer?: (visit: (child: Layer) => void) => void;
+      };
+      if (geo.getBounds) { const child = geo.getBounds(); if (child.isValid()) bounds.extend(child); }
+      else if (geo.getLatLng) bounds.extend(geo.getLatLng());
+      else geo.eachLayer?.(collect);
+    };
+    collect(layer);
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+  };
+
   // Switch de capa base
   useEffect(() => {
     const map = mapRef.current;
@@ -806,7 +849,8 @@ export function ProjectMasterViewer({
       mojones: mojones?.features?.length ?? 0,
       halos: anomalies?.features?.length ?? 0,
       halosIntensidad:
-        (anomalies?.features?.length ?? 0) >= 4 ? (anomalies?.features.length ?? 0) : 0,
+        !anomalyIntensityDisabledReason && (anomalies?.features?.length ?? 0) >= 4
+          ? (anomalies?.features.length ?? 0) : 0,
       sondajes: drillGrid?.features?.length ?? 0,
       ensayes: assays.length,
       pedimentos: pedimentos?.features?.length ?? 0,
@@ -836,6 +880,7 @@ export function ProjectMasterViewer({
       estructuras,
       pedimentosPendientes,
       mojones,
+      anomalyIntensityDisabledReason,
     ],
   );
   // Capas cuyo conteo representa nº de features (se muestra "· N"); el resto es contexto.
@@ -858,9 +903,10 @@ export function ProjectMasterViewer({
     () =>
       LAYER_SECTIONS.map((s) => ({
         ...s,
-        layers: s.layers.filter(([k]) => counts[k] > 0),
+        layers: s.layers.filter(([k, label]) => counts[k] > 0 &&
+          (label + " " + s.title).toLocaleLowerCase("es").includes(layerSearch.toLocaleLowerCase("es"))),
       })).filter((s) => s.layers.length > 0),
-    [counts],
+    [counts, layerSearch],
   );
 
   return (
@@ -893,6 +939,13 @@ export function ProjectMasterViewer({
           </div>
         )}
       </div>
+
+      {(anomalyIntensityDisabledReason || coordinateNotice) && (
+        <div className="space-y-1 border-b border-hairline px-4 py-2 text-[11px] text-content-subtle">
+          {anomalyIntensityDisabledReason && <p>{anomalyIntensityDisabledReason}</p>}
+          {coordinateNotice && <p>{coordinateNotice}</p>}
+        </div>
+      )}
 
       <div className="relative flex" style={{ height }}>
         {/* Mapa */}
@@ -945,6 +998,11 @@ export function ProjectMasterViewer({
           </button>
           {!collapsed && (
             <div className="min-h-0 flex-1 overflow-auto px-2 pb-2">
+              {enableLayerTools && (
+                <input type="search" value={layerSearch} onChange={(e) => setLayerSearch(e.target.value)}
+                  aria-label="Buscar capas" placeholder="Buscar capas"
+                  className="mb-2 w-full rounded border border-hairline bg-surface px-2 py-1.5 text-[11px]" />
+              )}
               {visibleSections.map((section, index) => {
                 const open = openSections[section.title] ?? false;
                 const Icon = section.icon;
@@ -986,8 +1044,8 @@ export function ProjectMasterViewer({
                           </div>
                         )}
                         {section.layers.map(([k, label]) => (
+                          <div key={k} className="mb-1">
                           <label
-                            key={k}
                             className="flex cursor-pointer items-start gap-2 rounded px-1 py-0.5 hover:bg-surface-2"
                           >
                             <input
@@ -1000,7 +1058,7 @@ export function ProjectMasterViewer({
                             />
                             <span className="min-w-0 flex-1 text-content-muted">
                               <span className="flex items-center gap-1">
-                                <span className="truncate">{label}</span>
+                                <span className="truncate">{k === "halos" && spectralFootprintsOnly ? "Huellas espectrales · Sentinel-2" : k === "ensayes" && assays.some((a) => a.certified === false) ? "Ensayes y observaciones" : label}</span>
                                 {COUNTED.includes(k) && (
                                   <span className="shrink-0 text-content-subtle">
                                     · {counts[k]}
@@ -1008,13 +1066,26 @@ export function ProjectMasterViewer({
                                 )}
                               </span>
                               <EvidenceBadge
-                                kind={LAYER_META[k].evidence}
+                                kind={k === "ensayes" && assays.some((a) => a.certified === false) ? "DECLARADO" : LAYER_META[k].evidence}
                                 scale={LAYER_META[k].scale}
                                 size="xs"
                                 className="mt-0.5"
                               />
                             </span>
                           </label>
+                          {enableLayerTools && (
+                            <div className="ml-6 flex items-center gap-2 pb-1">
+                              <input type="range" min={0} max={1} step={0.05}
+                                value={opacity[k] ?? 1} disabled={!visible[k]}
+                                aria-label={`Opacidad de ${label}`}
+                                onChange={(e) => setOpacity((state) => ({ ...state, [k]: Number(e.target.value) }))}
+                                className="min-w-0 flex-1 accent-gold" />
+                              <span className="w-7 text-right text-[9px] tabular-nums">{Math.round((opacity[k] ?? 1) * 100)}%</span>
+                              <button type="button" onClick={() => fitToLayer(k)} aria-label={`Encuadrar ${label}`}
+                                className="rounded p-1 hover:bg-surface-2"><Maximize className="h-3 w-3" /></button>
+                            </div>
+                          )}
+                          </div>
                         ))}
                       </div>
                     )}
@@ -1114,13 +1185,16 @@ function Inspector({
   let rows: Array<[string, unknown]> = [];
 
   if (selected.kind === "ensayes") {
-    title = `Ensaye ${p.code ?? ""}`;
-    prov = "certificado";
+    title = `${p.certified === false ? "Observación" : "Ensaye"} ${p.code ?? ""}`;
+    prov = p.certified === false ? "declarado" : "certificado";
     rows = [
       ["CuT (%)", num(p.cuTotalPct)],
       ["CuS (%)", num(p.cuSolublePct)],
       ["Au (g/t)", num(p.auGpt)],
       ["Ag (ppm)", num(p.agPpm, 1)],
+      ["Laboratorio", p.lab],
+      ["Informe", p.reportId],
+      ["Fecha del informe", p.reportDate],
       ["Lat, Lng", `${num(p.lat, 5)}, ${num(p.lng, 5)}`],
     ];
   } else if (selected.kind === "halos") {
@@ -1132,6 +1206,8 @@ function Inspector({
       ["z-score", num(p.z_score)],
       ["score", num(p.score)],
       ["Dentro de concesión", p.dentro_concesion ? "Sí" : "No"],
+      ["Procedencia", p.procedencia],
+      ["Método / antecedentes", p.notes],
     ];
   } else if (selected.kind === "sondajes") {
     title = `Sondaje ${p.code ?? ""}`;
