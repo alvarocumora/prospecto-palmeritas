@@ -161,7 +161,7 @@ function ListingDetailPage() {
               <Metric icon={<Target />} label="Targets exploración" value={l.metrics.targets} />
               <Metric
                 icon={<FileSignature />}
-                label="Reportes NI 43-101"
+                label="Reportes técnicos"
                 value={l.metrics.ni43101Reports}
               />
               <Metric icon={<Users />} label="Interesados" value={l.inquiriesCount} />
@@ -197,8 +197,13 @@ function ListingDetailPage() {
             </section>
           )}
 
-          {/* Data room real — con flujo NDA + descargas para inversionistas verificados */}
-          <PublicDataRoomSection listingId={l.id} listingTitle={l.title} aggregate={l.dataRoom} />
+          {/* Data room privado — NDA y permisos vigentes por recurso */}
+          <PublicDataRoomSection
+            key={l.id}
+            listingId={l.id}
+            listingTitle={l.title}
+            aggregate={l.dataRoom}
+          />
 
           {/* Data disponible */}
           {l.data_available && l.data_available.length > 0 && (
@@ -254,6 +259,7 @@ function ListingDetailPage() {
           </section>
 
           <InvestmentSimulator
+            key={l.id}
             listingId={l.id}
             listingTitle={l.title}
             askingPriceUSD={l.asking_price_usd}

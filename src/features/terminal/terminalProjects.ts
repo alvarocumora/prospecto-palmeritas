@@ -13,7 +13,7 @@ export const TERMINAL_TABS: Array<{ key: TerminalTabKey; label: string; short: s
   { key: "mapa", label: "Mapa & Exploración", short: "Mapa" },
   { key: "tesis", label: "Tesis & Ensayes", short: "Tesis" },
   { key: "simulador", label: "Simulador & Modelo", short: "Simulador" },
-  { key: "dataroom", label: "Data Room & Compliance", short: "Data room" },
+  { key: "dataroom", label: "Documentos & Data Room", short: "Data room" },
 ];
 
 export function isTerminalTab(value: unknown): value is TerminalTabKey {
@@ -26,6 +26,7 @@ export type TerminalProject = {
   name: string;
   ficha: ProjectFicha;
   livePath: string;
+  projectId?: string;
 };
 
 export function getTerminalProject(slug: string): TerminalProject | null {
@@ -40,6 +41,7 @@ export function getTerminalProject(slug: string): TerminalProject | null {
     name: ficha.name,
     ficha,
     livePath: record.livePath,
+    projectId: record.projectId,
   };
 }
 

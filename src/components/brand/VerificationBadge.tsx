@@ -3,12 +3,14 @@ import { FlaskConical, FileSearch, ShieldCheck } from "lucide-react";
 import { VERIFICATION_META, type VerificationLevel } from "@/lib/verification";
 
 const STYLES: Record<VerificationLevel, string> = {
+  pending: "text-slate-600 border-slate-400/40 bg-slate-100",
   demo: "text-amber-700 border-amber-500/40 bg-amber-500/10",
   traceable: "text-accent-brand border-accent-brand/40 bg-accent-brand-subtle/60",
   qp_verified: "text-emerald-700 border-emerald-500/40 bg-emerald-500/10",
 };
 
 const ICONS: Record<VerificationLevel, typeof FlaskConical> = {
+  pending: FileSearch,
   demo: FlaskConical,
   traceable: FileSearch,
   qp_verified: ShieldCheck,

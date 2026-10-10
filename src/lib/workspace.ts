@@ -208,7 +208,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
       { label: "Mi portafolio", to: "/dashboard/investments" },
       { label: "Expediente", to: "/dashboard/expediente", hideForInvestor: true },
       { label: "Vender proyecto", to: "/dashboard/listings", hideForInvestor: true },
-      { label: "Ofertas", to: "/dashboard/offerings", hideForInvestor: true },
+      { label: "Ofertas y participaciones", to: "/dashboard/offerings" },
     ],
   },
   {

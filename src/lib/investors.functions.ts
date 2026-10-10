@@ -254,7 +254,9 @@ export const getMyInvestmentHistory = createServerFn({ method: "GET" })
     const totalPaidUsd = settlements
       .filter((s) => s.status === "paid" || s.status === "received")
       .reduce((acc, s) => acc + Number(s.amount_usd ?? 0), 0);
-    const totalCommittedUsd = settlements.reduce((acc, s) => acc + Number(s.amount_usd ?? 0), 0);
+    const totalCommittedUsd = settlements
+      .filter((s) => ["pending", "invoiced", "paid", "received"].includes(s.status))
+      .reduce((acc, s) => acc + Number(s.amount_usd ?? 0), 0);
 
     return {
       profile: profileRes.data,

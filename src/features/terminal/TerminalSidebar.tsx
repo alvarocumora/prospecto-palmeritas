@@ -4,22 +4,27 @@ import { Logo } from "@/components/Logo";
 import { cn } from "@/lib/utils";
 
 const items = [
-  { label: "Overview", to: "/terminal", icon: Map, hash: undefined as string | undefined },
+  { label: "Proyectos", to: "/terminal", icon: Map, hash: undefined as string | undefined },
   {
-    label: "Market",
+    label: "Mercado",
     to: "/terminal/market",
     icon: TrendingUp,
     hash: undefined as string | undefined,
   },
-  { label: "Portfolio", to: "/terminal", icon: Briefcase, hash: "portfolio" as string | undefined },
   {
-    label: "Tokenize",
+    label: "Portafolio",
+    to: "/terminal",
+    icon: Briefcase,
+    hash: "portfolio" as string | undefined,
+  },
+  {
+    label: "Participaciones",
     to: "/terminal/tokenize",
     icon: Coins,
     hash: undefined as string | undefined,
   },
   {
-    label: "Capital Raise",
+    label: "Capital",
     to: "/terminal/capital-raise",
     icon: HandCoins,
     hash: undefined as string | undefined,
@@ -31,7 +36,7 @@ export function TerminalSidebar() {
   return (
     <aside className="hidden md:flex w-14 lg:w-48 shrink-0 border-r border-border bg-card/30 flex-col">
       <div className="h-10 flex items-center px-3 border-b border-border">
-        <Link to="/terminal" className="block">
+        <Link to="/terminal" aria-label="Inicio del terminal" className="block">
           <Logo size={18} textClassName="text-[11px] hidden lg:inline" />
         </Link>
       </div>
@@ -42,6 +47,9 @@ export function TerminalSidebar() {
           return (
             <Link
               key={it.label}
+              title={it.label}
+              aria-label={it.label}
+              aria-current={active ? "page" : undefined}
               to={it.to}
               hash={it.hash}
               className={cn(

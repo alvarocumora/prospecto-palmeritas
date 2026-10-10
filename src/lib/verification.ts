@@ -9,7 +9,7 @@
 //                    (NI 43-101 / JORC). Reservado: se puebla cuando exista el
 //                    convenio con QP firmante (Fase 1 del roadmap).
 
-export type VerificationLevel = "demo" | "traceable" | "qp_verified";
+export type VerificationLevel = "pending" | "demo" | "traceable" | "qp_verified";
 
 /** Proyectos de muestra: se etiquetan "demo" en toda la superficie pública. */
 export const DEMO_PROJECT_IDS: readonly string[] = [];
@@ -20,13 +20,19 @@ export const QP_VERIFIED_PROJECT_IDS: readonly string[] = [];
 export function projectVerification(projectId: string | null | undefined): VerificationLevel {
   if (projectId && QP_VERIFIED_PROJECT_IDS.includes(projectId)) return "qp_verified";
   if (projectId && DEMO_PROJECT_IDS.includes(projectId)) return "demo";
-  return "traceable";
+  return "pending";
 }
 
 export const VERIFICATION_META: Record<
   VerificationLevel,
   { label: string; short: string; description: string }
 > = {
+  pending: {
+    label: "Evidencia por revisar",
+    short: "En revisión",
+    description:
+      "La procedencia y la revisión técnica deben comprobarse en las evidencias del activo. Esta etiqueta no acredita verificación por Qualified Person.",
+  },
   demo: {
     label: "Datos demo",
     short: "Demo",

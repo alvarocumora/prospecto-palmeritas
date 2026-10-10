@@ -1,37 +1,63 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowRight, Files, PieChart, ShieldCheck } from "lucide-react";
+import { TerminalSectionFrame } from "@/features/terminal/TerminalSectionFrame";
 
 export const Route = createFileRoute("/terminal/tokenize")({
-  head: () => ({ meta: [{ title: "Tokenize · Geocapitals Terminal" }] }),
-  component: () => (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <div className="h-10 border-b border-border flex items-center px-3 gap-3 bg-card/40">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-3 h-3" /> Terminal
-        </Link>
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">Tokenize</span>
+  head: () => ({ meta: [{ title: "Participaciones · Geocapitals" }] }),
+  component: ParticipationsPage,
+});
+
+function ParticipationsPage() {
+  return (
+    <TerminalSectionFrame
+      eyebrow="Capital & participaciones"
+      title="Oportunidades y participaciones"
+      description="Consulta instrumentos disponibles y sigue tus suscripciones desde el espacio privado de inversión."
+    >
+      <div className="grid md:grid-cols-3 gap-4">
+        {[
+          {
+            icon: Files,
+            title: "Términos por oportunidad",
+            text: "Instrumento, unidades, precio y condiciones antes de comprometer capital.",
+          },
+          {
+            icon: PieChart,
+            title: "Mis participaciones",
+            text: "Distingue suscripciones pendientes de posiciones confirmadas.",
+          },
+          {
+            icon: ShieldCheck,
+            title: "Acceso autorizado",
+            text: "Los documentos privados y la administración del emisor conservan sus permisos.",
+          },
+        ].map(({ icon: Icon, title, text }) => (
+          <article key={title} className="rounded-xl border border-border bg-card/40 p-6">
+            <Icon className="w-6 h-6 text-gold mb-4" />
+            <h2 className="font-semibold">{title}</h2>
+            <p className="text-sm text-muted-foreground mt-2 leading-relaxed">{text}</p>
+          </article>
+        ))}
       </div>
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div className="max-w-md text-center space-y-4">
-          <h1 className="text-2xl font-semibold">Tokenización de activos mineros</h1>
-          <p className="text-sm text-muted-foreground">
-            Emite participaciones fraccionadas sobre proyectos NI 43-101 y gestiona el cap table de
-            inversionistas.
-          </p>
-          <Link
-            to="/dashboard/offerings"
-            className="inline-flex items-center gap-1.5 rounded-md bg-gold px-4 py-2 text-sm font-medium text-black hover:bg-gold/90"
-          >
-            Abrir ofertas y cap table
-          </Link>
-          <p className="text-[10px] text-muted-foreground">
-            Participaciones referenciales. No constituye oferta pública de valores.
+      <div className="rounded-xl border border-border bg-card/40 p-6 flex flex-wrap items-center justify-between gap-5">
+        <div>
+          <h2 className="text-lg font-semibold">Tu espacio de inversión</h2>
+          <p className="text-sm text-muted-foreground mt-2">
+            Explora ofertas y consulta el estado de tus participaciones.
           </p>
         </div>
+        <Link
+          to="/auth"
+          search={{ intent: "investor", next: "/dashboard/offerings" }}
+          className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
+        >
+          Abrir ofertas y participaciones <ArrowRight className="w-4 h-4" />
+        </Link>
       </div>
-    </div>
-  ),
-});
+      <p className="text-xs text-muted-foreground">
+        La plataforma registra ofertas y suscripciones. La titularidad y sus derechos dependen de
+        los documentos definitivos de cada instrumento. No constituye oferta pública de valores.
+      </p>
+    </TerminalSectionFrame>
+  );
+}

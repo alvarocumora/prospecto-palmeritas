@@ -19,6 +19,7 @@ import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
 import { buildNahuelbutaDoc } from "@/lib/pdf/adapters/nahuelbuta";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
+import { ProjectOpportunities } from "./ProjectOpportunities";
 import { TerminalSimulator } from "./TerminalSimulator";
 
 import {
@@ -154,7 +155,7 @@ export function ProjectTerminalShell({
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
             <Link
-              to="/proyectos"
+              to="/terminal"
               className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white"
             >
               Geocapitals · Terminal
@@ -167,6 +168,7 @@ export function ProjectTerminalShell({
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
                   search={{ tab, view }}
+                  aria-current={p.slug === project.slug ? "page" : undefined}
                   className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
                     p.slug === project.slug
                       ? "bg-white text-content border-white"
@@ -201,6 +203,7 @@ export function ProjectTerminalShell({
                 to="/terminal/$slug"
                 params={{ slug: project.slug }}
                 search={{ tab: t.key, view }}
+                aria-current={t.key === tab ? "page" : undefined}
                 className={`whitespace-nowrap px-4 py-2.5 text-[12px] font-mono uppercase tracking-wider border-b-2 transition-colors ${
                   t.key === tab
                     ? "border-white text-white"
@@ -435,10 +438,11 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
   const { ficha } = project;
   return (
     <>
+      <ProjectOpportunities projectId={project.projectId} />
       <section className="rounded-2xl border border-hairline bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
           <FileText className="w-4 h-4 text-accent-brand" />
-          <Eyebrow>Documentos del activo</Eyebrow>
+          <Eyebrow>Documentos públicos del activo</Eyebrow>
         </div>
         <p className="text-sm text-content-subtle max-w-2xl">
           Descarga el expediente con la marca de Geocapitals: presentación para comité, resumen de

@@ -11,10 +11,11 @@
 //  - bucket privado; toda subida/descarga pasa por estas funciones con service
 //    role, nunca por policies de storage del cliente
 //  - gate por NDA: el archivo confidencial solo se descarga si el solicitante
-//    es del proyecto o firmó el NDA del listing
+//    administra el proyecto o tiene NDA y un grant vigente para ese archivo
 //  - bitácora: cada intento de descarga queda en `data_room_access_logs`
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { activeRoomGrant, roomFileAllowed, type DataRoomGrant } from "./dataRoomAccess";
 import { requireCapitalRole } from "@/lib/access/roleMiddleware";
 
 const BUCKET = "data-room-files";
@@ -80,13 +81,14 @@ type RoomContext = {
   listingId: string;
   ownerUserId: string | null;
   listingTitle: string;
+  published: boolean;
 };
 
 /** Listing → proyecto → data room canónico (creándolo si no existe). */
-async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
+async function resolveRoom(sb: Admin, listingId: string, create = true): Promise<RoomContext> {
   const { data: listing, error } = await sb
     .from("property_listings")
-    .select("id, title, owner_user_id, project_id")
+    .select("id, title, owner_user_id, project_id, is_published")
     .eq("id", listingId)
     .maybeSingle();
   if (error) throw new Error(error.message);
@@ -105,6 +107,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
     .maybeSingle();
 
   let roomId = existing?.id as string | undefined;
+  if (!roomId && !create) throw new Error("El expediente aún no está disponible.");
   if (!roomId) {
     const { data: created, error: cErr } = await sb
       .from("data_rooms")
@@ -122,7 +125,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
     roomId = created.id as string;
   }
 
-  await ensureFolders(sb, roomId, listing.owner_user_id as string);
+  if (create) await ensureFolders(sb, roomId, listing.owner_user_id as string);
 
   return {
     roomId,
@@ -130,6 +133,7 @@ async function resolveRoom(sb: Admin, listingId: string): Promise<RoomContext> {
     listingId,
     ownerUserId: (listing.owner_user_id as string | null) ?? null,
     listingTitle: listing.title as string,
+    published: listing.is_published === true,
   };
 }
 
@@ -184,6 +188,36 @@ async function assertRoomManager(sb: Admin, room: RoomContext, userId: string) {
   if (room.ownerUserId === userId) return;
   const role = await projectRole(sb, room.projectId, userId);
   if (!isProjectPrivileged(role)) throw new Error("No autorizado");
+}
+
+async function readRoomAccess(sb: Admin, room: RoomContext, userId: string) {
+  const manager =
+    room.ownerUserId === userId ||
+    isProjectPrivileged(await projectRole(sb, room.projectId, userId));
+  if (manager) return { manager: true, ndaSigned: true, grants: [] as DataRoomGrant[] };
+  if (!room.published) throw new Error("Este expediente no está publicado.");
+  const [inquiry, grants] = await Promise.all([
+    sb
+      .from("property_deal_inquiries")
+      .select("nda_signed_at")
+      .eq("listing_id", room.listingId)
+      .eq("inquirer_user_id", userId)
+      .maybeSingle(),
+    sb
+      .from("data_room_access_grants")
+      .select(
+        "id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at",
+      )
+      .eq("data_room_id", room.roomId)
+      .eq("grantee_user_id", userId),
+  ]);
+  if (inquiry.error || grants.error)
+    throw new Error("No se pudo verificar el permiso del expediente.");
+  return {
+    manager: false,
+    ndaSigned: !!inquiry.data?.nda_signed_at,
+    grants: (grants.data ?? []) as DataRoomGrant[],
+  };
 }
 
 async function logAccess(
@@ -312,9 +346,10 @@ export const deleteDataRoomFile = createServerFn({ method: "POST" })
 export const listDataRoomFiles = createServerFn({ method: "GET" })
   .middleware([requireCapitalRole])
   .inputValidator((d) => z.object({ listingId: z.string().uuid() }).parse(d))
-  .handler(async ({ data }): Promise<DataRoomFileRow[]> => {
+  .handler(async ({ data, context }): Promise<DataRoomFileRow[]> => {
     const sb = await admin();
-    const room = await resolveRoom(sb, data.listingId);
+    const room = await resolveRoom(sb, data.listingId, false);
+    const access = await readRoomAccess(sb, room, context.userId);
     const { byId } = await folderMap(sb, room.roomId);
 
     const { data: rows, error } = await sb
@@ -326,11 +361,22 @@ export const listDataRoomFiles = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
 
-    return (rows ?? []).map((r) => ({
+    const allowed = (rows ?? []).filter(
+      (file) =>
+        access.manager ||
+        roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned),
+    );
+    await logAccess(sb, {
+      roomId: room.roomId,
+      actorUserId: context.userId,
+      action: "view",
+      allowed: true,
+    });
+    return allowed.map((r) => ({
       id: r.id as string,
       listing_id: data.listingId,
       file_name: r.file_name as string,
-      file_path: r.storage_path as string,
+      file_path: access.manager ? (r.storage_path as string) : "",
       file_size_bytes: r.size_bytes != null ? Number(r.size_bytes) : null,
       mime_type: (r.mime_type as string | null) ?? null,
       category: r.folder_id ? (byId.get(r.folder_id as string) ?? null) : null,
@@ -411,7 +457,27 @@ export const signNdaAndGrantAccess = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = await admin();
-    const room = await resolveRoom(sb, data.listingId);
+    const room = await resolveRoom(sb, data.listingId, false);
+    if (!room.published) throw new Error("Esta oportunidad no está publicada.");
+    const { data: grantRows, error: grantError } = await sb
+      .from("data_room_access_grants")
+      .select(
+        "id,data_room_id,grantee_user_id,access_level,scope,scope_file_ids,scope_folder_ids,nda_signed_at,revoked_at,expires_at",
+      )
+      .eq("data_room_id", room.roomId)
+      .eq("grantee_user_id", context.userId);
+    if (grantError) throw new Error("No se pudo verificar el acceso al expediente.");
+    const existingGrants = (grantRows ?? []) as DataRoomGrant[];
+    if (
+      existingGrants.length &&
+      !existingGrants.some((grant) =>
+        activeRoomGrant(grant, context.userId, room.roomId, Date.now()),
+      )
+    ) {
+      throw new Error(
+        "Tu permiso de acceso fue revocado o venció. Contacta al equipo para solicitar una revisión.",
+      );
+    }
     const now = new Date().toISOString();
 
     const { data: inquiry, error } = await sb
@@ -438,23 +504,18 @@ export const signNdaAndGrantAccess = createServerFn({ method: "POST" })
       p_note: "NDA firmado en la ficha del proyecto",
     });
 
-    // Permiso explícito de data room (idempotente)
-    const { data: existingGrant } = await sb
-      .from("data_room_access_grants")
-      .select("id")
-      .eq("data_room_id", room.roomId)
-      .eq("grantee_user_id", context.userId)
-      .is("revoked_at", null)
-      .maybeSingle();
-    if (!existingGrant) {
-      await sb.from("data_room_access_grants").insert({
+    // Preserve existing permissions, including revoked and expired records.
+    // Signing again must never broaden a file/folder grant or reopen revoked access.
+    if (existingGrants.length === 0) {
+      const { error: grantError } = await sb.from("data_room_access_grants").insert({
         data_room_id: room.roomId,
         grantee_user_id: context.userId,
         access_level: "view",
         scope: "room",
         nda_signed_at: now,
-        granted_by: room.ownerUserId ?? context.userId,
+        granted_by: context.userId,
       });
+      if (grantError) throw new Error("No se pudo registrar el acceso al expediente.");
     }
 
     await logAccess(sb, {
@@ -476,39 +537,30 @@ export const getDataRoomDownloadUrl = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const sb = await admin();
-    const room = await resolveRoom(sb, data.listingId);
+    const room = await resolveRoom(sb, data.listingId, false);
 
     const { data: file, error } = await sb
       .from("data_room_files")
-      .select("id, data_room_id, storage_path, confidentiality")
+      .select("id, data_room_id, folder_id, storage_path, confidentiality")
       .eq("id", data.fileId)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!file || file.data_room_id !== room.roomId) throw new Error("Archivo no encontrado");
 
-    const isManager =
-      room.ownerUserId === context.userId ||
-      isProjectPrivileged(await projectRole(sb, room.projectId, context.userId));
-    const requiresNda = (file.confidentiality as string) !== "public";
-
-    if (!isManager && requiresNda) {
-      const { data: inquiry } = await sb
-        .from("property_deal_inquiries")
-        .select("nda_signed_at")
-        .eq("listing_id", data.listingId)
-        .eq("inquirer_user_id", context.userId)
-        .maybeSingle();
-      if (!inquiry?.nda_signed_at) {
-        await logAccess(sb, {
-          roomId: room.roomId,
-          fileId: file.id as string,
-          actorUserId: context.userId,
-          action: "download",
-          allowed: false,
-          reason: "NDA no firmado",
-        });
-        throw new Error("Este archivo requiere firmar el NDA del proyecto.");
-      }
+    const access = await readRoomAccess(sb, room, context.userId);
+    if (
+      !access.manager &&
+      !roomFileAllowed(file, access.grants, context.userId, room.roomId, access.ndaSigned)
+    ) {
+      await logAccess(sb, {
+        roomId: room.roomId,
+        fileId: file.id,
+        actorUserId: context.userId,
+        action: "download",
+        allowed: false,
+        reason: "NDA o permiso vigente insuficiente",
+      });
+      throw new Error("Este documento requiere NDA y un permiso de acceso vigente.");
     }
 
     const path = file.storage_path as string;
