@@ -100,7 +100,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
 
   // ─────────────── CATASTRO & EXPLORACIÓN ───────────────
   {
-    to: "/catastro/proyecto",
+    to: "/catastro/mapa",
     label: "Catastro",
     icon: MapIcon,
     group: "CATASTRO & EXPLORACIÓN",
@@ -109,8 +109,8 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     requiresProjects: true,
     badgeKey: "catastroAlerts",
     tabs: [
-      { label: "Concesiones", to: "/catastro/proyecto" },
-      { label: "Mapa nacional", to: "/catastro/mapa" },
+      { label: "Catastro maestro", to: "/catastro/mapa" },
+      { label: "Conciliación", to: "/dashboard/catastro" },
       { label: "Boletín minero", to: "/dashboard/boletin" },
       { label: "Watchlist", to: "/catastro/app/watchlist" },
       { label: "Oportunidades IA", to: "/dashboard/opportunities" },
@@ -127,8 +127,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     requiresProjects: true,
     tabs: [
       { label: "Proyectos", to: "/dashboard/projects", exact: true },
-      { label: "Workspace 2D/3D", to: "/dashboard/project-report" },
-      { label: "Mission Control", to: "/dashboard/mission" },
+      { label: "Terminal 2D/3D", to: "/terminal" },
       { label: "Nuevo proyecto", to: "/dashboard/projects/nuevo" },
     ],
   },
