@@ -18,3 +18,9 @@ El acceso requiere sesión y un proyecto miembro con el UUID de la terminal. Par
 ## Límites
 
 El usuario informó que el SQL del almacenamiento privado se ejecutó correctamente. No se verificó una corrida autenticada ni los permisos reales del backend: la revisión visual fue con sesión anónima y las pruebas de membresía usan mocks. No se repitió el build completo para este ajuste de navegación. No se hizo push ni publicación; aplicar el SQL no actualiza el frontend publicado.
+
+## Preparación del PR y merge
+
+Validación completa posterior al ajuste de navegación: build aprobado, 700 tests pasados y 5 omitidos; lint sin errores con 7 advertencias existentes. Typecheck aprobado. Rama `feat/consolidacion-sentinel-terminal`, PR #317. El SQL de migración admite las políticas ya creadas desde el SQL Editor mediante DROP POLICY IF EXISTS específico, sin alterar reglas globales.
+
+GitHub Actions no inició los jobs CI/validate y Datos/datos: GitHub informó pagos recientes fallidos o necesidad de aumentar el límite de gasto. No hubo ejecución en Node 22/Ubuntu ni logs de jobs. La validación local usó Node 24.21.0/npm 11.19.0. No se modificaron los workflows ni se desactivaron checks. El usuario solicitó expresamente crear PR y merge; no se realiza despliegue manual.
