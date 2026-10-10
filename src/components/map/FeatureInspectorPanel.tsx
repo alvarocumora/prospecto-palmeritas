@@ -160,7 +160,7 @@ function ConcessionBody({ c }: { c: MiningConcession }) {
       <Row label="Hectáreas" value={c.area_ha != null ? `${c.area_ha} ha` : "—"} />
       <Row label="Vence" value={c.expires_at ?? "—"} />
       <Link
-        to="/catastro/proyecto"
+        to="/catastro/mapa"
         className="mt-3 inline-flex items-center gap-1 text-gold hover:underline"
       >
         Ir a Catastro <ExternalLink className="w-3 h-3" />

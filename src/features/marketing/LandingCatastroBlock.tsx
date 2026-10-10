@@ -208,7 +208,7 @@ export function LandingCatastroBlock() {
     { label: "Multi-país (PE · BR · ZM · MW)", to: "/catastro/global", icon: Globe2 },
     { label: "Monitoreo y alertas", to: "/catastro/app/watchlist", icon: Bell, badge: "Pro" },
     { label: "Reportes PDF / GeoJSON", to: "/catastro/precios", icon: FileText, badge: "Pro" },
-    { label: "Vista proyecto", to: "/catastro/proyecto", icon: Layers },
+    { label: "Vista proyecto", to: "/catastro/mapa", icon: Layers },
   ];
 
   return (
