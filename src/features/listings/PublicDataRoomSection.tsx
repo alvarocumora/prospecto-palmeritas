@@ -42,6 +42,8 @@ export function PublicDataRoomSection({
 
   // Cargar estado NDA + archivos si el visitante está logueado
   const refresh = useCallback(async () => {
+    setFiles([]);
+    setNdaSigned(false);
     if (!user) return;
     setChecking(true);
     try {
@@ -61,6 +63,9 @@ export function PublicDataRoomSection({
           setFilesLoading(false);
         }
       }
+    } catch (error) {
+      setFiles([]);
+      toast.error(error instanceof Error ? error.message : "No se pudo verificar el acceso al expediente.");
     } finally {
       setChecking(false);
     }
@@ -132,7 +137,7 @@ export function PublicDataRoomSection({
         <div className="mt-4 flex items-center justify-between gap-3 flex-wrap rounded-lg border border-hairline bg-accent-brand-subtle p-4">
           <div className="text-sm text-content">
             <ShieldCheck className="w-4 h-4 inline text-accent-brand mr-1.5 -mt-0.5" />
-            Firma el NDA dentro de la plataforma para desbloquear los archivos.
+            Firma el NDA para consultar los documentos incluidos en tu permiso de acceso.
           </div>
           <button
             type="button"
@@ -145,7 +150,7 @@ export function PublicDataRoomSection({
       ) : (
         <div className="mt-4">
           <div className="text-xs text-teal mb-3 inline-flex items-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5" /> NDA firmado · acceso habilitado
+            <ShieldCheck className="w-3.5 h-3.5" /> NDA firmado · documentos según tu permiso vigente
           </div>
           {filesLoading ? (
             <div className="text-xs text-content-subtle">
@@ -153,7 +158,7 @@ export function PublicDataRoomSection({
             </div>
           ) : files.length === 0 ? (
             <p className="text-sm text-content-subtle">
-              El titular aún no ha subido archivos. Te notificaremos cuando estén disponibles.
+              No hay documentos disponibles con tu permiso actual. Contacta al equipo para revisar el acceso o el estado del expediente.
             </p>
           ) : (
             <ul className="space-y-1.5">

@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { PublicRouteEntry } from "@/components/navigation/PublicRouteEntry";
 import { GlobalTerminalShell } from "@/features/terminal/GlobalTerminalShell";
 
 export const Route = createFileRoute("/terminal")({
@@ -17,5 +18,5 @@ export const Route = createFileRoute("/terminal")({
       },
     ],
   }),
-  component: GlobalTerminalShell,
+  component: () => <PublicRouteEntry path="/terminal"><GlobalTerminalShell /></PublicRouteEntry>,
 });

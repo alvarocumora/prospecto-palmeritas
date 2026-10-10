@@ -6,6 +6,7 @@
 // la base (app_roles, profiles.account_type y get_my_modules) y rechazan con
 // 403 cualquier consulta o generación de documentos sin autorización válida.
 import { createMiddleware } from "@tanstack/react-start";
+import { parseModuleEntitlements } from "./moduleEntitlements";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type ServerAccessRole = "admin" | "catastro" | "trade" | "capital";
@@ -53,12 +54,7 @@ export async function resolveServerAccess(
 
   const isSuperAdmin = !!roleRes?.data;
   const accountType = (profileRes?.data?.account_type ?? null) as ServerAccess["accountType"];
-  const payload = (modulesRes?.data ?? null) as {
-    unrestricted?: boolean;
-    modules?: { key: ModuleKey }[];
-  } | null;
-  const unrestricted = payload?.unrestricted ?? true;
-  const modules = (payload?.modules ?? []).map((m) => m.key);
+  const { unrestricted, modules } = parseModuleEntitlements(modulesRes?.data, modulesRes?.error);
 
   const roles = new Set<ServerAccessRole>();
   const isStaff = isSuperAdmin || accountType === "geocapitals_team";

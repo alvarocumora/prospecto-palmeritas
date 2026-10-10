@@ -13,13 +13,13 @@ describe("projectVerification", () => {
     }
   });
 
-  it("proyectos desconocidos son trazables (datos reales pre-QP)", () => {
-    expect(projectVerification("00000000-0000-4000-8000-000000000000")).toBe("traceable");
+  it("proyectos desconocidos no reciben trazabilidad sin evidencia", () => {
+    expect(projectVerification("00000000-0000-4000-8000-000000000000")).toBe("pending");
   });
 
-  it("sin project_id se asume trazable, nunca demo", () => {
-    expect(projectVerification(null)).toBe("traceable");
-    expect(projectVerification(undefined)).toBe("traceable");
+  it("sin project_id la evidencia queda pendiente", () => {
+    expect(projectVerification(null)).toBe("pending");
+    expect(projectVerification(undefined)).toBe("pending");
   });
 
   it("QP verified tiene prioridad sobre demo si un ID estuviera en ambas listas", () => {
@@ -28,7 +28,7 @@ describe("projectVerification", () => {
   });
 
   it("todos los niveles tienen metadata completa para el badge", () => {
-    for (const level of ["demo", "traceable", "qp_verified"] as const) {
+    for (const level of ["pending", "demo", "traceable", "qp_verified"] as const) {
       expect(VERIFICATION_META[level].label.length).toBeGreaterThan(0);
       expect(VERIFICATION_META[level].short.length).toBeGreaterThan(0);
       expect(VERIFICATION_META[level].description.length).toBeGreaterThan(20);

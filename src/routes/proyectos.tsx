@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Mountain, Activity, Satellite, FileText, Box as BoxIcon } from "lucide-react";
+import { PublicRouteEntry } from "@/components/navigation/PublicRouteEntry";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
 import { getPublicListings } from "@/lib/publicListings.functions";
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/proyectos")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: ProyectosPage,
+  component: () => <PublicRouteEntry path="/proyectos"><ProyectosPage /></PublicRouteEntry>,
 });
 
 // Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
@@ -65,7 +66,7 @@ const SHOWCASE = [
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
-      "Compliance NI 43-101 en curso",
+      "Preparación de expediente técnico",
     ],
   },
   {
@@ -121,7 +122,7 @@ function ProyectosPage() {
     <MarketingPage
       eyebrow="Proyectos"
       title="Activos reales operando sobre Geocapitals"
-      intro="Una muestra de los proyectos mineros que usan la plataforma para integrar catastro, exploración, monitoreo satelital y reporte NI 43-101."
+      intro="Una muestra de los proyectos mineros que usan la plataforma para integrar catastro, exploración, monitoreo satelital y documentación técnica."
     >
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="publicar">
         {SHOWCASE.map((p) => (

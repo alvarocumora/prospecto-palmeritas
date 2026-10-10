@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { AppShell, TerminalTopBar } from "@/components/shell/AppShell";
+import { PublicTerminalOverview } from "./PublicTerminalOverview";
 import { TerminalSidebar } from "./TerminalSidebar";
 import { TickerTape } from "./TickerTape";
 import { GeologicalMapPanel } from "./panels/GeologicalMapPanel";
@@ -10,18 +11,20 @@ import { PortfolioPanel } from "./panels/PortfolioPanel";
 import { getTerminalPortfolio } from "@/lib/terminal.functions";
 
 export function GlobalTerminalShell() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { activeId: selectedId, setActiveId: setSelectedId } = useProjects();
   const fetchPortfolio = useServerFn(getTerminalPortfolio);
 
   const { data, isLoading } = useQuery({
     queryKey: ["terminal-portfolio", user?.id ?? "anon"],
     queryFn: () => fetchPortfolio(),
-    enabled: !!user,
+    enabled: !!user && profile?.account_type !== "investor",
     staleTime: 30_000,
   });
 
   const projects = data?.projects ?? [];
+
+  if (!user || profile?.account_type === "investor") return <PublicTerminalOverview />;
 
   return (
     <AppShell variant="terminal" topBar={<TerminalTopBar />}>

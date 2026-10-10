@@ -46,7 +46,7 @@ const BENEFITS = [
   {
     i: CheckCircle2,
     t: "Proyectos calificados",
-    d: "Activos verificados por QPs y data trazable end-to-end.",
+    d: "Evidencias, fuentes y estado de revisión técnica por activo.",
   },
   {
     i: LineChart,

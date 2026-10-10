@@ -223,7 +223,7 @@ function SettlementsBlock({ items }: { items: Data["settlements"] }) {
               {items.map((s) => (
                 <tr key={s.id} className="border-b border-border/50 hover:bg-bg-elevated/40">
                   <td className="px-3 py-2">
-                    <div className="font-medium text-foreground">{s.listing?.title ?? "—"}</div>
+                    {s.listing_id ? <Link to="/proyectos/$listingId" params={{ listingId: s.listing_id }} className="font-medium text-foreground hover:underline">{s.listing?.title ?? "Revisar oportunidad"}</Link> : <div className="font-medium text-foreground">—</div>}
                     <div className="text-[10px] text-muted-foreground">
                       {s.listing?.commodity ?? ""}{" "}
                       {s.listing?.country ? `· ${s.listing.country}` : ""}
@@ -303,7 +303,7 @@ function InquiriesBlock({ items }: { items: Data["inquiries"] }) {
             <li key={i.id} className="px-4 py-3 flex items-center justify-between gap-3 text-xs">
               <div className="min-w-0">
                 <div className="font-medium text-foreground truncate">
-                  {i.listing?.title ?? "—"}
+                  <Link to="/proyectos/$listingId" params={{ listingId: i.listing_id }} className="hover:underline">{i.listing?.title ?? "Revisar oportunidad"}</Link>
                 </div>
                 <div className="text-[10px] text-muted-foreground font-mono">
                   Solicitado: {fmtDate(i.created_at)}

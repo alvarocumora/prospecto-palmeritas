@@ -1,33 +1,33 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { ArrowLeft } from "lucide-react";
+import { ArrowRight, FileSearch, Flag, Wallet } from "lucide-react";
+import { TerminalSectionFrame } from "@/features/terminal/TerminalSectionFrame";
+import { listTerminalProjects } from "@/features/terminal/terminalProjects";
+import { fmtUsd0 } from "@/lib/investor/fichas";
 
 export const Route = createFileRoute("/terminal/capital-raise")({
-  head: () => ({ meta: [{ title: "Capital Raise · Geocapitals Terminal" }] }),
-  component: () => (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
-      <div className="h-10 border-b border-border flex items-center px-3 gap-3 bg-card/40">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
-        >
-          <ArrowLeft className="w-3 h-3" /> Terminal
-        </Link>
-        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-gold">
-          Capital Raise
-        </span>
-      </div>
-      <div className="flex-1 flex items-center justify-center px-6">
-        <div className="max-w-md text-center space-y-3">
-          <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
-            Próximamente
-          </p>
-          <h1 className="text-2xl font-semibold">Capital Raise</h1>
-          <p className="text-sm text-muted-foreground">
-            Pipeline de inversionistas, data room virtual y flujo de term-sheets integrado al
-            portfolio.
-          </p>
-        </div>
-      </div>
-    </div>
-  ),
+  head: () => ({ meta: [{ title: "Capital de exploración · Geocapitals" }] }),
+  component: CapitalRaisePage,
 });
+
+function CapitalRaisePage() {
+  return (
+    <TerminalSectionFrame eyebrow="Capital de exploración" title="Financiar el próximo hito" description="Revisa la tesis, el uso de fondos y los hitos de cada activo antes de evaluar una oportunidad de inversión.">
+      <div className="grid md:grid-cols-3 gap-4">
+        {[{ icon: FileSearch, title: "Evaluar", text: "Evidencias, derechos y riesgos del proyecto." }, { icon: Flag, title: "Planificar", text: "Campaña, presupuesto e hitos financiables." }, { icon: Wallet, title: "Estructurar", text: "Instrumento, términos y acceso al expediente." }].map(({ icon: Icon, title, text }) => (
+          <div key={title} className="rounded-xl border border-border bg-card/40 p-5"><Icon className="w-5 h-5 text-gold mb-3" /><h2 className="font-semibold">{title}</h2><p className="text-sm text-muted-foreground mt-2">{text}</p></div>
+        ))}
+      </div>
+      <section className="grid md:grid-cols-2 gap-4" aria-label="Proyectos para evaluación">
+        {listTerminalProjects().map(({ slug, ficha }) => (
+          <article key={slug} className="rounded-xl border border-border bg-card/40 p-5 space-y-4">
+            <div><p className="text-[10px] font-mono uppercase text-gold">{ficha.commodity} · {ficha.stage}</p><h2 className="font-display text-2xl mt-2">{ficha.name}</h2><p className="text-xs text-muted-foreground mt-1">{ficha.region}</p></div>
+            <p className="text-sm text-muted-foreground">Ticket de referencia: <span className="text-foreground font-mono">{fmtUsd0(ficha.minTicketUsd)}</span></p>
+            <Link to="/terminal/$slug" params={{ slug }} search={{ tab: "dataroom" }} className="inline-flex items-center gap-2 text-sm text-gold hover:underline">Revisar hitos y documentos <ArrowRight className="w-4 h-4" /></Link>
+          </article>
+        ))}
+      </section>
+      <Link to="/inversionistas" className="inline-flex items-center gap-2 rounded-md bg-gold text-black px-5 py-3 text-sm font-medium">Ver oportunidades publicadas <ArrowRight className="w-4 h-4" /></Link>
+      <p className="text-xs text-muted-foreground">Los tickets y planes son referenciales. La disponibilidad y los términos se confirman en la oportunidad correspondiente.</p>
+    </TerminalSectionFrame>
+  );
+}

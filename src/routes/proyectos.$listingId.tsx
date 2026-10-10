@@ -161,7 +161,7 @@ function ListingDetailPage() {
               <Metric icon={<Target />} label="Targets exploración" value={l.metrics.targets} />
               <Metric
                 icon={<FileSignature />}
-                label="Reportes NI 43-101"
+                label="Reportes técnicos"
                 value={l.metrics.ni43101Reports}
               />
               <Metric icon={<Users />} label="Interesados" value={l.inquiriesCount} />

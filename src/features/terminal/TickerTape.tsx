@@ -6,7 +6,7 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 export function TickerTape() {
   const fetchTicker = useServerFn(getTerminalTicker);
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["terminal-ticker"],
     queryFn: () => fetchTicker(),
     refetchInterval: 60_000,
@@ -19,7 +19,7 @@ export function TickerTape() {
       <div className="flex items-center divide-x divide-border h-full">
         {items.length === 0 && (
           <span className="px-3 text-[10px] font-mono text-muted-foreground">
-            cargando mercado…
+            {isLoading ? "Consultando mercado…" : "Referencias de mercado no disponibles"}
           </span>
         )}
         {items.map((t) => {

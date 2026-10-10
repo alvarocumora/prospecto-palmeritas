@@ -1,33 +1,26 @@
 // Simulador de inversión client-side: calcula retorno proyectado bajo 3 escenarios
 // con fórmula determinista. Disclaimer legal explícito. NO ejecuta cálculos sensibles.
 import { useMemo, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useSearch } from "@tanstack/react-router";
 import { Calculator, TrendingUp, ArrowRight, Info, Lock } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
 import { useServerFn } from "@tanstack/react-start";
+import { calculateInvestmentReturn, readSimulationSearch, simulationReturnPath } from "@/lib/investor/simulation";
 import { fmtUSD } from "@/modules/deals/domain/format";
 
 type Scenario = "conservative" | "base" | "optimistic";
 
 const SCENARIOS: Record<
   Scenario,
-  { label: string; multiplier: number; irrFloor: number; color: string }
+  { label: string; color: string }
 > = {
-  conservative: { label: "Conservador", multiplier: 1.4, irrFloor: 0.08, color: "text-slate-600" },
-  base: { label: "Base", multiplier: 2.2, irrFloor: 0.18, color: "text-accent-brand" },
-  optimistic: { label: "Optimista", multiplier: 4.0, irrFloor: 0.32, color: "text-emerald-600" },
+  conservative: { label: "Conservador", color: "text-slate-600" },
+  base: { label: "Base", color: "text-accent-brand" },
+  optimistic: { label: "Optimista", color: "text-emerald-600" },
 };
-
-function calcReturn(amount: number, years: number, scenario: Scenario, stageBonus: number) {
-  const cfg = SCENARIOS[scenario];
-  const mult = cfg.multiplier * (1 + stageBonus);
-  const final = amount * mult;
-  const irr = Math.pow(final / amount, 1 / Math.max(1, years)) - 1;
-  return { final, multiplier: mult, irr: Math.max(cfg.irrFloor, irr), gain: final - amount };
-}
 
 // Bonus por etapa: greenfield más upside; pre-feas más cierre.
 const STAGE_BONUS: Record<string, number> = {
@@ -64,15 +57,18 @@ export function InvestmentSimulator({
   const minTicket = Math.max(50_000, Math.round(baseTicket * 0.05));
   const maxTicket = Math.max(minTicket * 4, baseTicket);
 
-  const [amount, setAmount] = useState(Math.round(baseTicket * 0.1));
-  const [years, setYears] = useState(5);
-  const [scenario, setScenario] = useState<Scenario>("base");
+  const search = useSearch({ strict: false }) as Record<string, unknown>;
+  const initial = readSimulationSearch(search, Math.max(minTicket, Math.round(baseTicket * 0.1)), minTicket, maxTicket);
+  const [amount, setAmount] = useState(initial.amount);
+  const [years, setYears] = useState(initial.years);
+  const [scenario, setScenario] = useState<Scenario>(initial.scenario);
+  const returnPath = simulationReturnPath(listingId, amount, years, scenario);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   const stageBonus = STAGE_BONUS[stage ?? ""] ?? 0;
   const result = useMemo(
-    () => calcReturn(amount, years, scenario, stageBonus),
+    () => calculateInvestmentReturn(amount, years, scenario, stageBonus),
     [amount, years, scenario, stageBonus],
   );
 
@@ -89,7 +85,7 @@ export function InvestmentSimulator({
   const handleSave = async () => {
     if (!user) {
       // Redirect to auth, preserving listing for return
-      window.location.href = `/auth?intent=investor&mode=signup`;
+      window.location.href = "/auth?intent=investor&mode=signup&next=" + encodeURIComponent(returnPath);
       return;
     }
     setSaving(true);
@@ -98,6 +94,7 @@ export function InvestmentSimulator({
       const msg = JSON.stringify(
         {
           type: "investment_simulation",
+          model_version: "reference-terminal-flow-v1",
           listing: listingTitle,
           amount_usd: amount,
           horizon_years: years,
@@ -215,7 +212,7 @@ export function InvestmentSimulator({
       <div className="grid grid-cols-3 gap-3">
         <Stat label="Retorno proy." value={fmtUSD(result.final)} highlight />
         <Stat label="Múltiplo" value={`${result.multiplier.toFixed(2)}x`} />
-        <Stat label="IRR estimada" value={`${(result.irr * 100).toFixed(1)}%`} />
+        <Stat label="Retorno anualizado" value={`${(result.irr * 100).toFixed(1)}%`} />
       </div>
 
       {/* Bar chart */}
@@ -245,7 +242,7 @@ export function InvestmentSimulator({
           {commodity ?? "—"}
           {modality === "royalty" && royaltyPct ? `, royalty ${royaltyPct}% NSR` : ""}). No
           constituye una oferta, recomendación de inversión ni promesa de retorno. Los retornos
-          reales dependen de variables geológicas, regulatorias y de mercado. Geocapitals actúa como
+          reales dependen de variables geológicas, regulatorias y de mercado, y pueden implicar pérdida de capital. La tasa supone un aporte inicial y un cobro final; no modela distribuciones ni dilución. Geocapitals actúa como
           facilitador del deal, no como gestor de capital.
         </p>
       </div>
@@ -276,7 +273,7 @@ export function InvestmentSimulator({
       ) : (
         <Link
           to="/auth"
-          search={{ intent: "investor", mode: "signup" } as never}
+          search={{ intent: "investor", mode: "signup", next: returnPath }}
           className="w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-white px-5 py-3 rounded-md text-sm font-medium hover:opacity-95"
         >
           <Lock className="w-4 h-4" /> Crear cuenta para guardar simulación

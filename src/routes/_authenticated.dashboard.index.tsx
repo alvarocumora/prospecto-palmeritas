@@ -24,6 +24,7 @@ import { useProjects } from "@/hooks/useProjects";
 import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useMyModules, type ModuleInfo } from "@/hooks/useMyModules";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
+import { InvestorHome } from "@/features/home/InvestorHome";
 import { RoleQuickStart } from "@/features/home/RoleQuickStart";
 import { getBusinessOverview } from "@/lib/businessOverview.functions";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
@@ -72,11 +73,14 @@ function BusinessHome() {
 
   const fn = useServerFn(getBusinessOverview);
   const { data: ov, isLoading } = useQuery({
-    queryKey: ["business-overview"],
+    queryKey: ["business-overview", user?.id],
+    enabled: !!user && !isInvestor,
     queryFn: () => fn(),
     staleTime: 30_000,
     refetchInterval: 60_000,
   });
+
+  if (isInvestor) return <InvestorHome name={name}>{needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}</InvestorHome>;
 
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
