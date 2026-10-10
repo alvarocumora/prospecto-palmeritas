@@ -34,8 +34,7 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
       eyebrow: "Economía preliminar",
       title: "Escenarios separados de la evidencia mineral",
       deck: true,
-      lead:
-        "Las toneladas y leyes de estos escenarios son supuestos de sensibilidad; la disponibilidad de inventario y la aceptación comercial siguen pendientes.",
+      lead: "Las toneladas y leyes de estos escenarios son supuestos de sensibilidad; la disponibilidad de inventario y la aceptación comercial siguen pendientes.",
       blocks: [
         {
           kind: "narrative",
@@ -67,8 +66,7 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
         {
           kind: "gap",
           title: "Retorno de inversión pendiente",
-          body:
-            "El payback matemático de un escenario no acredita retorno invertible. No se publican VAN/TIR ni payback de decisión hasta validar inventario, metalurgia, aceptación ENAMI, distancia, flete, liquidación, impuestos, financiamiento y cierre.",
+          body: "El payback matemático de un escenario no acredita retorno invertible. No se publican VAN/TIR ni payback de decisión hasta validar inventario, metalurgia, aceptación ENAMI, distancia, flete, liquidación, impuestos, financiamiento y cierre.",
           action:
             "Cerrar la matriz comercial y revisar un flujo financiero auditable antes de comprometer capital.",
         },
@@ -104,24 +102,22 @@ export function buildCholquiInvestmentDoc(teaser = false): ProjectDoc {
             ];
           }),
         },
-        ...plans.map(
-          (plan): Extract<DocSection["blocks"][number], { kind: "appendixTable" }> => ({
-            kind: "appendixTable",
-            title: "Flujo mensual de escenario · " + num(plan.params.plateau) + " t/mes",
-            head: ["Mes", "t/mes", "Ingresos CLP", "Costos CLP", "Margen CLP", "Caja CLP"],
-            widths: [0.08, 0.12, 0.2, 0.2, 0.2, 0.2],
-            provenance: "SCENARIO",
-            source: "projectCashflow · 24 meses / 1,5 % Cu soluble",
-            rows: plan.months.map((month) => [
-              String(month.month),
-              num(month.rate),
-              fmtClpM(month.revenueClp),
-              fmtClpM(month.costClp),
-              fmtClpM(month.marginClp),
-              fmtClpM(month.cumulativeCashflowClp),
-            ]),
-          }),
-        ),
+        ...plans.map((plan): Extract<DocSection["blocks"][number], { kind: "appendixTable" }> => ({
+          kind: "appendixTable",
+          title: "Flujo mensual de escenario · " + num(plan.params.plateau) + " t/mes",
+          head: ["Mes", "t/mes", "Ingresos CLP", "Costos CLP", "Margen CLP", "Caja CLP"],
+          widths: [0.08, 0.12, 0.2, 0.2, 0.2, 0.2],
+          provenance: "SCENARIO",
+          source: "projectCashflow · 24 meses / 1,5 % Cu soluble",
+          rows: plan.months.map((month) => [
+            String(month.month),
+            num(month.rate),
+            fmtClpM(month.revenueClp),
+            fmtClpM(month.costClp),
+            fmtClpM(month.marginClp),
+            fmtClpM(month.cumulativeCashflowClp),
+          ]),
+        })),
         {
           kind: "appendixTable",
           title: "Sensibilidad del modelo escalable",

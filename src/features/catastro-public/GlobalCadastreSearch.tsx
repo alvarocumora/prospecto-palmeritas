@@ -58,16 +58,19 @@ export function GlobalCadastreSearch({
   const [term, setTerm] = useState("");
   const searchFn = useServerFn(searchGlobalCadastre);
 
-  const { data, isFetching } = useQuery({
+  const { data, isFetching, isError, refetch } = useQuery({
     queryKey: ["global-cadastre", country, term],
     queryFn: () => searchFn({ data: { country, q: term } }),
     enabled: term.trim().length >= 2,
     staleTime: 5 * 60_000,
+    retry: 1,
   });
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setTerm(input);
+    const next = input.trim();
+    if (next === term) void refetch();
+    else setTerm(next);
   };
 
   const countryLabel = COUNTRY_TABS.find((c) => c.code === country)?.label ?? country;
@@ -80,6 +83,7 @@ export function GlobalCadastreSearch({
           <button
             key={c.code}
             type="button"
+            aria-pressed={country === c.code}
             onClick={() => setCountry(c.code)}
             className={`px-3 py-1.5 rounded-md border text-sm transition-colors ${
               country === c.code
@@ -101,6 +105,8 @@ export function GlobalCadastreSearch({
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
+            aria-label={t("cad_search_button")}
+            maxLength={64}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder={t(PLACEHOLDER_KEY[country])}
@@ -116,8 +122,28 @@ export function GlobalCadastreSearch({
         </button>
       </form>
 
+      {isError && !isFetching && (
+        <div
+          role="alert"
+          className="rounded-md border border-hairline bg-surface p-4 text-sm text-content"
+        >
+          <p>{t("cad_source_unavailable")}</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="mt-2 text-accent-brand hover:underline"
+          >
+            {t("cad_retry")}
+          </button>
+        </div>
+      )}
+      {isFetching && (
+        <p role="status" className="text-center text-sm text-content-subtle">
+          {t("cad_loading")}
+        </p>
+      )}
       {/* Resultados */}
-      {term.length >= 2 && !isFetching && data && (
+      {term.length >= 2 && !isFetching && !isError && data && (
         <>
           <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground mb-2">
             <Database className="w-3 h-3" />

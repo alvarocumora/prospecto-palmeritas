@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-10",
+  "sha": "9250d53f841880cba1d1f66391527b61e8bd6f0c",
+  "checks": {
+    "typecheck": 0,
+    "lint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 7
+    },
+    "tests": {
+      "exit": 0,
+      "passed": 687,
+      "skipped": 4,
+      "passedFiles": 133,
+      "skippedFiles": 1
+    },
+    "selectedTests": 26,
+    "prettier": 0,
+    "diffCheck": 0,
+    "build": {
+      "exit": 0,
+      "memoryWarnings": 0,
+      "circularDependencyWarnings": 0
+    }
+  },
+  "sources": [
+    "https://github.com/radiantearth/stac-browser",
+    "https://github.com/developmentseed/titiler",
+    "https://github.com/protomaps/PMTiles",
+    "https://github.com/developmentseed/eoAPI",
+    "https://github.com/DanielD-S/Capas_IDE_CHILE"
+  ],
+  "changes": [
+    "Fail ArcGIS queries explicitly rather than successful empty results",
+    "Public cadastre search unavailable/retry/loading states",
+    "Reject missing/invalid hyperspectral AOI and missing catalog scene in UI",
+    "Tag new generated data synthetic; recognize seeded legacy metadata",
+    "Reject seeded products in hyperspectral AI interpretation",
+    "Per-feature satellite map provenance",
+    "Remount satellite modules per active project"
+  ],
+  "limitations": [
+    "No real spectral/InSAR/DEM-diff processor implemented",
+    "No private authenticated browser QA",
+    "No production database writes or historical data migration",
+    "External repositories reviewed via documentation; not installed or deployed",
+    "Node 24 local; CI Node 22 not run"
+  ],
+  "push": false,
+  "published": false
+}

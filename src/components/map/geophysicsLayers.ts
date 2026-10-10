@@ -98,8 +98,8 @@ export function buildGeophysicsLayer(
       isSyn && !opts.realData
         ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
         : !isSyn
-        ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
-        : "";
+          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
+          : "";
     polyline.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
         <strong style="color:${color};">${ln.line_id}</strong>${badge}<br/>
@@ -137,8 +137,8 @@ export function buildGeophysicsLayer(
       isSyn && !opts.realData
         ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
         : !isSyn
-        ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
-        : "";
+          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
+          : "";
     const ip = [
       st.ip_chargeability_mvv != null
         ? `IP carg: <strong>${st.ip_chargeability_mvv} mV/V</strong>`
@@ -153,8 +153,8 @@ export function buildGeophysicsLayer(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;min-width:200px;">
         <strong style="color:${surveyColor};">${st.station_id}</strong>${badge}<br/>
         <span style="color:#A89080;font-size:10px;">${s?.name ?? "Sin campaña"} · ${
-        s?.method ?? "—"
-      }</span><br/>
+          s?.method ?? "—"
+        }</span><br/>
         ${
           hasMag
             ? `Mag: <strong>${(st.mag_nt as number).toFixed(1)} nT</strong> · <span style="color:${
@@ -164,8 +164,8 @@ export function buildGeophysicsLayer(
         }
         ${ip ? `${ip}<br/>` : ""}
         <span style="color:#A89080;font-size:10px;">${st.lat.toFixed(5)}, ${st.lng.toFixed(
-        5,
-      )}</span>
+          5,
+        )}</span>
         ${
           st.notes
             ? `<div style="margin-top:4px;color:#A89080;font-size:10px;border-top:1px solid #3a322c;padding-top:4px;">${st.notes}</div>`

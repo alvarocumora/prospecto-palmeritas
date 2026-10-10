@@ -72,29 +72,29 @@ function DealsPage() {
     (commodity ? 1 : 0) + (stage ? 1 : 0) + (modality ? 1 : 0) + (search ? 1 : 0);
 
   return (
-    <div className="p-3 md:p-4 max-w-[1600px] mx-auto">
+    <div className="mx-auto w-full max-w-6xl bg-surface p-4 text-content md:p-6">
       <header className="mb-4">
         <div className="flex items-center gap-2 mb-1">
-          <Briefcase className="w-5 h-5 text-gold" />
-          <h1 className="text-lg md:text-xl font-mono font-semibold text-foreground">
+          <Briefcase className="w-5 h-5 text-accent-brand" />
+          <h1 className="font-serif text-3xl font-normal text-content">
             Marketplace de Propiedades
           </h1>
         </div>
-        <p className="text-xs font-mono text-muted-foreground">
+        <p className="text-xs font-mono text-content-subtle">
           Pertenencias, JVs, royalties y opciones de propiedades mineras. Firma NDA para acceder al
           data room.
         </p>
       </header>
 
       {/* Scope tabs */}
-      <div className="flex items-center gap-1 mb-3 border-b border-border">
+      <div className="flex items-center gap-1 mb-3 border-b border-hairline">
         <button
           onClick={() => setScope("project")}
           disabled={!active}
           className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors disabled:opacity-40 ${
             scope === "project"
-              ? "border-gold text-gold"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-accent-brand text-accent-brand"
+              : "border-transparent text-content-subtle hover:text-content"
           }`}
         >
           Mi proyecto {active ? `(${projectCount})` : ""}
@@ -103,8 +103,8 @@ function DealsPage() {
           onClick={() => setScope("all")}
           className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
             scope === "all"
-              ? "border-gold text-gold"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              ? "border-accent-brand text-accent-brand"
+              : "border-transparent text-content-subtle hover:text-content"
           }`}
         >
           Todo el marketplace ({allCount})
@@ -114,13 +114,13 @@ function DealsPage() {
       {/* Filter bar */}
       <div className="flex flex-wrap items-center gap-2 mb-4">
         <div className="relative flex-1 min-w-[180px] max-w-md">
-          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-content-subtle" />
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, código, región…"
-            className="w-full pl-7 pr-2 py-1.5 text-xs font-mono rounded border border-border bg-background outline-none focus:border-gold"
+            className="w-full pl-7 pr-2 py-1.5 text-xs font-mono rounded border border-hairline bg-surface outline-none focus:border-accent-brand"
           />
         </div>
         <FilterSelect
@@ -149,12 +149,12 @@ function DealsPage() {
         {activeFilters > 0 && (
           <button
             onClick={clearFilters}
-            className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
+            className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono text-content-subtle hover:text-content"
           >
             <X className="w-3 h-3" /> Limpiar ({activeFilters})
           </button>
         )}
-        <span className="ml-auto text-[11px] font-mono text-muted-foreground">
+        <span className="ml-auto text-[11px] font-mono text-content-subtle">
           <Filter className="w-3 h-3 inline mr-1" />
           {filtered.length} resultado{filtered.length === 1 ? "" : "s"}
         </span>
@@ -162,14 +162,14 @@ function DealsPage() {
 
       {/* Grid */}
       {loading ? (
-        <div className="text-center py-16 text-xs font-mono text-muted-foreground">
+        <div className="text-center py-16 text-xs font-mono text-content-subtle">
           Cargando ofertas…
         </div>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-border rounded-lg">
-          <Briefcase className="w-8 h-8 text-muted-foreground/50 mx-auto mb-2" />
-          <div className="text-sm font-mono text-foreground mb-1">Sin resultados</div>
-          <div className="text-xs font-mono text-muted-foreground">
+        <div className="text-center py-16 border border-dashed border-hairline rounded-lg">
+          <Briefcase className="w-8 h-8 text-content-subtle/50 mx-auto mb-2" />
+          <div className="text-sm font-mono text-content mb-1">Sin resultados</div>
+          <div className="text-xs font-mono text-content-subtle">
             {activeFilters > 0
               ? "Ajusta los filtros o cambia el scope."
               : scope === "project"

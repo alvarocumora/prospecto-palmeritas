@@ -1,0 +1,585 @@
+{
+  "date": "2026-10-10",
+  "sha": "9250d53f841880cba1d1f66391527b61e8bd6f0c",
+  "collars": 7,
+  "totalMeters": 1070,
+  "pdfs": [
+    {
+      "file": "geoscience-ni.pdf",
+      "pages": 11,
+      "bytes": 307121,
+      "sha256": "ac515ee88cdae0f819eff181c9d69fddc385b1339109afec4cd8595d873a0667",
+      "internalLinks": 20,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": true,
+      "tableCollarsChecked": [
+        {
+          "code": "CHO-DDH-01",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-02",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-03",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-04",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-05",
+          "azimuth": 105,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-06",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-07",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        }
+      ],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "minuta-ni.pdf",
+      "pages": 11,
+      "bytes": 845738,
+      "sha256": "58ce59dede0a4af8c4bccfbd4a89ab27b6fba4b5d31f6953ade01bd566acba51",
+      "internalLinks": 20,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": true,
+      "tableCollarsChecked": [
+        {
+          "code": "CHO-DDH-01",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-02",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-03",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-04",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-05",
+          "azimuth": 105,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-06",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-07",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        }
+      ],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "targets-ni.pdf",
+      "pages": 12,
+      "bytes": 888640,
+      "sha256": "57a291f1f4431f9134ccabe0118c2433d330d498c84d70c534c21f762ed96d3a",
+      "internalLinks": 21,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": true,
+      "tableCollarsChecked": [
+        {
+          "code": "CHO-DDH-01",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-02",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-03",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-04",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-05",
+          "azimuth": 105,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-06",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-07",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        }
+      ],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "technical-deck.pdf",
+      "pages": 8,
+      "bytes": 175528,
+      "sha256": "71576bb52c4b883e87d377892d47d2824c56d30492742f4cb52ec9255e905570",
+      "internalLinks": 0,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": false,
+      "tableCollarsChecked": [],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "technical-jorc.pdf",
+      "pages": 11,
+      "bytes": 304750,
+      "sha256": "44588f65a7e82bd93fd5533ef887501bdd39437c7124fe972fe642f0e64324e6",
+      "internalLinks": 20,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": true,
+      "tableCollarsChecked": [
+        {
+          "code": "CHO-DDH-01",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-02",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-03",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-04",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-05",
+          "azimuth": 105,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-06",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-07",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        }
+      ],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "technical-ni.pdf",
+      "pages": 11,
+      "bytes": 307121,
+      "sha256": "da7f3a47eb8d08251438d9c20249a8e28d95a6634bc6511c572f92f00ac77284",
+      "internalLinks": 20,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": true,
+      "tableCollarsChecked": [
+        {
+          "code": "CHO-DDH-01",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-02",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-03",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-04",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 170
+        },
+        {
+          "code": "CHO-DDH-05",
+          "azimuth": 105,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-06",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        },
+        {
+          "code": "CHO-DDH-07",
+          "azimuth": 285,
+          "dip": -60,
+          "depth": 130
+        }
+      ],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    },
+    {
+      "file": "technical-onepager.pdf",
+      "pages": 1,
+      "bytes": 108775,
+      "sha256": "63bf3d38c2f4fde017f8522cd2491931c6751729ad2aecf4ecca7209b1c5f7aa",
+      "internalLinks": 0,
+      "allLinkTargetsValid": true,
+      "uniqueFinalFolios": false,
+      "tableCollarsChecked": [],
+      "textOutsidePage": 0,
+      "baseFonts": [
+        "Helvetica",
+        "Helvetica-Bold",
+        "Helvetica-Oblique",
+        "Helvetica-BoldOblique",
+        "Courier",
+        "Courier-Bold",
+        "Courier-Oblique",
+        "Courier-BoldOblique",
+        "Times-Roman",
+        "Times-Bold",
+        "Times-Italic",
+        "Times-BoldItalic",
+        "ZapfDingbats",
+        "Symbol",
+        "GCSerif",
+        "GCSans"
+      ],
+      "embeddedTtfFontFiles": 6,
+      "indexNumbersMatchTargets": true
+    }
+  ],
+  "environment": {
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "platform": "darwin",
+    "architecture": "x64",
+    "ciNode": "22",
+    "ciOS": "ubuntu-latest"
+  },
+  "originalDiff": {
+    "prettierCanonicalOutputVerified": true,
+    "files": 11,
+    "checkedBeforeAdditionalPdfFixes": true
+  },
+  "eslintScope": [
+    {
+      "file": "src/routes/mcp.ts",
+      "prettier": 0,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/routes/[.mcp]/list-tools.ts",
+      "prettier": 0,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/routes/[.mcp]/invoke-tool/$tool.ts",
+      "prettier": 0,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/routes/[.well-known]/oauth-protected-resource.ts",
+      "prettier": 0,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/routes/other/list-tools.ts",
+      "prettier": 2,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/routes/other/invoke-tool/other.ts",
+      "prettier": 2,
+      "hooks": 2,
+      "noExplicitAny": 2
+    },
+    {
+      "file": "src/features/franco/components/CholquiTerrain3D.tsx",
+      "prettier": 2,
+      "hooks": 2,
+      "noExplicitAny": 2
+    }
+  ],
+  "navigation": [
+    {
+      "label": "Tesis & ensayes",
+      "url": "http://127.0.0.1:8080/terminal/cholqui?tab=tesis&view=2d"
+    },
+    {
+      "label": "Simulador & modelo",
+      "url": "http://127.0.0.1:8080/terminal/cholqui?tab=simulador&view=2d"
+    },
+    {
+      "label": "Documentos & Data Room",
+      "url": "http://127.0.0.1:8080/terminal/cholqui?tab=dataroom&view=2d"
+    },
+    {
+      "label": "Volver al mapa",
+      "url": "http://127.0.0.1:8080/terminal/cholqui?tab=mapa&view=2d",
+      "leaflet": 1
+    }
+  ],
+  "browserErrors": [],
+  "terrain": {
+    "canvas": 1,
+    "collarMarkers": 7,
+    "collarTraces": 7,
+    "copernicusSourceShown": true,
+    "controls": [
+      {
+        "name": "Planta",
+        "pressed": "true"
+      },
+      {
+        "name": "Perspectiva",
+        "pressed": "true"
+      },
+      {
+        "name": "Reencuadrar",
+        "pressed": null
+      },
+      {
+        "variable": "mag_residual_nt",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      },
+      {
+        "variable": "ip_chargeability_mvv",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      },
+      {
+        "variable": "ip_resistivity_ohmm",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      }
+    ],
+    "errors": [],
+    "stationsAvailable": 0
+  },
+  "regionalMag": {
+    "controlChecked": true,
+    "errors": [],
+    "numericValuesVerified": false
+  },
+  "privateRoute": {
+    "url": "http://127.0.0.1:8080/auth",
+    "authenticated": false,
+    "renderedText": "",
+    "blocked": null,
+    "errors": []
+  },
+  "backendBlocker": "Missing SUPABASE_SERVICE_ROLE_KEY for publicListings",
+  "finalChecks": {
+    "typecheck": 0,
+    "lint": {
+      "exitCode": 0,
+      "errors": 0,
+      "warnings": 18
+    },
+    "test": {
+      "exitCode": 0,
+      "passed": 674,
+      "skipped": 4,
+      "filesPassed": 127,
+      "filesSkipped": 1
+    },
+    "build": 0,
+    "diffCheck": 0
+  },
+  "artifactsDirectory": "/tmp/geocapitals-browser-check"
+}

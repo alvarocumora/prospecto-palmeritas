@@ -13,7 +13,6 @@ import {
   donutLegend,
   editorialTable,
   eyebrow,
-  fill,
   fitTableRows,
   font,
   ink,
@@ -25,6 +24,7 @@ import {
 import type { ProjectDoc } from "../model";
 import { appendixTables, blockMetaLine, mainBlocks } from "../narrative";
 import {
+  folio,
   letterhead,
   section as institutionalSection,
   verificationSeal,
@@ -49,8 +49,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     profile === "investment"
       ? "Memorando de inversión\npreliminar"
       : profile === "targeting"
-      ? "Informe de targets\npreliminar"
-      : "Informe técnico\npreliminar";
+        ? "Informe de targets\npreliminar"
+        : "Informe técnico\npreliminar";
   const contents: Array<{ label: string; page: number }> = [];
   const chrome = () =>
     letterhead(doc, frame, {
@@ -60,6 +60,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
       page,
       total: 0,
       issued,
+      deferFooter: true,
     });
   const nextPage = () => {
     doc.addPage("a4", "portrait");
@@ -83,10 +84,10 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     }
     y += 7;
   };
-  const heading = (num: string, label: string) => {
+  const heading = (num: string, label: string, spaceAfter = 0) => {
     font(doc, "display", "bold", 16);
     const lines = doc.splitTextToSize(label, CW) as string[];
-    need(42 + lines.length * 18);
+    need(42 + lines.length * 18 + spaceAfter);
     contents.push({ label: `${num} · ${label}`, page });
     y = institutionalSection(doc, frame, y, num, "Informe técnico");
     y += title(doc, M, y, label, 16, CW) + 10;
@@ -144,8 +145,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y = verificationSeal(doc, frame, y, {
     qr,
     title: "Expediente del proyecto",
-    body:
-      "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
+    body: "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
     url: model.liveUrl,
     ref: model.code,
   });
@@ -414,14 +414,32 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   );
   const appendices = appendixTables(model);
   for (const [index, appendix] of appendices.entries()) {
-    heading(`Anexo ${String.fromCharCode(65 + index)}`, appendix.block.title);
     const meta = blockMetaLine(appendix.block);
-    if (meta) write(meta, 7, GC_COLOR.slate);
-    pagedTable(
-      appendix.block.head,
-      appendix.block.rows,
-      appendix.block.widths?.map((p) => CW * p),
+    font(doc, "body", "normal", 7);
+    const metaHeight = meta ? (doc.splitTextToSize(meta, CW) as string[]).length * 7 * 1.45 + 7 : 0;
+    const widths = appendix.block.widths?.map((p) => CW * p);
+    font(doc, "body", "normal", 7.8);
+    const firstRow = appendix.block.rows[0];
+    const firstRowHeight = firstRow
+      ? 18 +
+        Math.max(
+          ...firstRow.map(
+            (cell, i) =>
+              (doc.splitTextToSize(cell, (widths?.[i] ?? CW / firstRow.length) - 10) as string[])
+                .length,
+          ),
+        ) *
+          7.8 *
+          1.35 +
+        8
+      : 24;
+    heading(
+      `Anexo ${String.fromCharCode(65 + index)}`,
+      appendix.block.title,
+      metaHeight + firstRowHeight,
     );
+    if (meta) write(meta, 7, GC_COLOR.slate);
+    pagedTable(appendix.block.head, appendix.block.rows, widths);
     y += 18;
   }
   const contact = [model.contact?.name, model.contact?.email, model.contact?.phone]
@@ -471,12 +489,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   }
   for (let p = 1; p <= total; p++) {
     doc.setPage(p);
-    fill(doc, GC_COLOR.white);
-    doc.rect(M, H - 42, CW, 28, "F");
-    font(doc, "body", "normal", 6.6);
-    ink(doc, GC_COLOR.slate);
-    doc.text(`${model.code} · ${model.docVersion} · ${issued}`, M, H - 31);
-    doc.text(`Página ${p} de ${total}`, W - M, H - 31, { align: "right" });
+    folio(doc, frame, { page: p, total, issued });
   }
   doc.setPage(total);
 }

@@ -167,8 +167,7 @@ export function buildCholquiFieldMemoDoc(
         eyebrow: "Alcance",
         title: "Qué se valida y qué no",
         deck: true,
-        lead:
-          "La Fase 0 busca evidencia de terreno sobre indicios satelitales. No produce estimaciones de recursos ni resultados económicos.",
+        lead: "La Fase 0 busca evidencia de terreno sobre indicios satelitales. No produce estimaciones de recursos ni resultados económicos.",
         blocks: [
           {
             kind: "bullets",
@@ -186,8 +185,7 @@ export function buildCholquiFieldMemoDoc(
         eyebrow: "Targets",
         title: "Prioridad, concesión y acciones por target",
         deck: true,
-        lead:
-          "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas últimas no se ejecuta trabajo sin verificación registral ni acuerdo escrito previo.",
+        lead: "Cada target se ubica contra el catastro SERNAGEOMIN cargado. Se distingue la tenencia analizada del proyecto de las concesiones de terceros: sobre estas últimas no se ejecuta trabajo sin verificación registral ni acuerdo escrito previo.",
         blocks: [
           {
             kind: "table",
@@ -211,8 +209,7 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body:
-              "El score conserva el valor publicado; campañas e índices distintos no se comparan como ranking geológico o económico. La prioridad es una regla de planificación pendiente de revisión de terreno.",
+            body: "El score conserva el valor publicado; campañas e índices distintos no se comparan como ranking geológico o económico. La prioridad es una regla de planificación pendiente de revisión de terreno.",
           },
           {
             kind: "text",
@@ -275,8 +272,7 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body:
-              "Toda muestra se registra con coordenada UTM 19S, datum declarado, fotografía del sitio y ficha de terreno. Sin cadena de custodia completa la muestra no se incorpora a la base de datos del proyecto.",
+            body: "Toda muestra se registra con coordenada UTM 19S, datum declarado, fotografía del sitio y ficha de terreno. Sin cadena de custodia completa la muestra no se incorpora a la base de datos del proyecto.",
           },
         ],
       },
@@ -305,8 +301,7 @@ export function buildCholquiFieldMemoDoc(
           },
           {
             kind: "text",
-            body:
-              "La geofísica regional disponible (EMAG2 y WGM2012) tiene resolución kilométrica y sirve sólo como contexto. Las decisiones de perforación requieren datos de terreno a escala de prospecto como los de esta campaña.",
+            body: "La geofísica regional disponible (EMAG2 y WGM2012) tiene resolución kilométrica y sirve sólo como contexto. Las decisiones de perforación requieren datos de terreno a escala de prospecto como los de esta campaña.",
           },
         ],
       },

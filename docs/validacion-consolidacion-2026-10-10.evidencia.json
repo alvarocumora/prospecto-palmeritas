@@ -1,0 +1,335 @@
+{
+  "date": "2026-10-10",
+  "branch": "main",
+  "sha": "9250d53f841880cba1d1f66391527b61e8bd6f0c",
+  "versions": {
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "bun": "1.4.3",
+    "typescript": "5.9.3",
+    "vite": "7.3.2",
+    "tsgo": "7.0.0-dev.20260707.2",
+    "ciNode": 22,
+    "ciExecuted": false
+  },
+  "checks": {
+    "npmCi": {
+      "exit": 0,
+      "auditVulnerabilities": 44
+    },
+    "typecheck": {
+      "exit": 0
+    },
+    "tsgo": {
+      "exit": 0
+    },
+    "lint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 8
+    },
+    "tests": {
+      "exit": 0,
+      "passed": 677,
+      "skipped": 4,
+      "passedFiles": 129,
+      "skippedFiles": 1
+    },
+    "bunBuild": {
+      "exit": 0,
+      "memoryWarnings": 0,
+      "circularDependencyWarnings": 0
+    }
+  },
+  "bundle": {
+    "metric": "sum of all emitted client JavaScript chunks; not initial route payload",
+    "before": {
+      "raw": 10667938,
+      "gzip": 3191855
+    },
+    "after": {
+      "raw": 9025962,
+      "gzip": 2686511
+    },
+    "saved": {
+      "raw": 1641976,
+      "gzip": 505344
+    }
+  },
+  "pruning": {
+    "files": [
+      "src/engine3d/LosVerdesEngine3D.tsx",
+      "src/engine3d/access/enginePermissions.ts",
+      "src/engine3d/ai/aiGeologist.ts",
+      "src/engine3d/ai/drillTarget.worker.ts",
+      "src/engine3d/export/sectionExport.ts",
+      "src/engine3d/hooks/useBlockModel.ts",
+      "src/engine3d/hooks/useDrillTargets.ts",
+      "src/engine3d/hooks/useEngineRole.ts",
+      "src/engine3d/hooks/useIsosurface.ts",
+      "src/engine3d/hooks/useQAQC.ts",
+      "src/engine3d/hooks/useSection.ts",
+      "src/engine3d/hooks/useTerrainDEM.ts",
+      "src/engine3d/hooks/useVoxelModel.ts",
+      "src/engine3d/layers/AnomalyIsosurfaceLayer.tsx",
+      "src/engine3d/layers/AnomalyPointsLayer.tsx",
+      "src/engine3d/layers/AnomalyVoxelLayer.tsx",
+      "src/engine3d/layers/BasemapLayer.tsx",
+      "src/engine3d/layers/BlockModelLayer.tsx",
+      "src/engine3d/layers/CinematicEffects.tsx",
+      "src/engine3d/layers/DepthAxis.tsx",
+      "src/engine3d/layers/DrillTargetLayer.tsx",
+      "src/engine3d/layers/DrillholesLayer.tsx",
+      "src/engine3d/layers/PitShellLayer.tsx",
+      "src/engine3d/layers/ShadowApplier.tsx",
+      "src/engine3d/layers/SyntheticBlockModelLayer.tsx",
+      "src/engine3d/layers/SyntheticDemoScene.tsx",
+      "src/engine3d/layers/SyntheticDrillholeTraceLayer.tsx",
+      "src/engine3d/layers/TerrainMartiniLayer.tsx",
+      "src/engine3d/layers/TerrainPlane.tsx",
+      "src/engine3d/panels/AIGeologistPanel.tsx",
+      "src/engine3d/panels/AuditTrailPanel.tsx",
+      "src/engine3d/panels/BasemapPanel.tsx",
+      "src/engine3d/panels/CameraPresetCluster.tsx",
+      "src/engine3d/panels/CameraViewPresets.tsx",
+      "src/engine3d/panels/CommentsPanel.tsx",
+      "src/engine3d/panels/CompassAndMiniMap.tsx",
+      "src/engine3d/panels/DrillholeImportPanel.tsx",
+      "src/engine3d/panels/EngineAccessBadge.tsx",
+      "src/engine3d/panels/EngineTabsDock.tsx",
+      "src/engine3d/panels/EstimationSettingsPanel.tsx",
+      "src/engine3d/panels/NI43101Panel.tsx",
+      "src/engine3d/panels/QAQCPanel.tsx",
+      "src/engine3d/panels/ReportsPanel.tsx",
+      "src/engine3d/panels/ResourceModelPanel.tsx",
+      "src/engine3d/panels/TargetPlanningPanel.tsx",
+      "src/engine3d/panels/TonnageGradePanel.tsx",
+      "src/engine3d/panels/VersionSelectorPanel.tsx",
+      "src/engine3d/persistence/engineCloud.ts",
+      "src/engine3d/persistence/useEngineComments.ts",
+      "src/engine3d/qaqc/auditTrail.ts",
+      "src/engine3d/qaqc/compositing.worker.ts",
+      "src/engine3d/qaqc/estimationPresets.ts",
+      "src/engine3d/qaqc/modelVersions.ts",
+      "src/engine3d/qaqc/qaqc.worker.ts",
+      "src/engine3d/reports/reportGenerator.ts",
+      "src/engine3d/sections/AutoFitCamera.tsx",
+      "src/engine3d/sections/ClippingPlaneController.tsx",
+      "src/engine3d/sections/SectionViewPanel.tsx",
+      "src/engine3d/sections/section.worker.ts",
+      "src/engine3d/sections/sectionEngine.ts",
+      "src/engine3d/sections/useClippingPlanes.ts",
+      "src/engine3d/terrain/basemapTiles.ts",
+      "src/engine3d/terrain/martini.worker.ts",
+      "src/engine3d/workers/blockModel.worker.ts",
+      "src/engine3d/workers/isosurface.worker.ts",
+      "src/engine3d/workers/mcTables.ts",
+      "src/engine3d/workers/voxel.worker.ts",
+      "src/components/live/LosVerdesPublicScene.tsx",
+      "src/components/live/LosVerdesStrategicMap.tsx",
+      "src/components/geo/PublicCanonicalScene.tsx"
+    ],
+    "lines": 13444
+  },
+  "routes": [
+    {
+      "route": "/dashboard/map",
+      "url": "http://127.0.0.1:8081/catastro/mapa?vista=proyecto",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/catastro",
+      "url": "http://127.0.0.1:8081/catastro/mapa?lat=-31.63&lng=-71.17&z=11",
+      "leaflet": 1,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/sat3d",
+      "url": "http://127.0.0.1:8081/catastro/mapa?vista=proyecto",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/geology3d",
+      "url": "http://127.0.0.1:8081/catastro/mapa?vista=proyecto",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/trades",
+      "url": "http://127.0.0.1:8081/auth",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/deals",
+      "url": "http://127.0.0.1:8081/auth",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/colateral-leads",
+      "url": "http://127.0.0.1:8081/auth",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/terminal/palmeras?tab=mapa&view=2d",
+      "url": "http://127.0.0.1:8081/terminal/palmeras?tab=mapa&view=2d",
+      "leaflet": 1,
+      "canvas": 0
+    },
+    {
+      "route": "/terminal/losverdes?tab=mapa&view=2d",
+      "url": "http://127.0.0.1:8081/terminal/losverdes?tab=mapa&view=2d",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/visor-3d?project=cholqui",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=mapa&view=3d",
+      "leaflet": 0,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/map?project=e5360f13-1647-4e44-bb13-c0614e6f39fe",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=mapa&view=2d",
+      "leaflet": 1,
+      "canvas": 0
+    },
+    {
+      "route": "/dashboard/geology3d?project=e5360f13-1647-4e44-bb13-c0614e6f39fe",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=mapa&view=3d",
+      "leaflet": 0,
+      "canvas": 1
+    },
+    {
+      "route": "/dashboard/map?project=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "url": "http://127.0.0.1:8081/catastro/mapa?vista=proyecto&project=aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "leaflet": 0,
+      "canvas": 0
+    }
+  ],
+  "cholqui": {
+    "collars": 7,
+    "totalMetres": 1070,
+    "depthsMetres": [170, 170, 170, 170, 130, 130, 130],
+    "azimuthsDegrees": [285, 285, 285, 285, 105, 285, 285],
+    "dipDegrees": -60,
+    "provenance": "conceptual proposal, not measured drilling",
+    "table": "Sondaje\tCollar (lat, lon)\tAzimut\tIncl.\tProf.\tPrioridad\tObjetivo\nCHO-DDH-01\t-33.90260, -71.00702\t285°\t-60°\t170 m\tAlta\tObjetivo no informado en la propuesta publicada\nCHO-DDH-02\t-33.87393, -71.02884\t285°\t-60°\t170 m\tMedia\tObjetivo no informado en la propuesta publicada\nCHO-DDH-03\t-33.88047, -71.02618\t285°\t-60°\t170 m\tMedia\tObjetivo no informado en la propuesta publicada\nCHO-DDH-04\t-33.89788, -71.00908\t285°\t-60°\t170 m\tMedia\tObjetivo no informado en la propuesta publicada\nCHO-DDH-05\t-33.86221, -71.03958\t105°\t-60°\t130 m\tBaja\tObjetivo no informado en la propuesta publicada\nCHO-DDH-06\t-33.87316, -71.03185\t285°\t-60°\t130 m\tBaja\tObjetivo no informado en la propuesta publicada\nCHO-DDH-07\t-33.86698, -71.03451\t285°\t-60°\t130 m\tBaja\tObjetivo no informado en la propuesta publicada",
+    "controls": [
+      {
+        "name": "Planta",
+        "pressed": "true"
+      },
+      {
+        "name": "Perspectiva",
+        "pressed": "true"
+      },
+      {
+        "name": "Reencuadrar",
+        "pressed": null
+      },
+      {
+        "variable": "mag_residual_nt",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      },
+      {
+        "variable": "ip_chargeability_mvv",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      },
+      {
+        "variable": "ip_resistivity_ohmm",
+        "campaignDisabled": true,
+        "surfaceDisabled": true
+      }
+    ],
+    "browserErrors": [],
+    "dem": {
+      "source": "Copernicus GLO-30",
+      "extentKm": 20,
+      "grid": 257,
+      "renderGridMetres": 78.1
+    }
+  },
+  "pdfs": [
+    {
+      "file": "geoscience-ni.pdf",
+      "bytes": 307121,
+      "pages": 11,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    },
+    {
+      "file": "minuta-ni.pdf",
+      "bytes": 845738,
+      "pages": 11,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    },
+    {
+      "file": "targets-ni.pdf",
+      "bytes": 888640,
+      "pages": 12,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    },
+    {
+      "file": "technical-deck.pdf",
+      "bytes": 175528,
+      "pages": 8,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "cover unnumbered; native deck folios 2–8"
+    },
+    {
+      "file": "technical-jorc.pdf",
+      "bytes": 304750,
+      "pages": 11,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    },
+    {
+      "file": "technical-ni.pdf",
+      "bytes": 307121,
+      "pages": 11,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    },
+    {
+      "file": "technical-onepager.pdf",
+      "bytes": 108775,
+      "pages": 1,
+      "outsideMargins": 0,
+      "indexDestinationsMatch": true,
+      "embeddedBrandFontsVerified": true,
+      "pagination": "institutional folios"
+    }
+  ],
+  "blockers": [
+    "Los Verdes backend query failed: 88 registered / 10 drawable is user-provided, not revalidated live",
+    "Palmeras ownership requires authoritative RLS portfolio data; no inferred blanket ownership",
+    "Palmeras geographic discrepancy: public Illapel/Coquimbo vs local Melipilla coordinates",
+    "Private dashboard visual and CRUD QA requires authenticated session",
+    "No field MAG/IP campaign accessible; controls disabled rather than synthetic measured data",
+    "Node 22 Ubuntu CI not executed locally"
+  ],
+  "published": false,
+  "pushed": false,
+  "committed": false
+}

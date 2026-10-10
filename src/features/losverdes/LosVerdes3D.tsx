@@ -1,31 +1,45 @@
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import type { FeatureCollection } from "geojson";
 import { ProjectTerrain3D } from "@/components/geo/ProjectTerrain3D";
+import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
+import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 
 /** Relieve 3D estándar de Los Verdes: mismo visor institucional que el resto de proyectos. */
-export function LosVerdes3D() {
+export function LosVerdes3D({
+  projectId = "7a499b02-ecdf-447b-8956-b106fe4ec087",
+}: { projectId?: string } = {}) {
   const fetchData = useServerFn(getLosVerdesMapData);
-  const query = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchData() });
+  const query = useQuery({
+    queryKey: ["losverdes-map-data"],
+    queryFn: () => fetchData(),
+    enabled: projectId === "7a499b02-ecdf-447b-8956-b106fe4ec087",
+  });
 
   const layers = useMemo(() => {
     const d = query.data;
     if (!d) return null;
-    const concessions: FeatureCollection = {
-      type: "FeatureCollection",
-      features: d.concessions.features
-        .filter((f) => f.geometry)
-        .map((f) => ({ ...f, properties: { ...(f.properties ?? {}), es_tenencia_proyecto: true } })),
-    } as FeatureCollection;
-    const anomalies = {
-      type: "FeatureCollection",
-      features: [...d.satAnomalies.features, ...d.magAnomalies.features, ...d.targets.features],
-    } as FeatureCollection;
-    return { center: { lat: d.center[1], lng: d.center[0] }, concessions, anomalies, samples: d.samples as FeatureCollection };
-  }, [query.data]);
+    const manifest = buildPublicGeoManifest(
+      { id: projectId, name: "Los Verdes", center_lat: d.center[1], center_lng: d.center[0] },
+      [
+        "territory.cadastre",
+        "remote_sensing.sentinel2_alteration",
+        "geophysics.anomalies",
+        "sampling.results",
+        "targets.exploration",
+      ],
+    );
+    return {
+      center: { lat: d.center[1], lng: d.center[0] },
+      evidenceBundle: buildLosVerdesPublicGeoBundle(manifest, d),
+    };
+  }, [query.data, projectId]);
 
+  if (projectId !== "7a499b02-ecdf-447b-8956-b106fe4ec087")
+    return (
+      <p className="text-content-subtle">No hay capas de Los Verdes asociadas a este proyecto.</p>
+    );
   if (query.isError) {
     return (
       <div className="rounded-2xl border border-hairline p-6 text-sm text-content-subtle">
@@ -43,10 +57,11 @@ export function LosVerdes3D() {
   return (
     <ProjectTerrain3D
       slug="losverdes"
+      projectId={projectId}
+      notice={`${query.data?.counts.concessions ?? 0} concesiones registradas · ${query.data?.counts.concessionsWithGeom ?? 0} con geometría disponible. No se reconstruyen polígonos faltantes. ${query.data?.geometryLookupWarning ?? ""}`}
       center={layers.center}
       extentMeters={12000}
-      concessions={layers.concessions}
-      anomalies={layers.anomalies}
+      evidenceBundle={layers.evidenceBundle}
     />
   );
 }

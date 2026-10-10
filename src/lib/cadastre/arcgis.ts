@@ -33,18 +33,19 @@ export async function arcgisQueryAttributes(
     const res = await fetch(`${layerUrl}/query?${params.toString()}`, {
       signal: AbortSignal.timeout(opts.timeoutMs ?? 20_000),
     });
-    if (!res.ok) return [];
+    if (!res.ok) throw new Error(`CADASTRE_SOURCE_HTTP_${res.status}`);
     const json = (await res.json()) as {
       error?: unknown;
       features?: Array<{ attributes?: Record<string, unknown> }>;
     };
-    if (json.error) return [];
+    if (json.error) throw new Error("CADASTRE_SOURCE_QUERY_FAILED");
+    if (!Array.isArray(json.features)) throw new Error("CADASTRE_SOURCE_INVALID_RESPONSE");
     const rows = (json.features ?? [])
       .map((f) => f.attributes)
       .filter((a): a is Record<string, unknown> => !!a);
     return rows.slice(0, opts.limit);
-  } catch {
-    return [];
+  } catch (error) {
+    throw error instanceof Error ? error : new Error("CADASTRE_SOURCE_UNAVAILABLE");
   }
 }
 

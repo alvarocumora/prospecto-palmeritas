@@ -40,10 +40,10 @@ export function CholquiGeophysicsTerrainLayer({
     () => lines.flatMap((line) => terrainFootprintPaths(line.geometry_geojson, tile)),
     [lines, tile],
   );
-  const triangles = useMemo(() => (surface ? geophysicsTerrainTriangles(surface, tile) : []), [
-    surface,
-    tile,
-  ]);
+  const triangles = useMemo(
+    () => (surface ? geophysicsTerrainTriangles(surface, tile) : []),
+    [surface, tile],
+  );
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
     const vertices: number[] = [];

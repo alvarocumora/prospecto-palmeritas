@@ -3,7 +3,7 @@
  * (deck 16:9, resumen de una página y dossier técnico) desde un único botón.
  * Se usa en cualquier vista que disponga de un `ProjectDoc`.
  */
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { ChevronDown, FileDown, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -18,8 +18,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { DisclosureStandard } from "@/lib/reports/internationalStandards";
 import type { ProjectDoc, ProjectDocKind } from "@/lib/pdf/model";
-import { captureElement } from "@/lib/pdf/captureMap";
-import { downloadProjectDoc } from "@/lib/pdf/generateProjectDoc";
 
 const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
   {
@@ -43,7 +41,7 @@ export function ProjectDocsMenu({
   label = "Descargar documentos",
 }: {
   /** Construye el modelo en el momento de la descarga (permite datos asíncronos ya cargados). */
-  build: () => ProjectDoc | null | undefined;
+  build: () => ProjectDoc | null | undefined | Promise<ProjectDoc | null | undefined>;
   disabled?: boolean;
   className?: string;
   variant?: "default" | "outline" | "secondary";
@@ -51,20 +49,25 @@ export function ProjectDocsMenu({
 }) {
   const [busy, setBusy] = useState<ProjectDocKind | null>(null);
   const navigate = useNavigate();
+  const inFlight = useRef(false);
 
   const run = async (kind: ProjectDocKind, standard?: DisclosureStandard) => {
-    const model = build();
-    if (!model) {
-      toast.error("Los antecedentes del proyecto aún se están cargando");
-      return;
-    }
-    if (standard) model.disclosureStandard = standard;
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(kind);
     const id = toast.loading("Generando documento…");
     try {
+      const model = await build();
+      if (!model) {
+        toast.error("Los antecedentes del proyecto aún no están disponibles", { id });
+        return;
+      }
+      if (standard) model.disclosureStandard = standard;
+      const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
       // Capture the real live GIS when available. A capture failure is non-fatal:
       // the document renderer keeps its analytical fallback instead of blanking.
       if (model.map?.captureSelector) {
+        const { captureElement } = await import("@/lib/pdf/captureMap");
         const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
         if (snapshot) model.map.imageDataUrl = snapshot;
       }
@@ -74,6 +77,7 @@ export function ProjectDocsMenu({
       console.error(e);
       toast.error(e instanceof Error ? e.message : "No se pudo generar el documento", { id });
     } finally {
+      inFlight.current = false;
       setBusy(null);
     }
   };
@@ -83,7 +87,7 @@ export function ProjectDocsMenu({
       <DropdownMenuTrigger asChild>
         <Button variant={variant} className={className} disabled={disabled || busy !== null}>
           {busy ? <Loader2 className="animate-spin" /> : <FileDown />}
-          {label}
+          {busy ? "Generando documento…" : label}
           <ChevronDown className="opacity-70" />
         </Button>
       </DropdownMenuTrigger>

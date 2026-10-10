@@ -29,7 +29,7 @@ const BRAND_FONT_FILES: Array<[file: string, family: string, style: string]> = [
   ["PlexSans-SemiBold.ttf", "GCSans", "bold"],
   ["PlexSans-Italic.ttf", "GCSans", "italic"],
 ];
-const FONT_URLS = import.meta.glob("@/assets/fonts/pdf/*.ttf", {
+const FONT_URLS = import.meta.glob("../../../assets/fonts/pdf/*.ttf", {
   query: "?url",
   import: "default",
   eager: true,
@@ -619,6 +619,7 @@ export function editorialTable(
   });
   cy += 18;
   rows.forEach((row, ri) => {
+    font(doc, "body", "normal", size);
     const cells = row.map((cell, i) => doc.splitTextToSize(cell, widths[i] - 10) as string[]);
     const rowH = Math.max(...cells.map((c) => c.length)) * (size * 1.35) + 8;
     if (ri % 2 === 1) {
@@ -651,6 +652,7 @@ export function fitTableRows(
 ): number {
   const size = opts.size ?? 7.8;
   const widths = opts.widths ?? opts.head.map(() => opts.w / opts.head.length);
+  font(doc, "body", "normal", size);
   let h = 18;
   if (h > avail) return 0;
   let fit = 0;

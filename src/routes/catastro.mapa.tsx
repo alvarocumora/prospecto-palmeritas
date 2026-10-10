@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { CatastroProjectPage } from "@/features/catastro-project/CatastroProjectPage";
+import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
 import { searchConcessions } from "@/lib/catastroPublic.functions";
 import { SNGM_CONCESIONES_URL, SNGM_ELIMINADAS_POLY_URL } from "@/lib/sngm";
@@ -35,6 +36,7 @@ const searchSchema = z.object({
   base: z.enum(["satelite", "calles"]).optional().catch(undefined),
   elim: z.coerce.boolean().optional().catch(undefined),
   pais: z.enum(["CL", "PE", "BR", "ZM", "MW"]).optional().catch(undefined),
+  project: z.string().uuid().optional().catch(undefined),
   vista: z.enum(["explorar", "proyecto"]).optional().catch(undefined),
 });
 
@@ -89,6 +91,12 @@ function CatastroModeTabs({ active }: { active: "explorar" | "proyecto" }) {
 
 function ProjectWorkspace() {
   const { user, loading } = useAuth();
+  const { project } = Route.useSearch();
+  const { projects, active, setActiveId, loading: projectsLoading } = useProjects();
+  const requested = projects.find((item) => item.id === project);
+  useEffect(() => {
+    if (user && requested && active?.id !== requested.id) setActiveId(requested.id);
+  }, [user, requested, active?.id, setActiveId]);
   return (
     <PublicCatastroShell>
       <div className="px-4 pt-3">
@@ -96,6 +104,12 @@ function ProjectWorkspace() {
       </div>
       {loading ? (
         <p className="p-8 text-sm text-muted-foreground">Cargando…</p>
+      ) : user && project && (projectsLoading || active?.id !== project) ? (
+        <p className="p-8 text-sm text-content-subtle">
+          {projectsLoading || requested
+            ? "Activando proyecto…"
+            : "Este proyecto no está disponible en tu workspace."}
+        </p>
       ) : user ? (
         <CatastroProjectPage />
       ) : (
@@ -106,7 +120,11 @@ function ProjectWorkspace() {
           </p>
           <Link
             to="/auth"
-            search={{ redirect: "/catastro/mapa?vista=proyecto" } as never}
+            search={
+              {
+                redirect: "/catastro/mapa?vista=proyecto" + (project ? "&project=" + project : ""),
+              } as never
+            }
             className="inline-block rounded bg-primary px-4 py-2 text-sm text-primary-foreground"
           >
             Ingresar

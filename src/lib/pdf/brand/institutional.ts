@@ -42,7 +42,15 @@ export function pleca(doc: jsPDF, w: number) {
 export function letterhead(
   doc: jsPDF,
   f: Frame,
-  o: { unit: string; ref: string; version: string; page: number; total: number; issued: string },
+  o: {
+    unit: string;
+    ref: string;
+    version: string;
+    page: number;
+    total: number;
+    issued: string;
+    deferFooter?: boolean;
+  },
 ) {
   fill(doc, GC_COLOR.white);
   doc.rect(0, 0, f.w, f.h, "F");
@@ -60,6 +68,11 @@ export function letterhead(
   });
   doc.text(`Ref. ${o.ref} · ${o.version}`, f.w - f.m, 47, { align: "right" });
   rule(doc, f, 58);
+  if (!o.deferFooter) folio(doc, f, o);
+}
+
+/** Emit the institutional footer once pagination is final. */
+export function folio(doc: jsPDF, f: Frame, o: { page: number; total: number; issued: string }) {
   rule(doc, f, f.h - 44);
   font(doc, "body", "normal", 6.6);
   ink(doc, GC_COLOR.slate);
@@ -72,8 +85,9 @@ export function section(doc: jsPDF, f: Frame, y: number, num: string, label: str
   font(doc, "body", "bold", 7.4);
   ink(doc, IM_GOLD);
   doc.text(num, f.m, y);
+  const labelOffset = Math.max(22, doc.getTextWidth(num) + 10);
   ink(doc, IM_NAVY);
-  doc.text(label.toUpperCase(), f.m + 22, y, { charSpace: 0.6 });
+  doc.text(label.toUpperCase(), f.m + labelOffset, y, { charSpace: 0.6 });
   rule(doc, f, y + 5, IM_NAVY, 0.8);
   return y + 18;
 }

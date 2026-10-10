@@ -18,13 +18,11 @@ export function cholquiGeoscienceSections(): DocSection[] {
     {
       eyebrow: "Integración geocientífica",
       title: "Terreno, geofísica y límites de estimación",
-      lead:
-        "El relieve organiza la evidencia superficial; las propiedades del subsuelo requieren datos y modelos independientes.",
+      lead: "El relieve organiza la evidencia superficial; las propiedades del subsuelo requieren datos y modelos independientes.",
       blocks: [
         {
           kind: "narrative",
-          body:
-            "Copernicus GLO-30 aporta un modelo digital de superficie. La escena pública usa 20 × 20 km, una grilla visual de 257 × 257 nodos (78,1 m) y exageración vertical 1×. La resolución nominal del producto (~30 m) no es el paso de esta grilla ni precisión topográfica de replanteo. Ninguna cota o pendiente se incorpora como resultado sin un snapshot de terreno real y versionado.",
+          body: "Copernicus GLO-30 aporta un modelo digital de superficie. La escena pública usa 20 × 20 km, una grilla visual de 257 × 257 nodos (78,1 m) y exageración vertical 1×. La resolución nominal del producto (~30 m) no es el paso de esta grilla ni precisión topográfica de replanteo. Ninguna cota o pendiente se incorpora como resultado sin un snapshot de terreno real y versionado.",
           provenance: "DOCUMENTARY",
           source:
             "https://dataspace.copernicus.eu/explore-data/data-collections/copernicus-contributing-missions/collections-description/COP-DEM",
@@ -32,16 +30,14 @@ export function cholquiGeoscienceSections(): DocSection[] {
         {
           kind: "finding",
           title: "Medición, interpolación e inversión",
-          body:
-            "Las estaciones MAG/IP del proyecto se consultan por campaña. Una superficie IDW es una interpolación visual, no inversión. El residual magnético mostrado es TMI menos la mediana de la campaña: no acredita corrección diurna, IGRF ni reducción al polo. IP requiere geometría de electrodos y parámetros de adquisición antes de una inversión con topografía.",
+          body: "Las estaciones MAG/IP del proyecto se consultan por campaña. Una superficie IDW es una interpolación visual, no inversión. El residual magnético mostrado es TMI menos la mediana de la campaña: no acredita corrección diurna, IGRF ni reducción al polo. IP requiere geometría de electrodos y parámetros de adquisición antes de una inversión con topografía.",
           provenance: "INTERPRETED",
           source: "GeoCapitals · geophysicsSurface / SimPEG magnetics worker",
         },
         {
           kind: "gap",
           title: "Estimación mineral todavía pendiente",
-          body:
-            "Los ensayes puntuales, las huellas espectrales y el DEM no delimitan un volumen mineralizado. IDW/NN requieren sondajes ejecutados, compositado, dominios geológicos, densidad y QA/QC. Kriging requiere además variograma y validación espacial; la distancia por sí sola no justifica una categoría de recursos.",
+          body: "Los ensayes puntuales, las huellas espectrales y el DEM no delimitan un volumen mineralizado. IDW/NN requieren sondajes ejecutados, compositado, dominios geológicos, densidad y QA/QC. Kriging requiere además variograma y validación espacial; la distancia por sí sola no justifica una categoría de recursos.",
           action:
             "Validar collars/CRS, trayectorias y ensayes; definir dominios, densidad, corte topográfico y revisión competente antes de publicar tonelaje, ley media o clasificación.",
         },

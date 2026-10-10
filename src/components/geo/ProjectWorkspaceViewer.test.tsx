@@ -13,11 +13,10 @@ const context = vi.hoisted(() => ({
 }));
 
 vi.mock("@/hooks/useProjects", () => ({ useProjects: () => context }));
-vi.mock("@/components/geoscene", () => ({
-  GeoScene3D: () => <div data-testid="scene">3D</div>,
-}));
-vi.mock("@/components/geo/SnapshotAwareProjectMap", () => ({
-  SnapshotAwareProjectMap: () => <div data-testid="map">2D</div>,
+vi.mock("./WorkspaceProjectLayers", () => ({
+  WorkspaceProjectLayers: ({ view }: { view: string }) => (
+    <div data-testid={view === "3d" ? "scene" : "map"}>{view}</div>
+  ),
 }));
 
 describe("project workspace isolation", () => {

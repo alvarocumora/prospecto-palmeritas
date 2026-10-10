@@ -46,7 +46,7 @@ function LeadsPage() {
 
   return (
     <div data-theme="im-light" className="min-h-screen bg-surface text-content">
-      <div className="max-w-6xl mx-auto p-4 md:p-8">
+      <div className="mx-auto w-full max-w-6xl bg-surface p-4 text-content md:p-6">
         <div className="flex flex-wrap items-end justify-between gap-4 border-b border-hairline pb-6">
           <div>
             <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent-brand">

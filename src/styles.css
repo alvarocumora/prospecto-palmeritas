@@ -934,3 +934,45 @@
     transition: none !important;
   }
 }
+
+/* Shared map and terrain semantic palette. */
+:root {
+  --geo-tenureOwn: #f59e0b;
+  --geo-tenureNeighbor: #94a3b8;
+  --geo-terrainLow: #5b6a52;
+  --geo-terrainMid: #a3906b;
+  --geo-terrainHigh: #e7e2d6;
+  --geo-terrainEvidenceLow: #52634b;
+  --geo-terrainEvidenceHigh: #d5c4a5;
+  --geo-sceneBackground: #f5f2eb;
+  --geo-signal: #22b8cf;
+  --geo-drill: #e5e7eb;
+  --geo-clay: #0ea5e9;
+  --geo-hydrothermal: #d946ef;
+  --geo-ironOxide: #f97316;
+  --geo-lineament: #eab308;
+  --geo-measured: #0369a1;
+  --geo-declared: #64748b;
+  --geo-certified: #15803d;
+  --geo-conceptual: #a16207;
+  --geo-context: #b45309;
+  --geo-outline: #0b0a09;
+  --geo-contrast: #ffffff;
+  --geo-proposedDrill: #1f6feb;
+  --geo-sampleOutline: #052e16;
+  --geo-sample: #22c55e;
+  --geo-pedimento: #b98a2f;
+  --geo-pending: #7c3aed;
+  --geo-deposit: #dc2626;
+  --geo-depositOutline: #7f1d1d;
+  --geo-structure: #facc15;
+  --geo-geochemistry: #c2410c;
+  --geo-markerOutline: #475569;
+  --geo-markerFill: #e2e8f0;
+  --geo-pendingEvidence: #a78bfa;
+  --geo-proposedEvidence: #fb923c;
+  --geo-drillEvidence: #4d7cff;
+  --geo-geology: #38bdf8;
+  --geo-fallback: #cbd5e1;
+  --geo-neighbourDeposit: #ef4444;
+}

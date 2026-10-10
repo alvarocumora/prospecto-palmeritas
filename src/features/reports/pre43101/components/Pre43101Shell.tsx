@@ -10,7 +10,7 @@ import { generateSectionNarrative, type SectionNarrative } from "../ai/generateN
 import { SECTIONS } from "../sectionsCatalog";
 import { SectionRenderer } from "./SectionRenderer";
 import { exportReportToPDF } from "../export/pdfExport";
-import { LosVerdesEngine3D } from "@/engine3d/LosVerdesEngine3D";
+import { LosVerdes3D } from "@/features/losverdes/LosVerdes3D";
 
 function hashContext(s: string): string {
   let h = 0;
@@ -204,19 +204,19 @@ function Viewer3DSection({
       <header className="border-b border-border pb-2">
         <h2 className="text-2xl font-semibold tracking-tight">
           <span className="text-muted-foreground mr-2">§{sectionNumber}</span>
-          Visor 3D Geológico — Estilo Datamine
+          Relieve y evidencia del proyecto
         </h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Escena integrada: DEM Copernicus + drape satelital ESRI + anomalías satelitales extruidas
-          + vetas + sondajes + targets IA + isosurfaces.
+          DEM Copernicus GLO-30, tenencia declarada y señales de superficie derivadas. Las señales
+          no acreditan cuerpos mineralizados en profundidad.
         </p>
       </header>
-      <div className="rounded-md overflow-hidden border border-border bg-slate-950">
-        <LosVerdesEngine3D projectId={projectId} height={620} />
+      <div className="rounded-md overflow-hidden border border-border bg-surface">
+        <LosVerdes3D projectId={projectId} />
       </div>
       <p className="text-xs text-muted-foreground italic">
-        Esta vista interactiva no se incrusta en el PDF; usa el botón "Snapshot" del visor para
-        adjuntar capturas específicas.
+        La escena interactiva se consulta en la aplicación; el PDF conserva las secciones del
+        informe.
       </p>
     </section>
   );
