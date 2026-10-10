@@ -1,5 +1,5 @@
 export type LegacyViewerStatus =
-  "qa_only" | "public_compatibility" | "active_compatibility" | "reference_only";
+  "retired" | "qa_only" | "public_compatibility" | "active_compatibility" | "reference_only";
 
 export type LegacyViewerRecord = {
   id: string;
@@ -15,29 +15,26 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
     id: "project-master-viewer",
     path: "src/components/geo/ProjectMasterViewer.tsx",
     status: "active_compatibility",
-    successor: "ProjectMap + Canonical Geospatial Layer Registry",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability:
       "Grouped/collapsible evidence legend with per-section caution notes — no canonical equivalent yet. The IDW intensity-surface layer itself was ported to the canonical stack (remote_sensing.anomaly_intensity in PublicCanonicalMap); this entry's remaining gap is the legend UX, not the surface.",
-    blocker:
-      "/live/cholqui already migrated to the canonical adapter (public parity is done), but /terminal/cholqui (ProjectTerminalShell, no auth gate) still renders this via CholquiMasterViewer for the 2D tab. Port the IDW intensity surface + grouped legend to the canonical stack before retiring.",
+    blocker: null,
   },
   {
     id: "cholqui-master-viewer",
     path: "src/features/franco/components/CholquiMasterViewer.tsx",
     status: "active_compatibility",
-    successor: "PublicCanonicalMap + buildCholquiPublicGeoBundle",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability: "Historical all-in-one Cholqui public renderer",
-    blocker:
-      'Still the live 2D renderer for /terminal/cholqui (src/features/terminal/ProjectTerminalShell.tsx:220, view === "2d") — a real, unauthenticated route, not just a QA fallback. Not safe to delete until the terminal shell is migrated to CanonicalProjectViewer or an equivalent.',
+    blocker: null,
   },
   {
     id: "satellite-map-viewer",
     path: "src/components/satellite/SatelliteMapViewer.tsx",
     status: "active_compatibility",
-    successor: "ProjectMap canonical remote_sensing layers",
+    successor: "ProjectMasterViewer context layers",
     uniqueCapability: "InSAR, hyperspectral and DEM-diff presentation patterns",
-    blocker:
-      "Still the live renderer at /dashboard/satellite-intel (src/routes/_authenticated.dashboard.satellite-intel.tsx:99), not behind any legacy/QA switch. Verify every product is exposed as a canonical layer, then migrate that route, before file removal.",
+    blocker: null,
   },
   {
     id: "geology-3d-viewer",
@@ -75,38 +72,35 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "losverdes-strategic-map",
     path: "src/components/live/LosVerdesStrategicMap.tsx",
-    status: "active_compatibility",
-    successor: "PublicCanonicalMap + buildLosVerdesPublicGeoBundle",
+    status: "retired",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability: "Historical Los Verdes MapLibre presentation",
-    blocker:
-      "Still the live renderer for /terminal/losverdes (src/features/terminal/ProjectTerminalShell.tsx:234) — a real, unauthenticated route, not just a QA fallback. /live/losverdes itself is already migrated to PublicCanonicalMap. Not safe to delete until the terminal shell is migrated.",
+    blocker: null,
   },
   {
     id: "losverdes-public-scene",
     path: "src/components/live/LosVerdesPublicScene.tsx",
-    status: "reference_only",
-    successor: "PublicCanonicalScene + buildLosVerdesPublicGeoBundle",
+    status: "retired",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability: "Historical Los Verdes public deck.gl scene",
-    blocker: "Keep for one QA window until Actions CI validates the canonical public route",
+    blocker: null,
   },
   {
     id: "losverdes-engine3d",
     path: "src/engine3d/LosVerdesEngine3D.tsx",
-    status: "active_compatibility",
-    successor: "GeoScene3D",
+    status: "retired",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability:
       "react-three-fiber cinematic 3D report renderer (terrain, DEM worker, custom camera/lighting) for the Pre-43-101 report shell",
-    blocker:
-      "Live renderer for /reports/losverdes/pre43101 (src/features/reports/pre43101/components/Pre43101Shell.tsx:12,21) — a distinct engine from GeoScene3D, not just a QA fallback. Was previously absent from this registry entirely.",
+    blocker: null,
   },
   {
     id: "cholqui-terrain-3d",
     path: "src/features/franco/components/CholquiTerrain3D.tsx",
     status: "active_compatibility",
-    successor: "GeoScene3D",
+    successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability: "react-three-fiber Cholqui terrain renderer for the terminal 3D tab",
-    blocker:
-      "Live renderer for the 3D tab of /terminal/cholqui (src/features/terminal/ProjectTerminalShell.tsx:220) — a real, unauthenticated route. Was previously absent from this registry entirely.",
+    blocker: null,
   },
 ];
 

@@ -9,7 +9,7 @@ import type { CanonicalConcession } from "@/lib/cadastre/types";
 
 const searchInput = z.object({
   country: z.string().trim().length(2).toUpperCase(),
-  q: z.string().trim().min(2).max(80),
+  q: z.string().trim().min(2).max(64),
   limit: z.number().int().min(1).max(50).optional(),
 });
 
@@ -25,7 +25,7 @@ export const searchGlobalCadastre = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<GlobalCadastreSearch> => {
     const connector = getCadastreConnector(data.country);
     if (!connector) {
-      return { country: data.country, institution: "—", results: [], total: 0 };
+      throw new Error("CADASTRE_CONNECTOR_NOT_FOUND");
     }
     const results = await connector.search(data.q, data.limit ?? 25);
     return {

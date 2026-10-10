@@ -77,24 +77,24 @@ const fmtUsd = (n: number | null | undefined) =>
 function TradesPage() {
   const [selected, setSelected] = useState<string | null>(null);
   return (
-    <div className="container mx-auto p-4 md:p-6 max-w-6xl">
+    <div className="mx-auto w-full max-w-6xl bg-surface p-4 text-content md:p-6">
       <header className="mb-4">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground"
+          className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
         >
           <ArrowLeft className="w-3 h-3" /> Dashboard
         </Link>
-        <h1 className="text-xl md:text-2xl font-bold mt-1 flex items-center gap-2">
-          <Ship className="w-5 h-5 text-gold" /> Trade Desk · comercio de commodities
+        <h1 className="font-serif text-3xl font-normal mt-1 flex items-center gap-2">
+          <Ship className="w-5 h-5 text-accent-brand" /> Trade Desk · comercio de commodities
         </h1>
-        <p className="text-xs text-muted-foreground mt-1">
+        <p className="text-xs text-content-subtle mt-1">
           Transacciones de concentrado, cátodos y minerales con su ciclo completo: ICPO · FCO · SPA
           · pago (SBLC/DLC) · documentos de exportación y embarque.
         </p>
       </header>
 
-      <div className="rounded border border-amber-500/30 bg-amber-500/5 px-3 py-2 text-[11px] text-amber-700 dark:text-amber-500 mb-4 flex items-start gap-2">
+      <div className="rounded border border-brand-warn/30 bg-brand-warn/5 px-3 py-2 text-[11px] text-brand-warn mb-4 flex items-start gap-2">
         <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" />
         Gestión documental y de estado del deal entre contrapartes. No emite instrumentos
         financieros ni sustituye la revisión bancaria/legal de los documentos.
@@ -309,13 +309,13 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
 
   return (
     <>
-      <div className="rounded-lg border border-gold/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4">
+      <div className="rounded-lg border border-accent-brand/40 bg-gradient-to-r from-gold/10 to-transparent p-3 mb-4">
         <div className="flex items-center justify-between gap-3 flex-wrap">
           <div className="min-w-0">
-            <div className="text-[11px] font-mono uppercase tracking-wider text-gold">
+            <div className="text-[11px] font-mono uppercase tracking-wider text-accent-brand">
               Quickstart · Antimonio
             </div>
-            <div className="text-xs text-foreground mt-0.5">
+            <div className="text-xs text-content mt-0.5">
               Iniciar la operación de <b>Sb Grade 2#</b> con el NCNDA firmado (Carpio & Kaddu ·
               Marcela A. Cimino · Alvaro Oliva). Precarga commodity, incoterm CIF y SBLC MT760.
             </div>
@@ -337,7 +337,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             <button
               onClick={() => void startAntimony()}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-gold text-black text-xs font-semibold hover:bg-gold/90 disabled:opacity-50 shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent-brand text-black text-xs font-semibold hover:bg-accent-brand/90 disabled:opacity-50 shrink-0"
             >
               {saving ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -349,7 +349,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             <button
               onClick={() => void startCopper()}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt text-white text-xs font-semibold hover:bg-cobalt/90 disabled:opacity-50 shrink-0"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-cobalt/60 bg-cobalt text-accent-brand-contrast text-xs font-semibold hover:bg-cobalt/90 disabled:opacity-50 shrink-0"
               title="Copper Cathode Grade A · CIF · DLC MT700 · 2.000 MT/mes · 12 meses"
             >
               {saving ? (
@@ -442,8 +442,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
           }
         };
         return (
-          <div className="rounded-lg border border-border bg-bg-secondary/30 p-2.5 mb-3 flex items-center justify-between gap-2 flex-wrap">
-            <label className="inline-flex items-center gap-2 text-[11px] font-mono text-muted-foreground cursor-pointer">
+          <div className="rounded-lg border border-hairline bg-surface-2/30 p-2.5 mb-3 flex items-center justify-between gap-2 flex-wrap">
+            <label className="inline-flex items-center gap-2 text-[11px] font-mono text-content-subtle cursor-pointer">
               <input
                 type="checkbox"
                 checked={allChecked}
@@ -457,7 +457,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                 onClick={() => void runBatch()}
                 disabled={!someChecked || batching}
                 title="Envía NDA + LOI + link del Portal a la contraparte de cada trade seleccionado"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-[#0F2A6B] text-white text-xs font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-40"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent-brand text-accent-brand-contrast text-xs font-medium hover:bg-accent-brand/90 disabled:opacity-40"
               >
                 {batching ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -468,7 +468,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
               </button>
               <button
                 onClick={() => setShowForm((v) => !v)}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent-brand text-accent-brand-contrast text-xs font-medium hover:bg-accent-brand/90"
               >
                 <Plus className="w-3.5 h-3.5" /> Nuevo trade
               </button>
@@ -478,8 +478,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
       })()}
 
       {showForm && (
-        <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
-          <div className="sm:col-span-2 text-[10px] font-mono uppercase tracking-wider text-muted-foreground -mb-1">
+        <div className="rounded-lg border border-hairline bg-surface-2/30 p-4 mb-4 grid sm:grid-cols-2 gap-2">
+          <div className="sm:col-span-2 text-[10px] font-mono uppercase tracking-wider text-content-subtle -mb-1">
             Contraparte · usuario Geocapitals o externo
           </div>
           <F label="Email contraparte">
@@ -611,7 +611,7 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
             <button
               onClick={() => void submit()}
               disabled={saving}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-accent-brand text-accent-brand-contrast text-xs font-medium hover:bg-accent-brand/90 disabled:opacity-50"
             >
               {saving ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -648,19 +648,19 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
           ).length;
           return (
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground pb-1">
+              <div className="flex items-center gap-2 text-[11px] font-mono text-content-subtle pb-1">
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Filtrar por ref, commodity…"
-                  className="flex-1 min-w-0 px-2 py-1 rounded border border-border bg-transparent text-xs"
+                  className="flex-1 min-w-0 px-2 py-1 rounded border border-hairline bg-transparent text-xs"
                 />
                 <label className="inline-flex items-center gap-1.5 cursor-pointer shrink-0">
                   <input
                     type="checkbox"
                     checked={showCancelled}
                     onChange={(e) => setShowCancelled(e.target.checked)}
-                    className="accent-[#0F2A6B]"
+                    className="accent-accent-brand"
                   />
                   Ver cancelados{cancelledCount ? ` (${cancelledCount})` : ""}
                 </label>
@@ -677,8 +677,8 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                     key={t.id}
                     className={`w-full rounded-lg border p-3 transition-colors ${
                       isChecked
-                        ? "border-[#0F2A6B] bg-[#0F2A6B]/5"
-                        : "border-border bg-bg-secondary/30 hover:border-primary/50"
+                        ? "border-accent-brand bg-accent-brand/5"
+                        : "border-hairline bg-surface-2/30 hover:border-accent-brand/50"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -695,17 +695,17 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                             });
                           }}
                           onClick={(e) => e.stopPropagation()}
-                          className="accent-[#0F2A6B]"
+                          className="accent-accent-brand"
                         />
                       </label>
                       <button onClick={() => onOpen(t.id)} className="flex-1 min-w-0 text-left">
                         <div className="font-semibold text-sm truncate">
                           {t.reference ?? `${t.commodity ?? "Trade"} · ${t.form ?? ""}`}
-                          <span className="ml-2 text-[10px] font-mono uppercase text-muted-foreground">
+                          <span className="ml-2 text-[10px] font-mono uppercase text-content-subtle">
                             {t.role === "buyer" ? "compra" : "venta"}
                           </span>
                         </div>
-                        <div className="text-[11px] text-muted-foreground font-mono">
+                        <div className="text-[11px] text-content-subtle font-mono">
                           {t.quantity_t ? `${t.quantity_t} t` : "—"} · {t.incoterm ?? "—"} ·{" "}
                           {fmtUsd(t.total_value_usd)} · {t.payment_instrument ?? "—"}
                         </div>
@@ -717,12 +717,12 @@ function TradesList({ onOpen }: { onOpen: (id: string) => void }) {
                           <div className="text-xs font-mono font-semibold">{prog.overall.pct}%</div>
                           <div className="h-1 rounded bg-muted/40 overflow-hidden mt-0.5">
                             <div
-                              className="h-full bg-primary"
+                              className="h-full bg-accent-brand"
                               style={{ width: `${prog.overall.pct}%` }}
                             />
                           </div>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                        <ChevronRight className="w-4 h-4 text-content-subtle" />
                       </div>
                     </div>
                   </div>
@@ -774,29 +774,29 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
     <>
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-1 text-[11px] font-mono text-muted-foreground hover:text-foreground mb-3"
+        className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content mb-3"
       >
         <ArrowLeft className="w-3 h-3" /> Trades
       </button>
 
       {/* Cabecera */}
-      <div className="rounded-lg border border-border bg-bg-secondary/30 p-4 mb-4">
+      <div className="rounded-lg border border-hairline bg-surface-2/30 p-4 mb-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div>
             <div className="font-bold">{t.reference ?? "Trade"}</div>
-            <div className="text-xs text-muted-foreground font-mono mt-0.5">
+            <div className="text-xs text-content-subtle font-mono mt-0.5">
               {t.commodity ?? "—"} · {t.form ?? "—"} · {t.quantity_t ?? "—"} t · {t.incoterm ?? "—"}
             </div>
           </div>
           <div className="text-right">
-            <div className="text-lg font-bold">{fmtUsd(t.total_value_usd)}</div>
-            <div className="text-[10px] text-muted-foreground font-mono">
+            <div className="text-lg font-mono">{fmtUsd(t.total_value_usd)}</div>
+            <div className="text-[10px] text-content-subtle font-mono">
               {fmtUsd(t.unit_price_usd)}/t · {t.payment_instrument ?? "—"} ·{" "}
               {t.role === "buyer" ? "compra" : "venta"}
             </div>
           </div>
         </div>
-        <div className="mt-2 pt-2 border-t border-border/60 inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-primary">
+        <div className="mt-2 pt-2 border-t border-hairline/60 inline-flex items-center gap-1.5 text-[10px] font-mono uppercase tracking-wider text-accent-brand">
           <ShieldCheck className="w-3 h-3" /> {OPERATOR_LINE}
         </div>
       </div>
@@ -822,7 +822,7 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
       />
 
       {/* Pipeline */}
-      <div className="rounded-lg border border-border p-4 mb-4 overflow-x-auto">
+      <div className="rounded-lg border border-hairline p-4 mb-4 overflow-x-auto">
         <div className="flex items-center gap-1 min-w-max">
           {TRADE_STAGES.map((s, i) => {
             const active = stageIndex(t.stage) >= i;
@@ -837,16 +837,16 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
                 <span
                   className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-mono border ${
                     current
-                      ? "bg-primary text-primary-foreground border-primary"
+                      ? "bg-accent-brand text-accent-brand-contrast border-accent-brand"
                       : active
-                        ? "bg-primary/15 text-primary border-primary/40"
-                        : "bg-muted/30 text-muted-foreground border-border"
+                        ? "bg-accent-brand/15 text-accent-brand border-accent-brand/40"
+                        : "bg-muted/30 text-content-subtle border-hairline"
                   }`}
                 >
                   {active ? <Check className="w-3 h-3" /> : i + 1}
                 </span>
                 <span
-                  className={`text-[10px] font-mono whitespace-nowrap ${current ? "text-foreground font-semibold" : "text-muted-foreground"}`}
+                  className={`text-[10px] font-mono whitespace-nowrap ${current ? "text-content font-semibold" : "text-content-subtle"}`}
                 >
                   {s.label}
                 </span>
@@ -857,7 +857,7 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
             );
           })}
         </div>
-        <div className="text-[10px] text-muted-foreground mt-2">
+        <div className="text-[10px] text-content-subtle mt-2">
           Toca una etapa para avanzar el deal. Avance documental: {progress.overall.done}/
           {progress.overall.total} · núcleo {progress.coreDone}/{progress.coreTotal}.
         </div>
@@ -869,14 +869,14 @@ function TradeDetail({ id, onBack }: { id: string; onBack: () => void }) {
         return (
           <div key={phase} className="mb-4">
             <div className="flex items-center justify-between mb-2">
-              <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle flex items-center gap-1.5">
                 <FileCheck className="w-3.5 h-3.5" /> {PHASE_LABEL[phase]}
               </div>
-              <div className="text-[10px] font-mono text-muted-foreground">
+              <div className="text-[10px] font-mono text-content-subtle">
                 {pp.done}/{pp.total}
               </div>
             </div>
-            <div className="rounded-lg border border-border divide-y divide-border">
+            <div className="rounded-lg border border-hairline divide-y divide-border">
               {DOC_CATALOG.filter((d) => d.phase === phase).map((doc) => (
                 <DocRow
                   key={doc.key}
@@ -925,7 +925,7 @@ function TradeActivity({ tradeId }: { tradeId: string }) {
 
   return (
     <div className="mt-2">
-      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mb-2 flex items-center gap-1.5">
         <MessageSquare className="w-3.5 h-3.5" /> Actividad y mensajes
       </div>
       <div className="flex items-center gap-2 mb-3">
@@ -936,31 +936,31 @@ function TradeActivity({ tradeId }: { tradeId: string }) {
             if (e.key === "Enter") void send();
           }}
           placeholder="Escribe un mensaje a la contraparte…"
-          className="flex-1 px-3 py-2 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary"
+          className="flex-1 px-3 py-2 text-xs bg-surface border border-hairline rounded focus:outline-none focus:border-accent-brand"
         />
         <button
           onClick={() => void send()}
           disabled={busy || !msg.trim()}
-          className="px-3 py-2 rounded bg-primary text-primary-foreground text-xs font-medium hover:bg-primary/90 disabled:opacity-50 inline-flex items-center gap-1.5"
+          className="px-3 py-2 rounded bg-accent-brand text-accent-brand-contrast text-xs font-medium hover:bg-accent-brand/90 disabled:opacity-50 inline-flex items-center gap-1.5"
         >
           <Send className="w-3.5 h-3.5" /> Enviar
         </button>
       </div>
       {(data ?? []).length === 0 ? (
-        <div className="text-[11px] text-muted-foreground">Sin actividad todavía.</div>
+        <div className="text-[11px] text-content-subtle">Sin actividad todavía.</div>
       ) : (
-        <ol className="space-y-2 border-l border-border pl-3">
+        <ol className="space-y-2 border-l border-hairline pl-3">
           {(data ?? []).map((e) => (
             <li key={e.id} className="relative text-xs">
-              <span className="absolute -left-[15px] top-1.5 w-1.5 h-1.5 rounded-full bg-primary/60" />
+              <span className="absolute -left-[15px] top-1.5 w-1.5 h-1.5 rounded-full bg-accent-brand/60" />
               <div>
                 {e.kind === "message" ? (
-                  <span className="text-foreground">{e.detail}</span>
+                  <span className="text-content">{e.detail}</span>
                 ) : (
-                  <span className="text-muted-foreground">{eventLabel(e)}</span>
+                  <span className="text-content-subtle">{eventLabel(e)}</span>
                 )}
               </div>
-              <div className="text-[10px] font-mono text-muted-foreground/70">
+              <div className="text-[10px] font-mono text-content-subtle/70">
                 {e.actorName ?? "—"} · {new Date(e.created_at).toLocaleString("es-CL")}
               </div>
             </li>
@@ -1112,11 +1112,11 @@ function DocRow({
       <div className="flex items-center justify-between gap-2">
         <div className="min-w-0">
           <div className="text-xs font-medium truncate">
-            {doc.acronym && <span className="font-mono text-gold mr-1">{doc.acronym}</span>}
+            {doc.acronym && <span className="font-mono text-accent-brand mr-1">{doc.acronym}</span>}
             {doc.label}
-            {doc.core && <span className="ml-1 text-[9px] text-primary">•núcleo</span>}
+            {doc.core && <span className="ml-1 text-[9px] text-accent-brand">•núcleo</span>}
           </div>
-          <div className="text-[10px] text-muted-foreground font-mono">
+          <div className="text-[10px] text-content-subtle font-mono">
             {existing?.reference ? `N° ${existing.reference} · ` : ""}
             {doc.party === "buyer"
               ? "comprador"
@@ -1141,7 +1141,7 @@ function DocRow({
           {existing?.file_url && (
             <button
               onClick={() => void openDoc()}
-              className="p-1 text-primary hover:underline"
+              className="p-1 text-accent-brand hover:underline"
               title="Ver documento"
             >
               <ExternalLink className="w-3.5 h-3.5" />
@@ -1152,7 +1152,7 @@ function DocRow({
               onClick={() => fileRef.current?.click()}
               disabled={busy}
               title="Subir archivo"
-              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground disabled:opacity-50 inline-flex items-center gap-1"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-hairline text-content-subtle hover:text-content disabled:opacity-50 inline-flex items-center gap-1"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
             </button>
@@ -1162,7 +1162,7 @@ function DocRow({
             <button
               onClick={() => void generate()}
               title="Generar borrador PDF"
-              className="px-2 py-1 rounded text-[10px] font-mono border border-gold/50 text-gold hover:bg-gold/10 inline-flex items-center gap-1"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-accent-brand/50 text-accent-brand hover:bg-accent-brand/10 inline-flex items-center gap-1"
             >
               <FileDown className="w-3 h-3" /> Generar
             </button>
@@ -1170,7 +1170,7 @@ function DocRow({
           {status !== "signed" && status !== "verified" && (
             <button
               onClick={() => setOpen((v) => !v)}
-              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-hairline text-content-subtle hover:text-content"
             >
               {existing ? "Editar" : "Adjuntar"}
             </button>
@@ -1183,32 +1183,32 @@ function DocRow({
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="URL del documento (https://…)"
-            className="flex-1 min-w-[160px] px-2 py-1 text-[11px] bg-background border border-border rounded focus:outline-none focus:border-primary"
+            className="flex-1 min-w-[160px] px-2 py-1 text-[11px] bg-surface border border-hairline rounded focus:outline-none focus:border-accent-brand"
           />
           <input
             value={ref}
             onChange={(e) => setRef(e.target.value)}
             placeholder="N° doc"
-            className="w-24 px-2 py-1 text-[11px] bg-background border border-border rounded focus:outline-none focus:border-primary"
+            className="w-24 px-2 py-1 text-[11px] bg-surface border border-hairline rounded focus:outline-none focus:border-accent-brand"
           />
           <button
             onClick={() => void save("uploaded")}
             disabled={busy}
-            className="px-2 py-1 rounded text-[10px] font-mono bg-primary text-primary-foreground disabled:opacity-50"
+            className="px-2 py-1 rounded text-[10px] font-mono bg-accent-brand text-accent-brand-contrast disabled:opacity-50"
           >
             Guardar
           </button>
           <button
             onClick={() => void save("verified")}
             disabled={busy}
-            className="px-2 py-1 rounded text-[10px] font-mono border border-emerald-500/50 text-emerald-600"
+            className="px-2 py-1 rounded text-[10px] font-mono border border-brand-success/50 text-brand-success"
           >
             <Check className="w-3 h-3 inline" /> Verificar
           </button>
           {existing && (
             <button
               onClick={() => void sign()}
-              className="px-2 py-1 rounded text-[10px] font-mono border border-border text-muted-foreground hover:text-foreground inline-flex items-center gap-1"
+              className="px-2 py-1 rounded text-[10px] font-mono border border-hairline text-content-subtle hover:text-content inline-flex items-center gap-1"
             >
               <PenLine className="w-3 h-3" /> Firmar
             </button>
@@ -1221,7 +1221,7 @@ function DocRow({
 
 // ---------- UI helpers ----------
 const inputCls =
-  "w-full px-2 py-1.5 text-xs bg-background border border-border rounded focus:outline-none focus:border-primary";
+  "w-full px-2 py-1.5 text-xs bg-surface border border-hairline rounded focus:outline-none focus:border-accent-brand";
 
 function F({
   label,
@@ -1234,7 +1234,7 @@ function F({
 }) {
   return (
     <label className={`text-xs ${full ? "sm:col-span-2" : ""}`}>
-      <span className="block text-[10px] font-mono uppercase tracking-wider text-muted-foreground mb-1">
+      <span className="block text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-1">
         {label}
       </span>
       {children}
@@ -1249,8 +1249,8 @@ function StagePill({ stage }: { stage: string }) {
     <span
       className={`px-1.5 py-0.5 rounded text-[9px] font-mono border whitespace-nowrap ${
         closed
-          ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
-          : "text-primary border-primary/40 bg-primary/10"
+          ? "text-brand-success border-brand-success/40 bg-brand-success/10"
+          : "text-accent-brand border-accent-brand/40 bg-accent-brand/10"
       }`}
     >
       {s?.label.split(" (")[0] ?? stage}
@@ -1261,14 +1261,14 @@ function StagePill({ stage }: { stage: string }) {
 function DocStatusPill({ status }: { status: string }) {
   const tone =
     status === "verified"
-      ? "text-emerald-600 border-emerald-500/40 bg-emerald-500/10"
+      ? "text-brand-success border-brand-success/40 bg-brand-success/10"
       : status === "signed"
-        ? "text-sky-600 border-sky-500/40 bg-sky-500/10"
+        ? "text-brand-info border-brand-info/40 bg-brand-info/10"
         : status === "uploaded"
-          ? "text-amber-600 border-amber-500/40 bg-amber-500/10"
+          ? "text-brand-warn border-brand-warn/40 bg-brand-warn/10"
           : status === "rejected"
-            ? "text-red-600 border-red-500/40 bg-red-500/10"
-            : "text-muted-foreground border-border";
+            ? "text-brand-danger border-brand-danger/40 bg-brand-danger/10"
+            : "text-content-subtle border-hairline";
   const label: Record<string, string> = {
     pending: "Pendiente",
     uploaded: "Cargado",
@@ -1292,20 +1292,20 @@ function LotTrustCard({ lotId }: { lotId: string }) {
   });
   const tone =
     data?.level === "high"
-      ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-600"
+      ? "border-brand-success/40 bg-brand-success/5 text-brand-success"
       : data?.level === "medium"
-        ? "border-amber-500/40 bg-amber-500/5 text-amber-600"
-        : "border-red-500/40 bg-red-500/5 text-red-600";
+        ? "border-brand-warn/40 bg-brand-warn/5 text-brand-warn"
+        : "border-brand-danger/40 bg-brand-danger/5 text-brand-danger";
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/30 p-3 mb-4">
+    <div className="rounded-lg border border-hairline bg-surface-2/30 p-3 mb-4">
       <div className="flex items-center justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-content-subtle">
           <ShieldCheck className="w-3.5 h-3.5" /> Due diligence del lote · Know-Your-Mine
         </div>
         <Link
           to="/marketplace/$lotId"
           params={{ lotId }}
-          className="text-[11px] font-mono text-primary hover:underline inline-flex items-center gap-1"
+          className="text-[11px] font-mono text-accent-brand hover:underline inline-flex items-center gap-1"
         >
           Ver lote <ExternalLink className="w-3 h-3" />
         </Link>
@@ -1317,12 +1317,12 @@ function LotTrustCard({ lotId }: { lotId: string }) {
           </span>
           <span className="text-xs font-medium">{data.levelLabel}</span>
           {data.redFlags.length > 0 && (
-            <span className="text-[11px] text-red-600 font-medium">
+            <span className="text-[11px] text-brand-danger font-medium">
               {data.redFlags.length} bandera(s) roja(s)
             </span>
           )}
           {data.dictamen && (
-            <p className="text-[11px] text-muted-foreground w-full mt-1 leading-relaxed">
+            <p className="text-[11px] text-content-subtle w-full mt-1 leading-relaxed">
               {data.dictamen}
             </p>
           )}
@@ -1336,7 +1336,7 @@ function LotTrustCard({ lotId }: { lotId: string }) {
 
 function Loading() {
   return (
-    <div className="flex items-center gap-2 text-sm text-muted-foreground p-8 justify-center">
+    <div className="flex items-center gap-2 text-sm text-content-subtle p-8 justify-center">
       <Loader2 className="w-4 h-4 animate-spin" /> Cargando…
     </div>
   );
@@ -1344,7 +1344,7 @@ function Loading() {
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="p-8 text-center text-sm text-muted-foreground border border-dashed border-border rounded-lg">
+    <div className="p-8 text-center text-sm text-content-subtle border border-dashed border-hairline rounded-lg">
       {children}
     </div>
   );
@@ -1389,14 +1389,14 @@ function CounterpartyPanel({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
-      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2">
+    <div className="rounded-lg border border-hairline bg-surface-2/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mb-2">
         Contraparte · {party === "buyer" ? "Comprador" : "Vendedor"}
       </div>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="min-w-0 text-xs">
-          <div className="font-semibold text-foreground truncate">{cpName}</div>
-          <div className="text-muted-foreground font-mono text-[11px] truncate">
+          <div className="font-semibold text-content truncate">{cpName}</div>
+          <div className="text-content-subtle font-mono text-[11px] truncate">
             {cpEmail ?? "sin email"}
           </div>
         </div>
@@ -1404,23 +1404,23 @@ function CounterpartyPanel({
           <button
             onClick={() => void issue(false)}
             disabled={loading}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-hairline bg-surface text-[11px] font-mono hover:bg-muted disabled:opacity-50"
           >
             <ExternalLink className="w-3 h-3" /> Emitir link
           </button>
           <button
             onClick={() => void issue(true)}
             disabled={loading}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-hairline bg-surface text-[11px] font-mono hover:bg-muted disabled:opacity-50"
           >
             Rotar
           </button>
         </div>
       </div>
       {issuedUrl && (
-        <div className="mt-2 text-[10px] font-mono break-all bg-muted/40 border border-border rounded p-2">
+        <div className="mt-2 text-[10px] font-mono break-all bg-muted/40 border border-hairline rounded p-2">
           {issuedUrl}
-          <div className="text-muted-foreground mt-1">
+          <div className="text-content-subtle mt-1">
             Copiado al portapapeles · compártelo por email/WhatsApp con la contraparte.
           </div>
         </div>
@@ -1441,9 +1441,9 @@ const DEAL_DOCS = [
 ] as const;
 
 const SIGN_STATUS_META: Record<string, { label: string; cls: string }> = {
-  signed: { label: "Firmado", cls: "bg-green-500/15 text-green-600" },
-  pending: { label: "Pendiente", cls: "bg-amber-500/15 text-amber-600" },
-  void: { label: "Anulado", cls: "bg-muted text-muted-foreground" },
+  signed: { label: "Firmado", cls: "bg-brand-success/15 text-brand-success" },
+  pending: { label: "Pendiente", cls: "bg-brand-warn/15 text-brand-warn" },
+  void: { label: "Anulado", cls: "bg-muted text-content-subtle" },
 };
 
 function SendDocPanel({ tradeId }: { tradeId: string }) {
@@ -1456,8 +1456,8 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
   const sent = (data ?? []).filter((r) => r.trade_id === tradeId);
 
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
-      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+    <div className="rounded-lg border border-hairline bg-surface-2/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mb-2 flex items-center gap-1.5">
         <FileSignature className="w-3.5 h-3.5" /> Documentos del acuerdo · firma electrónica
       </div>
       <div className="flex flex-wrap gap-2">
@@ -1467,7 +1467,7 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
             to="/dashboard/documentos/$templateId"
             params={{ templateId: d.id }}
             search={{ trade: tradeId }}
-            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-border bg-background text-[11px] font-mono hover:border-primary/60 hover:text-primary"
+            className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded border border-hairline bg-surface text-[11px] font-mono hover:border-accent-brand/60 hover:text-accent-brand"
           >
             <Send className="w-3 h-3" /> {d.label}
           </Link>
@@ -1475,8 +1475,8 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
       </div>
 
       {sent.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-border/60 space-y-1.5">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="mt-3 pt-3 border-t border-hairline/60 space-y-1.5">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
             Enviados ({sent.length})
           </div>
           {sent.map((r) => {
@@ -1485,7 +1485,7 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
               <div key={r.id} className="flex items-center justify-between gap-3 text-xs">
                 <div className="min-w-0">
                   <div className="truncate">{r.title}</div>
-                  <div className="text-[10px] text-muted-foreground truncate">
+                  <div className="text-[10px] text-content-subtle truncate">
                     {r.status === "signed"
                       ? `Firmado por ${r.signed_by_name ?? "—"}${r.signed_at ? ` · ${new Date(r.signed_at).toLocaleDateString("es-CL")}` : ""}`
                       : `Firmante: ${r.signer_name_expected ?? "—"} · ${r.token_prefix}…`}
@@ -1502,7 +1502,7 @@ function SendDocPanel({ tradeId }: { tradeId: string }) {
         </div>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-2">
+      <p className="text-[10px] text-content-subtle mt-2">
         Se abre el editor con la contraparte precargada; al enviar, el documento queda ligado a este
         trade y, al firmarse, avanza el checklist documental.
       </p>
@@ -1545,15 +1545,15 @@ function RequestDocsPanel({
 
   if (!suggested.length) return null;
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+    <div className="rounded-lg border border-hairline bg-surface-2/20 p-4 mb-4">
       <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle flex items-center gap-1.5">
           <Upload className="w-3.5 h-3.5" /> Solicitar documentos a contraparte
         </div>
         <button
           onClick={() => void submit()}
           disabled={busy || !picked.length}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-brand text-accent-brand-contrast text-[11px] font-medium hover:bg-accent-brand/90 disabled:opacity-50"
         >
           {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Send className="w-3 h-3" />}
           Solicitar ({picked.length})
@@ -1568,8 +1568,8 @@ function RequestDocsPanel({
               onClick={() => toggle(d.key)}
               className={`text-[11px] font-mono px-2 py-1 rounded border transition ${
                 on
-                  ? "bg-primary/15 border-primary/40 text-primary"
-                  : "bg-background border-border text-foreground hover:bg-muted"
+                  ? "bg-accent-brand/15 border-accent-brand/40 text-accent-brand"
+                  : "bg-surface border-hairline text-content hover:bg-muted"
               }`}
               title={d.label}
             >
@@ -1625,8 +1625,8 @@ function UploadInboxPanel({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
-      <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground mb-3 flex items-center gap-1.5">
+    <div className="rounded-lg border border-hairline bg-surface-2/20 p-4 mb-4">
+      <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle mb-3 flex items-center gap-1.5">
         <Upload className="w-3.5 h-3.5" /> Bandeja de subida de documentos
       </div>
 
@@ -1644,28 +1644,28 @@ function UploadInboxPanel({
           ))}
         </div>
       ) : (
-        <div className="text-[11px] text-muted-foreground mb-3">
+        <div className="text-[11px] text-content-subtle mb-3">
           Sin documentos pendientes de subir.
         </div>
       )}
 
       {received.length > 0 && (
         <>
-          <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground mt-4 mb-2">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mt-4 mb-2">
             Recibidos
           </div>
-          <div className="rounded border border-border divide-y divide-border">
+          <div className="rounded border border-hairline divide-y divide-border">
             {received.map((d) => (
               <div
                 key={d.id}
                 className="p-2 flex items-center justify-between gap-2 text-[11px] font-mono"
               >
                 <div className="min-w-0">
-                  <span className="text-gold">{labelOf(d.doc_type)}</span>
-                  <span className="text-foreground ml-2 truncate">{fileName(d.file_url)}</span>
+                  <span className="text-accent-brand">{labelOf(d.doc_type)}</span>
+                  <span className="text-content ml-2 truncate">{fileName(d.file_url)}</span>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <span className="text-muted-foreground">
+                  <span className="text-content-subtle">
                     {new Date(d.updated_at).toLocaleString("es-CL")}
                   </span>
                   <DocStatusPill status={d.status} />
@@ -1708,15 +1708,15 @@ function UploadInboxRow({
         if (f) onFile(f);
       }}
       className={`flex items-center justify-between gap-3 p-2.5 rounded border transition ${
-        drag ? "border-primary bg-primary/5" : "border-dashed border-border bg-background"
+        drag ? "border-accent-brand bg-accent-brand/5" : "border-dashed border-hairline bg-surface"
       }`}
     >
       <div className="min-w-0">
         <div className="text-xs font-medium">
-          <span className="font-mono text-gold mr-1.5">{label}</span>
-          <span className="text-foreground">{full}</span>
+          <span className="font-mono text-accent-brand mr-1.5">{label}</span>
+          <span className="text-content">{full}</span>
         </div>
-        <div className="text-[10px] text-muted-foreground font-mono mt-0.5">
+        <div className="text-[10px] text-content-subtle font-mono mt-0.5">
           Pendiente · arrastra el archivo aquí o selecciónalo
         </div>
       </div>
@@ -1734,7 +1734,7 @@ function UploadInboxRow({
         <button
           onClick={() => ref.current?.click()}
           disabled={busy}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-brand text-accent-brand-contrast text-[11px] font-medium hover:bg-accent-brand/90 disabled:opacity-50"
         >
           {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Upload className="w-3 h-3" />}
           Subir archivo
@@ -1855,13 +1855,13 @@ function SupplierPanel({
   };
 
   return (
-    <div className="rounded-lg border border-border bg-bg-secondary/20 p-4 mb-4">
+    <div className="rounded-lg border border-hairline bg-surface-2/20 p-4 mb-4">
       <div className="flex items-center justify-between mb-2 gap-2 flex-wrap">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle">
           Proveedor / contraparte del trade
         </div>
         {currentName && (
-          <div className="text-[11px] font-mono text-foreground truncate">
+          <div className="text-[11px] font-mono text-content truncate">
             Actual: <b>{currentName}</b>
           </div>
         )}
@@ -1889,14 +1889,14 @@ function SupplierPanel({
           <button
             onClick={() => selectedId && void link(selectedId)}
             disabled={!selectedId || busy}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-brand text-accent-brand-contrast text-[11px] font-medium hover:bg-accent-brand/90 disabled:opacity-50"
           >
             {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
             Vincular al trade
           </button>
           <button
             onClick={() => setCreating(true)}
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded border border-hairline bg-surface text-[11px] font-mono hover:bg-muted"
           >
             <Plus className="w-3 h-3" /> Nuevo proveedor
           </button>
@@ -1904,7 +1904,7 @@ function SupplierPanel({
             onClick={() => void sendOnboarding()}
             disabled={onboarding || busy}
             title="Envía en un mail al proveedor: NDA + LOI para firma electrónica + link del Portal Proveedor para carga documental."
-            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-[#0F2A6B] text-white text-[11px] font-medium hover:bg-[#0F2A6B]/90 disabled:opacity-50"
+            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-brand text-accent-brand-contrast text-[11px] font-medium hover:bg-accent-brand/90 disabled:opacity-50"
           >
             {onboarding ? (
               <Loader2 className="w-3 h-3 animate-spin" />
@@ -1975,14 +1975,14 @@ function SupplierPanel({
             <button
               onClick={() => setCreating(false)}
               disabled={busy}
-              className="px-2.5 py-1 rounded border border-border bg-background text-[11px] font-mono hover:bg-muted"
+              className="px-2.5 py-1 rounded border border-hairline bg-surface text-[11px] font-mono hover:bg-muted"
             >
               Cancelar
             </button>
             <button
               onClick={() => void createAndLink()}
               disabled={busy}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary text-primary-foreground text-[11px] font-medium hover:bg-primary/90 disabled:opacity-50"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-accent-brand text-accent-brand-contrast text-[11px] font-medium hover:bg-accent-brand/90 disabled:opacity-50"
             >
               {busy ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
               Crear y vincular
@@ -1990,7 +1990,7 @@ function SupplierPanel({
           </div>
         </div>
       )}
-      <div className="mt-2 text-[10px] text-muted-foreground font-mono">
+      <div className="mt-2 text-[10px] text-content-subtle font-mono">
         Al vincular se actualizan los campos de contraparte del trade; luego emite el link de
         operación abajo para compartirlo por email/WhatsApp.
       </div>
@@ -2004,15 +2004,15 @@ function OnboardingBadge({ s }: { s?: OnboardingStatus }) {
     pending: { label: "", cls: "" },
     sent: {
       label: "NDA+LOI enviado",
-      cls: "bg-amber-500/10 text-amber-700 border-amber-500/30",
+      cls: "bg-brand-warn/10 text-brand-warn border-brand-warn/30",
     },
     partial: {
       label: s.ndaSigned ? "NDA firmado" : "LOI firmado",
-      cls: "bg-sky-500/10 text-sky-700 border-sky-500/30",
+      cls: "bg-brand-info/10 text-brand-info border-brand-info/30",
     },
     signed: {
       label: "NDA+LOI firmado",
-      cls: "bg-emerald-500/10 text-emerald-700 border-emerald-500/30",
+      cls: "bg-brand-success/10 text-brand-success border-brand-success/30",
     },
   };
   const m = map[s.state];
@@ -2057,22 +2057,22 @@ function AntimonyDeliveryPanel({
 }) {
   if (rows.length === 0 && !loading) {
     return (
-      <div className="mt-3 text-[11px] font-mono text-muted-foreground border-t border-gold/20 pt-2">
+      <div className="mt-3 text-[11px] font-mono text-content-subtle border-t border-accent-brand/20 pt-2">
         Aún no se ha despachado el paquete. Al enviarlo aparecerá aquí el estado (enviado /
         abierto).
       </div>
     );
   }
   return (
-    <div className="mt-3 border-t border-gold/20 pt-2">
+    <div className="mt-3 border-t border-accent-brand/20 pt-2">
       <div className="flex items-center justify-between mb-1.5">
-        <div className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">
+        <div className="text-[11px] font-mono uppercase tracking-wider text-content-subtle">
           Confirmación de entrega y lectura
         </div>
         <button
           onClick={onRefresh}
           disabled={loading}
-          className="text-[10px] font-mono text-muted-foreground hover:text-foreground disabled:opacity-50"
+          className="text-[10px] font-mono text-content-subtle hover:text-content disabled:opacity-50"
           title="Refrescar estado"
         >
           {loading ? "Actualizando…" : "Refrescar"}
@@ -2090,11 +2090,11 @@ function AntimonyDeliveryPanel({
           return (
             <div
               key={`${r.templateName}::${r.recipient}`}
-              className="flex items-center justify-between gap-2 text-[11px] bg-white/50 dark:bg-black/20 rounded px-2 py-1"
+              className="flex items-center justify-between gap-2 text-[11px] bg-surface-2 rounded px-2 py-1"
             >
               <div className="min-w-0 flex-1">
-                <div className="font-mono text-foreground truncate">{r.recipient}</div>
-                <div className="text-[10px] text-muted-foreground truncate">
+                <div className="font-mono text-content truncate">{r.recipient}</div>
+                <div className="text-[10px] text-content-subtle truncate">
                   {TEMPLATE_LABEL[r.templateName] ?? r.templateName}
                 </div>
               </div>
@@ -2116,7 +2116,7 @@ function AntimonyDeliveryPanel({
           );
         })}
       </div>
-      <div className="mt-1.5 text-[10px] text-muted-foreground">
+      <div className="mt-1.5 text-[10px] text-content-subtle">
         La apertura se detecta con un pixel de tracking. Algunos clientes de correo (Gmail con proxy
         de imágenes, Outlook con imágenes bloqueadas) pueden retrasar u ocultar la confirmación.
       </div>
@@ -2138,12 +2138,12 @@ function StatusBadge({
   time?: string | null;
 }) {
   const cls = fail
-    ? "bg-red-500/15 text-red-600 border-red-500/30"
+    ? "bg-brand-danger/15 text-brand-danger border-brand-danger/30"
     : ok
-      ? "bg-emerald-500/15 text-emerald-700 border-emerald-500/30"
+      ? "bg-brand-success/15 text-brand-success border-brand-success/30"
       : neutral
-        ? "bg-muted text-muted-foreground border-border"
-        : "bg-muted text-muted-foreground border-border";
+        ? "bg-muted text-content-subtle border-hairline"
+        : "bg-muted text-content-subtle border-hairline";
   return (
     <span
       className={`inline-flex items-center gap-1 border rounded px-1.5 py-0.5 text-[10px] font-mono ${cls}`}

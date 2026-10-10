@@ -19,6 +19,7 @@ export type FC = {
 };
 
 export type LosVerdesMapData = {
+  geometryLookupWarning?: string;
   bbox: [number, number, number, number] | null;
   center: [number, number];
   concessions: FC;
@@ -43,32 +44,74 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     const { data: cons, error: cErr } = await supabaseAdmin
       .from("mining_concessions")
       .select(
-        "id, code, name, holder, concession_type, status, area_ha, region, commune, granted_at, expires_at, geometry_geojson",
+        "id, code, name, holder, rut_holder, concession_type, status, area_ha, region, commune, granted_at, expires_at, geometry_geojson",
       )
       .eq("project_id", PROJECT_ID);
     if (cErr) throw new Error(`concessions: ${cErr.message}`);
+
+    // Recover only an exact official rol match. A holder or a centroid is not a polygon.
+    const missingCodes = (cons ?? []).filter((c) => !c.geometry_geojson).map((c) => c.code);
+    const officialGeometry = new Map<string, unknown>();
+    let geometryLookupWarning: string | undefined;
+    if (missingCodes.length) {
+      const cached = await supabaseAdmin
+        .from("cadastre_national")
+        .select("rol, geometry_geojson")
+        .is("archived_at", null)
+        .in("rol", missingCodes);
+      if (cached.error)
+        geometryLookupWarning = "No se pudo consultar la geometría oficial por rol.";
+      else {
+        const ambiguous = new Set<string>();
+        for (const row of cached.data ?? []) {
+          if (!row.rol || !row.geometry_geojson) continue;
+          if (officialGeometry.has(row.rol)) ambiguous.add(row.rol);
+          officialGeometry.set(row.rol, row.geometry_geojson);
+        }
+        for (const code of ambiguous) officialGeometry.delete(code);
+      }
+    }
 
     const concessions: FC = {
       type: "FeatureCollection",
       features: (cons ?? []).map((c): MapFeature => {
         let geom: GeoJSON.Geometry | null = null;
-        if (c.geometry_geojson) {
+        const rawGeometry = c.geometry_geojson ?? officialGeometry.get(c.code);
+        if (rawGeometry) {
           try {
             geom =
-              typeof c.geometry_geojson === "string"
-                ? JSON.parse(c.geometry_geojson)
-                : (c.geometry_geojson as unknown as GeoJSON.Geometry);
+              typeof rawGeometry === "string"
+                ? JSON.parse(rawGeometry)
+                : (rawGeometry as GeoJSON.Geometry);
+            if (!geom || !["Polygon", "MultiPolygon"].includes(geom.type)) geom = null;
           } catch {
             geom = null;
           }
         }
         const props: Props = {
           layer: "concession",
+          project_id: PROJECT_ID,
+          es_tenencia_proyecto: true,
+          tenencia_procedencia: "declared",
+          tenencia_asociacion: "project_id",
           hasGeometry: Boolean(geom),
+          geometry_source: c.geometry_geojson
+            ? "project_record"
+            : geom
+              ? "cadastre_national_exact_rol"
+              : null,
           id: String(c.id),
           code: c.code ?? null,
           name: c.name ?? null,
           holder: c.holder ?? null,
+          rut_holder: c.rut_holder ?? null,
+          rol: c.code ?? null,
+          nombre: c.name ?? null,
+          titular: c.holder ?? null,
+          situacion: c.status ?? null,
+          tipo: c.concession_type ?? null,
+          hectareas: c.area_ha != null ? Number(c.area_ha) : null,
+          comuna: c.commune ?? null,
           concession_type: c.concession_type ?? null,
           status: c.status ?? null,
           area_ha: c.area_ha != null ? Number(c.area_ha) : null,
@@ -275,6 +318,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     }
 
     return {
+      geometryLookupWarning,
       bbox,
       center,
       concessions,

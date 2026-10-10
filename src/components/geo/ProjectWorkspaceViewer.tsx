@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Box, Map as MapIcon } from "lucide-react";
-import { GeoScene3D } from "@/components/geoscene";
-import { SnapshotAwareProjectMap } from "@/components/geo/SnapshotAwareProjectMap";
+import { WorkspaceProjectLayers } from "./WorkspaceProjectLayers";
 import { useProjects } from "@/hooks/useProjects";
 import type { GeoViewerPresetId } from "@/lib/geospatial/layerRegistry";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -15,7 +14,7 @@ export function ProjectWorkspaceViewer({
   mode,
   defaultMode = "2d",
   onModeChange,
-  heightClassName = "h-[620px]",
+  heightClassName = "min-h-[620px]",
   compactHeader = false,
 }: {
   projectId: string;
@@ -85,12 +84,8 @@ export function ProjectWorkspaceViewer({
           })}
         </div>
       </header>
-      <div className={`relative ${heightClassName}`}>
-        {view === "2d" ? (
-          <SnapshotAwareProjectMap preset={twoD} profile={profile} />
-        ) : (
-          <GeoScene3D initialPreset={threeD} />
-        )}
+      <div className={`relative min-h-[620px]`}>
+        <WorkspaceProjectLayers key={project.id} project={project} view={view} />
       </div>
     </section>
   );

@@ -16,6 +16,7 @@ export type PublicProjectRecord = {
 export const PUBLIC_PROJECTS: readonly PublicProjectRecord[] = [
   {
     slug: "palmeras",
+    projectId: "8dc8e288-b22c-4bd4-9626-bb7fb85d1745",
     code: "PALMERAS",
     name: "Prospecto Las Palmeras",
     aliases: [],

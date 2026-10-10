@@ -317,8 +317,7 @@ export function buildCholquiTargetsDoc(
             {
               eyebrow: "Interpretación IA",
               title: "Notas del agente geológico-geofísico",
-              lead:
-                "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
+              lead: "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
               blocks: [
                 {
                   kind: "table" as const,
@@ -418,8 +417,7 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Detección",
         title: "Anomalías espectrales sobre el AOI",
         deck: true,
-        lead:
-          "Selección documental por score publicado; se conservan IDs estables según el orden original del archivo. Campañas e índices distintos no son comparables como ranking geológico.",
+        lead: "Selección documental por score publicado; se conservan IDs estables según el orden original del archivo. Campañas e índices distintos no son comparables como ranking geológico.",
         blocks: [
           {
             kind: "appendixTable",
@@ -442,8 +440,7 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body:
-              "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
+            body: "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
           },
           {
             kind: "text",
@@ -519,8 +516,7 @@ export function buildCholquiTargetsDoc(
       {
         eyebrow: "Contexto estructural",
         title: "Vetas con rumbo/manteo de terreno",
-        lead:
-          "Los rumbos y manteos documentados se presentan para revisar la orientación de cada collar; no acreditan continuidad en profundidad.",
+        lead: "Los rumbos y manteos documentados se presentan para revisar la orientación de cada collar; no acreditan continuidad en profundidad.",
         blocks: [
           {
             kind: "table",
@@ -545,8 +541,7 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body:
-              "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
+            body: "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
           },
         ],
       },

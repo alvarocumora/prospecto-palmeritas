@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap } from "leaflet";
-import { ProjectMap } from "@/components/ProjectMap";
+import { PortfolioLayers } from "@/components/geo/WorkspaceProjectLayers";
 import { useProjects } from "@/hooks/useProjects";
 import { useQualifiedPersons } from "@/hooks/useQualifiedPersons";
 import {
@@ -821,7 +821,14 @@ function NI43101Module() {
             <Mountain className="w-3 h-3 text-gold" /> Se captura al generar la vista previa
           </span>
         </div>
-        <ProjectMap onMapReady={onMapReady} basemapOverride={captureBasemap} />
+        {active && (
+          <PortfolioLayers
+            project={active}
+            view="2d"
+            onMapReady={onMapReady}
+            basemapOverride={captureBasemap}
+          />
+        )}
         {captureBasemap && (
           <div className="mt-2 text-[10px] font-mono text-amber-500 flex items-center gap-1.5">
             <Loader2 className="w-3 h-3 animate-spin" />

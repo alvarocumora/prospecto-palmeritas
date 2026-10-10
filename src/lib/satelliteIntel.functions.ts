@@ -4,6 +4,7 @@
 
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { satelliteEvidence, validSatelliteBbox } from "@/lib/satellite/evidence";
 import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
 
@@ -39,7 +40,9 @@ type CollectionKey = keyof typeof COLLECTIONS;
 const SearchInput = z.object({
   projectId: z.string().uuid(),
   collection: z.enum(["s2", "s1", "emit", "aster"]),
-  bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+  bbox: z
+    .tuple([z.number(), z.number(), z.number(), z.number()])
+    .refine(validSatelliteBbox, "Invalid geographic AOI"),
   dateFrom: z.string(),
   dateTo: z.string(),
   cloudCoverMax: z.number().min(0).max(100).optional(),
@@ -183,8 +186,10 @@ const SeedHyperInput = z.object({
   projectId: z.string().uuid(),
   source: z.enum(["EMIT", "EnMAP", "ASTER", "Sentinel-2", "PRISMA"]),
   acquisitionDate: z.string(),
-  bbox: z.tuple([z.number(), z.number(), z.number(), z.number()]),
-  sceneId: z.string().optional(),
+  bbox: z
+    .tuple([z.number(), z.number(), z.number(), z.number()])
+    .refine(validSatelliteBbox, "Invalid geographic AOI"),
+  sceneId: z.string().min(1),
   stacHref: z.string().optional(),
 });
 
@@ -227,11 +232,12 @@ export const seedHyperspectralFromScene = createServerFn({ method: "POST" })
       max_score: p.max,
       area_ha: p.area,
       threshold: 0.5,
-      algorithm: "SAM",
+      algorithm: "synthetic_demo",
       spectral_library: "USGS_v7",
       created_by: userId,
       metadata: {
         seeded: true,
+        provenance: "synthetic",
         note: "Productos derivados sintéticos pendientes de validación con worker Python real",
       },
     }));
@@ -263,6 +269,7 @@ type ProductRow = {
   area_ha: number | null;
   pixel_size_m: number | null;
   algorithm: string;
+  metadata?: unknown;
 };
 
 export const explainHyperspectralProducts = createServerFn({ method: "POST" })
@@ -273,12 +280,20 @@ export const explainHyperspectralProducts = createServerFn({ method: "POST" })
     const { data: rows, error } = await supabase
       .from("hyperspectral_products")
       .select(
-        "mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm",
+        "mineral,assemblage,source,acquisition_date,mean_score,max_score,area_ha,pixel_size_m,algorithm,metadata",
       )
       .eq("project_id", data.projectId)
       .in("id", data.productIds);
     if (error) return { ok: false, error: error.message, explanation: "", targets: [] as string[] };
     const products = (rows ?? []) as ProductRow[];
+    if (products.some((p) => satelliteEvidence(p.metadata).startsWith("CONCEPTUAL")))
+      return {
+        ok: false,
+        error:
+          "Los productos de demostración no acreditan minerales detectados. Usa productos procesados y validados para esta interpretación.",
+        explanation: "",
+        targets: [] as string[],
+      };
     if (products.length === 0) {
       return { ok: false, error: "No products found", explanation: "", targets: [] };
     }
@@ -438,7 +453,12 @@ export const seedInsarMonitoring = createServerFn({ method: "POST" })
           alert_severity: classifySeverity(velocity),
           time_series: ts,
           created_by: userId,
-          metadata: { sample_label: o.label, seeded: true, months_back: data.monthsBack },
+          metadata: {
+            sample_label: o.label,
+            seeded: true,
+            provenance: "synthetic",
+            months_back: data.monthsBack,
+          },
         });
       }
     }
@@ -632,7 +652,7 @@ export const seedStockpileVolume = createServerFn({ method: "POST" })
         volume_m3: volume,
         pixel_size_m: data.recentSource === "Drone" ? 0.1 : 1,
         cells_analyzed: Math.round(area / Math.pow(data.recentSource === "Drone" ? 0.1 : 1, 2)),
-        notes: `DEM-diff ${data.recentSource} − ${data.baselineSource}`,
+        notes: `CONCEPTUAL · DEM sintético de demostración: ${data.recentSource} − ${data.baselineSource}`,
       })
       .select("*")
       .single();

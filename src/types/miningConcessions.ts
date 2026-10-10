@@ -7,6 +7,7 @@ export type MiningConcession = {
   concession_type: string;
   status: string;
   holder: string | null;
+  rut_holder?: string | null;
   area_ha: number | null;
   granted_at: string | null;
   expires_at: string | null;

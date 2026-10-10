@@ -1,0 +1,150 @@
+{
+  "sceneId": "S2B_MSIL2A_20250323T143749_R096_T19HCC_20250323T180942",
+  "datetime": "2025-03-23T14:37:49.024000Z",
+  "stacHref": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20250323T143749_R096_T19HCC_20250323T180942",
+  "grid": {
+    "epsg": 32719,
+    "x": 310400,
+    "y": 6249320,
+    "resolution": 20,
+    "width": 143,
+    "height": 170
+  },
+  "stats": {
+    "ndvi": {
+      "mean": 0.566329113089842,
+      "min": 0.021302495435179564,
+      "max": 0.9042609153077328,
+      "count": 20781
+    },
+    "ndmi": {
+      "mean": 0.14749072271625213,
+      "min": -0.23960396039603957,
+      "max": 0.6201859229747676,
+      "count": 20781
+    },
+    "ironOxideRatio": {
+      "mean": 1.4945934129966918,
+      "min": 0.4090909090909091,
+      "max": 2.780269058295964,
+      "count": 20781
+    },
+    "swirContrast": {
+      "mean": 1.6547590525804412,
+      "min": 0.9871420222092345,
+      "max": 2.5823293172690756,
+      "count": 20781
+    }
+  },
+  "validPixels": 20781,
+  "excludedPixels": 3529,
+  "sha256": "7de9eff395c3e48b36ccc43773713a89a7c1de491cef7e5cceafdf111c503460",
+  "bytes": 389960,
+  "provenance": "modelled",
+  "radiometry": {
+    "B02": {
+      "scale": 0.0001,
+      "offset": -0.1,
+      "nodata": 0
+    },
+    "B04": {
+      "scale": 0.0001,
+      "offset": -0.1,
+      "nodata": 0
+    },
+    "B08": {
+      "scale": 0.0001,
+      "offset": -0.1,
+      "nodata": 0
+    },
+    "B11": {
+      "scale": 0.0001,
+      "offset": -0.1,
+      "nodata": 0
+    },
+    "B12": {
+      "scale": 0.0001,
+      "offset": -0.1,
+      "nodata": 0
+    },
+    "SCL": {
+      "scale": 1,
+      "offset": 0,
+      "nodata": 0
+    }
+  },
+  "geoTiffRoundTrip": {
+    "passed": true,
+    "metadata": {
+      "pipeline": "sentinel2-l2a-indices-v1",
+      "bands": ["ndvi", "ndmi", "ironOxideRatio", "swirContrast"],
+      "provenance": "modelled",
+      "units": "dimensionless",
+      "resampling": "nearest grid centre",
+      "sclAccepted": [4, 5],
+      "source": {
+        "sceneId": "S2B_MSIL2A_20250323T143749_R096_T19HCC_20250323T180942",
+        "acquisitionDate": "2025-03-23T14:37:49.024000Z"
+      }
+    },
+    "indices": {
+      "ndvi": {
+        "count": 20781,
+        "mean": 0.5663291132441929
+      },
+      "ndmi": {
+        "count": 20781,
+        "mean": 0.1474907226803513
+      },
+      "ironOxideRatio": {
+        "count": 20781,
+        "mean": 1.4945934130464444
+      },
+      "swirContrast": {
+        "count": 20781,
+        "mean": 1.654759053385216
+      }
+    }
+  },
+  "checks": {
+    "liveTest": {
+      "exit": 0
+    },
+    "targetedTests": {
+      "passed": 9
+    },
+    "typecheck": {
+      "exit": 0
+    },
+    "lint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 7
+    },
+    "build": {
+      "exit": 0,
+      "compiledCompactMetadataVerified": true
+    },
+    "fullTests": {
+      "exit": 0,
+      "passed": 696,
+      "skipped": 5,
+      "passedFiles": 135,
+      "skippedFiles": 2
+    },
+    "targetedLint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 0
+    },
+    "diffCheck": {
+      "exit": 0
+    }
+  },
+  "backend": {
+    "migrationApplied": false,
+    "authenticatedStorageVerified": false
+  },
+  "published": false,
+  "pushed": false
+}

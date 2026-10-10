@@ -11,6 +11,7 @@ import {
   explainHyperspectralProducts,
 } from "@/lib/satelliteIntel.functions";
 import { supabase } from "@/integrations/supabase/client";
+import { satelliteEvidence, validSatelliteBbox } from "@/lib/satellite/evidence";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -27,14 +28,8 @@ const ASSEMBLAGE_LABEL: Record<string, string> = {
   potassic: "Potásica",
 };
 
-function _bboxFromCenter(lat: number, lng: number, kmHalf = 8): [number, number, number, number] {
-  const dLat = kmHalf / 111;
-  const dLng = kmHalf / (111 * Math.cos((lat * Math.PI) / 180));
-  return [lng - dLng, lat - dLat, lng + dLng, lat + dLat];
-}
-
 export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
-  const { products, loading, refresh } = useHyperspectralProducts(projectId);
+  const { products, loading, error: loadError, refresh } = useHyperspectralProducts(projectId);
   const searchFn = useServerFn(searchStac);
   const seedFn = useServerFn(seedHyperspectralFromScene);
   const explainFn = useServerFn(explainHyperspectralProducts);
@@ -60,7 +55,9 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
     setError(null);
     setRunning(true);
     try {
-      const bbox = defaultBbox ?? [-71.2, -34.0, -71.0, -33.8];
+      if (!validSatelliteBbox(defaultBbox))
+        throw new Error("Define un AOI válido para este proyecto antes de consultar escenas.");
+      const bbox = defaultBbox;
       const today = new Date();
       const dateTo = today.toISOString().slice(0, 10);
       const dateFrom = new Date(today.getTime() - 365 * 24 * 3600 * 1000)
@@ -74,7 +71,11 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
       if (searchErr) throw new Error(`STAC: ${searchErr}`);
 
       const scene = items[0];
-      const acquisition = scene?.acquisitionDate ?? new Date().toISOString();
+      if (!scene?.id || !scene.acquisitionDate)
+        throw new Error(
+          "No hay escenas disponibles para el AOI y periodo consultados. No se generaron productos.",
+        );
+      const acquisition = scene.acquisitionDate;
       const { ok, error: seedErr } = await seedFn({
         data: {
           projectId,
@@ -131,6 +132,11 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
 
   return (
     <div className="space-y-4">
+      <p className="rounded border border-hairline bg-surface p-3 text-xs text-content">
+        El flujo actual consulta escenas y genera productos conceptuales de demostración. No ejecuta
+        procesamiento espectral ni acredita minerales detectados.{" "}
+        {!validSatelliteBbox(defaultBbox) && "Falta un AOI válido del proyecto."}
+      </p>
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-2 text-sm font-mono uppercase tracking-wider text-text-secondary">
           <Satellite className="w-4 h-4 text-signal-cyan" />
@@ -147,7 +153,7 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
           </select>
           <button
             onClick={runAnalysis}
-            disabled={running}
+            disabled={running || !validSatelliteBbox(defaultBbox)}
             className="inline-flex items-center gap-1.5 text-xs font-mono uppercase px-3 py-1.5 rounded bg-signal-cyan text-background hover:opacity-90 disabled:opacity-50"
           >
             {running ? (
@@ -155,7 +161,7 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
             ) : (
               <Telescope className="w-3.5 h-3.5" />
             )}
-            Ejecutar análisis
+            Crear demostración desde escena
           </button>
           <button
             onClick={runExplainer}
@@ -181,9 +187,9 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
         </div>
       </div>
 
-      {error && (
+      {(error || loadError) && (
         <div className="rounded border border-signal-amber bg-signal-amber/10 px-3 py-2 text-xs font-mono text-signal-amber">
-          {error}
+          {error || loadError}
         </div>
       )}
 
@@ -226,7 +232,8 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
         </div>
         {products.length === 0 ? (
           <div className="p-6 text-center text-xs text-text-dim font-mono">
-            No hay productos. Ejecuta un análisis para mapear ensambles de alteración.
+            No hay productos disponibles. Puedes consultar una escena para crear una demostración
+            conceptual.
           </div>
         ) : (
           <div className="divide-y divide-border">
@@ -247,8 +254,11 @@ export function HyperspectralPanel({ projectId, defaultBbox }: Props) {
                           {p.source} · {p.acquisition_date.slice(0, 10)}
                         </span>
                       </div>
+                      <p className="mt-1 text-[10px] font-mono text-content-subtle">
+                        {satelliteEvidence(p.metadata)}
+                      </p>
                       <div className="mt-1.5 grid grid-cols-3 gap-2 text-[11px] tabular-nums">
-                        <Metric label="mean" value={p.mean_score?.toFixed(2) ?? "—"} />
+                        <Metric label="score medio" value={p.mean_score?.toFixed(2) ?? "—"} />
                         <Metric label="max" value={p.max_score?.toFixed(2) ?? "—"} />
                         <Metric label="área ha" value={p.area_ha?.toFixed(1) ?? "—"} />
                       </div>

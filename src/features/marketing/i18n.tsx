@@ -70,6 +70,17 @@ export const STRINGS = {
     pt: "Camada Cadastral Universal",
   },
   cad_search_button: { es: "Buscar", en: "Search", pt: "Buscar" },
+  cad_source_unavailable: {
+    es: "La fuente catastral no está disponible. No se pudo comprobar si existen resultados.",
+    en: "The cadastre source is unavailable. Results could not be checked.",
+    pt: "A fonte cadastral está indisponível. Não foi possível verificar os resultados.",
+  },
+  cad_retry: { es: "Reintentar", en: "Try again", pt: "Tentar novamente" },
+  cad_loading: {
+    es: "Consultando fuente catastral…",
+    en: "Querying cadastre source…",
+    pt: "Consultando fonte cadastral…",
+  },
   cad_soon: { es: "pronto", en: "soon", pt: "em breve" },
   cad_results_live: {
     es: "resultado(s) · fuente {inst} en vivo",

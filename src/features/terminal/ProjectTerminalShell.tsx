@@ -14,13 +14,15 @@ import {
 } from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
-import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
-import { buildLosVerdesDoc } from "@/lib/pdf/adapters/losVerdes";
-import { buildNahuelbutaDoc } from "@/lib/pdf/adapters/nahuelbuta";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { ProjectOpportunities } from "./ProjectOpportunities";
-import { TerminalSimulator } from "./TerminalSimulator";
+const TerminalSatellitePanel = lazy(() =>
+  import("./TerminalSatellitePanel").then((m) => ({ default: m.TerminalSatellitePanel })),
+);
+const TerminalSimulator = lazy(() =>
+  import("./TerminalSimulator").then((m) => ({ default: m.TerminalSimulator })),
+);
 
 import {
   TERMINAL_TABS,
@@ -99,7 +101,6 @@ const NahuelbutaThesisPanel = lazy(() =>
     default: m.NahuelbutaThesisPanel,
   })),
 );
-const LOS_VERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 const PalmerasMasterViewer = lazy(() =>
   import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({
     default: m.PalmerasMasterViewer,
@@ -114,7 +115,11 @@ const Nahuelbuta3D = lazy(() =>
 
 function Loading({ label }: { label: string }) {
   return (
-    <div className="rounded-2xl border border-hairline bg-white py-20 grid place-items-center gap-3">
+    <div
+      role="status"
+      aria-live="polite"
+      className="rounded-2xl border border-hairline bg-surface py-20 grid place-items-center gap-3"
+    >
       <Loader2 className="w-5 h-5 animate-spin text-accent-brand" />
       <span className="text-xs font-mono uppercase tracking-wider text-content-subtle">
         {label}
@@ -224,6 +229,11 @@ export function ProjectTerminalShell({
             <MapaTab project={project} view={view} setView={setView} />
           </div>
         )}
+        {tab === "satelital" && (
+          <Suspense fallback={<Loading label="Cargando análisis satelital" />}>
+            <TerminalSatellitePanel project={project} />
+          </Suspense>
+        )}
         {tab === "tesis" && <TesisTab project={project} />}
         {tab === "simulador" && <SimuladorTab project={project} />}
         {tab === "dataroom" && <DataRoomTab project={project} />}
@@ -265,6 +275,7 @@ function MapaTab({
               <button
                 key={key}
                 type="button"
+                aria-pressed={view === key}
                 onClick={() => setView(key)}
                 className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
                   view === key
@@ -279,12 +290,16 @@ function MapaTab({
           </div>
         </div>
 
-        {view === "2d" ? <CholquiMasterViewer /> : <CholquiTerrain3D />}
+        <Suspense fallback={<Loading label="Cargando visor" />}>
+          {view === "2d" ? <CholquiMasterViewer /> : <CholquiTerrain3D />}
+        </Suspense>
 
-        <div className="mt-6 space-y-6">
-          <CholquiTargetsSummary />
-          <CholquiFieldProgramPanel />
-        </div>
+        <Suspense fallback={<Loading label="Cargando programa" />}>
+          <div className="mt-6 space-y-6">
+            <CholquiTargetsSummary />
+            <CholquiFieldProgramPanel />
+          </div>
+        </Suspense>
       </Suspense>
     );
   }
@@ -293,11 +308,15 @@ function MapaTab({
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
         <ViewToggle view={view} onChange={setView} />
-        {view === "2d" ? <NahuelbutaMasterViewer /> : <Nahuelbuta3D />}
-        <div className="mt-6 space-y-6">
-          <NahuelbutaSatellitePanel />
-          <NahuelbutaTenurePanel />
-        </div>
+        <Suspense fallback={<Loading label="Cargando visor" />}>
+          {view === "2d" ? <NahuelbutaMasterViewer /> : <Nahuelbuta3D />}
+        </Suspense>
+        <Suspense fallback={<Loading label="Cargando antecedentes" />}>
+          <div className="mt-6 space-y-6">
+            <NahuelbutaSatellitePanel />
+            <NahuelbutaTenurePanel />
+          </div>
+        </Suspense>
       </Suspense>
     );
   }
@@ -306,14 +325,18 @@ function MapaTab({
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
         <ViewToggle view={view} onChange={setView} />
-        {view === "2d" ? <LosVerdesMasterViewer /> : <LosVerdes3D />}
+        <Suspense fallback={<Loading label="Cargando visor" />}>
+          {view === "2d" ? <LosVerdesMasterViewer /> : <LosVerdes3D />}
+        </Suspense>
       </Suspense>
     );
   }
   return (
     <Suspense fallback={<Loading label="Cargando visor" />}>
       <ViewToggle view={view} onChange={setView} />
-      {view === "2d" ? <PalmerasMasterViewer /> : <Palmeras3D />}
+      <Suspense fallback={<Loading label="Cargando visor" />}>
+        {view === "2d" ? <PalmerasMasterViewer /> : <Palmeras3D />}
+      </Suspense>
     </Suspense>
   );
 }
@@ -332,6 +355,7 @@ function ViewToggle({ view, onChange }: { view: "2d" | "3d"; onChange: (v: "2d" 
           <button
             key={key}
             type="button"
+            aria-pressed={view === key}
             onClick={() => onChange(key)}
             className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
               view === key ? "bg-accent-brand text-white" : "text-content-subtle hover:text-content"
@@ -415,7 +439,9 @@ function TesisTab({ project }: { project: TerminalProject }) {
 function SimuladorTab({ project }: { project: TerminalProject }) {
   return (
     <>
-      <TerminalSimulator ficha={project.ficha} />
+      <Suspense fallback={<Loading label="Cargando simulador" />}>
+        <TerminalSimulator ficha={project.ficha} />
+      </Suspense>
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando escenarios" />}>
           <div className="mt-6 space-y-6">
@@ -443,9 +469,19 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
           una página y brief técnico con trazabilidad de fuentes.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
-          {project.slug === "cholqui" && <ProjectDocsMenu build={() => buildCholquiDoc()} />}
+          {project.slug === "cholqui" && (
+            <ProjectDocsMenu
+              build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()}
+            />
+          )}
           {project.slug === "losverdes" && <LosVerdesDocsMenu />}
-          {project.slug === "nahuelbuta" && <ProjectDocsMenu build={() => buildNahuelbutaDoc()} />}
+          {project.slug === "nahuelbuta" && (
+            <ProjectDocsMenu
+              build={async () =>
+                (await import("@/lib/pdf/adapters/nahuelbuta")).buildNahuelbutaDoc()
+              }
+            />
+          )}
           <Link
             to="/contacto"
             className="inline-flex items-center justify-center gap-2 rounded-md border border-accent-brand px-5 py-2.5 text-sm text-accent-brand hover:bg-accent-brand-subtle"
@@ -520,5 +556,12 @@ function LosVerdesDocsMenu() {
     queryFn: () => fetchReport(),
     staleTime: 5 * 60 * 1000,
   });
-  return <ProjectDocsMenu build={() => (data ? buildLosVerdesDoc(data) : null)} />;
+  return (
+    <ProjectDocsMenu
+      disabled={!data}
+      build={async () =>
+        data ? (await import("@/lib/pdf/adapters/losVerdes")).buildLosVerdesDoc(data) : null
+      }
+    />
+  );
 }

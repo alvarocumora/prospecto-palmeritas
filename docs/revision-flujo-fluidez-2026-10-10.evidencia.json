@@ -1,0 +1,60 @@
+{
+  "errors": [],
+  "navigation": [
+    {
+      "label": "TESIS & ENSAYES",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=tesis&view=2d",
+      "current": "page"
+    },
+    {
+      "label": "SIMULADOR & MODELO",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=simulador&view=2d",
+      "current": "page"
+    },
+    {
+      "label": "DOCUMENTOS & DATA ROOM",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=dataroom&view=2d",
+      "current": "page"
+    },
+    {
+      "label": "MAPA & EXPLORACIÓN",
+      "url": "http://127.0.0.1:8081/terminal/cholqui?tab=mapa&view=2d",
+      "current": "page"
+    }
+  ],
+  "viewportChecks": [
+    {
+      "width": 390,
+      "scrollWidth": 390,
+      "overflow": false
+    }
+  ],
+  "downloads": [
+    {
+      "file": "Geocapitals_CHOLQUI_One_Pager_v4.1.pdf",
+      "failure": null
+    }
+  ],
+  "mapRetained": true,
+  "cameraRedraw": true,
+  "viewPressed": "true",
+  "checks": {
+    "typecheck": 0,
+    "lint": {
+      "exit": 0,
+      "errors": 0,
+      "warnings": 7
+    },
+    "regressions": {
+      "exit": 0,
+      "files": 6,
+      "passed": 16
+    },
+    "build": 0,
+    "diffCheck": 0
+  },
+  "scope": "GeoCapitals local plus read-only stack/routing comparison with codeflow-ai-hub",
+  "benchmarked": false,
+  "published": false,
+  "pushed": false
+}

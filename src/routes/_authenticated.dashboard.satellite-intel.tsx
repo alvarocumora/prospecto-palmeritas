@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRef } from "react";
+import { lazy, Suspense, useRef } from "react";
 import { useProjects } from "@/hooks/useProjects";
 import { HyperspectralPanel } from "@/components/satellite/HyperspectralPanel";
 import { InsarMonitoringPanel } from "@/components/satellite/InsarMonitoringPanel";
@@ -9,6 +9,12 @@ import { SatelliteMapViewer } from "@/components/satellite/SatelliteMapViewer";
 import { InsarAlertWorkflowPanel } from "@/components/satellite/InsarAlertWorkflowPanel";
 import { SatelliteIntelPdfExport } from "@/components/satellite/SatelliteIntelPdfExport";
 import { Satellite } from "lucide-react";
+
+const SentinelProcessingPanel = lazy(() =>
+  import("@/components/satellite/SentinelProcessingPanel").then((module) => ({
+    default: module.SentinelProcessingPanel,
+  })),
+);
 
 export const Route = createFileRoute("/_authenticated/dashboard/satellite-intel")({
   component: SatelliteIntelPage,
@@ -76,7 +82,7 @@ function SatelliteIntelPage() {
   ];
 
   return (
-    <div className="p-4 md:p-6 space-y-6 max-w-6xl mx-auto">
+    <div key={active.id} className="p-4 md:p-6 space-y-6 max-w-6xl mx-auto bg-surface text-content">
       <header className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="text-lg font-mono uppercase tracking-wider text-foreground flex items-center gap-2">
@@ -94,6 +100,22 @@ function SatelliteIntelPage() {
           getAnnexes={getAnnexes}
         />
       </header>
+
+      <p className="rounded border border-hairline bg-surface-2 p-3 text-xs text-content">
+        Procedencia: las acciones actuales de generación hiperespectral, InSAR y DEM-diff producen
+        demostraciones conceptuales. Una escena de catálogo no acredita procesamiento ni mediciones.
+        Revisa la procedencia de cada registro antes de interpretar o exportar.
+      </p>
+
+      <Suspense
+        fallback={
+          <p role="status" className="text-xs text-content-subtle">
+            Cargando procesamiento Sentinel-2…
+          </p>
+        }
+      >
+        <SentinelProcessingPanel projectId={active.id} defaultBbox={bbox} />
+      </Suspense>
 
       <section ref={mapRef}>
         <SatelliteMapViewer

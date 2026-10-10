@@ -1,3 +1,4 @@
+import { geoColors } from "@/lib/geospatial/visualTokens";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Map as LeafletMap, Layer, GeoJSON as LeafletGeoJSON, TileLayer } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -60,6 +61,8 @@ export type AssayPoint = {
 
 export type MasterViewerProps = {
   projectName: string;
+  onMapReady?: (map: LeafletMap) => void;
+  basemapOverride?: "satellite" | "topo" | null;
   /** Selector estable para capturar el mapa real en los PDF (data-report-map). */
   reportMapId?: string;
   center: { lat: number; lng: number };
@@ -82,13 +85,24 @@ export type MasterViewerProps = {
   anomalyIntensityDisabledReason?: string;
   spectralFootprintsOnly?: boolean;
   coordinateNotice?: string;
+  contextLayers?: Array<{
+    id: string;
+    label: string;
+    evidence: string;
+    evidenceForFeature?: (properties: Record<string, unknown>) => string;
+    caution?: string | null;
+    features: FeatureCollection;
+    color?: string | ((properties: Record<string, unknown>) => string);
+  }>;
 };
 
+const EMPTY_ASSAYS: AssayPoint[] = [];
+
 const ALTERATION_COLOR: Record<string, string> = {
-  CLAY_MINERALS: "#0ea5e9", // Al-OH / fílica → cian
-  HYDROTHERMAL_ALTERATION: "#d946ef", // hidrotermal mixta → magenta
-  IRON_OXIDE: "#f97316", // óxidos / gossan → ámbar
-  STRUCTURAL_LINEAMENTS: "#eab308", // lineamientos → dorado
+  CLAY_MINERALS: geoColors.clay, // Al-OH / fílica → cian
+  HYDROTHERMAL_ALTERATION: geoColors.hydrothermal, // hidrotermal mixta → magenta
+  IRON_OXIDE: geoColors.ironOxide, // óxidos / gossan → ámbar
+  STRUCTURAL_LINEAMENTS: geoColors.lineament, // lineamientos → dorado
 };
 const ALTERATION_LABEL: Record<string, string> = {
   CLAY_MINERALS: "Al-OH / arcillas (fílica)",
@@ -200,12 +214,12 @@ const ANOMALY_GRADIENT_STOPS: ReadonlyArray<[number, string]> = [
 
 type ProvKind = "certificado" | "medido" | "declarado" | "derivado" | "conceptual" | "contexto";
 const PROV: Record<ProvKind, { label: string; bg: string }> = {
-  medido: { label: "MEDIDO EN TERRENO", bg: "#0369a1" },
-  declarado: { label: "OBSERVACIÓN DOCUMENTAL", bg: "#64748b" },
-  certificado: { label: "CERTIFICADO", bg: "#15803d" },
-  derivado: { label: "DERIVADO", bg: "#0369a1" },
-  conceptual: { label: "PROPUESTO / CONCEPTUAL", bg: "#a16207" },
-  contexto: { label: "CONTEXTO — verificar tenencia", bg: "#b45309" },
+  medido: { label: "MEDIDO EN TERRENO", bg: geoColors.measured },
+  declarado: { label: "OBSERVACIÓN DOCUMENTAL", bg: geoColors.declared },
+  certificado: { label: "CERTIFICADO", bg: geoColors.certified },
+  derivado: { label: "DERIVADO", bg: geoColors.measured },
+  conceptual: { label: "PROPUESTO / CONCEPTUAL", bg: geoColors.conceptual },
+  contexto: { label: "CONTEXTO — verificar tenencia", bg: geoColors.context },
 };
 
 // Badge de evidencia + escala/resolución por capa: hace evidente qué está viendo
@@ -246,13 +260,15 @@ const LAYER_META: Record<LayerKey, { evidence: Evidence; scale: string }> = {
 
 export function ProjectMasterViewer({
   projectName,
+  onMapReady,
+  basemapOverride,
   reportMapId,
   center,
   concessions,
   anomalies,
   drillGrid,
   pedimentos,
-  assays = [],
+  assays = EMPTY_ASSAYS,
   coverage,
   geophysics = null,
   franjas = null,
@@ -266,7 +282,10 @@ export function ProjectMasterViewer({
   anomalyIntensityDisabledReason,
   spectralFootprintsOnly = false,
   coordinateNotice,
+  contextLayers,
 }: MasterViewerProps) {
+  const readyCallback = useRef(onMapReady);
+  readyCallback.current = onMapReady;
   const mapEl = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<LeafletMap | null>(null);
   const groups = useRef<Partial<Record<LayerKey, Layer>>>({});
@@ -410,14 +429,20 @@ export function ProjectMasterViewer({
         // Halo de contraste bajo la tenencia propia: la despega del relieve satelital.
         const halo = L.geoJSON({ type: "FeatureCollection", features: ownFeatures } as never, {
           interactive: false,
-          style: () => ({ color: "#0b0a09", weight: 6, opacity: 0.55, fill: false }),
+          style: () => ({ color: geoColors.outline, weight: 6, opacity: 0.55, fill: false }),
         });
         const g = L.geoJSON(concessions as never, {
           style: (f?: Feature) =>
             isOwn(f)
-              ? { color: "#f59e0b", weight: 3, opacity: 1, fillColor: "#f59e0b", fillOpacity: 0.24 }
+              ? {
+                  color: geoColors.tenureOwn,
+                  weight: 3,
+                  opacity: 1,
+                  fillColor: geoColors.tenureOwn,
+                  fillOpacity: 0.24,
+                }
               : {
-                  color: "#94a3b8",
+                  color: geoColors.tenureNeighbor,
                   weight: 0.8,
                   opacity: 0.55,
                   dashArray: "3 3",
@@ -455,7 +480,7 @@ export function ProjectMasterViewer({
         for (const f of anomalies.features) {
           const p = (f.properties ?? {}) as Record<string, unknown>;
           const code = String(p.index_code ?? "CLAY_MINERALS");
-          const color = ALTERATION_COLOR[code] ?? "#0ea5e9";
+          const color = ALTERATION_COLOR[code] ?? geoColors.clay;
           const inside = Boolean(p.dentro_concesion);
 
           // Centroide y radio aparente del polígono (para el halo difuso).
@@ -563,9 +588,9 @@ export function ProjectMasterViewer({
           const [lng, lat] = g.coordinates as [number, number];
           const m = L.circleMarker([lat, lng], {
             radius: 7,
-            color: "#ffffff",
+            color: geoColors.contrast,
             weight: 1.4,
-            fillColor: "#1f6feb",
+            fillColor: geoColors.proposedDrill,
             fillOpacity: 1,
           }).on("click", () => sel("sondajes", p));
           items.push(m);
@@ -587,7 +612,7 @@ export function ProjectMasterViewer({
                 [lat, lng],
                 [endLat, endLng],
               ],
-              { color: "#1f6feb", weight: 2 },
+              { color: geoColors.proposedDrill, weight: 2 },
             ),
           );
         }
@@ -601,9 +626,9 @@ export function ProjectMasterViewer({
           .map((a) =>
             L.circleMarker([a.lat, a.lng], {
               radius: 6,
-              color: "#052e16",
+              color: geoColors.sampleOutline,
               weight: 1,
-              fillColor: a.certified === false ? "#64748b" : "#22c55e",
+              fillColor: a.certified === false ? geoColors.declared : geoColors.sample,
               fillOpacity: 1,
             }).on("click", () => sel("ensayes", a as unknown as Record<string, unknown>)),
           );
@@ -614,10 +639,10 @@ export function ProjectMasterViewer({
       if (pedimentos?.features?.length) {
         const g = L.geoJSON(pedimentos as never, {
           style: {
-            color: "#b98a2f",
+            color: geoColors.pedimento,
             weight: 2,
             dashArray: "6 4",
-            fillColor: "#b98a2f",
+            fillColor: geoColors.pedimento,
             fillOpacity: 0.1,
           },
           onEachFeature: (f: Feature, layer) =>
@@ -631,7 +656,12 @@ export function ProjectMasterViewer({
       // --- Franjas metalogénicas (contexto oficial; polígono tenue de fondo)
       if (franjas?.features?.length) {
         const g = L.geoJSON(franjas as never, {
-          style: { color: "#7c3aed", weight: 1, fillColor: "#7c3aed", fillOpacity: 0.06 },
+          style: {
+            color: geoColors.pending,
+            weight: 1,
+            fillColor: geoColors.pending,
+            fillOpacity: 0.06,
+          },
           onEachFeature: (f: Feature, layer) =>
             layer.on("click", () =>
               sel("franjas", (f.properties ?? {}) as Record<string, unknown>),
@@ -651,7 +681,7 @@ export function ProjectMasterViewer({
             L.marker([lat, lng], {
               icon: L.divIcon({
                 className: "",
-                html: '<div style="width:12px;height:12px;background:#dc2626;border:1.5px solid #fff;transform:rotate(45deg)"></div>',
+                html: '<div style="width:12px;height:12px;background:var(--geo-deposit);border:1.5px solid var(--geo-contrast);transform:rotate(45deg)"></div>',
                 iconSize: [12, 12],
               }),
             }).on("click", () =>
@@ -677,9 +707,9 @@ export function ProjectMasterViewer({
           items.push(
             L.circleMarker([lat, lng], {
               radius: 4 + 8 * (cu / (cuMax || 1)),
-              color: "#7f1d1d",
+              color: geoColors.depositOutline,
               weight: 0.8,
-              fillColor: "#f97316",
+              fillColor: geoColors.ironOxide,
               fillOpacity: 0.8,
             }).on("click", () =>
               sel("geoquimica", (f.properties ?? {}) as Record<string, unknown>),
@@ -692,7 +722,7 @@ export function ProjectMasterViewer({
       // --- Estructuras (vetas con rumbo/manteo medido en terreno; MEDIDO)
       if (estructuras?.features?.length) {
         const line = L.geoJSON(estructuras as never, {
-          style: { color: "#facc15", weight: 3, opacity: 0.9 },
+          style: { color: geoColors.structure, weight: 3, opacity: 0.9 },
           onEachFeature: (f: Feature, layer) =>
             layer.on("click", () =>
               sel("estructuras", (f.properties ?? {}) as Record<string, unknown>),
@@ -705,19 +735,19 @@ export function ProjectMasterViewer({
       if (pedimentosPendientes?.features?.length) {
         const g = L.geoJSON(pedimentosPendientes as never, {
           style: {
-            color: "#c2410c",
+            color: geoColors.geochemistry,
             weight: 1.6,
             dashArray: "5 4",
-            fillColor: "#c2410c",
+            fillColor: geoColors.geochemistry,
             fillOpacity: 0.05,
           },
           pointToLayer: (f, latlng) =>
             L.circleMarker(latlng, {
               radius: 6,
-              color: "#c2410c",
+              color: geoColors.geochemistry,
               weight: 1.6,
               dashArray: "3 2",
-              fillColor: "#c2410c",
+              fillColor: geoColors.geochemistry,
               fillOpacity: 0.4,
             }),
           onEachFeature: (f: Feature, layer) =>
@@ -738,9 +768,9 @@ export function ProjectMasterViewer({
           items.push(
             L.circleMarker([lat, lng], {
               radius: 3.5,
-              color: "#475569",
+              color: geoColors.markerOutline,
               weight: 1.4,
-              fillColor: "#e2e8f0",
+              fillColor: geoColors.markerFill,
               fillOpacity: 0.9,
             }).on("click", () => sel("mojones", (f.properties ?? {}) as Record<string, unknown>)),
           );
@@ -763,6 +793,7 @@ export function ProjectMasterViewer({
         /* sin bounds válidos */
       }
 
+      readyCallback.current?.(map);
       setReady(true);
     })();
     return () => {
@@ -771,7 +802,75 @@ export function ProjectMasterViewer({
       mapRef.current = null;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [geophysics]);
+  }, [
+    geophysics,
+    concessions,
+    anomalies,
+    drillGrid,
+    pedimentos,
+    assays,
+    franjas,
+    yacimientos,
+    geoquimica,
+    estructuras,
+    pedimentosPendientes,
+    mojones,
+    center.lat,
+    center.lng,
+    spectralFootprintsOnly,
+  ]);
+
+  const [contextSettings, setContextSettings] = useState<
+    Record<string, { visible: boolean; opacity: number }>
+  >({});
+  useEffect(() => {
+    const map = mapRef.current,
+      L = leafletRef.current;
+    if (!map || !L || !ready) return;
+    const layers: Layer[] = [];
+    for (const entry of contextLayers ?? []) {
+      const setting = contextSettings[entry.id] ?? { visible: true, opacity: 0.8 };
+      if (!setting.visible) continue;
+      const color = (feature?: Feature) =>
+        typeof entry.color === "function"
+          ? entry.color(feature?.properties ?? {})
+          : (entry.color ?? geoColors.context);
+      const layer = L.geoJSON(entry.features as never, {
+        style: (feature) => ({
+          color: color(feature),
+          weight: 2,
+          opacity: setting.opacity,
+          fillOpacity: setting.opacity * 0.15,
+        }),
+        pointToLayer: (feature, point) =>
+          L.circleMarker(point, {
+            radius: 5,
+            color: color(feature),
+            opacity: setting.opacity,
+            fillOpacity: setting.opacity,
+          }),
+        onEachFeature: (feature, item) => {
+          const content = document.createElement("div");
+          content.textContent =
+            entry.label +
+            " · " +
+            (entry.evidenceForFeature?.(feature.properties ?? {}) ?? entry.evidence) +
+            "\n" +
+            (entry.caution ? entry.caution + "\n" : "") +
+            Object.entries(feature.properties ?? {})
+              .filter(([, value]) => value != null && typeof value !== "object")
+              .map(([key, value]) => key + ": " + String(value))
+              .join("\n");
+          content.style.whiteSpace = "pre-line";
+          item.bindPopup(content);
+        },
+      }).addTo(map);
+      layers.push(layer);
+    }
+    return () => {
+      for (const layer of layers) map.removeLayer(layer);
+    };
+  }, [ready, contextLayers, contextSettings]);
 
   // Toggle de capas
   useEffect(() => {
@@ -814,6 +913,10 @@ export function ProjectMasterViewer({
     collect(layer);
     if (bounds.isValid()) map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
   };
+
+  useEffect(() => {
+    if (basemapOverride) setBase(basemapOverride === "satellite" ? "sat" : "topo");
+  }, [basemapOverride]);
 
   // Switch de capa base
   useEffect(() => {
@@ -936,6 +1039,48 @@ export function ProjectMasterViewer({
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-hairline bg-surface">
+      {!!contextLayers?.length && (
+        <details className="border-b border-hairline px-4 py-3 text-xs">
+          <summary className="cursor-pointer font-mono">Capas de evidencia del proyecto</summary>
+          <div className="mt-2 flex flex-wrap gap-3">
+            {contextLayers.map((entry) => (
+              <label key={entry.id} className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={contextSettings[entry.id]?.visible ?? true}
+                  onChange={(event) =>
+                    setContextSettings((state) => ({
+                      ...state,
+                      [entry.id]: {
+                        opacity: state[entry.id]?.opacity ?? 0.8,
+                        visible: event.target.checked,
+                      },
+                    }))
+                  }
+                />
+                {entry.label} · {entry.evidence} · {entry.features.features.length}
+                <input
+                  aria-label={"Opacidad " + entry.label}
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.1"
+                  value={contextSettings[entry.id]?.opacity ?? 0.8}
+                  onChange={(event) =>
+                    setContextSettings((state) => ({
+                      ...state,
+                      [entry.id]: {
+                        visible: state[entry.id]?.visible ?? true,
+                        opacity: Number(event.target.value),
+                      },
+                    }))
+                  }
+                />
+              </label>
+            ))}
+          </div>
+        </details>
+      )}
       {/* Cabecera: métrica de cobertura + descargo del halo */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-hairline px-4 py-3">
         <div>
@@ -1213,7 +1358,7 @@ function Badge({ kind }: { kind: ProvKind }) {
   const p = PROV[kind];
   return (
     <span
-      className="inline-block rounded px-2 py-0.5 text-[10px] font-bold text-white"
+      className="inline-block rounded px-2 py-0.5 text-[10px] font-bold text-accent-brand-contrast"
       style={{ background: p.bg }}
     >
       {p.label}
@@ -1346,7 +1491,7 @@ function Inspector({
     ];
   } else {
     title = `Concesión ${p.nombre ?? ""}`;
-    prov = p.es_tenencia_proyecto ? "certificado" : "contexto";
+    prov = p.es_tenencia_proyecto ? "declarado" : "contexto";
     rows = [
       ["Rol", p.rol],
       ["Titular", p.titular],
@@ -1354,7 +1499,14 @@ function Inspector({
       ["Tipo", p.tipo],
       ["Hectáreas", p.hectareas],
       ["Comuna", p.comuna],
-      ["Tenencia del proyecto", p.es_tenencia_proyecto ? "Sí" : "No (catastro oficial)"],
+      [
+        "Tenencia del proyecto",
+        p.es_tenencia_proyecto === true
+          ? "Declarada"
+          : p.es_tenencia_proyecto === false
+            ? "No"
+            : "Pendiente de verificación",
+      ],
     ];
   }
 

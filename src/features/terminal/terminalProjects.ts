@@ -7,10 +7,11 @@ import { getFicha, type ProjectFicha } from "@/lib/investor/fichas";
  * pestañas ejecutivas (mapa, tesis, simulador, data room). Reemplaza la cadena
  * portada → drawer → ficha → live map.
  */
-export type TerminalTabKey = "mapa" | "tesis" | "simulador" | "dataroom";
+export type TerminalTabKey = "mapa" | "satelital" | "tesis" | "simulador" | "dataroom";
 
 export const TERMINAL_TABS: Array<{ key: TerminalTabKey; label: string; short: string }> = [
   { key: "mapa", label: "Mapa & Exploración", short: "Mapa" },
+  { key: "satelital", label: "Análisis satelital", short: "Satelital" },
   { key: "tesis", label: "Tesis & Ensayes", short: "Tesis" },
   { key: "simulador", label: "Simulador & Modelo", short: "Simulador" },
   { key: "dataroom", label: "Documentos & Data Room", short: "Data room" },

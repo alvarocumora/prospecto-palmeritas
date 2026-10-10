@@ -14,25 +14,19 @@ describe("legacy viewer retirement registry", () => {
     expect(publicViewers.map((viewer) => viewer.id)).not.toContain("losverdes-strategic-map");
   });
 
-  it("no marca reference_only (retirado) lo que sigue siendo el renderer real de una ruta viva", () => {
-    // cholqui-master-viewer y losverdes-strategic-map NO están retirados: siguen
-    // siendo el renderer 2D de /terminal/cholqui y /terminal/losverdes
-    // (ProjectTerminalShell, sin auth gate) — una ruta distinta de /live/*, que
-    // sí migró. Marcarlos reference_only invitaría a borrarlos pensando que ya
-    // no se usan en ningún lado.
-    const referenceViewers = legacyViewersByStatus("reference_only");
-    const activeViewers = legacyViewersByStatus("active_compatibility");
-    expect(referenceViewers.map((viewer) => viewer.id)).not.toContain("cholqui-master-viewer");
-    expect(referenceViewers.map((viewer) => viewer.id)).not.toContain("losverdes-strategic-map");
-    expect(activeViewers.map((viewer) => viewer.id)).toContain("cholqui-master-viewer");
-    expect(activeViewers.map((viewer) => viewer.id)).toContain("losverdes-strategic-map");
-    expect(activeViewers.map((viewer) => viewer.id)).toContain("project-master-viewer");
-    expect(activeViewers.map((viewer) => viewer.id)).toContain("satellite-map-viewer");
-  });
-
-  it("losverdes-public-scene (sin importers) sí queda reference_only — retiro real", () => {
-    const referenceViewers = legacyViewersByStatus("reference_only");
-    expect(referenceViewers.map((viewer) => viewer.id)).toContain("losverdes-public-scene");
+  it("records actual retirement after the report and terminal migrations", () => {
+    const retired = legacyViewersByStatus("retired").map((viewer) => viewer.id);
+    expect(retired).toEqual(
+      expect.arrayContaining([
+        "losverdes-public-scene",
+        "losverdes-strategic-map",
+        "losverdes-engine3d",
+      ]),
+    );
+    const active = legacyViewersByStatus("active_compatibility").map((viewer) => viewer.id);
+    expect(active).toContain("project-master-viewer");
+    expect(active).toContain("cholqui-master-viewer");
+    expect(active).toContain("cholqui-terrain-3d");
   });
 
   it("does not mark a viewer deletable while a parity blocker remains", () => {
