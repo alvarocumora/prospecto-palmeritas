@@ -49,8 +49,26 @@ export function LosVerdesMasterViewer() {
     );
   }
   return (
-    <div data-report-map="losverdes">
+    <div data-report-map="losverdes" className="space-y-3">
       <PublicCanonicalMap bundle={bundle} />
+      <aside className="rounded-2xl border border-hairline bg-surface p-4 text-xs leading-relaxed text-content-subtle">
+        <p className="mb-2 font-mono uppercase tracking-wider text-content">
+          Tilama GeoAI · control de calidad · {query.data?.counts.targets ?? 0} targets ·{" "}
+          {query.data?.counts.samples ?? 0} muestras (WGS84 / UTM 19S, EPSG:32719)
+        </p>
+        <ul className="list-disc space-y-1 pl-4">
+          <li>
+            <strong>TOO-270</strong> (Cu 455.700 ppm) es un valor crítico pendiente de re-ensaye y
+            revisión del tipo de muestra; no representa una ley.
+          </li>
+          <li>Fe % se conserva como dato crudo: escala no validada, no se interpreta.</li>
+          <li>Au de esta campaña no se mezcla con resultados históricos sin conciliar métodos.</li>
+          <li>
+            Targets y anomalías Sentinel-2 son priorización de exploración (interpretación), no
+            recursos ni reservas.
+          </li>
+        </ul>
+      </aside>
     </div>
   );
 }
