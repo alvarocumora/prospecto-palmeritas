@@ -47,7 +47,6 @@ export function LosVerdes3D() {
       extentMeters={12000}
       concessions={layers.concessions}
       anomalies={layers.anomalies}
-      drillGrid={layers.samples}
     />
   );
 }
