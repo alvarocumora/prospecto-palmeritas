@@ -76,8 +76,8 @@ const LosVerdesMasterViewer = lazy(() =>
     default: m.LosVerdesMasterViewer,
   })),
 );
-const LosVerdesEngine3D = lazy(() =>
-  import("@/engine3d/LosVerdesEngine3D").then((m) => ({ default: m.LosVerdesEngine3D })),
+const LosVerdes3D = lazy(() =>
+  import("@/features/losverdes/LosVerdes3D").then((m) => ({ default: m.LosVerdes3D })),
 );
 const NahuelbutaMasterViewer = lazy(() =>
   import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({
@@ -306,13 +306,7 @@ function MapaTab({
     return (
       <Suspense fallback={<Loading label="Cargando visor" />}>
         <ViewToggle view={view} onChange={setView} />
-        {view === "2d" ? (
-          <LosVerdesMasterViewer />
-        ) : (
-          <div className="rounded-2xl border border-hairline bg-white overflow-hidden">
-            <LosVerdesEngine3D projectId={LOS_VERDES_PROJECT_ID} height={640} />
-          </div>
-        )}
+        {view === "2d" ? <LosVerdesMasterViewer /> : <LosVerdes3D />}
       </Suspense>
     );
   }

@@ -1,8 +1,8 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
-// Consolidado en /dashboard/geology3d (visor 3D canónico).
+// Consolidado: el relieve 3D vive dentro de cada ficha de proyecto.
 export const Route = createFileRoute("/_authenticated/dashboard/sat3d")({
   beforeLoad: () => {
-    throw redirect({ to: "/dashboard/geology3d" });
+    throw redirect({ to: "/proyectos", statusCode: 301 });
   },
 });
