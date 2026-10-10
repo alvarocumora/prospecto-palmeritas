@@ -1,7 +1,9 @@
 import type { GeophysicsStation } from "@/types/geophysics";
 
 export type GeophysicsSurfaceMetric =
-  "mag_residual_nt" | "ip_chargeability_mvv" | "ip_resistivity_ohmm";
+  | "mag_residual_nt"
+  | "ip_chargeability_mvv"
+  | "ip_resistivity_ohmm";
 
 export type GeophysicsSurfaceCell = {
   lat: number;
@@ -73,8 +75,17 @@ export function buildFieldGeophysicsSurface(
 ): GeophysicsSurface | null {
   const field = stations.filter(
     (station) =>
-      !station.is_synthetic && Number.isFinite(station.lat) && Number.isFinite(station.lng),
+      !station.is_synthetic &&
+      Number.isFinite(station.lat) &&
+      Number.isFinite(station.lng) &&
+      Math.abs(station.lat) < 90 &&
+      Math.abs(station.lng) <= 180,
   );
+  // A residual baseline cannot mix campaigns or project coordinate frames.
+  const campaigns = new Set(
+    field.map((station) => JSON.stringify([station.project_id, station.survey_id])),
+  );
+  if (campaigns.size > 1) return null;
   const magneticValues = field
     .map((station) => station.mag_nt)
     .filter((value): value is number => value != null && Number.isFinite(value));
@@ -93,6 +104,9 @@ export function buildFieldGeophysicsSurface(
 
   const minPoints = options.minPoints ?? 4;
   if (points.length < minPoints) return null;
+  const positions = new Set(points.map((point) => point.lat + ":" + point.lng));
+  // Repeated stations must be resolved by acquisition QA, not silently averaged.
+  if (positions.size !== points.length) return null;
 
   const gridSize = Math.max(8, Math.min(options.gridSize ?? 28, 80));
   const power = Math.max(1, Math.min(options.power ?? 2, 4));

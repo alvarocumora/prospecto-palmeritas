@@ -44,10 +44,17 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   const frame = { w: W, h: H, m: M };
   const framework = technicalStandard(model);
+  const profile = model.reportProfile ?? "technical";
+  const reportTitle =
+    profile === "investment"
+      ? "Memorando de inversión\npreliminar"
+      : profile === "targeting"
+      ? "Informe de targets\npreliminar"
+      : "Informe técnico\npreliminar";
   const contents: Array<{ label: string; page: number }> = [];
   const chrome = () =>
     letterhead(doc, frame, {
-      unit: "Informes técnicos de proyectos",
+      unit: profile === "investment" ? "Memorandos de inversión" : "Informes de proyectos",
       ref: model.code,
       version: model.docVersion,
       page,
@@ -108,7 +115,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   /* Portada: identidad institucional y ficha de control, no tarjetas comerciales. */
   chrome();
   y = 110;
-  y += title(doc, M, y, "Informe técnico\npreliminar", 30, CW) + 16;
+  y += title(doc, M, y, reportTitle, 30, CW) + 16;
   y += title(doc, M, y, model.name, 23, CW) + 10;
   write(model.subtitle, 10);
   write(`Marco de revisión: ${framework.name}`, 8, GC_COLOR.slate);
@@ -137,7 +144,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
   y = verificationSeal(doc, frame, y, {
     qr,
     title: "Expediente del proyecto",
-    body: "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
+    body:
+      "El QR enlaza a los antecedentes públicos. No certifica este documento, su contenido ni la aprobación de una persona competente.",
     url: model.liveUrl,
     ref: model.code,
   });
@@ -187,7 +195,8 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     heading("03", "Propiedad, ubicación y sistemas de coordenadas");
     write(model.map.title, 9);
     if (model.map.imageDataUrl) {
-      doc.addImage(model.map.imageDataUrl, "JPEG", M, y, CW, 220, undefined, "FAST");
+      const imageFormat = model.map.imageDataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
+      doc.addImage(model.map.imageDataUrl, imageFormat, M, y, CW, 220, undefined, "FAST");
       stroke(doc, GC_COLOR.hairline);
       doc.setLineWidth(0.7);
       doc.rect(M, y, CW, 220);
@@ -218,7 +227,10 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
 
   if (model.chart) {
     need(260);
-    heading("04", "Resultados analíticos disponibles");
+    heading(
+      "04",
+      profile === "targeting" ? "Indicadores de screening" : "Resultados analíticos disponibles",
+    );
     write(model.chart.title);
     barChart(doc, {
       x: M,
@@ -249,7 +261,7 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     );
   }
   let n = 5;
-  const technicalProfile = model.reportProfile ?? "technical";
+  const technicalProfile = profile;
   for (const section of model.sections.filter(
     (item) => !item.profiles || item.profiles.includes(technicalProfile),
   )) {

@@ -14,11 +14,8 @@ import { Button } from "@/components/ui/button";
 import { generateCholquiTargetNotes } from "@/lib/cholqui/targetNotes.functions";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { getCholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
-import {
-  buildCholquiTargetsDoc,
-  concessionAt,
-  type AgentNote,
-} from "@/lib/pdf/adapters/cholquiTargets";
+import { buildCholquiTargetsDoc, concessionAt } from "@/lib/pdf/adapters/cholquiTargets";
+import type { AgentNote } from "@/lib/pdf/adapters/cholquiTargets";
 import { indexLabel } from "@/lib/cholqui/drillGrid";
 
 function num(value: number, digits = 0): string {
@@ -46,10 +43,14 @@ export function CholquiTargetsSummary() {
       const inTenure = data.anomalies.filter((a) => a.withinTenure);
       const targets = [
         ...inTenure.map((a) => ({
-          label: `A-${String(data.anomalies.indexOf(a) + 1).padStart(2, "0")}`,
+          label: a.id,
           kind: "anomalia" as const,
           concession: concessionAt(a.lat, a.lng),
-          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${a.zScore ?? "s/d"}; area ${a.areaHa ?? "s/d"} ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E.`,
+          facts: `${indexLabel(a.indexCode)}; puntaje ${a.score ?? "s/d"}; z ${
+            a.zScore ?? "s/d"
+          }; area ${
+            a.areaHa ?? "s/d"
+          } ha; Sentinel-2 L2A, no verificada en terreno; rumbo estructural dominante N20E.`,
         })),
         ...data.collars.map((c) => ({
           label: c.code,
@@ -82,9 +83,9 @@ export function CholquiTargetsSummary() {
             Malla de sondajes propuesta · fase 1
           </h2>
           <p className="text-sm text-content-subtle mt-1 max-w-3xl">
-            Derivada de los halos espectrales que se ven en el visor de arriba. Sólo se proponen
-            sondajes sobre anomalías dentro de las concesiones conocidas; las de fuera quedan como
-            contexto regional hasta verificar la tenencia.
+            Propuesta publicada de siete collares, compartida con el mapa y el informe. Sus
+            objetivos y vínculos de anomalía requieren revisión de terreno; el score satelital
+            conserva su valor original y no compara campañas o índices distintos.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0">
@@ -139,7 +140,8 @@ export function CholquiTargetsSummary() {
 
       {data && data.collars.length === 0 && !isLoading && (
         <div className="px-6 py-10 text-sm text-content-subtle">
-          No hay anomalías dentro de la tenencia conocida: no se propone malla de sondajes.
+          El archivo publicado no contiene collares propuestos. La ausencia de una propuesta no
+          implica ausencia de mineralización.
         </div>
       )}
 

@@ -98,14 +98,18 @@ export function buildGeophysicsLayer(
       isSyn && !opts.realData
         ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
         : !isSyn
-          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
-          : "";
+        ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">REAL</span>`
+        : "";
     polyline.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;max-width:240px;">
         <strong style="color:${color};">${ln.line_id}</strong>${badge}<br/>
         ${s?.name ?? "—"}<br/>
         Método: ${s?.method ?? "—"}${ln.length_m != null ? ` · ${ln.length_m.toFixed(0)} m` : ""}
-        ${ln.notes ? `<div style="margin-top:4px;color:#A89080;font-size:10px;">${ln.notes}</div>` : ""}
+        ${
+          ln.notes
+            ? `<div style="margin-top:4px;color:#A89080;font-size:10px;">${ln.notes}</div>`
+            : ""
+        }
       </div>`,
     );
     group.addLayer(polyline);
@@ -133,8 +137,8 @@ export function buildGeophysicsLayer(
       isSyn && !opts.realData
         ? `<span style="background:#7c3aed22;color:#a78bfa;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">SIMULADO</span>`
         : !isSyn
-          ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
-          : "";
+        ? `<span style="background:#10b98122;color:#34d399;padding:1px 6px;border-radius:3px;font-size:9px;margin-left:6px;">CAMPO</span>`
+        : "";
     const ip = [
       st.ip_chargeability_mvv != null
         ? `IP carg: <strong>${st.ip_chargeability_mvv} mV/V</strong>`
@@ -148,11 +152,25 @@ export function buildGeophysicsLayer(
     marker.bindPopup(
       `<div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.5;min-width:200px;">
         <strong style="color:${surveyColor};">${st.station_id}</strong>${badge}<br/>
-        <span style="color:#A89080;font-size:10px;">${s?.name ?? "Sin campaña"} · ${s?.method ?? "—"}</span><br/>
-        ${hasMag ? `Mag: <strong>${(st.mag_nt as number).toFixed(1)} nT</strong> · <span style="color:${anomaly >= 0 ? "#dc2626" : "#1d4ed8"};">${anomaly >= 0 ? "+" : ""}${anomaly.toFixed(1)}</span><br/>` : ""}
+        <span style="color:#A89080;font-size:10px;">${s?.name ?? "Sin campaña"} · ${
+        s?.method ?? "—"
+      }</span><br/>
+        ${
+          hasMag
+            ? `Mag: <strong>${(st.mag_nt as number).toFixed(1)} nT</strong> · <span style="color:${
+                anomaly >= 0 ? "#dc2626" : "#1d4ed8"
+              };">${anomaly >= 0 ? "+" : ""}${anomaly.toFixed(1)}</span><br/>`
+            : ""
+        }
         ${ip ? `${ip}<br/>` : ""}
-        <span style="color:#A89080;font-size:10px;">${st.lat.toFixed(5)}, ${st.lng.toFixed(5)}</span>
-        ${st.notes ? `<div style="margin-top:4px;color:#A89080;font-size:10px;border-top:1px solid #3a322c;padding-top:4px;">${st.notes}</div>` : ""}
+        <span style="color:#A89080;font-size:10px;">${st.lat.toFixed(5)}, ${st.lng.toFixed(
+        5,
+      )}</span>
+        ${
+          st.notes
+            ? `<div style="margin-top:4px;color:#A89080;font-size:10px;border-top:1px solid #3a322c;padding-top:4px;">${st.notes}</div>`
+            : ""
+        }
       </div>`,
     );
     group.addLayer(marker);
@@ -175,7 +193,11 @@ export function fitToGeophysics(
   if (pts.length) map.fitBounds(L.latLngBounds(pts), { padding: [30, 30] });
 }
 
-function surfaceColor(surface: GeophysicsSurface, normalized: number, value: number): string {
+export function geophysicsSurfaceColor(
+  surface: GeophysicsSurface,
+  normalized: number,
+  value: number,
+): string {
   if (surface.metric === "mag_residual_nt") {
     const span = Math.max(Math.abs(surface.min), Math.abs(surface.max), 1);
     return magColor(value, span);
@@ -208,7 +230,7 @@ export function buildGeophysicsSurfaceLayer(L: LeafletNS, surface: GeophysicsSur
       ],
       {
         stroke: false,
-        fillColor: surfaceColor(surface, cell.normalized, cell.value),
+        fillColor: geophysicsSurfaceColor(surface, cell.normalized, cell.value),
         fillOpacity: 0.42,
         interactive: true,
       },

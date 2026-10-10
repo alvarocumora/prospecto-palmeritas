@@ -3,7 +3,7 @@
  * → modelo de documento global de Geocapitals.
  *
  * Todo lo que entra aquí viene de la corrida satelital almacenada y del
- * cálculo determinista de `lib/cholqui/drillGrid`. No se inventan cifras y
+ * archivo publicado de sondajes. No se regenera desde scores y
  * cada capa conserva su etiqueta de procedencia.
  */
 import { publicUrl } from "@/lib/publicUrl";
@@ -13,10 +13,12 @@ import {
   CHOLQUI_POINTS,
   LAS_MINITAS,
 } from "@/features/franco/data/cholqui";
-import { indexLabel, type ProposedCollar } from "@/lib/cholqui/drillGrid";
+import { indexLabel } from "@/lib/cholqui/drillGrid";
+import type { ProposedCollar } from "@/lib/cholqui/drillGrid";
 import type { CholquiSatelliteTargets } from "@/lib/cholqui/satelliteTargets.functions";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "@/features/franco/data/cholquiStructures";
 import type { ProjectDoc } from "../model";
+import { cholquiGeoscienceSections } from "./cholquiGeoscience";
 import type { MapPolygon } from "../brand/kit";
 import catastroRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 
@@ -112,7 +114,7 @@ export function tenureAt(
 
 export type AgentNote = { label: string; note: string };
 
-export const CHOLQUI_TARGETS_DOC_VERSION = "v1.1";
+export const CHOLQUI_TARGETS_DOC_VERSION = "v1.2";
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
@@ -150,6 +152,8 @@ export function buildCholquiTargetsDoc(
   const { anomalies, collars, summary } = data;
   const tenure = cholquiTenurePolygons();
   const top = anomalies.slice(0, 12);
+  const azimuths = [...new Set(collars.map((collar) => collar.azimuthDeg))].sort((a, b) => a - b);
+  const dips = [...new Set(collars.map((collar) => collar.dipDeg))].sort((a, b) => a - b);
 
   return {
     reportProfile: "targeting",
@@ -176,7 +180,7 @@ export function buildCholquiTargetsDoc(
       {
         label: "Dentro de la tenencia",
         value: `${summary.withinTenure} de ${summary.anomalies}`,
-        note: "Sólo estas generan plataforma propuesta",
+        note: "Bandera publicada: set de 29 concesiones; no acredita dominio",
       },
       {
         label: "Plataformas propuestas",
@@ -197,31 +201,47 @@ export function buildCholquiTargetsDoc(
       {
         label: "Puntaje máximo",
         value: summary.maxScore != null ? summary.maxScore.toFixed(2).replace(".", ",") : "s/d",
-        note: "Realce relativo al fondo del AOI",
+        note: "Máximo del archivo; campañas e índices no comparables",
       },
       {
         label: "Metraje propuesto",
         value: `${num(summary.totalMeters)} m`,
-        note: "Sondaje diamantino, inclinación -60°",
+        note: "Programa publicado; parámetros por collar en el anexo",
       },
     ],
     thesis: [
-      `Se detectaron ${summary.anomalies} anomalías espectrales reales sobre el AOI de Cholqui (${data.coverage.sensor}), agrupadas en ${summary.indexes.length} índices de alteración (arcillas Al-OH y alteración hidrotermal combinada).`,
-      `${summary.withinTenure} caen dentro de las concesiones conocidas y se traducen en ${summary.collars} plataformas propuestas por ${num(summary.totalMeters)} m de sondaje diamantino; las ${summary.outsideTenure} restantes son contexto regional y requieren verificar tenencia antes de considerar perforación.`,
-      `Superficie interpretable sin cubierta vegetal: ${data.coverage.typicalPct != null ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %` : "s/d"} típico y ${data.coverage.bestCasePct != null ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %` : "s/d"} en el mejor escenario del AOI.`,
-      "El azimut de perforación es perpendicular al rumbo dominante N20E documentado en La Maza, para cortar la estructura en ángulo y medir potencia real.",
+      `Se detectaron ${summary.anomalies} anomalías espectrales reales sobre el AOI de Cholqui (${data.coverage.sensor}), agrupadas en ${summary.indexes.length} índices de alteración (incluidos Al-OH, óxidos de hierro y alteración hidrotermal combinada).`,
+      `${
+        summary.withinTenure
+      } candidatos tienen bandera dentro_concesion en el set de 29 concesiones del archivo. Se conserva una propuesta independiente de ${
+        summary.collars
+      } collares por ${num(
+        summary.totalMeters,
+      )} m; no existe enlace de anomalía informado para cada collar. Las ${
+        summary.outsideTenure
+      } anomalías restantes son contexto regional.`,
+      `Superficie interpretable sin cubierta vegetal: ${
+        data.coverage.typicalPct != null
+          ? `${data.coverage.typicalPct.toFixed(1).replace(".", ",")} %`
+          : "s/d"
+      } típico y ${
+        data.coverage.bestCasePct != null
+          ? `${data.coverage.bestCasePct.toFixed(1).replace(".", ",")} %`
+          : "s/d"
+      } en el mejor escenario del AOI.`,
+      "Los azimuts son los de cada collar publicado (105°/285° en el archivo actual). Su coherencia con los rumbos de terreno debe revisarse; no se fuerza una orientación única ni se infiere el objetivo por proximidad.",
       "Una anomalía espectral es un indicio, no mineralización: ningún target sustituye mapeo, canaleta ni ensaye de laboratorio.",
     ],
     chart: {
-      title: "Puntaje de las anomalías principales",
+      title: "Puntajes publicados de candidatos seleccionados",
       labelA: "Puntaje (0–1)",
       unit: "puntaje relativo",
-      data: top.map((a, i) => ({
-        label: `A-${String(i + 1).padStart(2, "0")}`,
+      data: top.map((a) => ({
+        label: a.id,
         a: a.score ?? 0,
       })),
       caption:
-        "Puntaje de realce relativo al fondo del área de interés. No es ley, no es concentración y no es identificación mineral: Sentinel-2 usa bandas anchas y sólo permite afirmar anomalía en la razón de absorción.",
+        "Valores publicados de distintas campañas e índices: no son comparables como ranking geológico conjunto. No representan ley, concentración ni identificación mineral; requieren validación de terreno.",
     },
     map: {
       title: "Anomalías y plataformas de sondaje propuestas",
@@ -230,17 +250,17 @@ export function buildCholquiTargetsDoc(
       captureSelector: '[data-report-map="cholqui"]',
       source: "Geocapitals · corrida satelital almacenada",
       crs: "WGS84",
-      imagery: "Sentinel-2 L2A",
+      imagery: "Esri World Imagery al capturar el visor; candidatos derivados de Sentinel-2",
       polygons: tenure,
       points: [
-        ...anomalies.map((a, i) => ({
-          label: `A-${String(i + 1).padStart(2, "0")}`,
+        ...anomalies.map((a) => ({
+          label: a.id,
           lat: a.lat,
           lng: a.lng,
           value: a.score ?? undefined,
         })),
         ...collars.map((c) => ({
-          label: c.code.replace("CHQ-DDH-", "DDH"),
+          label: c.code,
           lat: c.lat,
           lng: c.lng,
           highlight: true,
@@ -253,7 +273,9 @@ export function buildCholquiTargetsDoc(
         status: "DERIVED",
         provenance: "DERIVED",
         label: "Anomalías espectrales",
-        detail: `Derivadas de razones de banda ${data.coverage.sensor}${data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""}. Indicio de alteración, sin verificación de terreno.`,
+        detail: `Derivadas de razones de banda ${data.coverage.sensor}${
+          data.coverage.scenesUsed ? ` sobre ${data.coverage.scenesUsed} escenas` : ""
+        }. Indicio de alteración, sin verificación de terreno.`,
       },
       {
         status: "PENDING_DD",
@@ -266,7 +288,7 @@ export function buildCholquiTargetsDoc(
         provenance: "PROPOSED",
         label: "Malla de sondajes",
         detail:
-          "Propuesta de exploración calculada sobre las anomalías. No es un programa comprometido ni una estimación de recursos.",
+          "Propuesta publicada conservada sin regeneración automática. No se informa vínculo de anomalía; no es un programa comprometido ni una estimación de recursos.",
       },
       {
         status: "VERIFIED",
@@ -283,12 +305,20 @@ export function buildCholquiTargetsDoc(
       },
     ],
     sections: [
+      ...cholquiGeoscienceSections().map((section) => ({
+        ...section,
+        blocks: section.blocks.filter(
+          (block) =>
+            block.kind !== "appendixTable" || block.title !== "Collares de la propuesta publicada",
+        ),
+      })),
       ...(agentNotes.length
         ? [
             {
               eyebrow: "Interpretación IA",
               title: "Notas del agente geológico-geofísico",
-              lead: "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
+              lead:
+                "Notas redactadas por un agente de IA a partir de los datos de este informe. Son interpretación, no hechos verificados: requieren revisión de un geólogo y verificación de terreno.",
               blocks: [
                 {
                   kind: "table" as const,
@@ -377,8 +407,8 @@ export function buildCholquiTargetsDoc(
             kind: "bullets",
             items: [
               "Screening Sentinel-2 L2A mediante razones de banda y realces relativos al fondo del área de interés.",
-              "Ranking determinista por puntaje de anomalía; el puntaje no representa ley ni concentración.",
-              "Cruce espacial con la tenencia conocida: sólo anomalías dentro de la tenencia pueden originar una plataforma conceptual.",
+              "Orden documental por score publicado: no constituye ranking comparable entre campañas e índices ni orden de valor económico.",
+              "La bandera de tenencia proviene del set de 29 concesiones publicado. El programa de perforación se lee de su propio archivo; no se reconstruye desde esa bandera.",
               "La propuesta de collar es una salida de planificación y permanece PROPOSED hasta completar ground truth y revisión técnica.",
             ],
           },
@@ -388,16 +418,20 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Detección",
         title: "Anomalías espectrales sobre el AOI",
         deck: true,
-        lead: "Cada anomalía se lista con su índice, severidad, puntaje y superficie. El orden es por puntaje descendente.",
+        lead:
+          "Selección documental por score publicado; se conservan IDs estables según el orden original del archivo. Campañas e índices distintos no son comparables como ranking geológico.",
         blocks: [
           {
-            kind: "table",
+            kind: "appendixTable",
+            title: "Catálogo completo de candidatos satelitales",
+            provenance: "DERIVED",
+            source: "cholqui_satellite_candidates.geojson; IDs por orden original",
             head: ["ID", "Índice", "Severidad", "Puntaje", "Tenencia", "Muestra más cercana"],
             widths: [0.09, 0.32, 0.13, 0.12, 0.16, 0.18],
-            rows: top.map((a, i) => {
+            rows: anomalies.map((a) => {
               const near = nearestSample(a.lat, a.lng);
               return [
-                `A-${String(i + 1).padStart(2, "0")}`,
+                a.id,
                 indexLabel(a.indexCode),
                 a.severity,
                 a.score != null ? a.score.toFixed(2).replace(".", ",") : "s/d",
@@ -408,7 +442,8 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body: "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
+            body:
+              "Honestidad espectral: Sentinel-2 no identifica minerales. Lo defendible es anomalía en la razón de absorción compatible con óxidos de hierro o minerales de Al-OH. La identificación mineral exige sensores hiperespectrales y verificación de terreno.",
           },
           {
             kind: "text",
@@ -439,7 +474,9 @@ export function buildCholquiTargetsDoc(
         eyebrow: "Propuesta",
         title: "Malla de sondajes de fase 1",
         deck: true,
-        lead: `${collars.length} plataformas por ${num(summary.totalMeters)} m de sondaje diamantino, según los azimuts, inclinaciones y profundidades de la propuesta publicada.`,
+        lead: `${collars.length} plataformas por ${num(
+          summary.totalMeters,
+        )} m de sondaje diamantino, según los azimuts, inclinaciones y profundidades de la propuesta publicada.`,
         blocks: [
           {
             kind: "table",
@@ -458,9 +495,9 @@ export function buildCholquiTargetsDoc(
             kind: "kv",
             items: [
               ["Método propuesto", "Sondaje diamantino con recuperación de testigo"],
-              ["Inclinación", "-60° desde la horizontal"],
-              ["Azimut", "110° / 290° según posición respecto al eje del distrito"],
-              ["Espaciamiento", "Secciones transversales al rumbo N20E"],
+              ["Inclinación publicada", dips.map((value) => value + "°").join(" / ")],
+              ["Azimut publicado", azimuths.map((value) => value + "°").join(" / ")],
+              ["Vínculo de anomalía", "No informado en la propuesta publicada"],
               ["Metraje total", `${num(summary.totalMeters)} m`],
               ["Estándar de control", "Protocolo QA/QC con blancos, estándares y duplicados"],
             ],
@@ -473,7 +510,7 @@ export function buildCholquiTargetsDoc(
         blocks: [
           {
             kind: "table",
-            head: ["Sondaje", "Índice que la origina", "Objetivo geológico"],
+            head: ["Sondaje", "Índice declarado", "Objetivo documentado"],
             widths: [0.15, 0.33, 0.52],
             rows: collars.map((c) => [c.code, indexLabel(c.indexCode), c.objective]),
           },
@@ -482,7 +519,8 @@ export function buildCholquiTargetsDoc(
       {
         eyebrow: "Contexto estructural",
         title: "Vetas con rumbo/manteo de terreno",
-        lead: "El azimut de perforación (290°/110°) es perpendicular al rumbo dominante N20E de estas vetas — no una hipótesis derivada de la anomalía satelital.",
+        lead:
+          "Los rumbos y manteos documentados se presentan para revisar la orientación de cada collar; no acreditan continuidad en profundidad.",
         blocks: [
           {
             kind: "table",
@@ -507,7 +545,8 @@ export function buildCholquiTargetsDoc(
           },
           {
             kind: "text",
-            body: "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
+            body:
+              "Rumbo/manteo de terreno del prospecto original (Arcos/Leman), no interpretación satelital. Procedencia MEDIDO.",
           },
         ],
       },
@@ -515,7 +554,7 @@ export function buildCholquiTargetsDoc(
     disclaimers: [
       "Screening satelital Nivel 0 (Sentinel-2). No constituye recurso, reserva ni identificación mineral.",
       "Las anomalías espectrales son indicios que requieren verificación de terreno (mapeo y ensaye). No reemplazan estudios de detalle.",
-      "La malla de sondajes es una propuesta conceptual derivada de las anomalías: no es un programa comprometido ni fue revisada por persona competente.",
+      "La malla publicada es una propuesta conceptual independiente, con vínculo de anomalía no informado; no es un programa comprometido ni acredita revisión competente.",
       "No existe estimación de recursos ni reservas bajo un estándar reconocido (CH 20235 / NI 43-101 / JORC / S-K 1300) para el Proyecto Cholqui.",
       "Las coordenadas de collar son preliminares y están sujetas a topografía, acceso y permisos.",
       "Documento informativo: no constituye oferta pública de valores ni recomendación de inversión.",

@@ -24,8 +24,9 @@ import {
 } from "@/features/franco/data/cholqui";
 import { getToki2ReportContext } from "@/lib/cholqui/toki2ReportContext";
 import type { ProjectDoc } from "../model";
+import { cholquiGeoscienceSections } from "./cholquiGeoscience";
 
-export const CHOLQUI_DOC_VERSION = "v4.0";
+export const CHOLQUI_DOC_VERSION = "v4.1";
 
 export function buildCholquiDoc(): ProjectDoc {
   const cuMax = Math.max(...CHOLQUI_ASSAYS.map((a) => a.cuTotalPct));
@@ -71,7 +72,9 @@ export function buildCholquiDoc(): ProjectDoc {
       {
         label: "Ronda referencial",
         value: `${fmtUsd(CHOLQUI_ROUND.roundSizeUsd)}`,
-        note: `${CHOLQUI_ROUND.equityOfferedPct} % equity · ticket mínimo ${fmtUsd(CHOLQUI_ROUND.minTicketUsd)}`,
+        note: `${CHOLQUI_ROUND.equityOfferedPct} % equity · ticket mínimo ${fmtUsd(
+          CHOLQUI_ROUND.minTicketUsd,
+        )}`,
       },
       {
         label: "Tarifa ENAMI 1,5 % Cu sol.",
@@ -95,14 +98,24 @@ export function buildCholquiDoc(): ProjectDoc {
         a: a.cuTotalPct,
         b: a.cuSolublePct,
       })),
-      caption: `Siete muestras puntuales de superficie certificadas en ${CHOLQUI_ASSAY_REPORTS.length} informes de laboratorio (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(", ")}). La razón soluble/total de ${ratioMin.toFixed(0)}–${ratioMax.toFixed(0)} % es el argumento metalúrgico central: no permite estimar ley media de mina, dilución, continuidad ni recuperación.`,
+      caption: `Siete muestras puntuales de superficie certificadas en ${
+        CHOLQUI_ASSAY_REPORTS.length
+      } informes de laboratorio (${CHOLQUI_ASSAY_REPORTS.map((r) => r.id).join(
+        ", ",
+      )}). La razón soluble/total de ${ratioMin.toFixed(0)}–${ratioMax.toFixed(
+        0,
+      )} % es el argumento metalúrgico central: no permite estimar ley media de mina, dilución, continuidad ni recuperación.`,
     },
     allocation: {
       title: "Uso de fondos de la ronda",
       centerTop: fmtUsd(CHOLQUI_ROUND.roundSizeUsd),
       centerSub: `${CHOLQUI_ROUND.equityOfferedPct} % equity`,
       slices: CHOLQUI_ROUND.useOfFunds.map((u) => ({ label: u.label, pct: u.pct })),
-      caption: `Instrumento: ${CHOLQUI_ROUND.instrument}. Valorización referencial ${fmtUsd(CHOLQUI_ROUND.valuationLowUsd)}–${fmtUsd(CHOLQUI_ROUND.valuationHighUsd)} (${CHOLQUI_ROUND.valuationMethod}). Términos de conversación, no oferta pública.`,
+      caption: `Instrumento: ${CHOLQUI_ROUND.instrument}. Valorización referencial ${fmtUsd(
+        CHOLQUI_ROUND.valuationLowUsd,
+      )}–${fmtUsd(CHOLQUI_ROUND.valuationHighUsd)} (${
+        CHOLQUI_ROUND.valuationMethod
+      }). Términos de conversación, no oferta pública.`,
     },
     map: {
       title: "Puntos de observación y muestreo",
@@ -153,7 +166,9 @@ export function buildCholquiDoc(): ProjectDoc {
         status: "CONCEPTUAL",
         provenance: "INTERPRETED",
         label: "Potencial conceptual",
-        detail: `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_CONCEPTUAL.sector}; no es recurso ni reserva.`,
+        detail: `${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${
+          CHOLQUI_CONCEPTUAL.sector
+        }; no es recurso ni reserva.`,
         confidence: "low",
       },
       ...(toki2
@@ -162,7 +177,9 @@ export function buildCholquiDoc(): ProjectDoc {
               status: "DERIVED" as const,
               provenance: "DERIVED" as const,
               label: "Toki 2 · planificación DEM",
-              detail: `${toki2.areaHa.toLocaleString("es-CL")} ha con ${toki2.controlPoints.length} puntos base de levantamiento. El screening topográfico usa Copernicus GLO-30 en el módulo operativo; las métricas DEM sólo entran al informe cuando existe una corrida/snapshot versionado.`,
+              detail: `${toki2.areaHa.toLocaleString("es-CL")} ha con ${
+                toki2.controlPoints.length
+              } puntos base de levantamiento. El screening topográfico usa Copernicus GLO-30 en el módulo operativo; las métricas DEM sólo entran al informe cuando existe una corrida/snapshot versionado.`,
               confidence: "medium" as const,
               source: "GeoCapitals · Toki 2 DEM field planning module",
             },
@@ -179,6 +196,7 @@ export function buildCholquiDoc(): ProjectDoc {
     ],
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
     sections: [
+      ...cholquiGeoscienceSections(),
       {
         eyebrow: "Geología",
         title: "Modelo geológico y mineralización",
@@ -211,7 +229,11 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "evidence",
             label: "Potencial conceptual La Maza",
-            body: `Se documenta un potencial geológico conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_CONCEPTUAL.sector}, calculado como ${CHOLQUI_CONCEPTUAL.formula}. ${CHOLQUI_CONCEPTUAL.note}`,
+            body: `Se documenta un potencial geológico conceptual de ${CHOLQUI_CONCEPTUAL.tonnes.toLocaleString(
+              "es-CL",
+            )} t en ${CHOLQUI_CONCEPTUAL.sector}, calculado como ${CHOLQUI_CONCEPTUAL.formula}. ${
+              CHOLQUI_CONCEPTUAL.note
+            }`,
             provenance: "INTERPRETED",
             confidence: "low",
             source: "Prospecto Cholqui — no es recurso",
@@ -232,7 +254,13 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "evidence",
             label: "Ensayes certificados",
-            body: `El cobre total observado en las muestras se ubica entre ${cuMin.toFixed(2).replace(".", ",")} % y ${cuMax.toFixed(2).replace(".", ",")} %, con razón Cu soluble/total entre ${ratioMin.toFixed(0)} % y ${ratioMax.toFixed(0)} %.`,
+            body: `El cobre total observado en las muestras se ubica entre ${cuMin
+              .toFixed(2)
+              .replace(".", ",")} % y ${cuMax
+              .toFixed(2)
+              .replace(".", ",")} %, con razón Cu soluble/total entre ${ratioMin.toFixed(
+              0,
+            )} % y ${ratioMax.toFixed(0)} %.`,
             provenance: "CERTIFIED",
             confidence: "high",
             source: CHOLQUI_ASSAY_REPORTS.map((report) => report.id).join(", "),
@@ -240,7 +268,8 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "finding",
             title: "Lectura técnica",
-            body: "La respuesta analítica justifica continuar la validación geológica y metalúrgica, pero el muestreo puntual no permite inferir continuidad tridimensional, dilución, recuperación ni ley media de mina.",
+            body:
+              "La respuesta analítica justifica continuar la validación geológica y metalúrgica, pero el muestreo puntual no permite inferir continuidad tridimensional, dilución, recuperación ni ley media de mina.",
             provenance: "INTERPRETED",
             confidence: "medium",
           },
@@ -286,7 +315,11 @@ export function buildCholquiDoc(): ProjectDoc {
         blocks: [
           {
             kind: "narrative",
-            body: `El escenario base entregado por el titular considera ${CHOLQUI_BASE_CASE.tonnes.toLocaleString("es-CL")} t en ${CHOLQUI_BASE_CASE.months} meses, con rampa ${CHOLQUI_BASE_CASE.ramp} y ${CHOLQUI_BASE_CASE.gradePct} % de Cu soluble. Las cifras son ilustrativas y no corresponden a VAN o TIR auditados.`,
+            body: `El escenario base entregado por el titular considera ${CHOLQUI_BASE_CASE.tonnes.toLocaleString(
+              "es-CL",
+            )} t en ${CHOLQUI_BASE_CASE.months} meses, con rampa ${CHOLQUI_BASE_CASE.ramp} y ${
+              CHOLQUI_BASE_CASE.gradePct
+            } % de Cu soluble. Las cifras son ilustrativas y no corresponden a VAN o TIR auditados.`,
             provenance: "SCENARIO",
             confidence: "low",
             source: "Escenario base entregado por el titular",
@@ -294,7 +327,8 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "evidence",
             label: "Supuestos económicos",
-            body: "Los supuestos de producción, precio, tarifa, logística y costos permanecen separados de la evidencia técnica y requieren due diligence antes de una decisión de capital.",
+            body:
+              "Los supuestos de producción, precio, tarifa, logística y costos permanecen separados de la evidencia técnica y requieren due diligence antes de una decisión de capital.",
             provenance: "SCENARIO",
             confidence: "low",
           },
@@ -317,7 +351,11 @@ export function buildCholquiDoc(): ProjectDoc {
               blocks: [
                 {
                   kind: "narrative" as const,
-                  body: `La concesión ${toki2.name} (rol ${toki2.rol}) cubre aproximadamente ${toki2.areaHa.toLocaleString("es-CL")} ha. El programa utiliza nueve estaciones base derivadas de la geometría canónica de la concesión: ocho controles perimetrales y una estación central. Su objetivo es levantar litología, estructuras, alteración, mineralización visible, accesibilidad y condiciones para trabajo posterior.`,
+                  body: `La concesión ${toki2.name} (rol ${
+                    toki2.rol
+                  }) cubre aproximadamente ${toki2.areaHa.toLocaleString(
+                    "es-CL",
+                  )} ha. El programa utiliza nueve estaciones base derivadas de la geometría canónica de la concesión: ocho controles perimetrales y una estación central. Su objetivo es levantar litología, estructuras, alteración, mineralización visible, accesibilidad y condiciones para trabajo posterior.`,
                   provenance: "DOCUMENTARY" as const,
                   confidence: "medium" as const,
                   source: "Catastro SERNAGEOMIN cargado en GeoCapitals",
@@ -335,20 +373,23 @@ export function buildCholquiDoc(): ProjectDoc {
                 {
                   kind: "finding" as const,
                   title: "Lectura de terreno requerida",
-                  body: "La ausencia de una anomalía espectral interna no es evidencia de ausencia de mineralización. Cobertura vegetal, sombra topográfica, resolución de Sentinel-2 y mineralización estructural sin expresión superficial obligan a validar el sector mediante mapeo y muestreo.",
+                  body:
+                    "La ausencia de una anomalía espectral interna no es evidencia de ausencia de mineralización. Cobertura vegetal, sombra topográfica, resolución de Sentinel-2 y mineralización estructural sin expresión superficial obligan a validar el sector mediante mapeo y muestreo.",
                   provenance: "INTERPRETED" as const,
                   confidence: "medium" as const,
                 },
                 {
                   kind: "recommendation" as const,
                   title: "Campaña inicial Toki 2",
-                  body: "Ejecutar control perimetral y accesos, traverse N–S, traverse E–O, seguimiento de estructuras y muestreo selectivo. En cada estación registrar GPS, fotografía, litología, alteración, mineralización visible, rumbo, manteo, potencia, acceso y pendiente local.",
+                  body:
+                    "Ejecutar control perimetral y accesos, traverse N–S, traverse E–O, seguimiento de estructuras y muestreo selectivo. En cada estación registrar GPS, fotografía, litología, alteración, mineralización visible, rumbo, manteo, potencia, acceso y pendiente local.",
                   priority: "high" as const,
                 },
                 {
                   kind: "gap" as const,
                   title: "Volumen y tonelaje todavía no habilitados",
-                  body: "El DEM permite caracterizar geometría superficial, pendiente y relieve. No existe base suficiente para estimar toneladas mineralizadas hasta delimitar un cuerpo geológico, medir potencia y continuidad y disponer de una densidad sustentada.",
+                  body:
+                    "El DEM permite caracterizar geometría superficial, pendiente y relieve. No existe base suficiente para estimar toneladas mineralizadas hasta delimitar un cuerpo geológico, medir potencia y continuidad y disponer de una densidad sustentada.",
                   action:
                     "Completar ground-truth y, si se define un cuerpo, versionar la geometría 3D y la densidad antes de habilitar cualquier escenario volumétrico.",
                 },
@@ -376,7 +417,8 @@ export function buildCholquiDoc(): ProjectDoc {
         blocks: [
           {
             kind: "narrative",
-            body: "Las siguientes brechas se mantienen explícitas para evitar que una ausencia de datos sea reemplazada por una conclusión automática o por texto generado.",
+            body:
+              "Las siguientes brechas se mantienen explícitas para evitar que una ausencia de datos sea reemplazada por una conclusión automática o por texto generado.",
             provenance: "PENDING_DD",
             confidence: "low",
           },
@@ -388,7 +430,8 @@ export function buildCholquiDoc(): ProjectDoc {
           {
             kind: "recommendation",
             title: "Cerrar brechas antes de escalar el compromiso",
-            body: "Priorizar verificación legal, metalurgia, topografía, logística y demostración de inventario antes de convertir escenarios comerciales en decisiones de inversión.",
+            body:
+              "Priorizar verificación legal, metalurgia, topografía, logística y demostración de inventario antes de convertir escenarios comerciales en decisiones de inversión.",
             priority: "high",
           },
         ],

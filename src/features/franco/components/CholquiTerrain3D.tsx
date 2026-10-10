@@ -1,12 +1,22 @@
 /** Published Cholqui evidence on real terrain; surface signals never become subsurface bodies. */
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { Canvas, useThree, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
+import type { ThreeEvent } from "@react-three/fiber";
 import { Html, Line, OrbitControls } from "@react-three/drei";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import * as THREE from "three";
 import { Loader2, Maximize } from "lucide-react";
-import { getDemTile, type DemTile } from "@/engine3d/terrain/dem.functions";
+import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
+import { cholquiFieldGeophysics, stationsForCampaign } from "@/lib/cholqui/geophysicsTerrain";
+import { buildFieldGeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
+import type { GeophysicsSurfaceMetric } from "@/lib/geoscience/geophysicsSurface";
+import { CholquiGeophysicsTerrainLayer } from "./CholquiGeophysicsTerrainLayer";
+import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
+import { buildCholquiDoc } from "@/lib/pdf/adapters/cholqui";
+import { geophysicsSurfaceColor } from "@/components/map/geophysicsLayers";
+import { getDemTile } from "@/engine3d/terrain/dem.functions";
+import type { DemTile } from "@/engine3d/terrain/dem.functions";
 import {
   projectTerrainPoint,
   proposedTraceEnd,
@@ -29,6 +39,19 @@ import {
 const PROJECT_ID = "e5360f13-1647-4e44-bb13-c0614e6f39fe";
 const EXTENT_M = 20000;
 const DEM_SIZE = 257;
+const METRICS: Array<{ id: GeophysicsSurfaceMetric; layer: string; label: string }> = [
+  { id: "mag_residual_nt", layer: "geophysics.mag_idw", label: "TMI menos mediana · nT" },
+  {
+    id: "ip_chargeability_mvv",
+    layer: "geophysics.ip_chargeability_idw",
+    label: "Cargabilidad · mV/V",
+  },
+  {
+    id: "ip_resistivity_ohmm",
+    layer: "geophysics.ip_resistivity_idw",
+    label: "Resistividad · Ω·m",
+  },
+];
 const SCALE = 0.02;
 type ScenePoint = [number, number, number];
 type Hover = { position: ScenePoint; title: string; lines: string[] } | null;
@@ -211,15 +234,54 @@ function CameraView({ view, reset }: { view: "perspective" | "plan"; reset: numb
 
 export function CholquiTerrain3D() {
   const demFn = useServerFn(getDemTile);
+  const geophysicsQuery = useProjectGeophysicsData(PROJECT_ID);
+  const field = useMemo(() => cholquiFieldGeophysics(geophysicsQuery.data, PROJECT_ID), [
+    geophysicsQuery.data,
+  ]);
+  const [campaignKey, setCampaignKey] = useState("");
+  const [metric, setMetric] = useState<GeophysicsSurfaceMetric>("mag_residual_nt");
+  const metricSpec = METRICS.find((item) => item.id === metric)!;
+  const campaigns = useMemo(
+    () =>
+      [
+        ...new Set([
+          ...field.stations.map((station) => station.survey_id),
+          ...field.lines.map((line) => line.survey_id),
+        ]),
+      ].map((id) => ({
+        id,
+        key: id ?? "__unassigned__",
+        label: field.surveys.find((survey) => survey.id === id)?.name ?? "Sin campaña informada",
+      })),
+    [field],
+  );
+  const campaign = campaigns.find((item) => item.key === campaignKey) ?? campaigns[0];
+  const stations = useMemo(() => (campaign ? stationsForCampaign(field, campaign.id) : []), [
+    campaign,
+    field,
+  ]);
+  const surveyLines = useMemo(
+    () => (campaign ? field.lines.filter((line) => line.survey_id === campaign.id) : []),
+    [campaign, field.lines],
+  );
+  const fieldSurface = useMemo(() => buildFieldGeophysicsSurface(stations, metric), [
+    stations,
+    metric,
+  ]);
   const bundle = useMemo(() => buildCholquiPublicGeoBundle(), []);
   const initial = useMemo(
-    () =>
-      Object.fromEntries(
+    () => ({
+      "geophysics.project_stations": true,
+      "geophysics.mag_idw": false,
+      "geophysics.ip_chargeability_idw": false,
+      "geophysics.ip_resistivity_idw": false,
+      ...Object.fromEntries(
         bundle.manifest.layers.map((meta) => [
           meta.id,
           !["territory.mojones", "geology.metallogenic_belts"].includes(meta.id),
         ]),
       ),
+    }),
     [bundle],
   );
   const { visible, setVisible, opacity, setOpacity } = useGeoLayerPreferences("cholqui", initial);
@@ -268,7 +330,7 @@ export function CholquiTerrain3D() {
   const neighbour = tile ? projectTerrainPoint(tile, LAS_MINITAS.lng, LAS_MINITAS.lat) : null;
   useEffect(() => {
     setHover(null);
-  }, [visible, opacity, primaryOnly]);
+  }, [visible, opacity, primaryOnly, metric, campaignKey]);
   const terrainFailure = dem.isError || (!dem.isPending && !tile);
 
   return (
@@ -288,7 +350,9 @@ export function CholquiTerrain3D() {
               type="button"
               aria-pressed={view === key}
               onClick={() => setView(key)}
-              className={`rounded border border-hairline px-2 py-1 ${view === key ? "bg-accent-brand text-white" : "hover:bg-surface-2"}`}
+              className={`rounded border border-hairline px-2 py-1 ${
+                view === key ? "bg-accent-brand text-white" : "hover:bg-surface-2"
+              }`}
             >
               {key === "plan" ? "Planta" : "Perspectiva"}
             </button>
@@ -338,6 +402,16 @@ export function CholquiTerrain3D() {
             <directionalLight position={[120, 180, 100]} intensity={1.4} />
             <Suspense fallback={null}>
               <Terrain tile={tile} opacity={terrainOpacity} />
+              <CholquiGeophysicsTerrainLayer
+                tile={tile}
+                stations={stations}
+                lines={surveyLines}
+                surface={!primaryOnly && visible[metricSpec.layer] ? fieldSurface : null}
+                showStations={Boolean(visible["geophysics.project_stations"])}
+                stationOpacity={opacity["geophysics.project_stations"] ?? 1}
+                opacity={opacity[metricSpec.layer] ?? 1}
+                onHover={setHover}
+              />
               {active.map((meta) =>
                 (bundle.layers[meta.id]?.features ?? []).map((feature, index) => (
                   <EvidenceFeature
@@ -456,8 +530,8 @@ export function CholquiTerrain3D() {
                     {code === "CLAY_MINERALS"
                       ? "Al-OH / arcillas"
                       : code === "IRON_OXIDE"
-                        ? "Óxidos de hierro"
-                        : "Alteración hidrotermal"}
+                      ? "Óxidos de hierro"
+                      : "Alteración hidrotermal"}
                   </span>
                 ))}
             <label className="mt-2 flex items-center gap-2">
@@ -474,6 +548,160 @@ export function CholquiTerrain3D() {
             </label>
           </div>
         )}
+      </div>
+      <details className="border-t border-hairline px-4 py-3 text-xs">
+        <summary className="cursor-pointer font-semibold text-content">
+          Geofísica sobre el terreno · {field.stations.length} estaciones de campo disponibles
+        </summary>
+        <div className="mt-3 flex flex-wrap items-end gap-3">
+          <label className="grid gap-1">
+            Campaña
+            <select
+              aria-label="Campaña geofísica"
+              value={campaign?.key ?? ""}
+              disabled={!campaigns.length}
+              onChange={(event) => setCampaignKey(event.target.value)}
+              className="rounded border border-hairline bg-surface px-2 py-1"
+            >
+              {!campaigns.length && <option value="">Sin estaciones disponibles</option>}
+              {campaigns.map((item) => (
+                <option key={item.key} value={item.key}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1">
+            Variable
+            <select
+              aria-label="Variable geofísica"
+              value={metric}
+              onChange={(event) => setMetric(event.target.value as GeophysicsSurfaceMetric)}
+              className="rounded border border-hairline bg-surface px-2 py-1"
+            >
+              {METRICS.map((item) => (
+                <option key={item.id} value={item.id}>
+                  {item.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={Boolean(visible["geophysics.project_stations"])}
+              onChange={(event) =>
+                setVisible((state) => ({
+                  ...state,
+                  "geophysics.project_stations": event.target.checked,
+                }))
+              }
+            />
+            Estaciones y líneas medidas
+          </label>
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={Boolean(visible[metricSpec.layer])}
+              disabled={!fieldSurface || primaryOnly}
+              onChange={(event) =>
+                setVisible((state) => ({
+                  ...state,
+                  [metricSpec.layer]: event.target.checked,
+                }))
+              }
+            />
+            Superficie IDW
+          </label>
+          <label className="flex items-center gap-2">
+            Opacidad IDW
+            <input
+              aria-label="Opacidad geofísica"
+              type="range"
+              min={0}
+              max={1}
+              step={0.05}
+              value={opacity[metricSpec.layer] ?? 1}
+              onChange={(event) =>
+                setOpacity((state) => ({
+                  ...state,
+                  [metricSpec.layer]: Number(event.target.value),
+                }))
+              }
+              className="w-20"
+            />
+          </label>
+        </div>
+        <div className="mt-3 space-y-1 text-content-subtle">
+          {geophysicsQuery.loading && <p role="status">Consultando estaciones del proyecto…</p>}
+          {geophysicsQuery.error && (
+            <p role="alert">No fue posible consultar la geofísica del proyecto.</p>
+          )}
+          {!geophysicsQuery.loading && !geophysicsQuery.error && !field.stations.length && (
+            <p>
+              No hay estaciones de campo disponibles para Cholqui con este acceso. Carga una campaña
+              MAG/IP para visualizarla; el relieve por sí solo no genera geofísica.
+            </p>
+          )}
+          {fieldSurface && (
+            <div className="flex items-center gap-2" aria-label="Escala de color geofísica">
+              <span>{fieldSurface.min.toFixed(2)}</span>
+              <span
+                className="h-2 w-36 rounded"
+                style={{
+                  background:
+                    "linear-gradient(to right, " +
+                    [0, 0.5, 1]
+                      .map((fraction) =>
+                        geophysicsSurfaceColor(
+                          fieldSurface,
+                          fraction,
+                          fieldSurface.min + fraction * (fieldSurface.max - fieldSurface.min),
+                        ),
+                      )
+                      .join(", ") +
+                    ")",
+                }}
+              />
+              <span>
+                {fieldSurface.max.toFixed(2)} {fieldSurface.unit}
+              </span>
+            </div>
+          )}
+          {fieldSurface ? (
+            <p>
+              Rango IDW: {fieldSurface.min.toFixed(2)} a {fieldSurface.max.toFixed(2)}{" "}
+              {fieldSurface.unit}
+              {" · "}
+              {fieldSurface.sourceCount} estaciones de {campaign?.label}.
+              {fieldSurface.baseline != null &&
+                " Mediana TMI: " + fieldSurface.baseline.toFixed(2) + " nT."}
+            </p>
+          ) : stations.length > 0 ? (
+            <p>
+              Sin superficie para esta variable: se requieren al menos cuatro posiciones únicas con
+              datos y extensión en dos direcciones.
+            </p>
+          ) : null}
+          <p>
+            El color expresa la variable numérica; la altura proviene del DEM. IDW no es inversión.
+            Restar la mediana no acredita corrección diurna ni IGRF; campañas y datos simulados no
+            se mezclan.
+          </p>
+          {primaryOnly && <p>Modo evidencia primaria: la superficie derivada está oculta.</p>}
+        </div>
+      </details>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline px-4 py-3">
+        <p className="max-w-2xl text-xs text-content-subtle">
+          Estimación mineral: pendiente de sondajes ejecutados, dominios, densidad y QA/QC. DEM y
+          ensayes puntuales sustentan planificación, no tonelaje mineralizado.
+        </p>
+        <ProjectDocsMenu
+          build={buildCholquiDoc}
+          label="Informe geocientífico"
+          variant="outline"
+          className="h-9 text-xs"
+        />
       </div>
       <div className="space-y-1 border-t border-hairline px-4 py-3 text-[11px] text-content-subtle">
         <p>
