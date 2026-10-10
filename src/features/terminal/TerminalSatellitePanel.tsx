@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { SentinelProcessingPanel } from "@/components/satellite/SentinelProcessingPanel";
+import { RealMineralSceneCatalog } from "@/components/satellite/RealMineralSceneCatalog";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import type { TerminalProject } from "./terminalProjects";
@@ -30,8 +31,8 @@ export function TerminalSatellitePanel({ project }: { project: TerminalProject }
       <header className="rounded-xl border border-hairline bg-surface-2 p-5 space-y-2">
         <h1 className="font-display text-2xl">Análisis satelital · {project.name}</h1>
         <p className="text-sm text-content-subtle">
-          Define el área de análisis, busca escenas Sentinel-2 y selecciona una para procesar
-          reflectancia real. Descarga los índices derivados como GeoTIFF privado.
+          Explora escenas científicas reales ASTER, EMIT y Sentinel-2 para el proyecto; revisa su
+          cobertura, fecha y productos antes de iniciar análisis.
         </p>
         <p className="text-xs text-content-subtle">
           Los índices son resultados modelados a partir de observaciones satelitales; no acreditan
@@ -67,11 +68,19 @@ export function TerminalSatellitePanel({ project }: { project: TerminalProject }
           equipo del proyecto.
         </p>
       ) : (
-        <SentinelProcessingPanel
-          key={memberProject.id}
-          projectId={memberProject.id}
-          defaultBbox={defaultBbox}
-        />
+        <div className="space-y-6">
+          <RealMineralSceneCatalog
+            key={`nasa-${memberProject.id}`}
+            projectId={memberProject.id}
+            defaultBbox={defaultBbox}
+          />
+          <SentinelProcessingPanel
+            key={`sentinel-${memberProject.id}`}
+            projectId={memberProject.id}
+            slug={project.slug}
+            defaultBbox={defaultBbox}
+          />
+        </div>
       )}
     </section>
   );

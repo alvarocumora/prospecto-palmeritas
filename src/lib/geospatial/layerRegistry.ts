@@ -236,6 +236,20 @@ export const GEO_LAYER_REGISTRY = [
     caution: "Proxy espectral; requiere ground-truth y no confirma mineralización.",
   }),
   layer({
+    id: "remote_sensing.sentinel2_processed_indices",
+    label: "Sentinel-2 · índices procesados",
+    domain: "remote_sensing",
+    evidence: "DERIVADO",
+    use: "visualization",
+    scaleLabel: "malla reducida · píxeles fuente 20 m",
+    sourceSystem: "Copernicus Sentinel-2 L2A",
+    datasetType: "remote_sensing",
+    capabilities: ["2d", "3d", "public", "report"],
+    legacyAliases: [],
+    caution:
+      "Vista vectorial reducida del GeoTIFF. Valores derivados modelados; no son ensayes ni identificación mineral.",
+  }),
+  layer({
     id: "remote_sensing.sentinel2_truecolor",
     label: "Sentinel-2 · color verdadero",
     domain: "remote_sensing",

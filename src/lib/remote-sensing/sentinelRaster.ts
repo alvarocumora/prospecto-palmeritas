@@ -40,6 +40,15 @@ export type SentinelRasterResult = {
   validPixels: number;
   excludedPixels: number;
   geoTiff: ArrayBuffer;
+  preview: {
+    type: "FeatureCollection";
+    features: Array<{
+      type: "Feature";
+      id: string;
+      geometry: { type: "Polygon"; coordinates: number[][][] };
+      properties: Record<string, number | string>;
+    }>;
+  };
 };
 const NO_DATA = -9999;
 export const INDEX_ORDER = ["ndvi", "ndmi", "ironOxideRatio", "swirContrast"] as const;
@@ -248,6 +257,41 @@ export async function processSentinelRaster(
       const [lng, lat] = inverse.forward([x, y]);
       return lng >= bbox[0] && lng <= bbox[2] && lat >= bbox[1] && lat <= bbox[3];
     });
+    // Small vector preview for the shared 2D/3D map engines. The scientific
+    // GeoTIFF remains the full-resolution deliverable; this is a display mesh.
+    const stride = Math.max(1, Math.ceil(Math.sqrt((grid.width * grid.height) / 900)));
+    const preview: SentinelRasterResult["preview"] = { type: "FeatureCollection", features: [] };
+    for (let row = 0; row < grid.height; row += stride) {
+      for (let col = 0; col < grid.width; col += stride) {
+        const offset = (row * grid.width + col) * INDEX_ORDER.length;
+        const ndvi = result.values[offset];
+        if (ndvi === NO_DATA) continue;
+        const corners = [
+          [grid.x + col * grid.resolution, grid.y - row * grid.resolution],
+          [
+            grid.x + Math.min(grid.width, col + stride) * grid.resolution,
+            grid.y - row * grid.resolution,
+          ],
+          [
+            grid.x + Math.min(grid.width, col + stride) * grid.resolution,
+            grid.y - Math.min(grid.height, row + stride) * grid.resolution,
+          ],
+          [
+            grid.x + col * grid.resolution,
+            grid.y - Math.min(grid.height, row + stride) * grid.resolution,
+          ],
+        ].map((point) => inverse.forward(point));
+        corners.push(corners[0]);
+        preview.features.push({
+          type: "Feature",
+          id: `${row}-${col}`,
+          geometry: { type: "Polygon", coordinates: [corners] },
+          properties: Object.fromEntries(
+            INDEX_ORDER.map((key, index) => [key, result.values[offset + index]]),
+          ),
+        });
+      }
+    }
     return {
       grid,
       stats: result.stats,
@@ -270,6 +314,7 @@ export async function processSentinelRaster(
           ]),
         ),
       }),
+      preview,
     };
   } finally {
     await Promise.allSettled(tiffs.map((tiff) => tiff.close()));

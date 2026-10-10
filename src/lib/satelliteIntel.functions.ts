@@ -31,20 +31,21 @@ type GeoJsonGeometry = {
 const COLLECTIONS = {
   s2: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "sentinel-2-l2a" },
   s1: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "sentinel-1-rtc" },
-  emit: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "EMITL2ARFL_v002" },
-  aster: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "ASTER_L1T_v003" },
+  emit: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "EMITL2ARFL_002" },
+  emitMinerals: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "EMITL2BMIN_002" },
+  aster: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "AST_07XT_004" },
 } as const;
 
 type CollectionKey = keyof typeof COLLECTIONS;
 
 const SearchInput = z.object({
   projectId: z.string().uuid(),
-  collection: z.enum(["s2", "s1", "emit", "aster"]),
+  collection: z.enum(["s2", "s1", "emit", "emitMinerals", "aster"]),
   bbox: z
     .tuple([z.number(), z.number(), z.number(), z.number()])
     .refine(validSatelliteBbox, "Invalid geographic AOI"),
-  dateFrom: z.string(),
-  dateTo: z.string(),
+  dateFrom: z.string().date(),
+  dateTo: z.string().date(),
   cloudCoverMax: z.number().min(0).max(100).optional(),
   limit: z.number().int().min(1).max(50).default(20),
 });
@@ -90,10 +91,11 @@ function normalizeFeature(f: unknown, collection: string): StacItem {
           number,
         ])
       : ([0, 0, 0, 0] as [number, number, number, number]);
+  // Missing acquisition time stays unknown; never invent the current date.
   const dt =
-    (props["datetime"] as string) ??
-    (props["start_datetime"] as string) ??
-    new Date().toISOString();
+    (props["datetime"] as string | undefined) ??
+    (props["start_datetime"] as string | undefined) ??
+    "";
   const cloud =
     typeof props["eo:cloud_cover"] === "number"
       ? (props["eo:cloud_cover"] as number)
@@ -121,6 +123,11 @@ export const searchStac = createServerFn({ method: "POST" })
   .inputValidator((input) => SearchInput.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
+    const { data: isMember, error: membershipError } = await supabase.rpc("is_project_member", {
+      _project_id: data.projectId,
+      _user_id: context.userId,
+    });
+    if (membershipError || !isMember) throw new Error("PROJECT_ACCESS_DENIED");
     const cfg = COLLECTIONS[data.collection as CollectionKey];
 
     const body: Record<string, unknown> = {
