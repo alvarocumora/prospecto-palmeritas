@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { CHOLQUI_ASSAYS } from "./data/cholqui";
 import { buildCholquiPublicGeoBundle } from "./cholquiPublicGeo";
+import drillGridRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
+import { parsePublishedDrillGrid, totalMeters } from "@/lib/cholqui/drillGrid";
 
 describe("Cholqui canonical public geo bundle", () => {
   it("preserves official catastro, derived satellite evidence and measured structures", () => {
@@ -25,29 +27,38 @@ describe("Cholqui canonical public geo bundle", () => {
     expect(bundle.layers["territory.proposed_pedimentos"]).toBeDefined();
   });
 
-  it("publishes the IDW intensity surface reinterpolated from the same satellite anomalies", () => {
+  it("preserves all candidate footprints without interpolating incompatible background populations", () => {
     const bundle = buildCholquiPublicGeoBundle();
-    const ids = bundle.manifest.layers.map((layer) => layer.id);
-    expect(ids).toContain("remote_sensing.anomaly_intensity");
-
-    const intensity = bundle.layers["remote_sensing.anomaly_intensity"];
-    const discrete = bundle.layers["remote_sensing.sentinel2_alteration"];
-    expect(intensity?.features.length).toBeGreaterThan(0);
-    // Reinterpola las mismas anomalías: no es una fuente de datos distinta.
-    expect(discrete?.features.length).toBeGreaterThan(0);
-    for (const feature of intensity?.features ?? []) {
-      expect(typeof feature.properties.value).toBe("number");
-      expect(feature.properties.normalized as number).toBeGreaterThanOrEqual(0);
-      expect(feature.properties.normalized as number).toBeLessThanOrEqual(1);
+    expect(bundle.layers["remote_sensing.sentinel2_alteration"]?.features).toHaveLength(57);
+    expect(bundle.layers["remote_sensing.anomaly_intensity"]).toBeUndefined();
+    expect(
+      bundle.manifest.layers.some((layer) => layer.id === "remote_sensing.anomaly_intensity"),
+    ).toBe(false);
+    expect(bundle.layers["drilling.proposed"]?.features).toHaveLength(7);
+  });
+  it("uses the published plan in the target table, rather than a second generated proposal", () => {
+    const collars = parsePublishedDrillGrid(JSON.parse(drillGridRaw));
+    const map = buildCholquiPublicGeoBundle().layers["drilling.proposed"]!;
+    expect(totalMeters(collars)).toBe(1070);
+    expect(collars[0]).toMatchObject({
+      code: "CHO-DDH-01",
+      azimuthDeg: 285,
+      dipDeg: -60,
+      depthM: 170,
+      anomalyId: null,
+    });
+    expect(collars).toHaveLength(map.features.length);
+    for (let i = 0; i < collars.length; i++) {
+      const feature = map.features[i];
+      expect([collars[i].lng, collars[i].lat]).toEqual(
+        feature.geometry?.type === "Point" ? feature.geometry.coordinates : null,
+      );
     }
   });
 
-  it("renders the intensity surface before the discrete anomalies (so it stays underneath)", () => {
-    const bundle = buildCholquiPublicGeoBundle();
-    const ids = bundle.manifest.layers.map((layer) => layer.id);
-    const intensityIndex = ids.indexOf("remote_sensing.anomaly_intensity");
-    const discreteIndex = ids.indexOf("remote_sensing.sentinel2_alteration");
-    expect(intensityIndex).toBeGreaterThanOrEqual(0);
-    expect(intensityIndex).toBeLessThan(discreteIndex);
+  it("rejects a published plan with missing depths instead of inventing a trace", () => {
+    const raw = JSON.parse(drillGridRaw);
+    delete raw.features[0].properties.depth_m;
+    expect(() => parsePublishedDrillGrid(raw)).toThrow("PUBLISHED_DRILL_COLLAR_INVALID");
   });
 });

@@ -16,6 +16,7 @@ import pedimentosPendientesRaw from "@/data/geo/cholqui_pedimentos_pendientes.ge
 import mojonesRaw from "@/data/geo/cholqui_mojones.geojson?raw";
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "../data/cholquiStructures";
+import { CHOLQUI_INTERPOLATION_NOTICE, CHOLQUI_COORDINATE_NOTICE } from "../cholquiGeoPolicy";
 
 /** Visor maestro unificado de Cholqui: reemplaza los 3 mapas apilados por uno solo. */
 function parse(raw: string): (FeatureCollection & { metadata?: Record<string, unknown> }) | null {
@@ -48,6 +49,10 @@ const assays: AssayPoint[] = CHOLQUI_POINTS.map((pt) => {
     cuSolublePct: a?.cuSolublePct,
     auGpt: a?.auGpt,
     agPpm: a?.agPpm,
+    certified: Boolean(a),
+    lab: a?.lab,
+    reportId: a?.reportId,
+    reportDate: a?.reportDate,
   };
 });
 
@@ -73,6 +78,10 @@ export function CholquiMasterViewer() {
     <ProjectMasterViewer
       projectName={CHOLQUI.name}
       reportMapId="cholqui"
+      enableLayerTools
+      spectralFootprintsOnly
+      anomalyIntensityDisabledReason={CHOLQUI_INTERPOLATION_NOTICE}
+      coordinateNotice={CHOLQUI_COORDINATE_NOTICE}
       center={CHOLQUI.center}
       concessions={concessions}
       anomalies={anomalies}
