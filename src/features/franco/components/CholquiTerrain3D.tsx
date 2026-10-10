@@ -270,7 +270,7 @@ export function CholquiTerrain3D() {
   ]);
   const bundle = useMemo(() => buildCholquiPublicGeoBundle(), []);
   const initial = useMemo(
-    () => ({
+    (): Record<string, boolean> => ({
       "geophysics.project_stations": true,
       "geophysics.mag_idw": false,
       "geophysics.ip_chargeability_idw": false,
