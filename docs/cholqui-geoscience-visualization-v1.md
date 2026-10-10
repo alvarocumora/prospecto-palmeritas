@@ -13,7 +13,7 @@ El terminal conserva sus visores existentes. El 3D consume el bundle de evidenci
 - Huellas originales de los 57 candidatos satelitales, con colores por índice, polígonos multipartes/anillos y líneas apoyadas sobre el terreno. No hay radio de alteración inventado, extrusión por score ni profundidad inferida del satélite.
 - No se interpola el conjunto de z-scores de Cholqui. El archivo publicado declara poblaciones de fondo distintas y mezcla índices; los valores originales se conservan en los inspectores.
 - Catastro oficial, pedimentos pendientes/propuestos, hitos de mensura, estructuras y contexto metalogénico provienen de los mismos archivos publicados. Las geometrías se recortan a la extensión disponible del DEM.
-- Proyección en planta de los sondajes según su azimut, inclinación y profundidad explícita. El 3D usa esa misma propuesta; no vuelve a generar un plan con otra función.
+- Proyección en planta de los sondajes según su azimut, inclinación y profundidad explícita. El 3D y la tabla de targets usan esa misma propuesta (1.070 m publicados); no vuelven a generar un plan con otra función. Los enlaces de anomalía y objetivos ausentes se declaran como no informados.
 - Visibilidad y opacidad guardadas por proyecto y capa canónica para continuidad 2D/3D. La opacidad respeta la transparencia original de cada estilo, también dentro de grupos Leaflet.
 - Búsqueda y encuadre por capa en el 2D; búsqueda, modo evidencia primaria, opacidad y vistas planta/perspectiva en 3D. Controles colapsables.
 - Los puntos sin informe de ensaye vinculado se conservan como observaciones documentales, con símbolos grises. No reciben un badge de ensaye certificado.

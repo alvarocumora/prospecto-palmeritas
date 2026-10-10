@@ -8,12 +8,13 @@
  */
 import { createServerFn } from "@tanstack/react-start";
 import candidatesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
+import drillGridRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
 import {
-  buildDrillGrid,
+  parsePublishedDrillGrid,
   distanceM,
   polygonCentroid,
   totalMeters,
-  type ProposedCollar,
+  type PublishedCollar,
   type SatelliteAnomaly,
 } from "./drillGrid";
 
@@ -46,7 +47,7 @@ export type CholquiSatelliteTargets = {
   runDate: string;
   coverage: CholquiCoverage;
   anomalies: CholquiAnomaly[];
-  collars: ProposedCollar[];
+  collars: PublishedCollar[];
   summary: {
     anomalies: number;
     withinTenure: number;
@@ -133,8 +134,8 @@ export const getCholquiSatelliteTargets = createServerFn({ method: "GET" }).hand
     const coverage = readCoverage();
     const anomalies = readAnomalies();
 
-    // Sólo se propone perforación dentro de la tenencia conocida.
-    const collars = buildDrillGrid(anomalies, CHOLQUI_CENTER);
+    // Same published proposal as 2D/3D; do not silently regenerate it from scores.
+    const collars = parsePublishedDrillGrid(JSON.parse(drillGridRaw));
 
     const counts = new Map<string, number>();
     for (const a of anomalies) counts.set(a.indexCode, (counts.get(a.indexCode) ?? 0) + 1);
