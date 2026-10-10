@@ -1,24 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { GeoScene3D } from "@/components/geoscene";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
+// Consolidado: el relieve 3D vive dentro de cada ficha de proyecto.
 export const Route = createFileRoute("/_authenticated/dashboard/geology3d")({
-  head: () => ({
-    meta: [
-      { title: "Geología 3D — Geocapitals" },
-      {
-        name: "description",
-        content:
-          "Visor 3D canónico GeoScene3D sobre MapLibre + deck.gl, con capas gobernadas por procedencia para superficie, subsuelo y modelos.",
-      },
-    ],
-  }),
-  component: Geology3DPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/proyectos", statusCode: 301 });
+  },
 });
-
-function Geology3DPage() {
-  return (
-    <div className="h-[calc(100vh-4rem)] w-full">
-      <GeoScene3D mode="surface" />
-    </div>
-  );
-}
