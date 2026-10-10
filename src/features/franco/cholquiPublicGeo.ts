@@ -102,7 +102,9 @@ function certifiedAssays(): PublicGeoFeatureCollection {
   };
 }
 
-export function buildCholquiPublicGeoBundle(): PublicGeoBundle {
+export function buildCholquiPublicGeoBundle(
+  satelliteIndices?: PublicGeoFeatureCollection | null,
+): PublicGeoBundle {
   const anomalies = JSON.parse(anomaliesRaw) as FeatureCollection;
 
   const layers: PublicGeoBundle["layers"] = {
@@ -118,6 +120,8 @@ export function buildCholquiPublicGeoBundle(): PublicGeoBundle {
     "sampling.assays": certifiedAssays(),
     "drilling.proposed": parse(drillRaw),
   };
+  if (satelliteIndices?.features.length)
+    layers["remote_sensing.sentinel2_processed_indices"] = satelliteIndices;
 
   const requested = Object.keys(layers) as CanonicalGeoLayerId[];
   const project = {

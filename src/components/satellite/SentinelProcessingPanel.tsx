@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import {
   getSentinelRasterDownload,
@@ -9,8 +11,13 @@ import {
 } from "@/lib/sentinelProcessing.functions";
 import { validSatelliteBbox } from "@/lib/satellite/evidence";
 
-type Props = { projectId: string; defaultBbox?: [number, number, number, number] | null };
-export function SentinelProcessingPanel({ projectId, defaultBbox }: Props) {
+type Props = {
+  projectId: string;
+  slug?: string;
+  defaultBbox?: [number, number, number, number] | null;
+};
+export function SentinelProcessingPanel({ projectId, slug, defaultBbox }: Props) {
+  const queryClient = useQueryClient();
   const listFn = useServerFn(listSentinelProcessingScenes),
     processFn = useServerFn(processSentinelScene),
     downloadFn = useServerFn(getSentinelRasterDownload);
@@ -74,6 +81,7 @@ export function SentinelProcessingPanel({ projectId, defaultBbox }: Props) {
       setError(error instanceof Error ? error.message : "Error de procesamiento");
     } finally {
       await history.refetch();
+      await queryClient.invalidateQueries({ queryKey: ["sentinel-real-preview", projectId] });
       inFlight.current = false;
       setBusy(null);
     }
@@ -286,6 +294,26 @@ export function SentinelProcessingPanel({ projectId, defaultBbox }: Props) {
                   >
                     Descargar GeoTIFF · 4 bandas
                   </button>
+                  {slug && (
+                    <div className="mt-2 flex flex-wrap gap-3">
+                      <Link
+                        to="/terminal/$slug"
+                        params={{ slug }}
+                        search={{ tab: "mapa", view: "2d" }}
+                        className="text-accent-brand hover:underline"
+                      >
+                        Abrir mapa 2D
+                      </Link>
+                      <Link
+                        to="/terminal/$slug"
+                        params={{ slug }}
+                        search={{ tab: "mapa", view: "3d" }}
+                        className="text-accent-brand hover:underline"
+                      >
+                        Abrir mapa 3D
+                      </Link>
+                    </div>
+                  )}
                 </>
               )}
               {run.status === "failed" && (

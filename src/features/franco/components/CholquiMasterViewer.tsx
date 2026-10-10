@@ -2,8 +2,10 @@ import type { FeatureCollection } from "geojson";
 import { ProjectMasterViewer } from "@/components/geo/ProjectMasterViewer";
 import type { AssayPoint } from "@/components/geo/ProjectMasterViewer";
 import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
+import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
 import { cholquiFieldGeophysics } from "@/lib/cholqui/geophysicsTerrain";
+import { geoColors } from "@/lib/geospatial/visualTokens";
 // Catastro OFICIAL directo de SERNAGEOMIN (no el KMZ del operador).
 import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
 import anomaliesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
@@ -75,6 +77,7 @@ export function CholquiMasterViewer() {
       candidate.name?.toLowerCase().includes("cholqui"),
   );
   const { data: geophysics } = useProjectGeophysicsData(project?.id);
+  const { data: satellitePreview } = useSentinelRasterPreview(project?.id);
 
   return (
     <ProjectMasterViewer
@@ -97,6 +100,21 @@ export function CholquiMasterViewer() {
       estructuras={CHOLQUI_STRUCTURES_GEOJSON}
       pedimentosPendientes={pedimentosPendientes}
       mojones={mojones}
+      contextLayers={
+        satellitePreview?.features.length
+          ? [
+              {
+                id: "sentinel2-real-preview",
+                label: "Sentinel-2 · índices procesados (malla de vista)",
+                evidence: "DERIVADO",
+                caution:
+                  "Vista reducida del GeoTIFF real; índices modelados, no son identificación mineral ni mediciones de terreno.",
+                features: satellitePreview,
+                color: geoColors.tenureOwn,
+              },
+            ]
+          : []
+      }
       // geoquimica: sin dato — la geoquímica de sedimentos SERNAGEOMIN no cubre
       // Melipilla (-33.85); no se cablea para no fabricar evidencia.
     />

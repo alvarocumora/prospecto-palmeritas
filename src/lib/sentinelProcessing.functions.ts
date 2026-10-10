@@ -79,6 +79,7 @@ export const processSentinelScene = createServerFn({ method: "POST" })
     if (createError || !run) throw new Error(createError?.message ?? "RUN_CREATE_FAILED");
     const storagePath = `${data.projectId}/${userId}/${run.id}.tif`;
     let uploaded = false;
+    let previewUploaded = false;
     try {
       const signal = AbortSignal.timeout(180_000);
       const scene = await loadSentinelRasterScene(data.sceneId, signal);
@@ -92,8 +93,18 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         .upload(storagePath, raster.geoTiff, { contentType: "image/tiff", upsert: false });
       if (uploadError) throw new Error(`ARTIFACT_UPLOAD_FAILED: ${uploadError.message}`);
       uploaded = true;
+      const previewPath = `${data.projectId}/${userId}/${run.id}.preview.geojson`;
+      const previewBlob = new Blob([JSON.stringify(raster.preview)], {
+        type: "application/geo+json",
+      });
+      const { error: previewError } = await supabase.storage
+        .from(BUCKET)
+        .upload(previewPath, previewBlob, { contentType: "application/geo+json", upsert: false });
+      if (previewError) throw new Error(`PREVIEW_UPLOAD_FAILED: ${previewError.message}`);
+      previewUploaded = true;
       const sourceMetadata = {
         provenance: "modelled",
+        preview_path: previewPath,
         stac_href: scene.stacHref,
         acquisition_date: scene.datetime,
         cloud_pct: scene.cloudPct,
@@ -118,6 +129,7 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         bands: [...INDEX_ORDER],
         units: "dimensionless",
         artifact_format: "GeoTIFF (not COG)",
+        map_preview_features: raster.preview.features.length,
         interpretation:
           "Índices espectrales derivados; no identificación de minerales ni mediciones de campo",
       };
@@ -139,6 +151,10 @@ export const processSentinelScene = createServerFn({ method: "POST" })
       return { ok: true as const, runId: run.id, stats, hash, error: null };
     } catch (error) {
       if (uploaded) await supabase.storage.from(BUCKET).remove([storagePath]);
+      if (previewUploaded)
+        await supabase.storage
+          .from(BUCKET)
+          .remove([`${data.projectId}/${userId}/${run.id}.preview.geojson`]);
       const message = error instanceof Error ? error.message : "PROCESSING_FAILED";
       const { error: recordError } = await supabase
         .from("satellite_analysis_runs")
@@ -155,6 +171,38 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         throw new Error(`${message}; FAILED_STATUS_SAVE_FAILED: ${recordError.message}`);
       return { ok: false as const, runId: run.id, stats: null, hash: null, error: message };
     }
+  });
+
+export const getSentinelRasterPreview = createServerFn({ method: "POST" })
+  .middleware([requireCatastroRole])
+  .inputValidator((input: unknown) => z.object({ projectId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    await member(context.supabase, data.projectId, context.userId);
+    const { data: runs, error } = await context.supabase
+      .from("satellite_analysis_runs")
+      .select("id,created_by,status,pipeline_version")
+      .eq("project_id", data.projectId)
+      .eq("pipeline_version", "sentinel2-l2a-indices-v1")
+      .eq("status", "succeeded")
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    for (const run of runs ?? []) {
+      const path = `${data.projectId}/${run.created_by}/${run.id}.preview.geojson`;
+      const { data: file, error: fileError } = await context.supabase.storage
+        .from(BUCKET)
+        .download(path);
+      if (fileError || !file) continue;
+      const parsed = JSON.parse(await file.text()) as unknown;
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        (parsed as { type?: unknown }).type === "FeatureCollection" &&
+        Array.isArray((parsed as { features?: unknown }).features)
+      )
+        return { runId: run.id, preview: parsed };
+    }
+    return { runId: null, preview: null };
   });
 
 export const getSentinelRasterDownload = createServerFn({ method: "POST" })
