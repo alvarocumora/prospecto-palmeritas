@@ -58,7 +58,7 @@ const SHOWCASE = [
     code: "LOSVERDES",
     slug: "losverdes" as const,
     name: "Los Verdes",
-    region: "Petorca · Valparaíso",
+    region: "Los Vilos · Choapa · Coquimbo",
     commodity: "Cu-Mo",
     image: losverdesImg.url,
     stage: "Pre NI 43-101",

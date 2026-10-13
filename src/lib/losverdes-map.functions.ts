@@ -29,6 +29,7 @@ export type LosVerdesMapData = {
   magAnomalies: FC;
   samples: FC;
   tenure: { ownHa: number; ownCount: number; neighborHa: number; neighborCount: number; targetHa: number };
+  tenure: { ownHa: number; ownCount: number; neighborHa: number; neighborCount: number; targetHa: number };
   counts: {
     concessions: number;
     concessionsWithGeom: number;
