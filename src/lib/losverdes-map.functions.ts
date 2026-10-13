@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import proj4 from "proj4";
+import integratedRaw from "@/data/geo/losverdes_proyecto_integrado.geojson?raw";
 
 const PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
@@ -123,6 +124,58 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
         return { type: "Feature", id: String(c.id), geometry: geom, properties: props };
       }),
     };
+
+    // Paquete integrado SERNAGEOMIN (polígonos declarados). Se agrega solo lo que falte por nombre.
+    const norm = (s: unknown) =>
+      String(s ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    const known = new Set(
+      concessions.features.filter((f) => f.geometry).map((f) => norm(f.properties.nombre)),
+    );
+    const integrated = JSON.parse(integratedRaw) as {
+      features: Array<{ geometry: GeoJSON.Geometry; properties: Record<string, PropValue> }>;
+    };
+    const tenure = { ownHa: 0, ownCount: 0, neighborHa: 0, neighborCount: 0, targetHa: 2600 };
+    integrated.features.forEach((f, i) => {
+      const p = f.properties;
+      const own = p.grupo === "proyecto";
+      const ha = Number(p.hectareas ?? 0);
+      if (own) {
+        tenure.ownHa += ha;
+        tenure.ownCount += 1;
+      } else {
+        tenure.neighborHa += ha;
+        tenure.neighborCount += 1;
+      }
+      if (own && known.has(norm(p.nombre))) return;
+      concessions.features.push({
+        type: "Feature",
+        id: `sngm-${i}`,
+        geometry: f.geometry,
+        properties: {
+          layer: "concession",
+          es_tenencia_proyecto: own,
+          tenencia_procedencia: "declared",
+          tenencia_asociacion: own ? "proyecto_integrado" : "vecino_major",
+          hasGeometry: true,
+          geometry_source: "sernageomin_catastro",
+          rol: p.rol ?? null,
+          code: p.rol ?? null,
+          nombre: p.nombre ?? null,
+          name: p.nombre ?? null,
+          titular: p.titular ?? null,
+          holder: p.titular ?? null,
+          situacion: p.situacion ?? null,
+          status: p.situacion ?? null,
+          tipo: p.tipo ?? null,
+          hectareas: ha,
+          area_ha: ha,
+          comuna: p.comuna ?? null,
+          fase: p.fase ?? null,
+        },
+      });
+    });
 
     // 2) Targets
     const { data: tgts, error: tErr } = await supabaseAdmin
