@@ -1,16 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import proj4 from "proj4";
-import integratedTenureRaw from "@/data/geo/losverdes_proyecto_integrado.geojson?raw";
+import integratedRaw from "@/data/geo/losverdes_proyecto_integrado.geojson?raw";
 
 const PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
-const integratedTenure = JSON.parse(integratedTenureRaw) as {
-  features: Array<{
-    id?: string | number;
-    geometry: GeoJSON.Geometry | null;
-    properties: Props;
-  }>;
-  metadata: { objetivo_ha: number };
-};
 
 type PropValue = string | number | boolean | null;
 type Props = Record<string, PropValue>;
@@ -36,17 +28,16 @@ export type LosVerdesMapData = {
   satAnomalies: FC;
   magAnomalies: FC;
   samples: FC;
+  tenure?: {
+    ownHa: number;
+    ownCount: number;
+    neighborHa: number;
+    neighborCount: number;
+    targetHa: number;
+  };
   counts: {
     concessions: number;
     concessionsWithGeom: number;
-    projectPackage?: number;
-    projectPackageHa?: number;
-    arranqueHa?: number;
-    annexHa?: number;
-    annexPendingHa?: number;
-    neighbours?: number;
-    objectiveHa?: number;
-    unconfirmedHa?: number;
     targets: number;
     satAnomalies: number;
     magAnomalies: number;
@@ -57,66 +48,141 @@ export type LosVerdesMapData = {
 export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
   async (): Promise<LosVerdesMapData> => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    // Paquete geoespacial oficial integrado, con asociación declarada y fases explícitas.
-    // No inferir propiedad legal desde titular/RUT: la cartera es multi-titular.
-    const packageFeatures = integratedTenure.features;
+    // 1) Concesiones
+    const { data: cons, error: cErr } = await supabaseAdmin
+      .from("mining_concessions")
+      .select(
+        "id, code, name, holder, rut_holder, concession_type, status, area_ha, region, commune, granted_at, expires_at, geometry_geojson",
+      )
+      .eq("project_id", PROJECT_ID);
+    if (cErr) throw new Error(`concessions: ${cErr.message}`);
+
+    // Recover only an exact official rol match. A holder or a centroid is not a polygon.
+    const missingCodes = (cons ?? []).filter((c) => !c.geometry_geojson).map((c) => c.code);
+    const officialGeometry = new Map<string, unknown>();
+    let geometryLookupWarning: string | undefined;
+    if (missingCodes.length) {
+      const cached = await supabaseAdmin
+        .from("cadastre_national")
+        .select("rol, geometry_geojson")
+        .is("archived_at", null)
+        .in("rol", missingCodes);
+      if (cached.error)
+        geometryLookupWarning = "No se pudo consultar la geometría oficial por rol.";
+      else {
+        const ambiguous = new Set<string>();
+        for (const row of cached.data ?? []) {
+          if (!row.rol || !row.geometry_geojson) continue;
+          if (officialGeometry.has(row.rol)) ambiguous.add(row.rol);
+          officialGeometry.set(row.rol, row.geometry_geojson);
+        }
+        for (const code of ambiguous) officialGeometry.delete(code);
+      }
+    }
+
     const concessions: FC = {
       type: "FeatureCollection",
-      features: packageFeatures.map((feature, index): MapFeature => {
-        const p = feature.properties;
-        const isProjectPackage = p.grupo === "proyecto";
-        return {
-          type: "Feature",
-          id: feature.id ?? String(p.rol ?? index),
-          geometry: feature.geometry,
-          properties: {
-            ...p,
-            layer: "concession",
-            project_id: PROJECT_ID,
-            es_tenencia_proyecto: isProjectPackage,
-            tenencia_procedencia: isProjectPackage ? "declared" : null,
-            tenencia_asociacion: isProjectPackage
-              ? "integrated_project_package"
-              : "official_neighbour_context",
-            contrato_verificado: false,
-            hasGeometry: Boolean(feature.geometry),
-            geometry_source: p.fuente ?? null,
-            id: String(p.rol ?? index),
-            code: p.rol ?? null,
-            name: p.nombre ?? null,
-            holder: p.titular ?? null,
-            rut_holder: null,
-            fase: p.fase ?? null,
-            grupo: p.grupo ?? null,
-            rol: p.rol ?? null,
-            hectareas: p.hectareas ?? null,
-            comuna: p.comuna ?? null,
-            status: p.situacion ?? null,
-            area_ha: p.hectareas ?? null,
-          },
+      features: (cons ?? []).map((c): MapFeature => {
+        let geom: GeoJSON.Geometry | null = null;
+        const rawGeometry = c.geometry_geojson ?? officialGeometry.get(c.code);
+        if (rawGeometry) {
+          try {
+            geom =
+              typeof rawGeometry === "string"
+                ? JSON.parse(rawGeometry)
+                : (rawGeometry as GeoJSON.Geometry);
+            if (!geom || !["Polygon", "MultiPolygon"].includes(geom.type)) geom = null;
+          } catch {
+            geom = null;
+          }
+        }
+        const props: Props = {
+          layer: "concession",
+          project_id: PROJECT_ID,
+          es_tenencia_proyecto: true,
+          tenencia_procedencia: "declared",
+          tenencia_asociacion: "project_id",
+          hasGeometry: Boolean(geom),
+          geometry_source: c.geometry_geojson
+            ? "project_record"
+            : geom
+              ? "cadastre_national_exact_rol"
+              : null,
+          id: String(c.id),
+          code: c.code ?? null,
+          name: c.name ?? null,
+          holder: c.holder ?? null,
+          rut_holder: c.rut_holder ?? null,
+          rol: c.code ?? null,
+          nombre: c.name ?? null,
+          titular: c.holder ?? null,
+          situacion: c.status ?? null,
+          tipo: c.concession_type ?? null,
+          hectareas: c.area_ha != null ? Number(c.area_ha) : null,
+          comuna: c.commune ?? null,
+          concession_type: c.concession_type ?? null,
+          status: c.status ?? null,
+          area_ha: c.area_ha != null ? Number(c.area_ha) : null,
+          region: c.region ?? null,
+          commune: c.commune ?? null,
+          granted_at: c.granted_at ?? null,
+          expires_at: c.expires_at ?? null,
         };
+        return { type: "Feature", id: String(c.id), geometry: geom, properties: props };
       }),
     };
-    const projectFeatures = concessions.features.filter(
-      (feature) => feature.properties.grupo === "proyecto",
+
+    // Paquete integrado SERNAGEOMIN (polígonos declarados). Se agrega solo lo que falte por nombre.
+    const norm = (s: unknown) =>
+      String(s ?? "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+    const known = new Set(
+      concessions.features.filter((f) => f.geometry).map((f) => norm(f.properties.nombre)),
     );
-    const arranqueHa = projectFeatures
-      .filter((feature) => feature.properties.fase === "arranque")
-      .reduce((sum, feature) => sum + Number(feature.properties.hectareas ?? 0), 0);
-    const annexes = projectFeatures.filter((feature) => feature.properties.fase === "anexo");
-    const annexHa = annexes.reduce(
-      (sum, feature) => sum + Number(feature.properties.hectareas ?? 0),
-      0,
-    );
-    const annexPendingHa = annexes
-      .filter((feature) =>
-        String(feature.properties.situacion)
-          .normalize("NFD")
-          .replace(/[\u0300-\u036f]/g, "")
-          .toUpperCase()
-          .includes("TRAMITE"),
-      )
-      .reduce((sum, feature) => sum + Number(feature.properties.hectareas ?? 0), 0);
+    const integrated = JSON.parse(integratedRaw) as {
+      features: Array<{ geometry: GeoJSON.Geometry; properties: Record<string, PropValue> }>;
+    };
+    const tenure = { ownHa: 0, ownCount: 0, neighborHa: 0, neighborCount: 0, targetHa: 2600 };
+    integrated.features.forEach((f, i) => {
+      const p = f.properties;
+      const own = p.grupo === "proyecto";
+      const ha = Number(p.hectareas ?? 0);
+      if (own) {
+        tenure.ownHa += ha;
+        tenure.ownCount += 1;
+      } else {
+        tenure.neighborHa += ha;
+        tenure.neighborCount += 1;
+      }
+      if (own && known.has(norm(p.nombre))) return;
+      concessions.features.push({
+        type: "Feature",
+        id: `sngm-${i}`,
+        geometry: f.geometry,
+        properties: {
+          layer: "concession",
+          es_tenencia_proyecto: own,
+          tenencia_procedencia: "declared",
+          tenencia_asociacion: own ? "proyecto_integrado" : "vecino_major",
+          hasGeometry: true,
+          geometry_source: "sernageomin_catastro",
+          rol: p.rol ?? null,
+          code: p.rol ?? null,
+          nombre: p.nombre ?? null,
+          name: p.nombre ?? null,
+          titular: p.titular ?? null,
+          holder: p.titular ?? null,
+          situacion: p.situacion ?? null,
+          status: p.situacion ?? null,
+          tipo: p.tipo ?? null,
+          hectareas: ha,
+          area_ha: ha,
+          comuna: p.comuna ?? null,
+          fase: p.fase ?? null,
+        },
+      });
+    });
 
     // 2) Targets
     const { data: tgts, error: tErr } = await supabaseAdmin
@@ -312,6 +378,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     }
 
     return {
+      geometryLookupWarning,
       bbox,
       center,
       concessions,
@@ -319,25 +386,10 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       satAnomalies,
       magAnomalies,
       samples,
+      tenure,
       counts: {
-        concessions: concessions.features.length,
+        concessions: concessions.features.filter((f) => f.properties.es_tenencia_proyecto).length,
         concessionsWithGeom: concessions.features.filter((f) => f.geometry != null).length,
-        projectPackage: projectFeatures.length,
-        projectPackageHa: projectFeatures.reduce(
-          (sum, feature) => sum + Number(feature.properties.hectareas ?? 0),
-          0,
-        ),
-        arranqueHa,
-        annexHa,
-        annexPendingHa,
-        neighbours: concessions.features.length - projectFeatures.length,
-        objectiveHa: Number(integratedTenure.metadata.objetivo_ha),
-        unconfirmedHa:
-          Number(integratedTenure.metadata.objetivo_ha) -
-          projectFeatures.reduce(
-            (sum, feature) => sum + Number(feature.properties.hectareas ?? 0),
-            0,
-          ),
         targets: targets.features.length,
         satAnomalies: satAnomalies.features.length,
         magAnomalies: magAnomalies.features.length,

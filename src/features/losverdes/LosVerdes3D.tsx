@@ -58,7 +58,7 @@ export function LosVerdes3D({
     <ProjectTerrain3D
       slug="losverdes"
       projectId={projectId}
-      notice={`${query.data?.counts.projectPackage ?? 0} pertenencias en cartera integrada · ${query.data?.counts.projectPackageHa?.toLocaleString("es-CL") ?? 0} ha mapeadas; asociación declarada y multi-titular, sujeta a verificación contractual. ${query.data?.counts.annexPendingHa?.toLocaleString("es-CL") ?? 0} ha de anexos en trámite.`}
+      notice={`${query.data?.tenure?.ownCount ?? 0} concesiones en cartera integrada · ${query.data?.tenure?.ownHa.toLocaleString("es-CL") ?? 0} ha mapeadas; asociación declarada y multi-titular, sujeta a verificación contractual. Objetivo distrital: ${query.data?.tenure?.targetHa.toLocaleString("es-CL") ?? 0} ha, saldo por confirmar.`}
       center={layers.center}
       extentMeters={12000}
       evidenceBundle={layers.evidenceBundle}

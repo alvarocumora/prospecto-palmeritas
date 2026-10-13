@@ -16,45 +16,29 @@ export function LosVerdesTenureSummaryPanel() {
   const fetchMapData = useServerFn(getLosVerdesMapData);
   const { data } = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchMapData() });
   const counts = data?.counts;
+  const tenure = data?.tenure;
 
   return (
     <section className="rounded-2xl border border-hairline bg-surface p-6">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <Eyebrow>Tenencia y evidencia · Los Verdes</Eyebrow>
-          <h3 className="mt-2 font-display text-xl text-content">Cartera integrada declarada</h3>
+          <Eyebrow>Evidencia geocientífica · Los Verdes</Eyebrow>
+          <h3 className="mt-2 font-display text-xl text-content">Inventario disponible</h3>
         </div>
         <span className="font-mono text-xs text-content-subtle">
           Fuente cartográfica: SERNAGEOMIN
         </span>
       </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Metric label="Pertenencias del paquete" value={counts?.projectPackage ?? "—"} />
-        <Metric
-          label="Superficie mapeada (ha)"
-          value={counts?.projectPackageHa?.toLocaleString("es-CL") ?? "—"}
-        />
-        <Metric label="Arranque (ha)" value={counts?.arranqueHa?.toLocaleString("es-CL") ?? "—"} />
-        <Metric label="Anexos (ha)" value={counts?.annexHa?.toLocaleString("es-CL") ?? "—"} />
-      </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        <Metric
-          label="Anexos en trámite (ha)"
-          value={counts?.annexPendingHa?.toLocaleString("es-CL") ?? "—"}
-        />
-        <Metric
-          label="Objetivo distrital (ha)"
-          value={counts?.objectiveHa?.toLocaleString("es-CL") ?? "—"}
-        />
-        <Metric
-          label="Saldo por confirmar (ha)"
-          value={counts?.unconfirmedHa?.toLocaleString("es-CL") ?? "—"}
-        />
+        <Metric label="Targets interpretados" value={counts?.targets ?? "—"} />
+        <Metric label="Anomalías Sentinel-2 derivadas" value={counts?.satAnomalies ?? "—"} />
+        <Metric label="Muestras georreferenciadas" value={counts?.samples ?? "—"} />
       </div>
-      <div className="mt-3 grid gap-3 sm:grid-cols-3">
-        <Metric label="Targets con ubicación" value={counts?.targets ?? "—"} />
-        <Metric label="Anomalías satelitales con ubicación" value={counts?.satAnomalies ?? "—"} />
-        <Metric label="Muestras con ubicación" value={counts?.samples ?? "—"} />
+      <div className="mt-4 rounded-xl border border-hairline bg-surface-subtle p-4 text-xs leading-relaxed text-content-subtle">
+        Tenencia declarada: {tenure?.ownCount ?? "—"} concesiones propias registradas (
+        {tenure?.ownHa.toLocaleString("es-CL") ?? "—"} ha); vecinos mayores:{" "}
+        {tenure?.neighborCount ?? "—"} ({tenure?.neighborHa.toLocaleString("es-CL") ?? "—"} ha). La
+        asociación no acredita propiedad, opción ni contrato vigente.
       </div>
       <p className="mt-4 border-t border-hairline pt-3 text-xs leading-relaxed text-content-subtle">
         La asociación al proyecto es declarada y multi-titular; no acredita propiedad, opción ni
