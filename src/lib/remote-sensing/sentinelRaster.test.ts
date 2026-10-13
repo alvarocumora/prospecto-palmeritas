@@ -4,6 +4,7 @@ import proj4 from "proj4";
 import {
   computeSentinelGrid,
   encodeSentinelGeoTiff,
+  encodeSentinelRgbGeoTiff,
   processSentinelRaster,
   SENTINEL_BANDS,
   utmDefinition,
@@ -133,6 +134,20 @@ describe("real raster indices", () => {
         nodata: 0,
       };
     }
+    const greenHref = "https://fixture.test/B03.tif";
+    fixtures.set(
+      greenHref,
+      writeArrayBuffer(new Uint16Array(64).fill(2500), {
+        width: 8,
+        height: 8,
+        ModelPixelScale: [10, 10, 0],
+        ModelTiepoint: [0, 0, 0, x, y, 0],
+        GTModelTypeGeoKey: 1,
+        GTRasterTypeGeoKey: 1,
+        ProjectedCSTypeGeoKey: 32719,
+      }),
+    );
+    assets.B03 = { href: greenHref, scale: 0.0001, offset: -0.1, nodata: 0 };
     const lower = proj4("EPSG:32719", "EPSG:4326", [x + 20, y - 60]),
       upper = proj4("EPSG:32719", "EPSG:4326", [x + 60, y - 20]);
     const result = await processSentinelRaster(
@@ -143,13 +158,27 @@ describe("real raster indices", () => {
     expect(result.stats.ndvi.mean).toBeCloseTo(1 / 3);
     expect(result.grid.resolution).toBe(20);
     expect(result.geoTiff.byteLength).toBeGreaterThan(0);
+    expect(result.rgbGeoTiff.byteLength).toBeGreaterThan(0);
+  });
+  it("writes a georeferenced RGBA natural-colour raster with a cloud mask", async () => {
+    const result = computeSentinelGrid(grid, windows());
+    const rgba = new Uint8Array([255, 0, 0, 255, 0, 255, 0, 0, 0, 0, 255, 255, 255, 255, 255, 255]);
+    const tiff = await fromArrayBuffer(
+      encodeSentinelRgbGeoTiff(grid, rgba, { sceneId: "fixture" }),
+    );
+    const image = await tiff.getImage();
+    expect(image.getSamplesPerPixel()).toBe(4);
+    expect(image.getGeoKeys()?.ProjectedCSTypeGeoKey).toBe(32719);
+    expect(Array.from(await image.readRasters({ interleave: true }))).toEqual(Array.from(rgba));
+    expect(result.validPixels).toBe(3);
+    await tiff.close();
   });
 });
 describe("source radiometry and trusted asset boundary", () => {
   it("reads per-band XML offsets and refuses missing offsets on newer baselines", () => {
     const xml =
       '<BOA_QUANTIFICATION_VALUE unit="none">10000</BOA_QUANTIFICATION_VALUE>' +
-      [1, 3, 7, 11, 12]
+      [1, 2, 3, 7, 11, 12]
         .map((id) => `<BOA_ADD_OFFSET band_id="${id}">-1000</BOA_ADD_OFFSET>`)
         .join("");
     expect(parseSentinelRadiometry(xml, "05.11").B02).toEqual({

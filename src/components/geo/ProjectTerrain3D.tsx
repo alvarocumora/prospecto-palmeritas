@@ -19,6 +19,8 @@ import type { FeatureCollection } from "geojson";
 import { buildPublicGeoManifest, type PublicGeoBundle } from "@/lib/geospatial/publicGeoContract";
 import { geophysicsSurfaceColor } from "@/components/map/geophysicsLayers";
 import { getDemTile } from "@/engine3d/terrain/dem.functions";
+import { getSentinelRgbDrape } from "@/lib/sentinelProcessing.functions";
+import { loadSentinelDrapeTexture } from "@/engine3d/terrain/sentinelDrape";
 import type { DemTile } from "@/engine3d/terrain/dem.functions";
 import {
   projectTerrainPoint,
@@ -114,7 +116,17 @@ function scenePoint(point: ScenePoint, lift = 2): ScenePoint {
   return [point[0] * SCALE, (point[1] + lift) * SCALE, point[2] * SCALE];
 }
 
-function Terrain({ tile, opacity }: { tile: DemTile; opacity: number }) {
+function Terrain({
+  tile,
+  opacity,
+  texture,
+  drape,
+}: {
+  tile: DemTile;
+  opacity: number;
+  texture: THREE.Texture | null;
+  drape: boolean;
+}) {
   const geometry = useMemo(() => {
     const side = tile.extentMeters * SCALE;
     const geo = new THREE.PlaneGeometry(side, side, tile.size - 1, tile.size - 1);
@@ -137,7 +149,14 @@ function Terrain({ tile, opacity }: { tile: DemTile; opacity: number }) {
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh geometry={geometry} rotation-x={-Math.PI / 2}>
-      <meshStandardMaterial vertexColors roughness={0.95} transparent opacity={opacity} />
+      <meshStandardMaterial
+        map={drape ? texture : null}
+        vertexColors={!drape}
+        roughness={0.95}
+        metalness={0}
+        transparent
+        opacity={opacity}
+      />
     </mesh>
   );
 }
@@ -346,6 +365,7 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   } = props;
   const projectId = props.projectId ?? "00000000-0000-0000-0000-000000000000";
   const demFn = useServerFn(getDemTile);
+  const sentinelDrapeFn = useServerFn(getSentinelRgbDrape);
   const geophysicsQuery = useProjectGeophysicsData(projectId);
   const field = useMemo(
     () => cholquiFieldGeophysics(geophysicsQuery.data, projectId),
@@ -403,6 +423,8 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   const [primaryOnly, setPrimaryOnly] = useState(false);
   const [view, setView] = useState<"perspective" | "plan">("perspective");
   const [reset, setReset] = useState(0);
+  const [terrainDrape, setTerrainDrape] = useState<"elevation" | "sentinel">("elevation");
+  const [sentinelTexture, setSentinelTexture] = useState<THREE.Texture | null>(null);
   const available = useMemo(() => new Set(bundle.manifest.layers.map((meta) => meta.id)), [bundle]);
   const counts = useMemo(
     () =>
@@ -457,6 +479,40 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
     staleTime: Infinity,
   });
   const tile = dem.data?.source === "copernicus" ? dem.data : null;
+  const terrainBbox = useMemo(() => {
+    const cosine = Math.cos((center.lat * Math.PI) / 180);
+    const half = extentMeters / 2;
+    const dLng = half / (111_320 * cosine);
+    const dLat = half / 111_320;
+    return [center.lng - dLng, center.lat - dLat, center.lng + dLng, center.lat + dLat] as [
+      number,
+      number,
+      number,
+      number,
+    ];
+  }, [center.lat, center.lng, extentMeters]);
+  const sentinelDrape = useQuery({
+    queryKey: ["sentinel-terrain-drape", projectId, terrainBbox],
+    queryFn: () => sentinelDrapeFn({ data: { projectId, bbox: terrainBbox } }),
+    enabled: Boolean(tile) && projectId !== "00000000-0000-0000-0000-000000000000",
+    retry: false,
+    staleTime: 240_000,
+  });
+  useEffect(() => {
+    let cancelled = false;
+    setSentinelTexture(null);
+    if (!tile || !sentinelDrape.data?.url) return;
+    void loadSentinelDrapeTexture(sentinelDrape.data.url, tile)
+      .then((texture) => {
+        if (cancelled) texture.dispose();
+        else setSentinelTexture(texture);
+      })
+      .catch(() => setTerrainDrape("elevation"));
+    return () => {
+      cancelled = true;
+    };
+  }, [sentinelDrape.data?.url, tile]);
+  useEffect(() => () => sentinelTexture?.dispose(), [sentinelTexture]);
   const certifiedVisible = visible["sampling.assays"];
   const neighbour =
     tile && neighbourDeposit
@@ -605,6 +661,38 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-1 text-[11px]">
+          <button
+            type="button"
+            aria-pressed={terrainDrape === "elevation"}
+            onClick={() => setTerrainDrape("elevation")}
+            className={`rounded border border-hairline px-2 py-1 ${
+              terrainDrape === "elevation"
+                ? "bg-accent-brand text-accent-brand-contrast"
+                : "hover:bg-surface-2"
+            }`}
+          >
+            Topografía
+          </button>
+          <button
+            type="button"
+            aria-pressed={terrainDrape === "sentinel"}
+            disabled={!sentinelTexture}
+            onClick={() => setTerrainDrape("sentinel")}
+            title={
+              sentinelDrape.isError
+                ? "Sin acceso a un raster Sentinel-2 compatible"
+                : sentinelDrape.isPending
+                  ? "Buscando una escena procesada que cubra el terreno"
+                  : "Procesa una escena Sentinel-2 que cubra todo el DEM para habilitar el drape"
+            }
+            className={`rounded border border-hairline px-2 py-1 disabled:cursor-not-allowed disabled:opacity-40 ${
+              terrainDrape === "sentinel"
+                ? "bg-accent-brand text-accent-brand-contrast"
+                : "hover:bg-surface-2"
+            }`}
+          >
+            Sentinel RGB
+          </button>
           {(["perspective", "plan"] as const).map((key) => (
             <button
               key={key}
@@ -663,7 +751,12 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
             <directionalLight position={[120, 180, 100]} intensity={1.4} />
             <Suspense fallback={null}>
               {visible["territory.dem"] && (
-                <Terrain tile={tile} opacity={opacity["territory.dem"] ?? 0.9} />
+                <Terrain
+                  tile={tile}
+                  opacity={opacity["territory.dem"] ?? 0.9}
+                  texture={sentinelTexture}
+                  drape={terrainDrape === "sentinel" && Boolean(sentinelTexture)}
+                />
               )}
               <CholquiGeophysicsTerrainLayer
                 tile={tile}
@@ -769,6 +862,13 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
               />
             </Suspense>
           </Canvas>
+        )}
+        {terrainDrape === "sentinel" && sentinelDrape.data && (
+          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[80%] rounded border border-hairline bg-surface/90 px-2 py-1 font-mono text-[10px] text-content">
+            Sentinel-2 L2A · RGB B04/B03/B02 ·{" "}
+            {sentinelDrape.data.acquisitionDate?.slice(0, 10) ?? "fecha no informada"} · máscara SCL
+            · reflectancia derivada
+          </div>
         )}
         {tile && (
           <div className="absolute left-3 top-3 z-20">

@@ -78,7 +78,9 @@ export const processSentinelScene = createServerFn({ method: "POST" })
       .single();
     if (createError || !run) throw new Error(createError?.message ?? "RUN_CREATE_FAILED");
     const storagePath = `${data.projectId}/${userId}/${run.id}.tif`;
+    const rgbStoragePath = `${data.projectId}/${userId}/${run.id}.rgb.tif`;
     let uploaded = false;
+    let rgbUploaded = false;
     let previewUploaded = false;
     try {
       const signal = AbortSignal.timeout(180_000);
@@ -93,6 +95,11 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         .upload(storagePath, raster.geoTiff, { contentType: "image/tiff", upsert: false });
       if (uploadError) throw new Error(`ARTIFACT_UPLOAD_FAILED: ${uploadError.message}`);
       uploaded = true;
+      const { error: rgbUploadError } = await supabase.storage
+        .from(BUCKET)
+        .upload(rgbStoragePath, raster.rgbGeoTiff, { contentType: "image/tiff", upsert: false });
+      if (rgbUploadError) throw new Error(`RGB_UPLOAD_FAILED: ${rgbUploadError.message}`);
+      rgbUploaded = true;
       const previewPath = `${data.projectId}/${userId}/${run.id}.preview.geojson`;
       const previewBlob = new Blob([JSON.stringify(raster.preview)], {
         type: "application/geo+json",
@@ -127,6 +134,14 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         excluded_pixels: raster.excludedPixels,
         byte_length: raster.geoTiff.byteLength,
         bands: [...INDEX_ORDER],
+        visualization: {
+          storage_path: rgbStoragePath,
+          bands: ["B04", "B03", "B02"],
+          pixel_type: "RGBA UInt8",
+          valid_pixels: raster.validPixels,
+          transparent_pixels: raster.excludedPixels,
+          stretch: "BOA 0–0.3 reflectance to sRGB",
+        },
         units: "dimensionless",
         artifact_format: "GeoTIFF (not COG)",
         map_preview_features: raster.preview.features.length,
@@ -151,6 +166,7 @@ export const processSentinelScene = createServerFn({ method: "POST" })
       return { ok: true as const, runId: run.id, stats, hash, error: null };
     } catch (error) {
       if (uploaded) await supabase.storage.from(BUCKET).remove([storagePath]);
+      if (rgbUploaded) await supabase.storage.from(BUCKET).remove([rgbStoragePath]);
       if (previewUploaded)
         await supabase.storage
           .from(BUCKET)
@@ -231,4 +247,59 @@ export const getSentinelRasterDownload = createServerFn({ method: "POST" })
       .createSignedUrl(run.storage_path, 300, { download: `Sentinel2_${run.id}.tif` });
     if (signError || !signed) throw new Error(signError?.message ?? "DOWNLOAD_SIGN_FAILED");
     return { url: signed.signedUrl };
+  });
+
+/** Returns a short-lived, member-authorized RGB raster only when it covers the requested terrain. */
+export const getSentinelRgbDrape = createServerFn({ method: "POST" })
+  .middleware([requireCatastroRole])
+  .inputValidator((input: unknown) => scopeSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    await member(context.supabase, data.projectId, context.userId);
+    const { data: runs, error } = await context.supabase
+      .from("satellite_analysis_runs")
+      .select("id,project_id,created_by,external_scene_id,created_at,bbox,stats,source_metadata")
+      .eq("project_id", data.projectId)
+      .eq("pipeline_version", "sentinel2-l2a-indices-v1")
+      .eq("status", "succeeded")
+      .order("created_at", { ascending: false })
+      .limit(20);
+    if (error) throw new Error(error.message);
+    const covers = (value: unknown) => {
+      if (!Array.isArray(value) || value.length !== 4 || !value.every(Number.isFinite))
+        return false;
+      return (
+        value[0] <= data.bbox[0] &&
+        value[1] <= data.bbox[1] &&
+        value[2] >= data.bbox[2] &&
+        value[3] >= data.bbox[3]
+      );
+    };
+    for (const run of runs ?? []) {
+      if (!covers(run.bbox)) continue;
+      const stats = run.stats as {
+        visualization?: { storage_path?: unknown; valid_pixels?: unknown };
+      } | null;
+      const expectedPath = `${run.project_id}/${run.created_by}/${run.id}.rgb.tif`;
+      if (stats?.visualization?.storage_path !== expectedPath) continue;
+      const { data: signed, error: signError } = await context.supabase.storage
+        .from(BUCKET)
+        .createSignedUrl(expectedPath, 300);
+      if (signError || !signed) continue;
+      const metadata = run.source_metadata as {
+        acquisition_date?: unknown;
+        cloud_pct?: unknown;
+      } | null;
+      return {
+        url: signed.signedUrl,
+        sceneId: run.external_scene_id,
+        acquisitionDate:
+          typeof metadata?.acquisition_date === "string" ? metadata.acquisition_date : null,
+        cloudPct: typeof metadata?.cloud_pct === "number" ? metadata.cloud_pct : null,
+        validPixels:
+          typeof stats?.visualization?.valid_pixels === "number"
+            ? stats.visualization.valid_pixels
+            : null,
+      };
+    }
+    return null;
   });
