@@ -51,6 +51,38 @@ export function LosVerdesMasterViewer() {
   return (
     <div data-report-map="losverdes" className="space-y-3">
       <PublicCanonicalMap bundle={bundle} />
+      {query.data?.tenure && (
+        <section className="grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline sm:grid-cols-4">
+          {[
+            [
+              "Tenencia del proyecto",
+              `${query.data.tenure.ownHa.toLocaleString("es-CL")} ha`,
+              `${query.data.tenure.ownCount} concesiones · declarado SERNAGEOMIN`,
+            ],
+            [
+              "Objetivo integrado",
+              `~${query.data.tenure.targetHa.toLocaleString("es-CL")} ha`,
+              `~${(query.data.tenure.targetHa - query.data.tenure.ownHa).toLocaleString("es-CL")} ha por confirmar`,
+            ],
+            [
+              "Vecinos mayores",
+              `${query.data.tenure.neighborHa.toLocaleString("es-CL")} ha`,
+              `${query.data.tenure.neighborCount} concesiones · no son del proyecto`,
+            ],
+            [
+              "Recursos / reservas",
+              "No declarados",
+              `${query.data.counts.samples} muestras medidas · ${query.data.counts.targets} targets (interpretación)`,
+            ],
+          ].map(([k, v, d]) => (
+            <div key={k} className="bg-surface p-4">
+              <p className="font-mono text-[10px] uppercase tracking-wider text-content-subtle">{k}</p>
+              <p className="mt-1 font-serif text-2xl text-content">{v}</p>
+              <p className="mt-1 text-xs text-content-subtle">{d}</p>
+            </div>
+          ))}
+        </section>
+      )}
       <aside className="rounded-2xl border border-hairline bg-surface p-4 text-xs leading-relaxed text-content-subtle">
         <p className="mb-2 font-mono uppercase tracking-wider text-content">
           Tilama GeoAI · control de calidad · {query.data?.counts.targets ?? 0} targets ·{" "}
