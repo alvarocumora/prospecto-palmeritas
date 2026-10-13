@@ -63,14 +63,14 @@ const SHOWCASE = [
     image: losverdesImg.url,
     stage: "Pre NI 43-101",
     stats: [
-      ["88", "concesiones"],
-      ["34", "targets"],
-      ["23", "anomalías MAG"],
+      ["17", "pertenencias mapeadas"],
+      ["1.963", "ha en paquete"],
+      ["637", "ha por confirmar"],
     ],
     bullets: [
       "AOI 3D + satélite multi-índice",
       "Targets generados por IA",
-      "Preparación de expediente técnico",
+      "Asociación declarada; tenencia multi-titular pendiente de verificación contractual",
     ],
   },
   {

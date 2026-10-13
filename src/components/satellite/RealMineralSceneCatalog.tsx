@@ -4,7 +4,7 @@ import { ExternalLink, Loader2, Satellite } from "lucide-react";
 import { searchStac, type StacItem } from "@/lib/satelliteIntel.functions";
 import { validSatelliteBbox } from "@/lib/satellite/evidence";
 
-type Collection = "aster" | "emit" | "emitMinerals";
+type Collection = "aster" | "emit" | "emitMinerals" | "hls" | "hlsLandsat" | "landsat";
 type Props = { projectId: string; defaultBbox: [number, number, number, number] | null };
 const COLLECTIONS: Array<{
   id: Collection;
@@ -12,6 +12,27 @@ const COLLECTIONS: Array<{
   period: [string, string];
   detail: string;
 }> = [
+  {
+    id: "hls",
+    label: "HLS v2 S30 · Sentinel-2 armonizado · 30 m",
+    period: ["2015-06-23", new Date().toISOString().slice(0, 10)],
+    detail:
+      "Reflectancia de superficie armonizada del instrumento Sentinel-2. Incluye capas de calidad; sirve para ampliar series temporales, pero esta búsqueda solo consulta metadatos.",
+  },
+  {
+    id: "hlsLandsat",
+    label: "HLS v2 L30 · Landsat 8/9 armonizado · 30 m",
+    period: ["2013-04-11", new Date().toISOString().slice(0, 10)],
+    detail:
+      "Reflectancia de superficie Landsat 8/9 armonizada con Sentinel-2 a 30 m. Permite comparaciones temporales más consistentes; esta búsqueda no procesa bandas.",
+  },
+  {
+    id: "landsat",
+    label: "Landsat Collection 2 · Level-2",
+    period: ["1982-08-22", new Date().toISOString().slice(0, 10)],
+    detail:
+      "Reflectancia de superficie Landsat Collection 2 Level-2, útil para contexto histórico multidecenal. La disponibilidad de bandas y sensores varía por escena.",
+  },
   {
     id: "aster",
     label: "ASTER L2 surface reflectance v004 · VNIR/SWIR",
@@ -68,8 +89,9 @@ export function RealMineralSceneCatalog({ projectId, defaultBbox }: Props) {
   const searchFn = useServerFn(searchStac);
   const [collection, setCollection] = useState<Collection>("emitMinerals");
   const [bboxText, setBboxText] = useState(defaultBbox?.join(", ") ?? "");
-  const [dateFrom, setDateFrom] = useState(COLLECTIONS[2].period[0]);
-  const [dateTo, setDateTo] = useState(COLLECTIONS[2].period[1]);
+  const initialCollection = COLLECTIONS.find((source) => source.id === "emitMinerals")!;
+  const [dateFrom, setDateFrom] = useState(initialCollection.period[0]);
+  const [dateTo, setDateTo] = useState(initialCollection.period[1]);
   const [items, setItems] = useState<StacItem[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,16 +130,17 @@ export function RealMineralSceneCatalog({ projectId, defaultBbox }: Props) {
   return (
     <section
       className="space-y-4 rounded-xl border border-hairline bg-surface p-4 md:p-6"
-      aria-label="Catálogo real ASTER y EMIT"
+      aria-label="Catálogo de escenas satelitales"
     >
       <header className="space-y-1">
         <h2 className="flex items-center gap-2 font-display text-xl text-content">
           <Satellite className="h-4 w-4 text-accent-brand" />
-          Catálogo real · ASTER y EMIT
+          Catálogo de escenas · Landsat, HLS, ASTER y EMIT
         </h2>
         <p className="text-xs text-content-subtle">
-          Consulta escenas de NASA para el AOI de {projectId}. El catálogo y las vistas previas son
-          datos reales; una escena disponible no significa que sus píxeles se hayan procesado.
+          Consulta escenas de Microsoft Planetary Computer y NASA para el AOI de {projectId}. El
+          catálogo y las vistas previas son datos reales; una escena disponible no significa que sus
+          píxeles se hayan procesado.
         </p>
       </header>
       <div className="grid gap-3 md:grid-cols-2">
@@ -190,7 +213,7 @@ export function RealMineralSceneCatalog({ projectId, defaultBbox }: Props) {
         className="inline-flex items-center gap-2 rounded border border-accent-brand px-3 py-2 text-xs text-accent-brand disabled:opacity-50"
       >
         {busy && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
-        {busy ? "Consultando NASA…" : "Buscar escenas reales"}
+        {busy ? "Consultando catálogo…" : "Buscar escenas reales"}
       </button>
       {error && (
         <p role="alert" className="text-xs text-brand-danger">
@@ -199,8 +222,8 @@ export function RealMineralSceneCatalog({ projectId, defaultBbox }: Props) {
       )}
       {items.length > 0 && (
         <p role="status" className="text-xs font-mono text-content">
-          {items.length} escenas con fecha de adquisición · {selected.label} · catálogo NASA
-          CMR-STAC. No se han leído píxeles.
+          {items.length} escenas con fecha de adquisición · {selected.label}. No se han leído
+          píxeles.
         </p>
       )}
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">

@@ -58,6 +58,11 @@ const CholquiEvidencePanel = lazy(() =>
     default: m.CholquiEvidencePanel,
   })),
 );
+const LosVerdesTenureSummaryPanel = lazy(() =>
+  import("@/features/losverdes/LosVerdesTenureSummaryPanel").then((m) => ({
+    default: m.LosVerdesTenureSummaryPanel,
+  })),
+);
 const CholquiScenariosPanel = lazy(() =>
   import("@/features/franco/components/CholquiScenariosPanel").then((m) => ({
     default: m.CholquiScenariosPanel,
@@ -296,6 +301,18 @@ function MapaTab({
 
         <Suspense fallback={<Loading label="Cargando programa" />}>
           <div className="mt-6 space-y-6">
+            {view === "2d" && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-surface p-4">
+                <p className="max-w-xl text-xs text-content-subtle">
+                  El informe técnico y el deck incorporan capturas separadas de teledetección y
+                  geofísica desde las capas del visor 2D.
+                </p>
+                <ProjectDocsMenu
+                  label="Exportar mapas e informe"
+                  build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()}
+                />
+              </div>
+            )}
             <CholquiTargetsSummary />
             <CholquiFieldProgramPanel />
           </div>
@@ -429,6 +446,13 @@ function TesisTab({ project }: { project: TerminalProject }) {
         <Suspense fallback={<Loading label="Cargando ensayes" />}>
           <div className="mt-6">
             <CholquiEvidencePanel />
+          </div>
+        </Suspense>
+      )}
+      {project.slug === "losverdes" && (
+        <Suspense fallback={<Loading label="Cargando tenencia y evidencia" />}>
+          <div className="mt-6">
+            <LosVerdesTenureSummaryPanel />
           </div>
         </Suspense>
       )}

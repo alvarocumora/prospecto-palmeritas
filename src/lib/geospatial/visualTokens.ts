@@ -1,6 +1,7 @@
 /** Semantic cartographic colors. CSS tokens are the authority; fallback values support SSR. */
 const fallback = {
   tenureOwn: "#f59e0b",
+  tenureAnnex: "#d6a84f",
   tenureNeighbor: "#94a3b8",
   terrainLow: "#5b6a52",
   terrainMid: "#a3906b",

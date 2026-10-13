@@ -58,7 +58,7 @@ export function LosVerdes3D({
     <ProjectTerrain3D
       slug="losverdes"
       projectId={projectId}
-      notice={`${query.data?.counts.concessions ?? 0} concesiones registradas · ${query.data?.counts.concessionsWithGeom ?? 0} con geometría disponible. No se reconstruyen polígonos faltantes. ${query.data?.geometryLookupWarning ?? ""}`}
+      notice={`${query.data?.tenure?.ownCount ?? 0} concesiones en cartera integrada · ${query.data?.tenure?.ownHa.toLocaleString("es-CL") ?? 0} ha mapeadas; asociación declarada y multi-titular, sujeta a verificación contractual. Objetivo distrital: ${query.data?.tenure?.targetHa.toLocaleString("es-CL") ?? 0} ha, saldo por confirmar.`}
       center={layers.center}
       extentMeters={12000}
       evidenceBundle={layers.evidenceBundle}
