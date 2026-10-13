@@ -12,7 +12,7 @@ export type SentinelRasterScene = {
   datetime: string;
   cloudPct: number | null;
   stacHref: string;
-  assets: Record<SentinelBand, RasterAsset>;
+  assets: Record<SentinelBand, RasterAsset> & { B03?: RasterAsset };
 };
 export type RasterGrid = {
   epsg: number;
@@ -40,6 +40,7 @@ export type SentinelRasterResult = {
   validPixels: number;
   excludedPixels: number;
   geoTiff: ArrayBuffer;
+  rgbGeoTiff: ArrayBuffer;
   preview: {
     type: "FeatureCollection";
     features: Array<{
@@ -52,6 +53,43 @@ export type SentinelRasterResult = {
 };
 const NO_DATA = -9999;
 export const INDEX_ORDER = ["ndvi", "ndmi", "ironOxideRatio", "swirContrast"] as const;
+
+function reflectanceToSrgb(value: number) {
+  const linear = Math.max(0, Math.min(1, value / 0.3));
+  const srgb = linear <= 0.0031308 ? linear * 12.92 : 1.055 * linear ** (1 / 2.4) - 0.055;
+  return Math.round(srgb * 255);
+}
+
+export function encodeSentinelRgbGeoTiff(
+  grid: RasterGrid,
+  rgba: Uint8Array,
+  source: Record<string, unknown> = {},
+) {
+  if (rgba.length !== grid.width * grid.height * 4) throw new Error("RGB_RASTER_SIZE_MISMATCH");
+  const metadata = {
+    width: grid.width,
+    height: grid.height,
+    SamplesPerPixel: 4,
+    BitsPerSample: [8, 8, 8, 8],
+    SampleFormat: [1, 1, 1, 1],
+    PhotometricInterpretation: 2,
+    ExtraSamples: [2],
+    PlanarConfiguration: 1,
+    ModelPixelScale: [grid.resolution, grid.resolution, 0],
+    ModelTiepoint: [0, 0, 0, grid.x, grid.y, 0],
+    GTModelTypeGeoKey: 1,
+    GTRasterTypeGeoKey: 1,
+    ProjectedCSTypeGeoKey: grid.epsg,
+    ImageDescription: JSON.stringify({
+      pipeline: SENTINEL_PIPELINE,
+      bands: ["B04", "B03", "B02", "alpha"],
+      rendering: "BOA reflectance 0–0.3 to sRGB; SCL 4/5 only",
+      provenance: "modelled",
+      source,
+    }),
+  };
+  return writeArrayBuffer(rgba, metadata);
+}
 
 export function utmDefinition(epsg: number) {
   const north = epsg >= 32601 && epsg <= 32660;
@@ -212,6 +250,11 @@ export async function processSentinelRaster(
       tiffs.push(tiff);
       images[key] = await tiff.getImage();
     }
+    const greenHref = scene.assets.B03?.href;
+    if (!greenHref) throw new Error("MISSING_BAND_B03");
+    const greenTiff = await fromUrl(greenHref, {}, signal);
+    tiffs.push(greenTiff);
+    const greenImage = await greenTiff.getImage();
     const reference = images.B11;
     const epsg = imageCrs(reference);
     const crs = utmDefinition(epsg);
@@ -252,11 +295,32 @@ export async function processSentinelRaster(
     const windows = {} as Record<SentinelBand, BandWindow>;
     for (const key of SENTINEL_BANDS)
       windows[key] = await readBand(images[key], grid, scene.assets[key], signal);
+    const greenWindow = await readBand(greenImage, grid, scene.assets.B03!, signal);
     const inverse = proj4(crs, "EPSG:4326");
     const result = computeSentinelGrid(grid, windows, (x, y) => {
       const [lng, lat] = inverse.forward([x, y]);
       return lng >= bbox[0] && lng <= bbox[2] && lat >= bbox[1] && lat <= bbox[3];
     });
+    const rgba = new Uint8Array(grid.width * grid.height * 4);
+    for (let row = 0; row < grid.height; row++) {
+      for (let col = 0; col < grid.width; col++) {
+        const pixel = row * grid.width + col;
+        const x = grid.x + (col + 0.5) * grid.resolution;
+        const y = grid.y - (row + 0.5) * grid.resolution;
+        const [lng, lat] = inverse.forward([x, y]);
+        if (lng < bbox[0] || lng > bbox[2] || lat < bbox[1] || lat > bbox[3]) continue;
+        const scl = valueAt(windows.SCL, x, y);
+        const red = valueAt(windows.B04, x, y);
+        const green = valueAt(greenWindow, x, y);
+        const blue = valueAt(windows.B02, x, y);
+        if (scl !== 4 && scl !== 5) continue;
+        if ([red, green, blue].some((value) => value == null || value <= 0)) continue;
+        rgba[pixel * 4] = reflectanceToSrgb(red!);
+        rgba[pixel * 4 + 1] = reflectanceToSrgb(green!);
+        rgba[pixel * 4 + 2] = reflectanceToSrgb(blue!);
+        rgba[pixel * 4 + 3] = 255;
+      }
+    }
     // Small vector preview for the shared 2D/3D map engines. The scientific
     // GeoTIFF remains the full-resolution deliverable; this is a display mesh.
     const stride = Math.max(1, Math.ceil(Math.sqrt((grid.width * grid.height) / 900)));
@@ -313,6 +377,12 @@ export async function processSentinelRaster(
             },
           ]),
         ),
+      }),
+      rgbGeoTiff: encodeSentinelRgbGeoTiff(grid, rgba, {
+        sceneId: scene.id,
+        acquisitionDate: scene.datetime,
+        stacHref: scene.stacHref,
+        bboxWgs84: bbox,
       }),
       preview,
     };
