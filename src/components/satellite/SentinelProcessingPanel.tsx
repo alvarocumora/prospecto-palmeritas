@@ -88,6 +88,7 @@ export function SentinelProcessingPanel({ projectId, slug, defaultBbox }: Props)
     } finally {
       await history.refetch();
       await queryClient.invalidateQueries({ queryKey: ["sentinel-real-preview", projectId] });
+      await queryClient.invalidateQueries({ queryKey: ["sentinel-terrain-drape", projectId] });
       inFlight.current = false;
       setBusy(null);
     }
