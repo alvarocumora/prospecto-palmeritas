@@ -938,6 +938,7 @@
 /* Shared map and terrain semantic palette. */
 :root {
   --geo-tenureOwn: #f59e0b;
+  --geo-tenureAnnex: #d6a84f;
   --geo-tenureNeighbor: #94a3b8;
   --geo-terrainLow: #5b6a52;
   --geo-terrainMid: #a3906b;

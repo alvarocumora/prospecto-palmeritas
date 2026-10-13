@@ -435,11 +435,17 @@ export function ProjectMasterViewer({
           style: (f?: Feature) =>
             isOwn(f)
               ? {
-                  color: geoColors.tenureOwn,
+                  color:
+                    f?.properties?.fase === "arranque"
+                      ? geoColors.tenureOwn
+                      : geoColors.tenureAnnex,
                   weight: 3,
                   opacity: 1,
-                  fillColor: geoColors.tenureOwn,
-                  fillOpacity: 0.24,
+                  fillColor:
+                    f?.properties?.fase === "arranque"
+                      ? geoColors.tenureOwn
+                      : geoColors.tenureAnnex,
+                  fillOpacity: f?.properties?.fase === "arranque" ? 0.24 : 0.14,
                 }
               : {
                   color: geoColors.tenureNeighbor,
@@ -453,11 +459,14 @@ export function ProjectMasterViewer({
               const p = (f.properties ?? {}) as Record<string, unknown>;
               const name = String(p.nombre ?? p.name ?? p.NOMBRE ?? p.codigo ?? "").trim();
               if (name) {
-                layer.bindTooltip(name, {
-                  permanent: true,
-                  direction: "center",
-                  className: "gc-own-concession-label",
-                });
+                layer.bindTooltip(
+                  `${name}${p.fase === "arranque" ? " · Arranque" : p.fase === "anexo" ? " · Anexo" : ""}`,
+                  {
+                    permanent: true,
+                    direction: "center",
+                    className: "gc-own-concession-label",
+                  },
+                );
               }
             }
             layer.on("click", () =>
@@ -883,6 +892,63 @@ export function ProjectMasterViewer({
       else map.removeLayer(g);
     });
   }, [visible, ready]);
+
+  useEffect(() => {
+    if (!reportMapId || !enableLayerTools) return;
+    let capturing = false;
+    const onCapture = async (event: Event) => {
+      const detail = (
+        event as CustomEvent<{
+          mapId?: string;
+          preset?: "remote_sensing" | "geophysics";
+          resolve?: (image: string | null) => void;
+        }>
+      ).detail;
+      if (detail?.mapId !== reportMapId || !detail.resolve) return;
+      if (capturing || !mapRef.current) {
+        detail.resolve(null);
+        return;
+      }
+      capturing = true;
+      const previous = visible;
+      let image: string | null = null;
+      const next: Record<LayerKey, boolean> = Object.fromEntries(
+        Object.keys(previous).map((key) => [key, false]),
+      ) as Record<LayerKey, boolean>;
+      next.tenencia = true;
+      if (detail.preset === "remote_sensing") {
+        next.halos = true;
+        next.halosIntensidad = true;
+      } else if (detail.preset === "geophysics") {
+        next.magneticaRegional = true;
+        next.gravedadRegional = true;
+        next.geofisicaProyecto = true;
+        next.magSurfaceProject = true;
+        next.ipChargeSurfaceProject = true;
+        next.ipResSurfaceProject = true;
+      }
+      try {
+        setVisible(next);
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
+        mapRef.current?.invalidateSize();
+        const { captureElement } = await import("@/lib/pdf/captureMap");
+        image = await captureElement(`[data-report-map="${reportMapId}"]`, { scale: 2 });
+      } catch {
+        image = null;
+      } finally {
+        setVisible(previous);
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
+        capturing = false;
+        detail.resolve(image);
+      }
+    };
+    window.addEventListener("geocapitals:report-map-preset", onCapture);
+    return () => window.removeEventListener("geocapitals:report-map-preset", onCapture);
+  }, [enableLayerTools, reportMapId, setVisible, visible]);
 
   useEffect(() => {
     if (!ready) return;

@@ -70,6 +70,65 @@ export function ProjectDocsMenu({
         const { captureElement } = await import("@/lib/pdf/captureMap");
         const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
         if (snapshot) model.map.imageDataUrl = snapshot;
+        if (model.map.capturePresets?.length && (kind === "technical" || kind === "deck")) {
+          const captures = await Promise.all(
+            model.map.capturePresets.map(
+              (preset) =>
+                new Promise<string | null>((resolve) => {
+                  const timer = window.setTimeout(() => resolve(null), 12_000);
+                  window.dispatchEvent(
+                    new CustomEvent("geocapitals:report-map-preset", {
+                      detail: {
+                        mapId: model.map?.captureSelector?.match(/data-report-map="([^"]+)"/)?.[1],
+                        preset,
+                        resolve: (image: string | null) => {
+                          window.clearTimeout(timer);
+                          resolve(image);
+                        },
+                      },
+                    }),
+                  );
+                }),
+            ),
+          );
+          const descriptions = {
+            remote_sensing: {
+              title: "Teledetección · capas espectrales",
+              caption:
+                "Vista del visor Sentinel-2 y capas de anomalía derivadas. Es un producto de screening; no identifica minerales ni representa alteración medida en terreno.",
+              source: "Sentinel-2 y capas derivadas del visor del proyecto",
+            },
+            geophysics: {
+              title: "Geofísica · contexto y superficies",
+              caption:
+                "Vista de capas geofísicas disponibles. Distingue observaciones de campo, productos regionales y superficies interpoladas; no constituye una inversión geofísica.",
+              source: "Datos de campo, EMAG2/WGM2012 y superficies IDW del visor",
+            },
+          } as const;
+          model.map.capturePresets.forEach((preset, index) => {
+            const imageDataUrl = captures[index];
+            if (!imageDataUrl) return;
+            const description = descriptions[preset];
+            model.sections.push({
+              eyebrow: "ANEXO CARTOGRÁFICO",
+              title: description.title,
+              blocks: [
+                {
+                  kind: "map",
+                  title: description.title,
+                  imageDataUrl,
+                  caption: description.caption,
+                  imagery: model.map?.imagery,
+                  crs: model.map?.crs,
+                  provenance: "DERIVED",
+                  source: description.source,
+                  confidence: "medium",
+                },
+              ],
+              deck: true,
+            });
+          });
+        }
       }
       await downloadProjectDoc(model, kind);
       toast.success("Documento generado", { id });

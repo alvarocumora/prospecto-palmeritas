@@ -6,6 +6,7 @@ const mocks = vi.hoisted(() => ({
   process: vi.fn(),
   download: vi.fn(),
   refetch: vi.fn(),
+  invalidateQueries: vi.fn(),
 }));
 vi.mock("@/lib/sentinelProcessing.functions", () => ({
   listSentinelProcessingScenes: mocks.list,
@@ -15,6 +16,7 @@ vi.mock("@/lib/sentinelProcessing.functions", () => ({
 vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
 vi.mock("@tanstack/react-query", () => ({
   useQuery: () => ({ data: [], isPending: false, isError: false, refetch: mocks.refetch }),
+  useQueryClient: () => ({ invalidateQueries: mocks.invalidateQueries }),
 }));
 vi.mock("@/integrations/supabase/client", () => ({ supabase: {} }));
 describe("real Sentinel processing workflow", () => {

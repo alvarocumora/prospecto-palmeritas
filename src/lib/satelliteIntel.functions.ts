@@ -31,6 +31,9 @@ type GeoJsonGeometry = {
 const COLLECTIONS = {
   s2: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "sentinel-2-l2a" },
   s1: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "sentinel-1-rtc" },
+  hls: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "hls2-s30" },
+  hlsLandsat: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "hls2-l30" },
+  landsat: { stac: "https://planetarycomputer.microsoft.com/api/stac/v1", id: "landsat-c2-l2" },
   emit: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "EMITL2ARFL_002" },
   emitMinerals: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "EMITL2BMIN_002" },
   aster: { stac: "https://cmr.earthdata.nasa.gov/stac/LPCLOUD", id: "AST_07XT_004" },
@@ -40,7 +43,7 @@ type CollectionKey = keyof typeof COLLECTIONS;
 
 const SearchInput = z.object({
   projectId: z.string().uuid(),
-  collection: z.enum(["s2", "s1", "emit", "emitMinerals", "aster"]),
+  collection: z.enum(["s2", "s1", "hls", "hlsLandsat", "landsat", "emit", "emitMinerals", "aster"]),
   bbox: z
     .tuple([z.number(), z.number(), z.number(), z.number()])
     .refine(validSatelliteBbox, "Invalid geographic AOI"),

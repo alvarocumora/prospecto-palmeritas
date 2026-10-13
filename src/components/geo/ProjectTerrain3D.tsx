@@ -146,7 +146,11 @@ function featureColor(meta: PublicGeoLayerManifestEntry, p: Record<string, unkno
   if (meta.domain === "remote_sensing")
     return SPECTRAL_COLORS[String(p.index_code)] ?? geoColors.ironOxide;
   if (meta.id === "territory.cadastre")
-    return p.es_tenencia_proyecto === true ? geoColors.tenureOwn : geoColors.tenureNeighbor;
+    return p.es_tenencia_proyecto !== true
+      ? geoColors.tenureNeighbor
+      : p.fase === "arranque"
+        ? geoColors.tenureOwn
+        : geoColors.tenureAnnex;
   if (meta.id === "territory.pending_pedimentos") return geoColors.pendingEvidence;
   if (meta.id === "territory.proposed_pedimentos") return geoColors.proposedEvidence;
   if (meta.domain === "sampling") return geoColors.sample;
@@ -186,9 +190,24 @@ function details(
     ["dipText", "Manteo"],
     ["titular", "Titular"],
     ["situacion", "Situación"],
+    ["rol", "Rol SERNAGEOMIN"],
+    ["fase", "Fase de integración"],
+    ["grupo", "Grupo catastral"],
+    ["hectareas", "Superficie (ha)"],
+    ["tenencia_procedencia", "Procedencia de la asociación"],
+    ["tenencia_asociacion", "Criterio de asociación"],
+    ["contrato_verificado", "Contrato verificado"],
   ];
   return {
-    title: String(p.code ?? p.sample_code ?? p.nombre ?? p.name ?? feature.id ?? meta.label),
+    title: String(
+      (meta.id === "territory.cadastre" ? (p.nombre ?? p.name) : undefined) ??
+        p.code ??
+        p.sample_code ??
+        p.nombre ??
+        p.name ??
+        feature.id ??
+        meta.label,
+    ),
     lines: [
       meta.label + " · " + featureEvidence(meta, p),
       ...fields.flatMap(([key, label]) => (p[key] != null ? [label + ": " + String(p[key])] : [])),
@@ -678,14 +697,21 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
             className="mr-1 inline-block h-2 w-2"
             style={{ background: "var(--geo-tenureOwn)" }}
           />
-          Tenencia del proyecto · DECLARADO
+          Arranque · cartera declarada
+        </span>
+        <span>
+          <span
+            className="mr-1 inline-block h-2 w-2"
+            style={{ background: "var(--geo-tenureAnnex)" }}
+          />
+          Anexos · cartera declarada
         </span>
         <span>
           <span
             className="mr-1 inline-block h-2 w-2"
             style={{ background: "var(--geo-tenureNeighbor)" }}
           />
-          Catastro de contexto · verificar tenencia
+          Vecinos · contexto catastral
         </span>
       </div>
       <details className="border-t border-hairline px-4 py-3 text-xs">

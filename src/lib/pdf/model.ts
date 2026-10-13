@@ -128,6 +128,8 @@ export type ProjectDoc = {
     crs?: string;
     imagery?: string;
     snapshotManifest?: GeoSnapshotManifest;
+    /** Capturas temáticas del visor 2D activo para anexar al informe técnico/deck. */
+    capturePresets?: Array<"remote_sensing" | "geophysics">;
   };
   dataQuality?: DataQualityFlag[];
   milestones?: Array<{ when: string; what: string }>;
