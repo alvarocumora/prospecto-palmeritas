@@ -40,8 +40,9 @@ export function parseSentinelRadiometry(xml: string, baseline: string) {
     /<BOA_ADD_OFFSET\b[^>]*band_id=["'](\d+)["'][^>]*>([^<]+)<\/BOA_ADD_OFFSET>/g,
   ))
     offsets.set(Number(match[1]), Number(match[2]));
-  const ids: Record<Exclude<SentinelBand, "SCL">, number> = {
+  const ids: Record<Exclude<SentinelBand, "SCL"> | "B03", number> = {
     B02: 1,
+    B03: 2,
     B04: 3,
     B08: 7,
     B11: 11,
@@ -55,7 +56,10 @@ export function parseSentinelRadiometry(xml: string, baseline: string) {
       if (!Number.isFinite(offset)) throw new Error(`MISSING_BOA_OFFSET_${key}`);
       return [key, { scale: 1 / quantification, offset: offset / quantification, nodata: 0 }];
     }),
-  ) as Record<Exclude<SentinelBand, "SCL">, { scale: number; offset: number; nodata: number }>;
+  ) as Record<
+    Exclude<SentinelBand, "SCL"> | "B03",
+    { scale: number; offset: number; nodata: number }
+  >;
 }
 export async function loadSentinelRasterScene(
   id: string,
@@ -94,6 +98,12 @@ export async function loadSentinelRasterScene(
       ...(band === "SCL" ? { scale: 1, offset: 0, nodata: 0 } : radiometry[band]),
     };
   }
+  const greenHref = item.assets?.B03?.href;
+  if (!greenHref) throw new Error("MISSING_BAND_B03");
+  assets.B03 = {
+    href: await signAsset(greenHref, signal),
+    ...radiometry.B03,
+  };
   return {
     id,
     datetime,
