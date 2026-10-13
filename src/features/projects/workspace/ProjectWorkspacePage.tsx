@@ -147,6 +147,8 @@ export function ProjectWorkspacePage({
             projectId={projectId}
             mode={view}
             onModeChange={onViewChange}
+            showModeToggle={false}
+            compactHeader
           />
         ) : panel === "satelite" ? (
           <CholquiSatellitePanel />

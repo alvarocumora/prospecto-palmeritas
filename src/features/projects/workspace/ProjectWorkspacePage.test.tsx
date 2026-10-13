@@ -22,8 +22,24 @@ vi.mock("@tanstack/react-router", () => ({
   Link: ({ children, to }: { children: ReactNode; to: string }) => <a href={to}>{children}</a>,
 }));
 vi.mock("@/components/geo/ProjectWorkspaceViewer", () => ({
-  ProjectWorkspaceViewer: ({ projectId, mode }: { projectId: string; mode: string }) => (
-    <div data-testid="viewer">{projectId + ":" + mode}</div>
+  ProjectWorkspaceViewer: ({
+    projectId,
+    mode,
+    compactHeader,
+    showModeToggle,
+  }: {
+    projectId: string;
+    mode: string;
+    compactHeader?: boolean;
+    showModeToggle?: boolean;
+  }) => (
+    <div
+      data-testid="viewer"
+      data-compact-header={compactHeader}
+      data-show-mode-toggle={showModeToggle}
+    >
+      {projectId + ":" + mode}
+    </div>
   ),
 }));
 
@@ -88,5 +104,7 @@ describe("canonical workspace isolation", () => {
       />,
     );
     expect(screen.getByTestId("viewer")).toHaveTextContent(state.active.id + ":3d");
+    expect(screen.getByTestId("viewer")).toHaveAttribute("data-show-mode-toggle", "false");
+    expect(screen.getByTestId("viewer")).toHaveAttribute("data-compact-header", "true");
   });
 });

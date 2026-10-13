@@ -384,6 +384,7 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   const bundle = useMemo(() => props.evidenceBundle ?? projectBundle(props), [props]);
   const initial = useMemo(
     (): Record<string, boolean> => ({
+      "territory.dem": true,
       "geophysics.project_stations": true,
       "geophysics.mag_idw": false,
       "geophysics.ip_chargeability_idw": false,
@@ -402,7 +403,6 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   const [primaryOnly, setPrimaryOnly] = useState(false);
   const [view, setView] = useState<"perspective" | "plan">("perspective");
   const [reset, setReset] = useState(0);
-  const [terrainOpacity, setTerrainOpacity] = useState(0.9);
   const available = useMemo(() => new Set(bundle.manifest.layers.map((meta) => meta.id)), [bundle]);
   const counts = useMemo(
     () =>
@@ -466,6 +466,133 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
     setHover(null);
   }, [visible, opacity, primaryOnly, metric, campaignKey]);
   const terrainFailure = dem.isError || (!dem.isPending && !tile);
+  const geophysicsControls = (
+    <div className="space-y-3 text-[10px] text-content-subtle">
+      <label className="grid gap-1">
+        Campaña
+        <select
+          aria-label="Campaña geofísica"
+          value={campaign?.key ?? ""}
+          disabled={!campaigns.length}
+          onChange={(event) => setCampaignKey(event.target.value)}
+          className="rounded border border-hairline bg-surface px-2 py-1"
+        >
+          {!campaigns.length && <option value="">Sin estaciones disponibles</option>}
+          {campaigns.map((item) => (
+            <option key={item.key} value={item.key}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="grid gap-1">
+        Variable
+        <select
+          aria-label="Variable geofísica"
+          value={metric}
+          onChange={(event) => setMetric(event.target.value as GeophysicsSurfaceMetric)}
+          className="rounded border border-hairline bg-surface px-2 py-1"
+        >
+          {METRICS.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={Boolean(visible["geophysics.project_stations"])}
+          onChange={(event) =>
+            setVisible((state) => ({
+              ...state,
+              "geophysics.project_stations": event.target.checked,
+            }))
+          }
+        />
+        Estaciones y líneas medidas
+      </label>
+      <label className="flex items-center gap-2">
+        <input
+          type="checkbox"
+          checked={Boolean(visible[metricSpec.layer])}
+          disabled={!fieldSurface || primaryOnly}
+          onChange={(event) =>
+            setVisible((state) => ({ ...state, [metricSpec.layer]: event.target.checked }))
+          }
+        />
+        Superficie IDW
+      </label>
+      <label className="flex items-center gap-2">
+        Opacidad IDW
+        <input
+          aria-label="Opacidad geofísica"
+          type="range"
+          min={0}
+          max={1}
+          step={0.05}
+          value={opacity[metricSpec.layer] ?? 1}
+          onChange={(event) =>
+            setOpacity((state) => ({ ...state, [metricSpec.layer]: Number(event.target.value) }))
+          }
+          className="w-20"
+        />
+      </label>
+      {geophysicsQuery.loading && <p role="status">Consultando estaciones del proyecto…</p>}
+      {geophysicsQuery.error && (
+        <p role="alert">No fue posible consultar la geofísica del proyecto.</p>
+      )}
+      {!geophysicsQuery.loading && !geophysicsQuery.error && !field.stations.length && (
+        <p>No hay estaciones de campo disponibles con este acceso; el DEM no genera geofísica.</p>
+      )}
+      {fieldSurface && (
+        <>
+          <div className="flex items-center gap-2" aria-label="Escala de color geofísica">
+            <span>{fieldSurface.min.toFixed(2)}</span>
+            <span
+              className="h-2 min-w-0 flex-1 rounded"
+              style={{
+                background:
+                  "linear-gradient(to right, " +
+                  [0, 0.5, 1]
+                    .map((fraction) =>
+                      geophysicsSurfaceColor(
+                        fieldSurface,
+                        fraction,
+                        fieldSurface.min + fraction * (fieldSurface.max - fieldSurface.min),
+                      ),
+                    )
+                    .join(", ") +
+                  ")",
+              }}
+            />
+            <span>
+              {fieldSurface.max.toFixed(2)} {fieldSurface.unit}
+            </span>
+          </div>
+          <p>
+            Rango IDW: {fieldSurface.min.toFixed(2)}–{fieldSurface.max.toFixed(2)}{" "}
+            {fieldSurface.unit} · {fieldSurface.sourceCount} estaciones de {campaign?.label}.
+            {fieldSurface.baseline != null &&
+              ` Mediana TMI: ${fieldSurface.baseline.toFixed(2)} nT.`}
+          </p>
+        </>
+      )}
+      {!fieldSurface && stations.length > 0 && (
+        <p>
+          Sin superficie: se requieren al menos cuatro posiciones únicas con datos y extensión en
+          dos direcciones.
+        </p>
+      )}
+      <p>
+        El color expresa la variable; la altura proviene del DEM. IDW es interpolación, no
+        inversión. Restar la mediana no acredita corrección diurna ni IGRF; las campañas no se
+        mezclan.
+      </p>
+      {primaryOnly && <p>Modo evidencia primaria: la superficie derivada está oculta.</p>}
+    </div>
+  );
 
   return (
     <div className="overflow-hidden rounded-xl border border-hairline bg-surface">
@@ -535,7 +662,9 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
             <ambientLight intensity={0.7} />
             <directionalLight position={[120, 180, 100]} intensity={1.4} />
             <Suspense fallback={null}>
-              <Terrain tile={tile} opacity={terrainOpacity} />
+              {visible["territory.dem"] && (
+                <Terrain tile={tile} opacity={opacity["territory.dem"] ?? 0.9} />
+              )}
               <CholquiGeophysicsTerrainLayer
                 tile={tile}
                 stations={stations}
@@ -654,6 +783,21 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
               onOpacity={(id, value) => setOpacity((state) => ({ ...state, [id]: value }))}
               counts={counts}
               compact
+              tree
+              terrain={{
+                visible: Boolean(visible["territory.dem"]),
+                opacity: opacity["territory.dem"] ?? 0.9,
+                onToggle: () =>
+                  setVisible((state) => ({ ...state, "territory.dem": !state["territory.dem"] })),
+                onOpacity: (value) => setOpacity((state) => ({ ...state, "territory.dem": value })),
+              }}
+              sections={[
+                {
+                  id: "geophysics-field",
+                  label: `Geofísica MAG/IP · ${field.stations.length} estaciones disponibles`,
+                  children: geophysicsControls,
+                },
+              ]}
             />
           </div>
         )}
@@ -676,18 +820,6 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
                         : "Alteración hidrotermal"}
                   </span>
                 ))}
-            <label className="mt-2 flex items-center gap-2">
-              Opacidad del terreno
-              <input
-                type="range"
-                min={0.1}
-                max={1}
-                step={0.05}
-                value={terrainOpacity}
-                onChange={(event) => setTerrainOpacity(Number(event.target.value))}
-                className="w-20"
-              />
-            </label>
           </div>
         )}
       </div>
@@ -714,148 +846,6 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
           Vecinos · contexto catastral
         </span>
       </div>
-      <details className="border-t border-hairline px-4 py-3 text-xs">
-        <summary className="cursor-pointer font-semibold text-content">
-          Geofísica sobre el terreno · {field.stations.length} estaciones de campo disponibles
-        </summary>
-        <div className="mt-3 flex flex-wrap items-end gap-3">
-          <label className="grid gap-1">
-            Campaña
-            <select
-              aria-label="Campaña geofísica"
-              value={campaign?.key ?? ""}
-              disabled={!campaigns.length}
-              onChange={(event) => setCampaignKey(event.target.value)}
-              className="rounded border border-hairline bg-surface px-2 py-1"
-            >
-              {!campaigns.length && <option value="">Sin estaciones disponibles</option>}
-              {campaigns.map((item) => (
-                <option key={item.key} value={item.key}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-1">
-            Variable
-            <select
-              aria-label="Variable geofísica"
-              value={metric}
-              onChange={(event) => setMetric(event.target.value as GeophysicsSurfaceMetric)}
-              className="rounded border border-hairline bg-surface px-2 py-1"
-            >
-              {METRICS.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={Boolean(visible["geophysics.project_stations"])}
-              onChange={(event) =>
-                setVisible((state) => ({
-                  ...state,
-                  "geophysics.project_stations": event.target.checked,
-                }))
-              }
-            />
-            Estaciones y líneas medidas
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={Boolean(visible[metricSpec.layer])}
-              disabled={!fieldSurface || primaryOnly}
-              onChange={(event) =>
-                setVisible((state) => ({
-                  ...state,
-                  [metricSpec.layer]: event.target.checked,
-                }))
-              }
-            />
-            Superficie IDW
-          </label>
-          <label className="flex items-center gap-2">
-            Opacidad IDW
-            <input
-              aria-label="Opacidad geofísica"
-              type="range"
-              min={0}
-              max={1}
-              step={0.05}
-              value={opacity[metricSpec.layer] ?? 1}
-              onChange={(event) =>
-                setOpacity((state) => ({
-                  ...state,
-                  [metricSpec.layer]: Number(event.target.value),
-                }))
-              }
-              className="w-20"
-            />
-          </label>
-        </div>
-        <div className="mt-3 space-y-1 text-content-subtle">
-          {geophysicsQuery.loading && <p role="status">Consultando estaciones del proyecto…</p>}
-          {geophysicsQuery.error && (
-            <p role="alert">No fue posible consultar la geofísica del proyecto.</p>
-          )}
-          {!geophysicsQuery.loading && !geophysicsQuery.error && !field.stations.length && (
-            <p>
-              No hay estaciones de campo disponibles para el proyecto con este acceso. Carga una
-              campaña MAG/IP para visualizarla; el relieve por sí solo no genera geofísica.
-            </p>
-          )}
-          {fieldSurface && (
-            <div className="flex items-center gap-2" aria-label="Escala de color geofísica">
-              <span>{fieldSurface.min.toFixed(2)}</span>
-              <span
-                className="h-2 w-36 rounded"
-                style={{
-                  background:
-                    "linear-gradient(to right, " +
-                    [0, 0.5, 1]
-                      .map((fraction) =>
-                        geophysicsSurfaceColor(
-                          fieldSurface,
-                          fraction,
-                          fieldSurface.min + fraction * (fieldSurface.max - fieldSurface.min),
-                        ),
-                      )
-                      .join(", ") +
-                    ")",
-                }}
-              />
-              <span>
-                {fieldSurface.max.toFixed(2)} {fieldSurface.unit}
-              </span>
-            </div>
-          )}
-          {fieldSurface ? (
-            <p>
-              Rango IDW: {fieldSurface.min.toFixed(2)} a {fieldSurface.max.toFixed(2)}{" "}
-              {fieldSurface.unit}
-              {" · "}
-              {fieldSurface.sourceCount} estaciones de {campaign?.label}.
-              {fieldSurface.baseline != null &&
-                " Mediana TMI: " + fieldSurface.baseline.toFixed(2) + " nT."}
-            </p>
-          ) : stations.length > 0 ? (
-            <p>
-              Sin superficie para esta variable: se requieren al menos cuatro posiciones únicas con
-              datos y extensión en dos direcciones.
-            </p>
-          ) : null}
-          <p>
-            El color expresa la variable numérica; la altura proviene del DEM. IDW no es inversión.
-            Restar la mediana no acredita corrección diurna ni IGRF; campañas y datos simulados no
-            se mezclan.
-          </p>
-          {primaryOnly && <p>Modo evidencia primaria: la superficie derivada está oculta.</p>}
-        </div>
-      </details>
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-hairline px-4 py-3">
         <p className="max-w-2xl text-xs text-content-subtle">
           Estimación mineral: pendiente de sondajes ejecutados, dominios, densidad y QA/QC. DEM y

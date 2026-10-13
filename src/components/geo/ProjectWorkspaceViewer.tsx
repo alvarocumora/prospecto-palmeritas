@@ -14,6 +14,7 @@ export function ProjectWorkspaceViewer({
   mode,
   defaultMode = "2d",
   onModeChange,
+  showModeToggle = true,
   heightClassName = "min-h-[620px]",
   compactHeader = false,
 }: {
@@ -25,6 +26,7 @@ export function ProjectWorkspaceViewer({
   mode?: ProjectView;
   defaultMode?: ProjectView;
   onModeChange?: (mode: ProjectView) => void;
+  showModeToggle?: boolean;
   heightClassName?: string;
   compactHeader?: boolean;
 }) {
@@ -63,27 +65,31 @@ export function ProjectWorkspaceViewer({
       data-geo-preset={view === "2d" ? twoD : threeD}
       data-project-id={projectId}
     >
-      <header className="flex items-center justify-between gap-3 border-b border-border px-3 py-2">
-        {!compactHeader && <h2 className="text-sm font-semibold">{title ?? project.name}</h2>}
-        <div className="ml-auto flex gap-1">
-          {(["2d", "3d"] as const).map((key) => {
-            const Icon = key === "2d" ? MapIcon : Box;
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => changeMode(key)}
-                aria-pressed={view === key}
-                className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs ${
-                  view === key ? "border-primary text-primary" : "border-border"
-                }`}
-              >
-                <Icon className="h-3 w-3" /> {key.toUpperCase()}
-              </button>
-            );
-          })}
-        </div>
-      </header>
+      {(!compactHeader || showModeToggle) && (
+        <header className="flex items-center justify-between gap-3 border-b border-border px-3 py-2">
+          {!compactHeader && <h2 className="text-sm font-semibold">{title ?? project.name}</h2>}
+          {showModeToggle && (
+            <div className="ml-auto flex gap-1">
+              {(["2d", "3d"] as const).map((key) => {
+                const Icon = key === "2d" ? MapIcon : Box;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => changeMode(key)}
+                    aria-pressed={view === key}
+                    className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs ${
+                      view === key ? "border-primary text-primary" : "border-border"
+                    }`}
+                  >
+                    <Icon className="h-3 w-3" /> {key.toUpperCase()}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </header>
+      )}
       <div className={`relative min-h-[620px]`}>
         <WorkspaceProjectLayers key={project.id} project={project} view={view} />
       </div>

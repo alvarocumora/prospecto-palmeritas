@@ -44,5 +44,18 @@ describe("project workspace isolation", () => {
     render(<ProjectWorkspaceViewer projectId="second" mode="3d" />);
     expect(screen.getByTestId("scene")).toBeInTheDocument();
     expect(screen.queryByTestId("map")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /2d/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /3d/i })).toBeInTheDocument();
+  });
+
+  it("can leave mode selection to the project section navigation", () => {
+    context.active = context.projects[1];
+    render(
+      <ProjectWorkspaceViewer projectId="second" mode="3d" compactHeader showModeToggle={false} />,
+    );
+    expect(screen.getByTestId("scene")).toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Proyecto B" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /2d/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /3d/i })).not.toBeInTheDocument();
   });
 });

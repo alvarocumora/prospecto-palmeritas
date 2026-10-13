@@ -10,6 +10,10 @@ import {
   processSentinelScene,
 } from "@/lib/sentinelProcessing.functions";
 import { validSatelliteBbox } from "@/lib/satellite/evidence";
+import {
+  COMPARABLE_SENTINEL_INDICES,
+  comparableSentinelRuns,
+} from "@/lib/remote-sensing/sentinelRunComparison";
 
 type Props = {
   projectId: string;
@@ -40,7 +44,9 @@ export function SentinelProcessingPanel({ projectId, slug, defaultBbox }: Props)
     queryFn: async () => {
       const { data, error } = await supabase
         .from("satellite_analysis_runs")
-        .select("id,status,external_scene_id,created_at,stats,content_hash,error_message")
+        .select(
+          "id,status,external_scene_id,created_at,stats,source_metadata,bbox,content_hash,error_message",
+        )
         .eq("project_id", projectId)
         .eq("pipeline_version", "sentinel2-l2a-indices-v1")
         .order("created_at", { ascending: false })
@@ -108,6 +114,34 @@ export function SentinelProcessingPanel({ projectId, slug, defaultBbox }: Props)
   }
   const inputClass =
     "w-full rounded border border-hairline bg-surface px-3 py-2 font-mono text-xs text-content";
+  const comparableRuns = comparableSentinelRuns(history.data ?? [], bbox);
+  function downloadComparisonCsv() {
+    const headings = [
+      "fecha_adquisicion",
+      "scene_id",
+      "pixeles_validos",
+      ...COMPARABLE_SENTINEL_INDICES,
+    ];
+    const rows = comparableRuns.map((run) => [
+      run.acquisitionDate,
+      run.sceneId,
+      String(run.validPixels),
+      ...COMPARABLE_SENTINEL_INDICES.map((index) =>
+        run.means[index] == null ? "" : run.means[index]!.toFixed(6),
+      ),
+    ]);
+    const escape = (value: string) => `"${value.replaceAll('"', '""')}"`;
+    const blob = new Blob(
+      [[headings, ...rows].map((row) => row.map(escape).join(",")).join("\r\n")],
+      { type: "text/csv;charset=utf-8" },
+    );
+    const href = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = href;
+    anchor.download = `Sentinel2_comparacion_${slug ?? "proyecto"}.csv`;
+    anchor.click();
+    URL.revokeObjectURL(href);
+  }
   return (
     <section
       className="space-y-4 rounded-xl border border-hairline bg-surface p-4 md:p-6"
@@ -223,6 +257,65 @@ export function SentinelProcessingPanel({ projectId, slug, defaultBbox }: Props)
         </p>
       )}
       <div className="space-y-2">
+        <section className="space-y-3 rounded border border-hairline bg-surface p-3">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="font-mono text-xs text-content">Comparación temporal · mismo AOI</h3>
+            {comparableRuns.length > 1 && (
+              <button
+                type="button"
+                onClick={downloadComparisonCsv}
+                className="text-xs text-accent-brand hover:underline"
+              >
+                Descargar CSV
+              </button>
+            )}
+          </div>
+          <p className="text-xs leading-relaxed text-content-subtle">
+            Medias agregadas de corridas Sentinel-2 exitosas para el AOI actual. Cada escena puede
+            tener distinta máscara de nubes y píxeles válidos; la tabla no es un análisis de cambio
+            píxel a píxel ni confirma alteración o mineralización.
+          </p>
+          {comparableRuns.length > 1 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[680px] text-left text-xs">
+                <thead className="font-mono text-content-subtle">
+                  <tr className="border-b border-hairline">
+                    <th className="py-2 pr-3">Adquisición</th>
+                    <th className="py-2 pr-3">Escena</th>
+                    <th className="py-2 pr-3 text-right">Píxeles</th>
+                    {COMPARABLE_SENTINEL_INDICES.map((index) => (
+                      <th key={index} className="py-2 pl-3 text-right">
+                        {index}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="font-mono text-content">
+                  {comparableRuns.map((run) => (
+                    <tr key={run.id} className="border-b border-hairline last:border-0">
+                      <td className="py-2 pr-3 tabular-nums">{run.acquisitionDate}</td>
+                      <td className="max-w-40 truncate py-2 pr-3" title={run.sceneId}>
+                        {run.sceneId}
+                      </td>
+                      <td className="py-2 pr-3 text-right tabular-nums">
+                        {run.validPixels.toLocaleString("es-CL")}
+                      </td>
+                      {COMPARABLE_SENTINEL_INDICES.map((index) => (
+                        <td key={index} className="py-2 pl-3 text-right tabular-nums">
+                          {run.means[index]?.toFixed(4) ?? "—"}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="text-xs text-content-subtle">
+              Procesa al menos dos escenas exitosas del AOI actual para habilitar la comparación.
+            </p>
+          )}
+        </section>
         <h3 className="text-xs font-mono text-content">Corridas del proyecto</h3>
         {history.isPending && (
           <p role="status" className="text-xs text-content-subtle">
