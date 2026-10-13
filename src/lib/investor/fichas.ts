@@ -107,7 +107,7 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     slug: "losverdes",
     code: "LOSVERDES",
     name: "Los Verdes",
-    region: "Petorca · Valparaíso",
+    region: "Los Vilos · Choapa · Coquimbo",
     country: "Chile",
     commodity: "Cu-Mo",
     stage: "Exploración avanzada · compliance en curso",

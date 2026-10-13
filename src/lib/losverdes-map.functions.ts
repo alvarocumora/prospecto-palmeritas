@@ -28,6 +28,7 @@ export type LosVerdesMapData = {
   satAnomalies: FC;
   magAnomalies: FC;
   samples: FC;
+  tenure: { ownHa: number; ownCount: number; neighborHa: number; neighborCount: number; targetHa: number };
   counts: {
     concessions: number;
     concessionsWithGeom: number;
@@ -379,8 +380,9 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
       satAnomalies,
       magAnomalies,
       samples,
+      tenure,
       counts: {
-        concessions: cons?.length ?? 0,
+        concessions: concessions.features.filter((f) => f.properties.es_tenencia_proyecto).length,
         concessionsWithGeom: concessions.features.filter((f) => f.geometry != null).length,
         targets: targets.features.length,
         satAnomalies: satAnomalies.features.length,
