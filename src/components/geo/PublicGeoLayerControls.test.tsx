@@ -56,4 +56,44 @@ describe("public layer controls", () => {
     fireEvent.change(official, { target: { value: "0.4" } });
     expect(onOpacity).toHaveBeenCalledWith("territory.cadastre", 0.4);
   });
+
+  it("renders the project object tree with DEM, grouped evidence and custom geophysics controls", () => {
+    const onTerrainToggle = vi.fn();
+    const onTerrainOpacity = vi.fn();
+    render(
+      <PublicGeoLayerControls
+        manifest={manifest}
+        available={available}
+        visible={available}
+        certificationMode={false}
+        onToggleLayer={vi.fn()}
+        onToggleCertification={vi.fn()}
+        tree
+        terrain={{
+          visible: true,
+          opacity: 0.8,
+          onToggle: onTerrainToggle,
+          onOpacity: onTerrainOpacity,
+        }}
+        sections={[{ id: "geophysics", label: "Geofísica MAG/IP", children: <p>Campañas</p> }]}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /árbol del proyecto/i })).toHaveAttribute(
+      "aria-expanded",
+      "true",
+    );
+    expect(screen.getByRole("heading", { name: "Superficie" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Tenencia y territorio" })).toBeInTheDocument();
+    expect(screen.getByText("Geofísica MAG/IP")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("checkbox", { name: "Mostrar topografía DEM Copernicus" }));
+    fireEvent.change(
+      screen.getByRole("slider", { name: "Opacidad de la topografía DEM Copernicus" }),
+      {
+        target: { value: "0.5" },
+      },
+    );
+    expect(onTerrainToggle).toHaveBeenCalledOnce();
+    expect(onTerrainOpacity).toHaveBeenCalledWith(0.5);
+  });
 });

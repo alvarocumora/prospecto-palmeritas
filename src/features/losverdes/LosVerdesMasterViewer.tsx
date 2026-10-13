@@ -76,7 +76,9 @@ export function LosVerdesMasterViewer() {
             ],
           ].map(([k, v, d]) => (
             <div key={k} className="bg-surface p-4">
-              <p className="font-mono text-[10px] uppercase tracking-wider text-content-subtle">{k}</p>
+              <p className="font-mono text-[10px] uppercase tracking-wider text-content-subtle">
+                {k}
+              </p>
               <p className="mt-1 font-serif text-2xl text-content">{v}</p>
               <p className="mt-1 text-xs text-content-subtle">{d}</p>
             </div>

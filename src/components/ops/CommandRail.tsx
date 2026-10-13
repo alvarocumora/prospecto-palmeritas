@@ -153,6 +153,8 @@ export function CommandRail({
                       key={it.to}
                       to={it.to}
                       title={it.label}
+                      aria-label={it.label}
+                      aria-current={active ? "page" : undefined}
                       className={cn(
                         "group relative flex items-center h-8 mx-1.5 rounded-[3px] font-mono text-[11px] transition-colors",
                         expanded ? "gap-2.5 px-2.5" : "justify-center px-0",

@@ -1,0 +1,70 @@
+# Plan para ordenar flujo, visor y dashboard
+
+**Base revisada:** `main` y `origin/main`, SHA `00684bb580c5b23500b659bfa101c08cd61e0c49` (13 oct 2026). Revisión estática del código y rutas; no se hizo una sesión de usuario autenticada ni una prueba visual en navegador. El trabajo local no comprometido de Sentinel se dejó intacto y fuera de esta revisión. Sin commit, push ni publicación.
+
+## Diagnóstico verificado
+
+La plataforma ya tiene piezas de una arquitectura ordenada, pero esas piezas no forman todavía un recorrido único entre ellas:
+
+1. **El shell autenticado sí está consolidado.** `src/routes/_authenticated.tsx` monta `TopBar`, `CommandRail`, `ModuleSwitcher`, `WorkspaceTabs`, barra de estado, navegación móvil y control de acceso. `src/lib/workspace.ts` es la fuente de navegación y pestañas. Por eso no conviene iniciar reescribiendo el dashboard ni creando otro AppShell.
+2. **La jerarquía sigue siendo extensa.** Hay 180 archivos de ruta en `src/routes/`; 85 rutas pertenecen a módulos `/dashboard` autenticados. La navegación agrupa secciones, pero algunas pantallas tienen hasta nueve pestañas y el rail cambia según el espacio seleccionado. Es una jerarquía codificada, no evidencia de que las etiquetas, orden y prioridades sean comprensibles para cada rol.
+3. **Hay tres contextos de proyecto que pueden confundirse.** El dashboard privado usa IDs de proyecto y secciones `/projects/$projectId/$section`; el terminal público usa slugs y pestañas `/terminal/$slug?tab=...`; y sobreviven rutas de dashboards/visores específicos (`/live.*`, `/dashboard/cholqui`, `/dashboard/palmeras`, entre otras). Una ficha privada puede abrir el terminal público en otra pestaña. La selección global del dashboard y la selección del terminal no son el mismo estado.
+4. **El visor no tiene un punto de entrada operativo único.** `/catastro/mapa` combina explorar catastro y mis proyectos; el workspace privado incluye mapa y modelo; el terminal público incluye mapa, satelital y modelo por proyecto. También existen `/satelital`, `/visor-3d`, `/dashboard/map`, `/dashboard/sat3d` y vistas de proyecto heredadas. `/visor-3d` redirige al terminal solo cuando la selección permite resolver un proyecto sin anomalía/InSAR; por lo demás conserva una vista propia. El resultado son rutas con propósitos próximos y persistencia distinta.
+5. **La vista 2D/3D persiste de forma desigual.** El terminal público serializa `tab` y `view` en la URL. El workspace privado acepta `view` en búsqueda y ofrece secciones de proyecto, pero `ProjectWorkspaceViewer` también mantiene un modo local cuando no recibe `mode`. Hay que acordar qué ajustes son estado compartido y cuáles pertenecen a cada modo antes de unificar el chrome.
+6. **El contenido del terminal varía por proyecto.** `ProjectTerminalShell` comparte encabezado y pestañas, pero ramas por proyecto montan combinaciones distintas de visor, evidencia, paneles y descargas. Es razonable que cambie la evidencia disponible; falta que la estructura, los estados vacíos y la acción siguiente sean predecibles.
+7. **El modelo de evidencia ya ofrece una base útil.** El workspace compone capas de catastro y targets con metadatos de procedencia, y el terminal tiene exportaciones institucionales. La organización del producto debe mantener visibles origen, fecha, cobertura y limitaciones; no presentar modelos como mediciones ni dar a NI 43-101/JORC apariencia de certificación.
+
+La revisión confirma duplicación de entradas y contextos en el código; **no** demuestra que todos los usuarios vean cada ruta, que un flujo concreto falle con datos reales, ni cuáles son las cinco tareas más frecuentes. Esos puntos requieren pruebas moderadas por rol y métricas de uso.
+
+## Flujo objetivo
+
+Usar una misma secuencia y vocabulario en todos los módulos:
+
+**Elegir espacio → elegir proyecto o cartera → revisar evidencia → ejecutar una acción → volver al mismo contexto o exportar.**
+
+- Espacios principales: **Explorar** (catastro, capas, satélite y geociencia), **Proyectos** (ficha, exploración, evidencia y documentos), **Capital** (oportunidades, deal flow y portafolio), **Comercialización** (lotes, RFQ, operaciones y logística). **Administración** queda claramente separada como espacio de soporte.
+- El selector de proyecto debe explicar su alcance: proyecto activo, cartera completa o vista pública. Cambiarlo actualiza el contenido y conserva filtros compatibles; no convierte silenciosamente una selección privada en un activo público.
+- `/catastro/mapa` queda como puerta de catastro; `/terminal/$slug` como puerta pública del activo; `/projects/$projectId/...` como espacio de trabajo privado. Las rutas antiguas se mantienen temporalmente como alias con redirección explícita y contexto preservado, o se retiran solo después de verificar enlaces externos.
+- Cada pantalla comienza con título claro, proyecto/alcance visible, estado de datos y una acción primaria. Evitar menús con alternativas duplicadas para la misma tarea.
+
+## Plan priorizado
+
+| Fase | Trabajo | Cierre verificable |
+|---|---|---|
+| **0. Línea base de tareas** | Probar con usuario operador/exploración, analista/inversionista y administrador. Pedirles completar: encontrar proyecto y concesiones; abrir una capa satelital; alternar 2D/3D; localizar evidencia y origen; generar PDF; retomar el proyecto tras navegar. Registrar pantalla inicial, clics, tiempo, errores, dudas y dispositivo. Revisar analítica disponible para frecuencia de rutas. | Mapa de tareas con severidad y frecuencia observada; separar defectos, etiquetas confusas y diferencias por rol. No priorizar por intuición solamente. |
+| **1. Inventario y destinos canónicos** | Clasificar las 180 rutas por público/privado, rol, propósito, shell, dato de proyecto y destino de retorno. Marcar rutas duplicadas, heredadas y API sin mezclarlas con navegación. Especificar una tabla de redirecciones para `/satelital`, `/visor-3d`, rutas `/live.*`, dashboards específicos y mapas secundarios. | Cada pantalla de usuario tiene dueño, destino canónico, rol y decisión (mantener, alias, fusionar o retirar); ningún enlace de navegación termina en una pantalla sorpresa o ruta vacía. |
+| **2. Proyecto como contexto consistente** | Unificar el contrato de navegación privado: ID de proyecto y búsqueda tipada en URL; slug solo en enlaces públicos. Usar breadcrumb y selector global con alcance explícito. Definir retorno, deep-link y autenticación para conservar destino; sincronizar estado global solo donde sea seguro. | Abrir enlace directo, cambiar sección y proyecto, refrescar y volver atrás conservando proyecto y sección válidos; acceso denegado explica cómo volver sin perder el destino permitido. |
+| **3. Dashboard por tareas y rol** | Reducir el nivel uno a cuatro espacios de trabajo y “Administración”. Dentro, ordenar entre 4–7 tareas frecuentes y mover controles secundarios a subpestañas contextualizadas. Mantener capacidades/gates de permisos; no ocultar accesos solo con CSS ni replicar la lista completa en menú móvil. Hacer inicio una bandeja de “continuar”, alertas y acciones, no otro catálogo. | Cinco tareas de prueba por rol se completan sin ayuda; navegación desktop y móvil ofrece los mismos destinos permitidos y marca claramente ubicación actual. |
+| **4. Visor como herramienta de trabajo** | Establecer un visor canónico con cabecera persistente de proyecto, buscador, controles 2D/3D, panel de capas y leyenda, inspector/selección, estado/fuente/fecha y acciones de exportación. Reutilizar el registro de capas y perfiles existentes. Acordar por capa qué se comparte al pasar entre 2D y 3D y qué se reinicia; persistir proyecto, modo y filtros relevantes en URL. Mantener indicadores de carga, falta de cobertura, error y fuente vacía dentro del mapa. | Para un proyecto de prueba: activar/desactivar capas, seleccionar elemento, ir y volver entre 2D/3D, actualizar URL y volver atrás sin perder contexto; contraste visual distingue tenencia, catastro vecino y evidencia según procedencia. |
+| **5. Terminal por proyecto** | Mantener encabezado, orden de pestañas y ubicación de acciones iguales para todos. Definir una ficha resumen común (ubicación, estado, evidencia disponible y próxima acción); los paneles específicos se insertan dentro del mismo patrón y muestran “no disponible” con causa cuando aplique. Separar mapa, interpretación y decisión económica con límites visibles. | Cholqui, Los Verdes, Palmeras y Nahuelbuta comparten navegación y estructura base; las diferencias de datos y funciones se explican, no aparecen como huecos o cambios de producto. |
+| **6. Reportes, validación y retiro de legado** | Situar “Exportar mapa / informe” junto al contexto exportado. Generar documentos solo con la estructura institucional, `ensureBrandFonts`, helpers de disclosure y fuentes derivadas de metadatos existentes. Añadir pruebas de flujo con roles y datos de prueba; retirar alias o visores legacy tras registrar telemetría y comprobar enlaces. | El PDF muestra proyecto, capas/fuentes, fechas, filtros, escala/contexto y limitaciones realmente conocidas; la navegación termina sin enlaces huérfanos. Typecheck, lint, pruebas de rutas/roles y build aprobados. |
+
+## Criterios de producto para darlo por funcional
+
+- Un usuario nuevo puede responder en menos de 10 segundos: “¿qué proyecto estoy viendo?”, “¿qué datos están cargados?” y “¿cuál es mi siguiente acción?”. Medirlo en prueba moderada, no asumirlo por inspección de código.
+- Cinco recorridos acordados por negocio (catastro, revisión satelital, evidencia técnica, decisión/inversión, operación comercial) terminan sin callejón sin salida; cada uno tiene inicio, acción, confirmación y retorno.
+- Los estados de carga, error, sin datos, sin permiso y datos parciales son diferentes y ofrecen una salida concreta. No mostrar cifras como cero cuando su consulta falló.
+- Navegación de teclado, foco visible, etiquetas accesibles, área táctil y sin desplazamiento horizontal a 390 px; el mapa ofrece controles utilizables en pantalla pequeña.
+- URL compartible/reabrible con contexto relevante. No serializar tokens ni información privada sensible.
+- Toda capa y cifra conserva `measured`, `declared`, `modelled` o `synthetic/conceptual`, con fuente y limitación; no inferir medición de un modelo.
+- Los PDF se construyen en el renderer institucional compartido, con tipografías incrustadas mediante `ensureBrandFonts`; el marco NI 43-101/JORC describe estructura de revisión y nunca afirma cumplimiento certificado.
+
+## Orden de ejecución recomendado
+
+Hacer primero fases 0 y 1 como un PR de diagnóstico y navegación; luego fase 2 junto a una tarea piloto de fase 3 (Explorar/catastro). Después fase 4 en el workspace privado y el terminal público, con el mismo contrato de estado. Fases 5 y 6 se abordan tras validar los dos proyectos piloto. Migrar una ruta por vez, mantener alias medibles durante la transición y evitar una reescritura total.
+
+**Bloqueos para la consolidación amplia:** confirmar con usuarios el orden real de tareas por rol; preparar cuentas/datos representativos para recorridos autenticados; decidir qué rutas públicas heredadas tienen enlaces externos o tráfico que no deba romperse. Esta revisión hizo una corrección acotada en el chrome del workspace y preservó el trabajo local de Sentinel.
+
+## Validación del plan maestro compartido
+
+- La colisión descrita entre ficha privada y terminal público existe, pero no se debe resolver con una redirección universal. El terminal solo reconoce los cuatro slugs de `PUBLIC_PROJECTS`; proyectos privados sin ficha publicada no tienen destino. Además, la ruta privada comprueba pertenencia y permisos, mientras `/terminal/$slug` es una experiencia pública. La sesión del operador y sus acciones protegidas no pueden transferirse a una página pública por una redirección 301.
+- Los mapeos de secciones propuestos tampoco son equivalentes: `exploration` contiene trabajo geofísico y no equivale siempre a análisis satelital; `targets` no equivale a tesis; `validation` (QA/QC) no equivale a data room. Redirigirlas cambiaría el significado y puede ocultar operaciones.
+- La duplicación visible del modelo 3D estaba en `ProjectWorkspacePage` y `ProjectWorkspaceViewer`, no en `ProjectTerminalShell`. Se corrigió para que el workspace use una sola elección de modo: las secciones Resumen y Modelo 3D; el visor interno ya no repite título ni botones 2D/3D en ese contexto. El componente sigue permitiendo esos controles cuando se reutiliza fuera del workspace.
+- El rail no tenía texto permanentemente visible cuando está contraído, pero ya expandía nombres al pasar el puntero y ofrecía `title`. Se añadieron `aria-label` y `aria-current` a cada enlace. Reducir sus doce entradas visibles a cuatro exige reordenar destinos y revisar permisos por rol; queda como decisión de la fase 0, no como cambio ciego.
+- Los conteos de tenencia de Los Verdes son resultados del adaptador/servicio en ejecución; esta revisión local no consulta el backend ni certifica “22 concesiones / ~2.500 ha”. El código ya muestra métricas y declara saldo por confirmar, vecinos separados y TOO-270 sujeto a re-ensaye. La validación de cantidades, geometrías y halo requiere consulta real con credenciales y contraste de fuente.
+
+## Avance de Fase 1 · GeoEngine
+
+En la rama local actual, `ProjectTerrain3D` ya aloja un árbol lateral colapsable que reúne las capas publicadas disponibles, la geofísica MAG/IP y el control de topografía Copernicus. La visibilidad y opacidad del DEM usan las preferencias canónicas por proyecto. El árbol muestra fuentes, evidencia y conteos existentes; no crea capas para sondajes ejecutados, voxels, secciones o drape espectral que aún no se alimentan desde el contrato actual. La opacidad del DEM reemplaza el control que antes estaba separado en la leyenda.
+
+Verificación de esta fase: 11 pruebas enfocadas aprobadas, ESLint limpio en archivos modificados, `npm run typecheck` completo aprobado y `git diff --check` limpio. Falta la inspección visual interactiva del árbol en navegador, incluyendo ancho móvil y escenas de cada proyecto.
