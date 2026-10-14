@@ -3,6 +3,7 @@ import { canEnterPath, type AccessContext } from "@/lib/access/workspaceAccess";
 import { moduleForRoute } from "@/lib/modules";
 import {
   PROJECT_WORKSPACE_SECTIONS,
+  publishedTerminalDestination,
   projectWorkspaceLegacyPath,
   projectWorkspacePath,
   projectWorkspaceSection,
@@ -36,6 +37,26 @@ describe("canonical project workspace", () => {
         second,
       ),
     ).toBe(`/projects/${second}/model?view=3d&layer=targets#layers`);
+  });
+
+  it("routes published map and target screens to their canonical terminal views", () => {
+    expect(publishedTerminalDestination(second, "targets")).toEqual({
+      slug: "losverdes",
+      tab: "mapa",
+      view: "2d",
+    });
+    expect(publishedTerminalDestination(second, "model")).toEqual({
+      slug: "losverdes",
+      tab: "mapa",
+      view: "3d",
+    });
+    expect(publishedTerminalDestination(second, "validation")).toBeNull();
+  });
+
+  it("keeps projects without a published terminal in the private workspace", () => {
+    expect(
+      publishedTerminalDestination("00000000-0000-0000-0000-000000000000", "targets"),
+    ).toBeNull();
   });
 
   it("keeps the migrated section's module and role policy", () => {

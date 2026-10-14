@@ -1,13 +1,28 @@
-import { createFileRoute, notFound } from "@tanstack/react-router";
+import { createFileRoute, notFound, redirect } from "@tanstack/react-router";
 import { ProjectWorkspacePage } from "@/features/projects/workspace/ProjectWorkspacePage";
 import { projectIdFromSearch } from "@/lib/projects/navigation";
-import { projectWorkspaceSearch, projectWorkspaceSection } from "@/lib/projects/workspace";
+import {
+  projectWorkspaceSearch,
+  projectWorkspaceSection,
+  publishedTerminalDestination,
+} from "@/lib/projects/workspace";
 
 export const Route = createFileRoute("/_authenticated/projects/$projectId/$section")({
   validateSearch: projectWorkspaceSearch,
   beforeLoad: ({ params }) => {
-    if (!projectIdFromSearch(params.projectId) || !projectWorkspaceSection(params.section)) {
+    const projectId = projectIdFromSearch(params.projectId);
+    const section = projectWorkspaceSection(params.section);
+    if (!projectId || !section) {
       throw notFound();
+    }
+    const destination = publishedTerminalDestination(projectId, section);
+    if (destination) {
+      throw redirect({
+        to: "/terminal/$slug",
+        params: { slug: destination.slug },
+        search: { tab: destination.tab, view: destination.view },
+        replace: true,
+      });
     }
   },
   head: () => ({ meta: [{ title: "Workspace de proyecto — Geocapitals" }] }),

@@ -4,7 +4,6 @@ import { useProjects } from "@/hooks/useProjects";
 import { useWorkspaceAccess } from "@/hooks/useWorkspaceAccess";
 import { ProjectWorkspaceViewer } from "@/components/geo/ProjectWorkspaceViewer";
 import { getPublicProjectById } from "@/lib/projects/catalog";
-import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
 import type { ProjectView } from "@/lib/projects/navigation";
 import {
   PROJECT_WORKSPACE_SECTIONS,
@@ -51,9 +50,7 @@ export function ProjectWorkspacePage({
   const panel = section === "overview" ? (search.panel ?? "mapa") : "mapa";
   const publishedProject = getPublicProjectById(projectId);
   const isCholqui = publishedProject?.slug === "cholqui";
-  const publicSlug = project
-    ? (publishedProject?.slug ?? terminalSlugForListing({ code: project.code }))
-    : null;
+  const publicSlug = publishedProject?.status === "published" ? publishedProject.slug : null;
 
   if (loading || (project && (active?.id !== projectId || !access.ready))) {
     return <div className="p-6 text-sm">Activando proyecto…</div>;
@@ -89,11 +86,9 @@ export function ProjectWorkspacePage({
               to="/terminal/$slug"
               params={{ slug: publicSlug }}
               search={{ tab: "mapa", view }}
-              target="_blank"
-              rel="noreferrer"
               className="text-primary"
             >
-              Abrir ficha pública ↗
+              Terminal del activo
             </Link>
           )}
         </div>

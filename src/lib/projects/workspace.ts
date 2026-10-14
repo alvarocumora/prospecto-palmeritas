@@ -1,4 +1,6 @@
 import { projectIdFromSearch, projectView, type ProjectView } from "./navigation";
+import { getPublicProjectById } from "./catalog";
+import type { TerminalTabKey } from "@/features/terminal/terminalProjects";
 
 export const PROJECT_WORKSPACE_SECTIONS = [
   { id: "overview", label: "Resumen", legacyPath: "/dashboard/project-report" },
@@ -39,4 +41,19 @@ export function projectWorkspaceLegacyPath(pathname: string): string {
   return (
     PROJECT_WORKSPACE_SECTIONS.find((section) => section.id === match[2])?.legacyPath ?? pathname
   );
+}
+
+/** Published projects use the terminal for their map and target views. */
+export function publishedTerminalDestination(
+  projectId: string,
+  section: ProjectWorkspaceSection,
+): { slug: string; tab: TerminalTabKey; view: ProjectView } | null {
+  const project = getPublicProjectById(projectId);
+  if (!project || project.status !== "published") return null;
+
+  if (section === "overview" || section === "targets") {
+    return { slug: project.slug, tab: "mapa", view: "2d" };
+  }
+  if (section === "model") return { slug: project.slug, tab: "mapa", view: "3d" };
+  return null;
 }
