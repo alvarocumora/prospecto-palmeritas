@@ -331,7 +331,7 @@ export function GlobalGeoCopilot() {
         ref={btnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
-        title="Geo Copilot global (⌘K)"
+        title="Geo·AI Copilot contextual (⌘K)"
         className={cn(
           "inline-flex items-center gap-1 h-7 px-2 rounded-[2px] border transition-colors font-mono text-[10px]",
           open
@@ -342,7 +342,7 @@ export function GlobalGeoCopilot() {
         aria-expanded={open}
       >
         <Sparkles className="w-3 h-3" />
-        <span className="hidden sm:inline uppercase tracking-wider">Geo·AI</span>
+        <span className="hidden sm:inline uppercase tracking-wider">Geo·AI Copilot · ⌘K</span>
       </button>
 
       {open && (

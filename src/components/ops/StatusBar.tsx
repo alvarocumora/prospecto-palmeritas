@@ -1,95 +1,73 @@
-import { useEffect, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { useUnreadCatastroAlerts } from "@/hooks/useUnreadCatastroAlerts";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { getPublicProjectById } from "@/lib/projects/catalog";
 import { StatusDot } from "./StatusDot";
-import { Link } from "@tanstack/react-router";
 
 export function StatusBar() {
   const { user } = useAuth();
   const { active } = useProjects();
   const { total: alerts } = useUnreadCatastroAlerts(active?.id ?? null);
   const online = useOnlineStatus();
-  const [latency, setLatency] = useState<number | null>(null);
-  const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const tick = () => setNow(new Date());
-    const t = setInterval(tick, 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const ping = async () => {
-      const t0 = performance.now();
-      try {
-        await fetch("/favicon.ico", { cache: "no-store" });
-        if (!cancelled) setLatency(Math.round(performance.now() - t0));
-      } catch {
-        if (!cancelled) setLatency(null);
-      }
-    };
-    ping();
-    const i = setInterval(ping, 15000);
-    return () => {
-      cancelled = true;
-      clearInterval(i);
-    };
-  }, []);
-
+  const publicProject = active ? getPublicProjectById(active.id) : null;
   if (!user) return null;
-  const time = now.toLocaleTimeString("es-CL", { hour12: false });
 
   return (
     <footer
-      className="hidden md:flex fixed bottom-0 left-0 right-0 z-30 h-6 border-t border-border bg-bg-panel/95 backdrop-blur items-center px-2 gap-3 font-mono text-[10px] text-text-mono select-none"
+      className="hidden md:flex fixed bottom-0 left-0 right-0 z-30 h-6 border-t border-border bg-bg-panel/95 backdrop-blur items-center px-2 gap-3 font-mono text-[10px] text-text-mono"
       role="status"
       aria-live="polite"
     >
       <StatusDot
         status={online ? "live" : "crit"}
         pulse={online}
-        label={online ? "LIVE" : "OFFLINE"}
+        label={online ? "EN LÍNEA" : "SIN CONEXIÓN"}
       />
-      <span className="text-text-dim">|</span>
-      {active ? (
+      <span aria-hidden="true" className="text-text-dim">
+        ·
+      </span>
+      {publicProject?.status === "published" ? (
         <Link
-          to="/dashboard/projects"
-          className="hover:text-signal-cyan transition-colors uppercase tracking-wider"
+          to="/terminal/$slug"
+          params={{ slug: publicProject.slug }}
+          search={{ tab: "mapa" }}
+          className="max-w-48 truncate hover:text-signal-cyan transition-colors"
+          title={`${active?.name ?? "Proyecto"} · ${active?.code ?? ""}`}
         >
-          {active.code}
+          {active?.name ?? active?.code}
         </Link>
       ) : (
-        <span className="text-text-dim uppercase tracking-wider">NO PROJECT</span>
+        <Link
+          to="/dashboard/projects"
+          className="max-w-48 truncate hover:text-signal-cyan transition-colors"
+          title={active?.name ?? "Seleccionar proyecto"}
+        >
+          {active?.name ?? "Seleccionar proyecto"}
+        </Link>
       )}
-      <span className="text-text-dim">|</span>
+      <span aria-hidden="true" className="text-text-dim">
+        ·
+      </span>
       <Link
         to="/dashboard/boletin"
-        className="hover:text-signal-amber transition-colors flex items-center gap-1"
+        className="inline-flex items-center gap-1 hover:text-signal-amber transition-colors"
       >
         {alerts > 0 && <StatusDot status="warn" />}
         <span className="tabular-nums">{alerts}</span>
-        <span className="text-text-dim uppercase tracking-wider">alerts</span>
-      </Link>
-      <span className="hidden sm:inline text-text-dim">|</span>
-      <Link
-        to="/dashboard/approvals"
-        className="hidden sm:inline hover:text-signal-cyan transition-colors uppercase tracking-wider text-text-dim"
-      >
-        approvals
+        <span className="hidden lg:inline">alertas de catastro</span>
       </Link>
       <div className="flex-1" />
-      <span className="hidden md:inline text-text-dim tabular-nums">
-        {latency != null ? `${latency}ms` : "—"}
+      <Link to="/contacto" className="hidden lg:inline hover:text-signal-cyan transition-colors">
+        Soporte
+      </Link>
+      <span aria-hidden="true" className="hidden lg:inline text-text-dim">
+        ·
       </span>
-      <span className="hidden md:inline text-text-dim">|</span>
-      <kbd className="hidden md:inline text-text-dim border border-border px-1 rounded-[2px]">
-        ⌘K
-      </kbd>
-      <span className="text-text-dim">|</span>
-      <span className="tabular-nums text-text-mono">{time}</span>
+      <Link to="/metodologia" className="hidden lg:inline hover:text-signal-cyan transition-colors">
+        Cumplimiento
+      </Link>
     </footer>
   );
 }

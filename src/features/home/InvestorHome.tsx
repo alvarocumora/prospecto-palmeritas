@@ -4,8 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, FileSearch, Layers, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useProjects } from "@/hooks/useProjects";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
 import { listMyHoldings } from "@/lib/tokenization.functions";
+import { ActiveProjectCard } from "./ActiveProjectCard";
 
 const usd = (value: number) => "USD " + value.toLocaleString("es-CL", { maximumFractionDigits: 0 });
 const statusLabels: Record<string, string> = {
@@ -20,6 +22,7 @@ const statusLabels: Record<string, string> = {
 
 export function InvestorHome({ name, children }: { name: string; children?: ReactNode }) {
   const { user } = useAuth();
+  const { active } = useProjects();
   const fetchHistory = useServerFn(getMyInvestmentHistory);
   const fetchHoldings = useServerFn(listMyHoldings);
   const history = useQuery({
@@ -38,30 +41,49 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
   const inquiries = data?.inquiries ?? [];
   const confirmed = (holdings.data ?? []).filter((holding) => holding.status === "confirmed");
   const latest = inquiries.slice(0, 5);
+  const formattedName = name
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((part) => part.charAt(0).toLocaleUpperCase("es-CL") + part.slice(1))
+    .join(" ");
 
   return (
     <div data-theme="im-light" className="min-h-full bg-background text-foreground">
       <main className="max-w-7xl mx-auto p-4 md:p-7 pb-20 space-y-6">
-        <header className="rounded-2xl bg-slate-950 text-white p-6 md:p-8 space-y-5">
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-white/60">
+        <header className="rounded-xl border border-hairline bg-surface-elevated p-5 md:p-7 space-y-4">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-subtle">
             Geocapitals · Espacio del inversionista
           </p>
           <div className="flex flex-wrap justify-between gap-5 items-end">
             <div>
-              <h1 className="font-display text-3xl md:text-4xl">Hola{name ? ", " + name : ""}.</h1>
-              <p className="text-sm text-white/65 mt-3 max-w-xl">
+              <h1 className="font-display text-3xl md:text-4xl text-content">
+                Hola{formattedName ? `, ${formattedName}` : ""}.
+              </h1>
+              <p className="text-sm text-content-subtle mt-2 max-w-xl">
                 Evalúa oportunidades, revisa documentos y sigue el avance de tus inversiones.
               </p>
             </div>
             <Link
               to="/inversionistas"
-              className="inline-flex items-center gap-2 rounded-md bg-white text-slate-950 px-5 py-3 text-sm font-medium"
+              className="inline-flex items-center gap-2 rounded-md bg-accent-brand text-accent-brand-contrast px-4 py-2.5 text-sm font-medium"
             >
               Explorar oportunidades <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </header>
-        {children}
+        {children && (
+          <details className="rounded-xl border border-hairline bg-surface">
+            <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-content marker:hidden">
+              <span className="mr-2 rounded-full bg-accent-brand-subtle px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-accent-brand">
+                Perfil
+              </span>
+              Completa la configuración de tu cuenta
+            </summary>
+            <div className="border-t border-hairline p-3 md:p-4">{children}</div>
+          </details>
+        )}
+        <ActiveProjectCard project={active} />
         <div className="grid sm:grid-cols-3 gap-4">
           <InvestorMetric
             icon={<FileSearch className="w-4 h-4" />}
@@ -73,13 +95,21 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
                   ? "No disponible"
                   : "…"
             }
-            description="Solicitudes abiertas; todavía no son inversiones."
+            description={
+              data && inquiries.filter((item) => !item.closed_at).length === 0
+                ? "Sin solicitudes activas. Explora proyectos disponibles."
+                : "Solicitudes abiertas; todavía no son inversiones."
+            }
           />
           <InvestorMetric
             icon={<Wallet className="w-4 h-4" />}
             title="Pagos registrados"
             value={data ? usd(data.totals.paidUsd) : history.isError ? "No disponible" : "…"}
-            description="Liquidaciones registradas como pagadas o recibidas."
+            description={
+              data?.totals.paidUsd === 0
+                ? "Aún no hay pagos registrados en tu cuenta."
+                : "Liquidaciones registradas como pagadas o recibidas."
+            }
           />
           <InvestorMetric
             icon={<Layers className="w-4 h-4" />}
@@ -87,7 +117,11 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
             value={
               holdings.data ? String(confirmed.length) : holdings.isError ? "No disponible" : "…"
             }
-            description="Suscripciones confirmadas; consulta sus términos."
+            description={
+              holdings.data && confirmed.length === 0
+                ? "Aún no tienes participaciones confirmadas."
+                : "Suscripciones confirmadas; consulta sus términos."
+            }
           />
         </div>
         <div className="grid lg:grid-cols-[1.5fr_1fr] gap-5">

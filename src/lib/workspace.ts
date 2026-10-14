@@ -82,10 +82,10 @@ export type WorkspaceEntry = {
 };
 
 export type WorkspaceGroup =
-  | "INICIO"
-  | "CATASTRO & EXPLORACIÓN"
-  | "TRADE & COMMODITIES"
-  | "CAPITAL & DEALS"
+  | "GENERAL"
+  | "CATASTRO & TERRITORIO"
+  | "TERMINAL DE ACTIVOS & GEOCIENCIA"
+  | "CAPITAL & NEGOCIOS"
   | "ADMINISTRACIÓN";
 
 export const WORKSPACE_NAV: WorkspaceEntry[] = [
@@ -93,17 +93,17 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     to: "/dashboard",
     label: "Inicio",
     icon: LayoutDashboard,
-    group: "INICIO",
+    group: "GENERAL",
     module: "core",
     exact: true,
   },
 
-  // ─────────────── CATASTRO & EXPLORACIÓN ───────────────
+  // ─────────────── CATASTRO & TERRITORIO ───────────────
   {
     to: "/catastro/mapa",
     label: "Catastro",
     icon: MapIcon,
-    group: "CATASTRO & EXPLORACIÓN",
+    group: "CATASTRO & TERRITORIO",
     module: "catastro",
     capability: "catastro",
     requiresProjects: true,
@@ -119,9 +119,9 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
   },
   {
     to: "/dashboard/projects",
-    label: "Proyectos",
+    label: "Activos & proyectos",
     icon: FolderKanban,
-    group: "CATASTRO & EXPLORACIÓN",
+    group: "TERMINAL DE ACTIVOS & GEOCIENCIA",
     module: "catastro",
     capability: "projects",
     requiresProjects: true,
@@ -135,7 +135,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     to: "/dashboard/geophysics",
     label: "Exploración & Reportes",
     icon: Activity,
-    group: "CATASTRO & EXPLORACIÓN",
+    group: "TERMINAL DE ACTIVOS & GEOCIENCIA",
     module: "catastro",
     hideForInvestor: true,
     tabs: [
@@ -151,12 +151,12 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     ],
   },
 
-  // ─────────────── TRADE & COMMODITIES ───────────────
+  // ─────────────── CAPITAL & NEGOCIOS ───────────────
   {
     to: "/dashboard/trades",
     label: "Mesa de operaciones",
     icon: Handshake,
-    group: "TRADE & COMMODITIES",
+    group: "CAPITAL & NEGOCIOS",
     module: "commodities",
     tabs: [
       { label: "Operaciones", to: "/dashboard/trades" },
@@ -171,7 +171,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     to: "/dashboard/clientes",
     label: "Clientes & Contratos",
     icon: Users,
-    group: "TRADE & COMMODITIES",
+    group: "CAPITAL & NEGOCIOS",
     module: "commodities",
     tabs: [
       { label: "Clientes", to: "/dashboard/clientes" },
@@ -184,7 +184,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     to: "/dashboard/cobranza",
     label: "Finanzas & Logística",
     icon: Wallet,
-    group: "TRADE & COMMODITIES",
+    group: "CAPITAL & NEGOCIOS",
     module: "commodities",
     tabs: [
       { label: "Cobranza", to: "/dashboard/cobranza" },
@@ -194,12 +194,12 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     ],
   },
 
-  // ─────────────── CAPITAL & DEALS ───────────────
+  // ─────────────── CAPITAL & NEGOCIOS ───────────────
   {
     to: "/dashboard/deals",
     label: "Deal Flow",
     icon: Briefcase,
-    group: "CAPITAL & DEALS",
+    group: "CAPITAL & NEGOCIOS",
     module: "capital",
     tabs: [
       { label: "Deal flow", to: "/dashboard/deals" },
@@ -214,7 +214,7 @@ export const WORKSPACE_NAV: WorkspaceEntry[] = [
     to: "/dashboard/colateral-leads",
     label: "Inversión con colateral",
     icon: KanbanSquare,
-    group: "CAPITAL & DEALS",
+    group: "CAPITAL & NEGOCIOS",
     module: "capital",
     hideForInvestor: true,
     tabs: [
