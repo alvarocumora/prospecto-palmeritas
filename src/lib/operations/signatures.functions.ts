@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import { publicUrl } from "@/lib/publicUrl";
+import { requireOperationManager } from "./access.server";
 
 // ---------------------------------------------------------------------------
 // Firma electrónica sobre operaciones — versiones inmutables.
@@ -49,7 +50,8 @@ export const createOperationSignatureFlow = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const sb = await admin();
 
-    // 1) Verificar acceso a operación
+    // 1) Verificar permiso de gestión antes de congelar documentos o crear sobres.
+    await requireOperationManager(sb, data.operation_id, context.userId);
     const { data: op } = await sb
       .from("operations")
       .select("id, code, name, commodity")
@@ -205,13 +207,8 @@ export const listOperationSignatureFlows = createServerFn({ method: "POST" })
   .inputValidator((raw: unknown) => z.object({ operation_id: z.string().uuid() }).parse(raw))
   .handler(async ({ data, context }) => {
     const sb = await admin();
-    // Verifica acceso vía RLS del context.supabase, pero leemos con admin para joinear
-    const { data: gate } = await context.supabase
-      .from("operations")
-      .select("id")
-      .eq("id", data.operation_id)
-      .maybeSingle();
-    if (!gate) throw new Error("Sin acceso a la operación");
+    // La respuesta incluye tokens de firma: lectura de participante no basta.
+    await requireOperationManager(sb, data.operation_id, context.userId);
 
     const { data: envelopes } = await sb
       .from("signature_envelopes")
@@ -441,6 +438,7 @@ export const voidOperationSignatureFlow = createServerFn({ method: "POST" })
       .eq("id", data.envelope_id)
       .maybeSingle();
     if (!env) throw new Error("Sobre no encontrado");
+    await requireOperationManager(sb, env.operation_id, context.userId);
     if (env.status === "completed") throw new Error("El flujo ya está completado");
 
     await sb.from("signature_envelopes").update({ status: "void" }).eq("id", data.envelope_id);
