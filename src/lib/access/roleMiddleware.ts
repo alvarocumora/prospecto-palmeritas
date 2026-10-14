@@ -8,6 +8,7 @@
 import { createMiddleware } from "@tanstack/react-start";
 import { parseModuleEntitlements } from "./moduleEntitlements";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { parseModuleEntitlements } from "./moduleEntitlements";
 
 export type ServerAccessRole = "admin" | "catastro" | "trade" | "capital";
 

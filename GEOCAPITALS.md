@@ -24,6 +24,10 @@ Integra **catastro, exploración geocientífica, monitoreo satelital, NI 43-101 
 
 ## 2. Arquitectura
 
+Plan técnico de consolidación: [Blueprint técnico global](docs/blueprint-tecnico-global.md).
+Incluye inventario basado en código, fragmentación, contratos de exploración/capital/trade,
+prioridades de seguridad y gates de validación. Su existencia no certifica producción.
+
 - **Frontend**: TanStack Start v1 + React 19 + Tailwind v4 (CSS-first, sin `tailwind.config.js`).
 - **Backend**: Lovable Cloud (Supabase) — 135 tablas, 35 edge functions, **PostGIS 3.3.7**, pg_cron + pg_net.
 - **AI**: Lovable AI Gateway (Gemini 3 Flash) para tesis IA, target generator y geo-copiloto.
