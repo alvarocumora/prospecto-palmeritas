@@ -128,7 +128,7 @@ function AuthenticatedLayout() {
       <MobileDrawer
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        items={items}
+        items={allowedItems}
         userName={profile?.display_name ?? user.email ?? ""}
         roleLabel={access.role ? ROLE_LABEL[access.role] : null}
         onSignOut={async () => {

@@ -1,7 +1,7 @@
 import { PROJECT_WORKSPACE_SECTIONS } from "@/lib/projects/workspace";
 import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
-import { ChevronDown, Plus, Command, LogOut, UserCircle, Menu } from "lucide-react";
+import { ChevronDown, Plus, LogOut, UserCircle, Menu } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { Logo } from "@/components/Logo";
@@ -9,6 +9,7 @@ import { OnlineStatusBadge } from "@/components/OnlineStatusBadge";
 import { GlobalGeoCopilot } from "@/components/ops/GlobalGeoCopilot";
 import { projectNavigationHref, workspaceProjectId } from "@/lib/projects/navigation";
 import { findWorkspaceEntry } from "@/lib/workspace";
+import { getPublicProjectById } from "@/lib/projects/catalog";
 import { cn } from "@/lib/utils";
 
 function breadcrumb(path: string): string {
@@ -48,6 +49,7 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
   }, [openProj, openUser]);
 
   const initial = (profile?.display_name ?? user?.email ?? "?")[0]?.toUpperCase() ?? "?";
+  const activePublic = active ? getPublicProjectById(active.id) : null;
 
   return (
     <header
@@ -85,11 +87,12 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
             )}
             aria-haspopup="listbox"
             aria-expanded={openProj}
+            aria-label={`Proyecto activo: ${active?.name ?? "ninguno"} (${active?.code ?? "sin código"})`}
           >
-            <span className="hidden sm:inline text-text-dim text-[9px] uppercase tracking-wider">
-              Project
+            <span className="hidden lg:inline max-w-[150px] truncate text-foreground">
+              {loading ? "Cargando proyecto…" : (active?.name ?? "Sin proyecto activo")}
             </span>
-            <span className="text-foreground tabular-nums truncate max-w-[90px] sm:max-w-[140px]">
+            <span className="max-w-[105px] truncate rounded-sm border border-border px-1.5 py-0.5 text-[9px] text-text-mono tabular-nums">
               {loading ? "…" : (active?.code ?? "—")}
             </span>
             <ChevronDown
@@ -148,6 +151,27 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
                   <span className="text-[9px] text-text-dim uppercase">{p.role}</span>
                 </button>
               ))}
+              {activePublic?.status === "published" && (
+                <div className="flex gap-2 border-t border-border px-3 py-2">
+                  <Link
+                    to="/terminal/$slug"
+                    params={{ slug: activePublic.slug }}
+                    search={{ tab: "mapa" }}
+                    onClick={() => setOpenProj(false)}
+                    className="flex-1 rounded border border-border px-2 py-1.5 text-center font-mono text-[10px] text-text-mono hover:border-signal-cyan hover:text-signal-cyan"
+                  >
+                    Terminal
+                  </Link>
+                  <Link
+                    to="/proyectos/ficha/$slug"
+                    params={{ slug: activePublic.slug }}
+                    onClick={() => setOpenProj(false)}
+                    className="flex-1 rounded border border-border px-2 py-1.5 text-center font-mono text-[10px] text-text-mono hover:border-signal-cyan hover:text-signal-cyan"
+                  >
+                    Ficha oficial
+                  </Link>
+                </div>
+              )}
               <button
                 type="button"
                 onClick={() => {
@@ -175,14 +199,6 @@ export function TopBar({ onMenuClick }: { onMenuClick?: () => void }) {
       {/* Actions zone */}
       <div className="flex items-center gap-1.5 h-full pr-2 pl-3 border-l border-border/60">
         <GlobalGeoCopilot />
-        <button
-          type="button"
-          title="Command palette (⌘K)"
-          className="hidden lg:inline-flex items-center gap-1 h-7 px-2 rounded-[2px] border border-border bg-bg-elevated text-text-mono hover:border-signal-cyan hover:text-signal-cyan transition-colors font-mono text-[10px]"
-        >
-          <Command className="w-3 h-3" />
-          <span>⌘K</span>
-        </button>
         <div className="hidden md:inline-flex">
           <OnlineStatusBadge />
         </div>

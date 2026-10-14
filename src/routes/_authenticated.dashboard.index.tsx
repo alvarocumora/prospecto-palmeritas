@@ -25,6 +25,7 @@ import { useOnboardingStatus } from "@/hooks/useOnboardingStatus";
 import { useMyModules, type ModuleInfo } from "@/hooks/useMyModules";
 import { OnboardingWizard } from "@/features/onboarding/OnboardingWizard";
 import { InvestorHome } from "@/features/home/InvestorHome";
+import { ActiveProjectCard } from "@/features/home/ActiveProjectCard";
 import { RoleQuickStart } from "@/features/home/RoleQuickStart";
 import { getBusinessOverview } from "@/lib/businessOverview.functions";
 import { SHIPMENT_STATUS_LABELS } from "@/lib/shipments";
@@ -59,6 +60,15 @@ const fmtUsd = (n: number) =>
     ? `US$ ${(n / 1_000_000).toLocaleString("es-CL", { maximumFractionDigits: 1 })}M`
     : `US$ ${Math.round(n).toLocaleString("es-CL")}`;
 
+function formatName(value: string) {
+  return value
+    .trim()
+    .replace(/\s+/g, " ")
+    .split(" ")
+    .map((part) => part.charAt(0).toLocaleUpperCase("es-CL") + part.slice(1))
+    .join(" ");
+}
+
 function BusinessHome() {
   const { profile, user } = useAuth();
   const { projects, active } = useProjects();
@@ -67,7 +77,7 @@ function BusinessHome() {
   const { data: myModules } = useMyModules();
   const locale: "es" | "en" =
     (profile as { language?: string } | null)?.language === "en" ? "en" : "es";
-  const name = profile?.display_name ?? user?.email?.split("@")[0] ?? "";
+  const name = formatName(profile?.display_name ?? user?.email?.split("@")[0] ?? "");
   const needsOnboarding = !profile?.account_type || !onboardingComplete;
   const isInvestor = profile?.account_type === "investor";
 
@@ -124,6 +134,7 @@ function BusinessHome() {
           </div>
         )}
 
+        <ActiveProjectCard project={active} />
         <RoleQuickStart />
 
         {myModules && myModules.modules.length > 1 && (
@@ -154,7 +165,19 @@ function BusinessHome() {
           </div>
         )}
 
-        {needsOnboarding && <OnboardingWizard onComplete={refreshOnboarding} />}
+        {needsOnboarding && (
+          <details className="rounded-xl border border-hairline bg-surface">
+            <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-content">
+              <span className="mr-2 rounded-full bg-accent-brand-subtle px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-accent-brand">
+                Perfil
+              </span>
+              Completa la configuración de tu cuenta
+            </summary>
+            <div className="border-t border-hairline p-3 md:p-4">
+              <OnboardingWizard onComplete={refreshOnboarding} />
+            </div>
+          </details>
+        )}
 
         {/* KPIs del negocio */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
