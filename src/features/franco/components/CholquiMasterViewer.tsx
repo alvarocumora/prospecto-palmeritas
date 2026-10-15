@@ -18,6 +18,11 @@ import yacimientosRaw from "@/data/geo/cholqui_yacimientos.geojson?raw";
 // catastro oficial SERNAGEOMIN, y sus hitos de mensura declarados:
 import pedimentosPendientesRaw from "@/data/geo/cholqui_pedimentos_pendientes.geojson?raw";
 import mojonesRaw from "@/data/geo/cholqui_mojones.geojson?raw";
+import cadSurveyJson from "@/data/geo/cholqui_levantamiento_cad.json";
+const cadSurvey = cadSurveyJson as unknown as Record<
+  "contours" | "accesos" | "hitos" | "perimetro",
+  FeatureCollection
+>;
 import { CHOLQUI, CHOLQUI_POINTS, CHOLQUI_ASSAYS } from "../data/cholqui";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "../data/cholquiStructures";
 import { CHOLQUI_INTERPOLATION_NOTICE, CHOLQUI_COORDINATE_NOTICE } from "../cholquiGeoPolicy";
@@ -69,6 +74,45 @@ const coverage = cov
     }
   : null;
 
+// Levantamiento topográfico del titular (DWG 14-oct-2026, UTM 19S → WGS84) + perímetro KMZ.
+const CAD_CAUTION =
+  "Plano declarado por el titular (CAD Franco De Martino); no reemplaza la mensura oficial SERNAGEOMIN.";
+const CAD_LAYERS = [
+  {
+    id: "cad-perimetro",
+    label: "Perímetro total pertenencias (KMZ titular)",
+    evidence: "DECLARADO",
+    caution: CAD_CAUTION,
+    features: cadSurvey.perimetro,
+    color: geoColors.signal,
+  },
+  {
+    id: "cad-curvas",
+    label: "Curvas de nivel levantamiento (270–1.730 m)",
+    evidence: "DECLARADO",
+    caution: CAD_CAUTION,
+    features: cadSurvey.contours,
+    color: (p: Record<string, unknown>) =>
+      p.tipo === "maestra" ? geoColors.terrainLow : geoColors.terrainMid,
+  },
+  {
+    id: "cad-accesos",
+    label: "Accesos y caminos (CAD)",
+    evidence: "DECLARADO",
+    caution: CAD_CAUTION,
+    features: cadSurvey.accesos,
+    color: geoColors.deposit,
+  },
+  {
+    id: "cad-hitos",
+    label: "Hitos topográficos (Portón 1, Pallocabe 6, Pico quebrada)",
+    evidence: "DECLARADO",
+    caution: CAD_CAUTION,
+    features: cadSurvey.hitos,
+    color: geoColors.proposedDrill,
+  },
+];
+
 export function CholquiMasterViewer() {
   const { projects } = useProjects();
   const project = projects.find(
@@ -100,8 +144,9 @@ export function CholquiMasterViewer() {
       estructuras={CHOLQUI_STRUCTURES_GEOJSON}
       pedimentosPendientes={pedimentosPendientes}
       mojones={mojones}
-      contextLayers={
-        satellitePreview?.features.length
+      contextLayers={[
+        ...CAD_LAYERS,
+        ...(satellitePreview?.features.length
           ? [
               {
                 id: "sentinel2-real-preview",
@@ -113,8 +158,8 @@ export function CholquiMasterViewer() {
                 color: geoColors.tenureOwn,
               },
             ]
-          : []
-      }
+          : []),
+      ]}
       // geoquimica: sin dato — la geoquímica de sedimentos SERNAGEOMIN no cubre
       // Melipilla (-33.85); no se cablea para no fabricar evidencia.
     />
