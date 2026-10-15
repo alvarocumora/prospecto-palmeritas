@@ -5,11 +5,13 @@ import { PublicCanonicalMap } from "@/components/geo/PublicCanonicalMap";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
+import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 
 const PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
 export function LosVerdesMasterViewer() {
   const fetchData = useServerFn(getLosVerdesMapData);
+  const emitLayers = useEmitMineralogyLayers("losverdes");
   const query = useQuery({
     queryKey: ["losverdes-map-data"],
     queryFn: () => fetchData(),
@@ -50,7 +52,7 @@ export function LosVerdesMasterViewer() {
   }
   return (
     <div data-report-map="losverdes" className="space-y-3">
-      <PublicCanonicalMap bundle={bundle} />
+      <PublicCanonicalMap bundle={bundle} extraLayers={emitLayers} />
       {query.data?.tenure && (
         <section className="grid gap-px overflow-hidden rounded-2xl border border-hairline bg-hairline sm:grid-cols-4">
           {[
