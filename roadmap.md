@@ -32,4 +32,5 @@
 - [x] Módulo live Nahuelbuta REE (paños Arcillas 1-34, satélite, informes) en /terminal/nahuelbuta
 - [ ] Nahuelbuta: términos de inversión reales (valorización, ticket, instrumento) — espera al usuario
 - [x] Cholqui: mineralogía NASA EMIT L2B (7 y 12 ene 2023) ortorrectificada con GLT oficial → 5 capas MODELADO en visor 2D (scripts/process_emit_l2bmin.py).
-- [ ] Renovar secreto EARTHDATA_TOKEN con la llave nueva del usuario (formulario seguro).
+- [x] Secreto EARTHDATA_TOKEN renovado.
+- [x] Los Verdes: mineralogía EMIT L2B (18 y 22 mar 2023) en visor 2D.

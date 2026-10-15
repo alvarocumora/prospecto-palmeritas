@@ -1,5 +1,5 @@
 import { featureEvidence } from "@/lib/geospatial/featureEvidence";
-import { useMemo } from "react";
+import { useMemo, type ComponentProps } from "react";
 import type { FeatureCollection } from "geojson";
 import { ProjectMasterViewer } from "./ProjectMasterViewer";
 import type { PublicGeoBundle } from "@/lib/geospatial/publicGeoContract";
@@ -8,13 +8,16 @@ import type { PublicGeoBundle } from "@/lib/geospatial/publicGeoContract";
 export function PublicCanonicalMap({
   bundle,
   height = 620,
+  extraLayers,
 }: {
   bundle: PublicGeoBundle;
   height?: number;
+  /** Capas adicionales con procedencia propia (p. ej. mineralogía EMIT MODELADA). */
+  extraLayers?: ComponentProps<typeof ProjectMasterViewer>["contextLayers"];
 }) {
   const contextLayers = useMemo(
-    () =>
-      bundle.manifest.layers
+    (): NonNullable<typeof extraLayers> => [
+      ...bundle.manifest.layers
         .filter((meta) => meta.id !== "territory.cadastre")
         .map((meta) => ({
           id: meta.id,
@@ -39,7 +42,9 @@ export function PublicCanonicalMap({
             featureEvidence(meta, properties),
           caution: meta.caution,
         })),
-    [bundle],
+      ...(extraLayers ?? []),
+    ],
+    [bundle, extraLayers],
   );
   return (
     <ProjectMasterViewer
