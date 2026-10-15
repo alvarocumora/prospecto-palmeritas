@@ -168,6 +168,7 @@ function Terrain({
   return (
     <mesh geometry={geometry} rotation-x={-Math.PI / 2}>
       <meshStandardMaterial
+        key={drape ? "satellite-textured" : "elevation-colors"}
         map={drape ? texture : null}
         vertexColors={!drape}
         roughness={0.95}
@@ -907,12 +908,6 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
             </Suspense>
           </Canvas>
         )}
-        {props.satelliteImage && terrainDrape === "sentinel" && (
-          <div className="pointer-events-none absolute bottom-3 left-3 max-w-[80%] rounded border border-hairline bg-surface/90 px-2 py-1 font-mono text-[10px] text-content">
-            {imageTexture ? props.satelliteImage.attribution : imageFailed ? "Imagen no disponible" : "Cargando imagen real…"}
-            {imageTexture && <span className="block">Mosaico real · fecha de adquisición no verificada · contexto visual, no análisis espectral</span>}
-          </div>
-        )}
         {!props.satelliteImage && terrainDrape === "sentinel" && sentinelDrape.data && (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-[80%] rounded border border-hairline bg-surface/90 px-2 py-1 font-mono text-[10px] text-content">
             Sentinel-2 L2A · RGB B04/B03/B02 ·{" "}
@@ -977,6 +972,12 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
           </div>
         )}
       </div>
+      {props.satelliteImage && terrainDrape === "sentinel" && (
+        <div className="border-t border-hairline px-4 py-2 font-mono text-[10px] text-content-subtle">
+          {imageTexture ? props.satelliteImage.attribution : imageFailed ? "Imagen no disponible" : "Cargando imagen real…"}
+          {imageTexture && <span className="block">Mosaico real · fecha de adquisición no verificada · contexto visual, no análisis espectral</span>}
+        </div>
+      )}
       <div className="flex flex-wrap gap-4 border-t border-hairline px-4 py-2 text-[11px] font-mono text-content-subtle">
         <span>
           <span
