@@ -93,6 +93,7 @@ export type MasterViewerProps = {
     caution?: string | null;
     features: FeatureCollection;
     color?: string | ((properties: Record<string, unknown>) => string);
+    defaultVisible?: boolean;
   }>;
 };
 
@@ -838,7 +839,10 @@ export function ProjectMasterViewer({
     if (!map || !L || !ready) return;
     const layers: Layer[] = [];
     for (const entry of contextLayers ?? []) {
-      const setting = contextSettings[entry.id] ?? { visible: true, opacity: 0.8 };
+      const setting = contextSettings[entry.id] ?? {
+        visible: entry.defaultVisible ?? true,
+        opacity: 0.8,
+      };
       if (!setting.visible) continue;
       const color = (feature?: Feature) =>
         typeof entry.color === "function"
@@ -1113,7 +1117,7 @@ export function ProjectMasterViewer({
               <label key={entry.id} className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  checked={contextSettings[entry.id]?.visible ?? true}
+                  checked={contextSettings[entry.id]?.visible ?? entry.defaultVisible ?? true}
                   onChange={(event) =>
                     setContextSettings((state) => ({
                       ...state,
@@ -1136,7 +1140,7 @@ export function ProjectMasterViewer({
                     setContextSettings((state) => ({
                       ...state,
                       [entry.id]: {
-                        visible: state[entry.id]?.visible ?? true,
+                        visible: state[entry.id]?.visible ?? entry.defaultVisible ?? true,
                         opacity: Number(event.target.value),
                       },
                     }))

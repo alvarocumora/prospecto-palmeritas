@@ -5,6 +5,7 @@ import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
 import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
 import { cholquiFieldGeophysics } from "@/lib/cholqui/geophysicsTerrain";
+import { cholquiEmitLayers } from "@/lib/cholqui/emitMineralogy";
 import { geoColors } from "@/lib/geospatial/visualTokens";
 // Catastro OFICIAL directo de SERNAGEOMIN (no el KMZ del operador).
 import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
@@ -146,6 +147,7 @@ export function CholquiMasterViewer() {
       mojones={mojones}
       contextLayers={[
         ...CAD_LAYERS,
+        ...cholquiEmitLayers,
         ...(satellitePreview?.features.length
           ? [
               {
