@@ -34,4 +34,6 @@ export const cholquiEmitLayers = Object.entries(emit.metadata.familias).map(([ke
     features: emit.features.filter((f) => f.properties?.familia === key),
   } as FeatureCollection,
   color: FAMILY_COLORS[key] ?? geoColors.signal,
+  // Óxidos de Fe³⁺ cubren casi todo el AOI: apagados al abrir para no ocultar el resto.
+  defaultVisible: key !== "oxidos",
 }));
