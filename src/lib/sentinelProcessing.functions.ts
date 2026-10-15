@@ -59,7 +59,7 @@ export const processSentinelScene = createServerFn({ method: "POST" })
         created_by: userId,
         provider: "planetary_computer",
         sensor: "sentinel-2-l2a",
-        index_code: "SENTINEL2_REAL_INDICES",
+        index_code: "HYDROTHERMAL_ALTERATION",
         status: "running",
         started_at: new Date().toISOString(),
         external_scene_id: data.sceneId,
