@@ -16,8 +16,8 @@ export function PublicCanonicalMap({
   extraLayers?: ComponentProps<typeof ProjectMasterViewer>["contextLayers"];
 }) {
   const contextLayers = useMemo(
-    (): NonNullable<typeof extraLayers> =>
-      bundle.manifest.layers
+    (): NonNullable<typeof extraLayers> => [
+      ...bundle.manifest.layers
         .filter((meta) => meta.id !== "territory.cadastre")
         .map((meta) => ({
           id: meta.id,
@@ -41,8 +41,9 @@ export function PublicCanonicalMap({
           evidenceForFeature: (properties: Record<string, unknown>) =>
             featureEvidence(meta, properties),
           caution: meta.caution,
-        }))
-        .concat(extraLayers ?? []),
+        })),
+      ...(extraLayers ?? []),
+    ],
     [bundle, extraLayers],
   );
   return (

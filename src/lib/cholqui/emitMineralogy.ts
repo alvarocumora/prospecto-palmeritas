@@ -53,9 +53,10 @@ export function buildEmitLayers(emit: EmitCollection): EmitLayer[] {
     id: `emit-${key}`,
     label: `EMIT · ${label}`,
     evidence: "MODELADO",
-    caution: key === "oxidos" && emit.metadata.filtro_oxidos
-      ? `${caution} ${emit.metadata.filtro_oxidos}`
-      : caution,
+    caution:
+      key === "oxidos" && emit.metadata.filtro_oxidos
+        ? `${caution} ${emit.metadata.filtro_oxidos}`
+        : caution,
     features: {
       type: "FeatureCollection",
       features: emit.features.filter((f) => f.properties?.familia === key),
