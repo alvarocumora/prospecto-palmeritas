@@ -1,6 +1,7 @@
 """Ortorrectifica EMIT L2B MIN (NASA) con la GLT oficial y recorta al AOI de Cholqui.
 
-Uso: python scripts/process_emit_l2bmin.py <dir_con_nc> <salida.json>
+Uso: python scripts/process_emit_l2bmin.py <dir_con_nc> <salida_cruda.json> <salida_visor.json> [w s e n]
+AOI por defecto: Cholqui. Los Verdes: -71.157 -32.070 -71.071 -31.994 (proyecto integrado + ~500 m).
 Sin interpolación ni relleno: cada celda de salida es un píxel EMIT referenciado por la GLT
 (vecino más cercano oficial). Píxeles con fill, banda nula o incertidumbre >= profundidad se descartan.
 """
@@ -23,6 +24,7 @@ def ortho(arr, gx, gy, fill):
     return out
 
 def process(min_path, unc_path):
+    global AOI
     f = h5py.File(min_path); u = h5py.File(unc_path)
     gt = f.attrs['geotransform']; gx = f['location/glt_x'][:]; gy = f['location/glt_y'][:]
     x0, dx, y0, dy = gt[0], gt[1], gt[3], gt[5]
@@ -69,7 +71,6 @@ def main(d, out):
         'escenas': scenes}, 'features': all_feats}, open(out, 'w'), separators=(',', ':'), ensure_ascii=False)
     print(json.dumps(scenes, indent=1, ensure_ascii=False)); print('bytes', os.path.getsize(out))
 
-if __name__ == '__main__': main(sys.argv[1], sys.argv[2])
 
 # ---- Compactación para el visor: familias minerales, una celda = un punto (centro de píxel GLT) ----
 FAMILIES = [
@@ -104,5 +105,13 @@ def compact(src, out):
     meta = fc['metadata']; meta['familias'] = {k: l for k, l, _ in FAMILIES}
     meta['geometria'] = 'Punto en el centro de cada píxel EMIT ortorrectificado (~60 m); una celda puede aparecer en ambas escenas.'
     meta['conteo_familias'] = {k: sum(1 for f in feats if f['properties']['familia'] == k) for k, _, _ in FAMILIES}
+    feats = [f for f in feats if f['properties']['familia'] != 'oxidos' or f['properties']['coincide_2_escenas'] or len(meta['escenas']) < 2]
+    meta['filtro_oxidos'] = 'Óxidos de Fe³⁺: solo celdas detectadas en ambas escenas, por su ubicuidad en suelos.'
+    meta['conteo_familias'] = {k: sum(1 for f in feats if f['properties']['familia'] == k) for k, _, _ in FAMILIES}
     json.dump({'type': 'FeatureCollection', 'metadata': meta, 'features': feats}, open(out, 'w'), separators=(',', ':'), ensure_ascii=False)
     print(meta['conteo_familias'], 'coinciden', sum(f['properties']['coincide_2_escenas'] for f in feats), 'bytes', os.path.getsize(out))
+
+if __name__ == '__main__':
+    if len(sys.argv) >= 8: AOI = tuple(float(v) for v in sys.argv[4:8])
+    main(sys.argv[1], sys.argv[2])
+    compact(sys.argv[2], sys.argv[3])
