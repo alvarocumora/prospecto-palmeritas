@@ -53,7 +53,7 @@ export function geophysicsTerrainTriangles(
   surface: GeophysicsSurface,
   tile: TerrainGrid,
 ): TerrainSurfaceTriangle[] {
-  if (tile.source !== "copernicus") return [];
+  if (tile.source === "synthetic") return [];
   const triangles: TerrainSurfaceTriangle[] = [];
   const cellM = tile.extentMeters / (tile.size - 1);
   if (!Number.isFinite(cellM) || cellM <= 0) return [];
