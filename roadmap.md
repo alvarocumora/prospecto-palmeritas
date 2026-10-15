@@ -1,6 +1,6 @@
 # Roadmap
 
-- [ ] Colocar imagen satelital real georreferenciada sobre el relieve CAD de Cholqui, con atribución y controles topografía/satélite.
+- [x] Colocar imagen satelital real georreferenciada sobre el relieve CAD de Cholqui, con atribución y controles topografía/satélite; verificada en perspectiva, planta y móvil, sin alterar cotas ni backend.
 
 - [x] Cholqui: construir relieve interpolado de las curvas CAD declaradas en el visor compartido de Los Verdes, sin modificar backend ni extrapolar fuera de cobertura.
 - [x] Verificar relieve, capas y controles 3D de Cholqui con pruebas y navegador (9 pruebas; sesión real; perspectiva, planta, modo de evidencia primaria y móvil sin desbordamiento).
