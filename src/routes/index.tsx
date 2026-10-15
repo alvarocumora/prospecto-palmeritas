@@ -22,6 +22,7 @@ export const Route = createFileRoute("/")({
           "Proyectos mineros, mapa live de concesiones y lotes de commodities verificados en una sola plataforma.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: MarketingLanding,
