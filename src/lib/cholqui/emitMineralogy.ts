@@ -62,8 +62,8 @@ export function buildEmitLayers(emit: EmitCollection): EmitLayer[] {
       features: emit.features.filter((f) => f.properties?.familia === key),
     } as FeatureCollection,
     color: FAMILY_COLORS[key] ?? geoColors.signal,
-    // Óxidos de Fe³⁺ cubren gran parte del AOI: apagados al abrir para no ocultar el resto.
-    defaultVisible: key !== "oxidos",
+    // Solo las familias más diagnósticas abren activas; las extensas se encienden a pedido.
+    defaultVisible: key === "alunita" || key === "arcillas",
   }));
 }
 
