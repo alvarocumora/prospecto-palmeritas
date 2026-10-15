@@ -34,6 +34,10 @@ export function PublicGeoLayerControls({
   counts?: Readonly<Partial<Record<CanonicalGeoLayerId, number>>>;
   tree?: boolean;
   terrain?: {
+    label?: string;
+    evidence?: "OFICIAL" | "DERIVADO";
+    scale?: string;
+    blocked?: boolean;
     visible: boolean;
     opacity: number;
     onToggle: () => void;
@@ -103,10 +107,11 @@ export function PublicGeoLayerControls({
                     type="checkbox"
                     checked={terrain.visible}
                     onChange={terrain.onToggle}
-                    aria-label="Mostrar topografía DEM Copernicus"
+                    disabled={terrain.blocked}
+                    aria-label={`Mostrar ${terrain.label ?? "topografía DEM Copernicus"}`}
                   />
-                  <span className="flex-1">Topografía · DEM Copernicus GLO-30</span>
-                  <EvidenceBadge kind="OFICIAL" scale="~30 m" size="xs" />
+                  <span className="flex-1">{terrain.label ?? "Topografía · DEM Copernicus GLO-30"}</span>
+                  <EvidenceBadge kind={terrain.evidence ?? "OFICIAL"} scale={terrain.scale ?? "~30 m"} size="xs" />
                 </label>
                 <label className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
                   Opacidad
@@ -117,7 +122,8 @@ export function PublicGeoLayerControls({
                     step={0.05}
                     value={terrain.opacity}
                     onChange={(event) => terrain.onOpacity(Number(event.target.value))}
-                    aria-label="Opacidad de la topografía DEM Copernicus"
+                    disabled={terrain.blocked}
+                    aria-label={`Opacidad de ${terrain.label ?? "la topografía DEM Copernicus"}`}
                     className="min-w-0 flex-1 accent-gold"
                   />
                   <span className="w-7 text-right tabular-nums">
