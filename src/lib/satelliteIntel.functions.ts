@@ -136,7 +136,7 @@ export const searchStac = createServerFn({ method: "POST" })
     const body: Record<string, unknown> = {
       collections: [cfg.id],
       bbox: data.bbox,
-      datetime: `${data.dateFrom}/${data.dateTo}`,
+      datetime: `${data.dateFrom}T00:00:00Z/${data.dateTo}T23:59:59Z`,
       limit: data.limit,
     };
     if (
