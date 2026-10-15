@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from "react";
 import { Line } from "@react-three/drei";
 import * as THREE from "three";
-import type { DemTile } from "@/engine3d/terrain/dem.functions";
+import type { TerrainTile } from "@/lib/geospatial/terrainTile";
 import type { GeophysicsLine, GeophysicsStation } from "@/types/geophysics";
 import type { GeophysicsSurface } from "@/lib/geoscience/geophysicsSurface";
 import { geophysicsSurfaceColor } from "@/components/map/geophysicsLayers";
@@ -27,7 +27,7 @@ export function CholquiGeophysicsTerrainLayer({
   opacity,
   onHover,
 }: {
-  tile: DemTile;
+  tile: TerrainTile;
   stations: GeophysicsStation[];
   lines: GeophysicsLine[];
   surface: GeophysicsSurface | null;

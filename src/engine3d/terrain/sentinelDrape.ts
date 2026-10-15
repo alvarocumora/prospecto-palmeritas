@@ -1,16 +1,16 @@
 import proj4 from "proj4";
 import { fromArrayBuffer } from "geotiff";
 import * as THREE from "three";
-import type { DemTile } from "./dem.functions";
+import type { TerrainTile } from "@/lib/geospatial/terrainTile";
 
 const METERS_PER_DEGREE = 111_320;
 
 /** Reprojects the stored Sentinel RGB raster onto the DEM's local terrain grid. */
 export async function loadSentinelDrapeTexture(
   url: string,
-  tile: DemTile,
+  tile: TerrainTile,
 ): Promise<THREE.CanvasTexture> {
-  if (tile.source !== "copernicus" || tile.centerLat == null || tile.centerLng == null)
+  if (tile.source === "synthetic" || tile.centerLat == null || tile.centerLng == null)
     throw new Error("REAL_TERRAIN_REQUIRED_FOR_SENTINEL_DRAPE");
   const response = await fetch(url);
   if (!response.ok) throw new Error(`SENTINEL_RGB_${response.status}`);
