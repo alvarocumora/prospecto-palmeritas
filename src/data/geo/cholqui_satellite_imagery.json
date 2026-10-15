@@ -1,0 +1,15 @@
+{
+  "bbox": [
+    -71.08871909051041,
+    -33.903297590510405,
+    -70.9697459094896,
+    -33.7843244094896
+  ],
+  "crs": "EPSG:4326",
+  "source": "Esri World Imagery",
+  "attribution": "Source: Esri, Vantor, Earthstar Geographics, and the GIS User Community",
+  "acquisitionDate": null,
+  "retrievedAt": "2026-10-15",
+  "sha256": "cfab96e73153942f789d73528fe52df56c5554d462a542f3a1267a02160274f5",
+  "notice": "Mosaico de imagen real para contexto visual; fecha de adquisición variable/no verificada. No es un raster analítico Sentinel ni aporta nuevas cotas."
+}

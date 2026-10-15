@@ -23,6 +23,7 @@ import { getSentinelRgbDrape } from "@/lib/sentinelProcessing.functions";
 import { loadSentinelDrapeTexture } from "@/engine3d/terrain/sentinelDrape";
 import type { TerrainTile } from "@/lib/geospatial/terrainTile";
 import { Button } from "@/components/ui/button";
+import { loadImageDrape, type GeoreferencedImageDrape } from "@/lib/geospatial/imageDrape";
 import {
   projectTerrainPoint,
   proposedTraceEnd,
@@ -60,6 +61,8 @@ export type ProjectTerrain3DProps = {
   documentMenu?: ReactNode;
   terrainTile?: TerrainTile;
   terrainSourceNotice?: string;
+  satelliteImage?: GeoreferencedImageDrape;
+  initialDrape?: "elevation" | "satellite";
 };
 
 function projectBundle(props: ProjectTerrain3DProps): PublicGeoBundle {
@@ -165,6 +168,7 @@ function Terrain({
   return (
     <mesh geometry={geometry} rotation-x={-Math.PI / 2}>
       <meshStandardMaterial
+        key={drape ? "satellite-textured" : "elevation-colors"}
         map={drape ? texture : null}
         vertexColors={!drape}
         roughness={0.95}
@@ -438,8 +442,13 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   const [primaryOnly, setPrimaryOnly] = useState(false);
   const [view, setView] = useState<"perspective" | "plan">("perspective");
   const [reset, setReset] = useState(0);
-  const [terrainDrape, setTerrainDrape] = useState<"elevation" | "sentinel">("elevation");
+  const [terrainDrape, setTerrainDrape] = useState<"elevation" | "sentinel">(
+    props.initialDrape === "satellite" ? "sentinel" : "elevation",
+  );
   const [sentinelTexture, setSentinelTexture] = useState<THREE.Texture | null>(null);
+  const [imageTexture, setImageTexture] = useState<THREE.Texture | null>(null);
+  const [imageFailed, setImageFailed] = useState(false);
+  const drapeTexture = props.satelliteImage ? imageTexture : sentinelTexture;
   const available = useMemo(() => new Set(bundle.manifest.layers.map((meta) => meta.id)), [bundle]);
   const counts = useMemo(
     () =>
@@ -512,7 +521,7 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
   const sentinelDrape = useQuery({
     queryKey: ["sentinel-terrain-drape", projectId, terrainBbox],
     queryFn: () => sentinelDrapeFn({ data: { projectId, bbox: terrainBbox } }),
-    enabled: Boolean(tile) && projectId !== "00000000-0000-0000-0000-000000000000",
+    enabled: !props.satelliteImage && Boolean(tile) && projectId !== "00000000-0000-0000-0000-000000000000",
     retry: false,
     staleTime: 240_000,
   });
@@ -531,6 +540,16 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
     };
   }, [sentinelDrape.data?.url, tile]);
   useEffect(() => () => sentinelTexture?.dispose(), [sentinelTexture]);
+  useEffect(() => {
+    let cancelled = false;
+    setImageTexture(null); setImageFailed(false);
+    if (!tile || !props.satelliteImage) return;
+    void loadImageDrape(props.satelliteImage, tile).then((texture) => {
+      if (cancelled) texture.dispose(); else setImageTexture(texture);
+    }).catch(() => { if (!cancelled) { setImageFailed(true); setTerrainDrape("elevation"); } });
+    return () => { cancelled = true; };
+  }, [tile, props.satelliteImage]);
+  useEffect(() => () => imageTexture?.dispose(), [imageTexture]);
   const certifiedVisible = visible["sampling.assays"];
   const neighbour =
     tile && neighbourDeposit
@@ -694,10 +713,12 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
           <Button size="sm" variant="outline"
             type="button"
             aria-pressed={terrainDrape === "sentinel"}
-            disabled={!sentinelTexture}
+            disabled={!drapeTexture}
             onClick={() => setTerrainDrape("sentinel")}
             title={
-              sentinelDrape.isError
+              props.satelliteImage
+                ? imageFailed ? "No se pudo cargar la imagen real" : drapeTexture ? props.satelliteImage.source : "Cargando imagen satelital real"
+                : sentinelDrape.isError
                 ? "Sin acceso a un raster Sentinel-2 compatible"
                 : sentinelDrape.isPending
                   ? "Buscando una escena procesada que cubra el terreno"
@@ -709,7 +730,7 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
                 : "hover:bg-surface-2"
             }`}
           >
-            Sentinel RGB
+            {props.satelliteImage ? "Satélite real" : "Sentinel RGB"}
           </Button>
           {(["perspective", "plan"] as const).map((key) => (
             <Button size="sm" variant="outline"
@@ -734,7 +755,9 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
         </div>
       </div>
       <div className="relative bg-surface" data-surface="canvas"
-        data-terrain-source={tile?.source} style={{ height }}>
+        data-terrain-source={tile?.source}
+        data-terrain-drape={terrainDrape === "sentinel" && drapeTexture ? "satellite" : "elevation"}
+        style={{ height }}>
         {!props.terrainTile && dem.isPending && (
           <div
             role="status"
@@ -776,8 +799,8 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
                 <Terrain
                   tile={tile}
                   opacity={opacity["territory.dem"] ?? 0.9}
-                  texture={sentinelTexture}
-                  drape={terrainDrape === "sentinel" && Boolean(sentinelTexture)}
+                  texture={drapeTexture}
+                  drape={terrainDrape === "sentinel" && Boolean(drapeTexture)}
                 />
               )}
               <CholquiGeophysicsTerrainLayer
@@ -885,7 +908,7 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
             </Suspense>
           </Canvas>
         )}
-        {terrainDrape === "sentinel" && sentinelDrape.data && (
+        {!props.satelliteImage && terrainDrape === "sentinel" && sentinelDrape.data && (
           <div className="pointer-events-none absolute bottom-3 left-3 max-w-[80%] rounded border border-hairline bg-surface/90 px-2 py-1 font-mono text-[10px] text-content">
             Sentinel-2 L2A · RGB B04/B03/B02 ·{" "}
             {sentinelDrape.data.acquisitionDate?.slice(0, 10) ?? "fecha no informada"} · máscara SCL
@@ -949,6 +972,12 @@ export function ProjectTerrain3D(props: ProjectTerrain3DProps) {
           </div>
         )}
       </div>
+      {props.satelliteImage && terrainDrape === "sentinel" && (
+        <div className="border-t border-hairline px-4 py-2 font-mono text-[10px] text-content-subtle">
+          {imageTexture ? props.satelliteImage.attribution : imageFailed ? "Imagen no disponible" : "Cargando imagen real…"}
+          {imageTexture && <span className="block">Mosaico real · fecha de adquisición no verificada · contexto visual, no análisis espectral</span>}
+        </div>
+      )}
       <div className="flex flex-wrap gap-4 border-t border-hairline px-4 py-2 text-[11px] font-mono text-content-subtle">
         <span>
           <span
