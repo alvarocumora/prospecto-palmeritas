@@ -70,3 +70,39 @@ def main(d, out):
     print(json.dumps(scenes, indent=1, ensure_ascii=False)); print('bytes', os.path.getsize(out))
 
 if __name__ == '__main__': main(sys.argv[1], sys.argv[2])
+
+# ---- Compactación para el visor: familias minerales, una celda = un punto (centro de píxel GLT) ----
+FAMILIES = [
+    ('alunita', 'Alunita / sulfatos ácidos (argílica avanzada)', ('alun', 'jarosite')),
+    ('arcillas', 'Caolinita / esmectita (argílica)', ('kaol', 'smectite', 'pyroph')),
+    ('clorita', 'Clorita / serpentina / talco (propilítica)', ('chlorite', 'serpentine', 'talc', 'actinolite', 'epidote')),
+    ('carbonatos', 'Carbonatos / yeso', ('carbonate', 'gypsum', 'calcite')),
+    ('oxidos', 'Óxidos de Fe³⁺ (hematita / goethita)', ('fe3+', 'hematite', 'goeth', 'ferrihydrite')),
+]
+
+def family(name):
+    n = name.lower()
+    for key, _, pats in FAMILIES:
+        if any(p in n for p in pats): return key
+    return None
+
+def compact(src, out):
+    fc = json.load(open(src)); cells = {}
+    for ft in fc['features']:
+        p = ft['properties']; fam = family(p['mineral'])
+        if not fam: continue
+        ring = ft['geometry']['coordinates'][0]
+        lon = round((ring[0][0] + ring[2][0]) / 2, 6); lat = round((ring[0][1] + ring[2][1]) / 2, 6)
+        k = (fam, lon, lat); scene = p['escena'][-15:-7]
+        c = cells.setdefault(k, {'f': fam, 'm': p['mineral'], 'd': p['profundidad_banda'], 'u': p['incertidumbre'], 's': set()})
+        c['s'].add(scene)
+        if p['profundidad_banda'] > c['d']: c.update(m=p['mineral'], d=p['profundidad_banda'], u=p['incertidumbre'])
+    feats = [{'type': 'Feature', 'geometry': {'type': 'Point', 'coordinates': [k[1], k[2]]},
+              'properties': {'familia': c['f'], 'mineral': c['m'], 'profundidad_banda': c['d'], 'incertidumbre': c['u'],
+                             'escenas': ','.join(sorted(c['s'])), 'coincide_2_escenas': len(c['s']) > 1}}
+             for k, c in cells.items()]
+    meta = fc['metadata']; meta['familias'] = {k: l for k, l, _ in FAMILIES}
+    meta['geometria'] = 'Punto en el centro de cada píxel EMIT ortorrectificado (~60 m); una celda puede aparecer en ambas escenas.'
+    meta['conteo_familias'] = {k: sum(1 for f in feats if f['properties']['familia'] == k) for k, _, _ in FAMILIES}
+    json.dump({'type': 'FeatureCollection', 'metadata': meta, 'features': feats}, open(out, 'w'), separators=(',', ':'), ensure_ascii=False)
+    print(meta['conteo_familias'], 'coinciden', sum(f['properties']['coincide_2_escenas'] for f in feats), 'bytes', os.path.getsize(out))
