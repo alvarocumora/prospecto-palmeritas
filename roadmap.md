@@ -1,5 +1,8 @@
 # Roadmap
 
+- [ ] Cholqui: construir relieve interpolado de las curvas CAD declaradas en el visor compartido de Los Verdes, sin modificar backend ni extrapolar fuera de cobertura.
+- [ ] Verificar relieve, capas y controles 3D de Cholqui con pruebas y navegador.
+
 - [x] Actualizar el informe técnico compartido con membrete Geocapitals, índice paginado, control documental, procedencia y revisión NI 43-101/JORC.
 - [x] Verificar descargas NI 43-101/JORC de Nahuelbuta y Cholqui; revisar visualmente todas las páginas y eliminar la página de guía casi vacía.
 - [ ] Verificar exportación Los Verdes — bloqueada durante la comprobación por la carga de antecedentes del reporte; no generar resultados de sustitución.
