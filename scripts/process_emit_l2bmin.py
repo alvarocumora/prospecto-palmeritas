@@ -107,6 +107,11 @@ def compact(src, out):
     meta['conteo_familias'] = {k: sum(1 for f in feats if f['properties']['familia'] == k) for k, _, _ in FAMILIES}
     feats = [f for f in feats if f['properties']['familia'] != 'oxidos' or f['properties']['coincide_2_escenas'] or len(meta['escenas']) < 2]
     meta['filtro_oxidos'] = 'Óxidos de Fe³⁺: solo celdas detectadas en ambas escenas, por su ubicuidad en suelos.'
+    ox = [f['properties']['profundidad_banda'] for f in feats if f['properties']['familia'] == 'oxidos']
+    if len(ox) > 5000:  # casi todo el AOI: conservar solo el cuartil superior de profundidad de banda
+        p75 = float(np.percentile(ox, 75))
+        feats = [f for f in feats if f['properties']['familia'] != 'oxidos' or f['properties']['profundidad_banda'] >= p75]
+        meta['filtro_oxidos'] += f' Además, cuartil superior de profundidad de banda en el AOI (>= {p75:.4f}).'
     meta['conteo_familias'] = {k: sum(1 for f in feats if f['properties']['familia'] == k) for k, _, _ in FAMILIES}
     json.dump({'type': 'FeatureCollection', 'metadata': meta, 'features': feats}, open(out, 'w'), separators=(',', ':'), ensure_ascii=False)
     print(meta['conteo_familias'], 'coinciden', sum(f['properties']['coincide_2_escenas'] for f in feats), 'bytes', os.path.getsize(out))
