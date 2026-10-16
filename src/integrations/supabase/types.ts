@@ -16398,39 +16398,54 @@ export type Database = {
         Row: {
           created_at: string
           currency: string
+          escrow_instructions: string | null
           id: string
           incorporated_on: string | null
           legal_name: string
+          min_ticket: number | null
           notes: string | null
           project_code: string
+          round_shares: number | null
+          round_size: number | null
           rut: string | null
           share_price: number | null
+          tickets_open: boolean
           total_shares: number
           updated_at: string
         }
         Insert: {
           created_at?: string
           currency?: string
+          escrow_instructions?: string | null
           id?: string
           incorporated_on?: string | null
           legal_name: string
+          min_ticket?: number | null
           notes?: string | null
           project_code: string
+          round_shares?: number | null
+          round_size?: number | null
           rut?: string | null
           share_price?: number | null
+          tickets_open?: boolean
           total_shares?: number
           updated_at?: string
         }
         Update: {
           created_at?: string
           currency?: string
+          escrow_instructions?: string | null
           id?: string
           incorporated_on?: string | null
           legal_name?: string
+          min_ticket?: number | null
           notes?: string | null
           project_code?: string
+          round_shares?: number | null
+          round_size?: number | null
           rut?: string | null
           share_price?: number | null
+          tickets_open?: boolean
           total_shares?: number
           updated_at?: string
         }
@@ -20207,6 +20222,15 @@ export type Database = {
       }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
+      spv_round_status: {
+        Args: { _project_code: string }
+        Returns: {
+          committed: number
+          settled: number
+          spv_id: string
+          tickets_count: number
+        }[]
+      }
       tenencia_overlaps: {
         Args: { p_exclude_project?: string; p_geom: Json }
         Returns: {
@@ -20308,6 +20332,43 @@ export type Database = {
           _signature_name: string
           _ticket_id: string
         }
+        Returns: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "investment_tickets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ticket_submit_for_review: {
+        Args: { _ticket_id: string }
         Returns: {
           amount: number
           cancel_reason: string | null
