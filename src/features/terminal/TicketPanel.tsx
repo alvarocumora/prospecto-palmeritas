@@ -145,7 +145,7 @@ function TicketPanelInner({ spvCode, projectName }: { spvCode: string; projectNa
             </div>
             <label className="mt-3 flex gap-2 text-xs text-content-subtle">
               <input type="checkbox" checked={risk} onChange={(e) => setRisk(e.target.checked)} />
-              Entiendo que es un proyecto en exploración, sin recursos ni reservas certificados
+              Entiendo que es un proyecto en explotación, sin recursos ni reservas certificados
               (NI 43-101 / JORC), y que no se garantiza rentabilidad.
             </label>
           </div>
