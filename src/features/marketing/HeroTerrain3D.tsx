@@ -60,7 +60,8 @@ function TerrainMesh({ tile, texture }: { tile: TerrainTile; texture: THREE.Text
   }, [tile]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
-    <mesh geometry={geometry}>
+    // Remount instead of updating props: dev tooling injects attributes R3F cannot patch.
+    <mesh key={texture ? "drape" : "ramp"} geometry={geometry}>
       {texture ? (
         <meshStandardMaterial map={texture} roughness={0.95} />
       ) : (
