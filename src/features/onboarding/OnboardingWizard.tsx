@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { notifyInvestorSubmitted } from "@/lib/investors.functions";
+import { sha256Hex } from "@/lib/documents/signing";
 
 type AccountType = "investor" | "mining_owner" | "geocapitals_team";
 
@@ -169,7 +170,10 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     setSaving(true);
     try {
       if (selected === "investor") {
-        if (!inv.full_name.trim() || !inv.company_name.trim()) {
+        if (
+          !inv.full_name.trim() ||
+          (inv.investor_type !== "individual" && !inv.company_name.trim())
+        ) {
           toast.error("Nombre y empresa son obligatorios.");
           setSaving(false);
           return;
@@ -373,9 +377,9 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 onChange={(e) => setInv({ ...inv, investor_type: e.target.value })}
                 className={selectCls}
               >
-                {INVESTOR_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
+                {INVESTOR_TYPES.map(([v, l]) => (
+                  <option key={v} value={v}>
+                    {l}
                   </option>
                 ))}
               </select>
@@ -417,6 +421,64 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 placeholder="https://"
               />
             </Field>
+            <Field label="RUT / Tax ID *">
+              <Input
+                value={inv.tax_id}
+                onChange={(v) => setInv({ ...inv, tax_id: v })}
+                placeholder="76.xxx.xxx-x"
+              />
+            </Field>
+            <Field label="Inversionista calificado">
+              <label className="flex items-center gap-2 text-xs text-muted-foreground h-[34px]">
+                <input
+                  type="checkbox"
+                  checked={inv.is_accredited}
+                  onChange={(e) => setInv({ ...inv, is_accredited: e.target.checked })}
+                  className="accent-gold"
+                />
+                Declaro ser inversionista calificado / acreditado
+              </label>
+            </Field>
+            {inv.is_accredited && (
+              <Field label="Fundamento de la calificación" full>
+                <Input
+                  value={inv.accreditation_basis}
+                  onChange={(v) => setInv({ ...inv, accreditation_basis: v })}
+                  placeholder="Ej.: NCG 216 CMF, patrimonio, inversionista institucional…"
+                />
+              </Field>
+            )}
+            <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
+              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+                Declaración de riesgos
+              </div>
+              <p className="text-xs text-muted-foreground">{RISK_TEXT}</p>
+              <label className="flex items-start gap-2 text-xs cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={inv.risk_accepted}
+                  onChange={(e) => setInv({ ...inv, risk_accepted: e.target.checked })}
+                  className="mt-0.5 accent-gold"
+                />
+                He leído y acepto la declaración de riesgos.
+              </label>
+            </div>
+            <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
+              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+                Acuerdo de confidencialidad y no elusión ({NDA_VERSION})
+              </div>
+              <p className="text-xs text-muted-foreground">{NDA_TEXT}</p>
+              <Field label="Firma: escribe tu nombre completo *" full>
+                <Input
+                  value={inv.nda_signature}
+                  onChange={(v) => setInv({ ...inv, nda_signature: v })}
+                  placeholder={inv.full_name || "Nombre completo"}
+                />
+              </Field>
+              <p className="text-[10px] font-mono text-muted-foreground">
+                Se registra fecha y hora UTC y una huella SHA-256 de la firma.
+              </p>
+            </div>
             <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
               <input
                 type="checkbox"
