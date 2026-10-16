@@ -39,4 +39,4 @@
 - [ ] Siguiente capa satelital (Sentinel-1 SAR lineamientos o ASTER sílice) — espera elección del usuario
 - [x] Cholqui: ASTER TIR sílice + Sentinel-1 lineamientos (scripts/process_aster_s1.py)
 
-- [ ] Flujo de inversiones: H1 base de datos ✓ · H2 onboarding ✓ · H3 configurador · H4 contrato · H5 paneles · H6 QA
+- [ ] Flujo de inversiones: H1 base de datos ✓ · H2 onboarding ✓ · H3 configurador ✓ (Cholqui y Los Verdes: 15.000 acciones a USD 100, meta USD 1.500.000, mínimo USD 25.000; ambas rondas cerradas) · H4 contrato con QR y página pública de verificación · H5 QA de flujo completo en navegador · Abrir rondas cuando el usuario lo decida
