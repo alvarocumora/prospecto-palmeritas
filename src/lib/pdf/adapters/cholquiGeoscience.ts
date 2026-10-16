@@ -1,4 +1,4 @@
-import { CHOLQUI_ASSAYS, CHOLQUI_ASSAY_REPORTS } from "@/features/franco/data/cholqui";
+import { CHOLQUI_ASSAYS, CHOLQUI_ASSAY_REPORTS, CHOLQUI_POINTS } from "@/features/franco/data/cholqui";
 import {
   CHOLQUI_COORDINATE_NOTICE,
   CHOLQUI_INTERPOLATION_NOTICE,
@@ -6,7 +6,96 @@ import {
 import candidatesRaw from "@/data/geo/cholqui_satellite_candidates.geojson?raw";
 import drillRaw from "@/data/geo/cholqui_drill_grid.geojson?raw";
 import { parsePublishedDrillGrid, totalMeters } from "@/lib/cholqui/drillGrid";
+import emitRaw from "@/data/geo/cholqui_emit_mineralogia.json?raw";
+import { crossValidate, type AssayPoint, type EmitFeature } from "@/lib/cholqui/crossValidation";
 import type { DocSection } from "../model";
+
+const CV_RADIUS_M = 150;
+
+function crossValidationSection(): DocSection {
+  const emit = JSON.parse(emitRaw) as {
+    metadata: { familias: Record<string, string>; escenas: Array<{ id: string }> };
+    features: EmitFeature[];
+  };
+  const families = Object.keys(emit.metadata.familias);
+  const points: AssayPoint[] = [];
+  const unlocated: string[] = [];
+  for (const a of CHOLQUI_ASSAYS) {
+    const p = CHOLQUI_POINTS.find((pt) => pt.code.replace("-", "") === a.sample.replace("-", ""));
+    if (p) points.push({ ...a, lat: p.lat, lng: p.lng });
+    else unlocated.push(a.sample);
+  }
+  const rows = crossValidate(points, emit.features, families, CV_RADIUS_M);
+  const withSignal = rows.filter((r) => r.convergent.length > 0).length;
+  const fmt = (f: { nearestM: number | null; countWithin: number }) =>
+    f.nearestM == null ? "—" : f.nearestM + " m" + (f.countWithin ? " (" + f.countWithin + ")" : "");
+  const noAdvanced = rows.filter((r) => !r.convergent.includes("alunita") && !r.convergent.includes("arcillas"));
+  return {
+    eyebrow: "Validación cruzada",
+    title: "Ensayes certificados frente a mineralogía espectral EMIT",
+    lead: "Mide la proximidad entre cada muestra de laboratorio y las detecciones satelitales; no transforma una estimación espectral en ley.",
+    blocks: [
+      {
+        kind: "narrative",
+        body:
+          "Para cada ensaye con coordenadas publicadas se calculó la distancia geodésica a la detección NASA EMIT L2B más cercana de cada familia mineral y el número de detecciones dentro de " +
+          CV_RADIUS_M +
+          " m (≈2,5 píxeles EMIT de 60 m). " +
+          withSignal +
+          " de " +
+          rows.length +
+          " muestras ubicadas tienen al menos una familia espectral dentro del radio. La coincidencia espacial apoya priorizar terreno; no demuestra continuidad, génesis ni ley.",
+        provenance: "DERIVED",
+        source: "crossValidation.ts · " + emit.metadata.escenas.map((e) => e.id).join(", "),
+      },
+      {
+        kind: "appendixTable",
+        title: "Distancia a la detección EMIT más cercana (n.º dentro de " + CV_RADIUS_M + " m)",
+        head: ["Muestra", "Cu %", "Au g/t", ...families.map((f) => f[0].toUpperCase() + f.slice(1))],
+        widths: [0.13, 0.1, 0.1, ...families.map(() => 0.67 / families.length)],
+        provenance: "DERIVED",
+        source: "Ensayes CERTIFICADOS × EMIT MODELADO; distancia haversine",
+        rows: rows.map((r) => [
+          r.assay.sample,
+          r.assay.cuTotalPct.toLocaleString("es-CL"),
+          r.assay.auGpt.toLocaleString("es-CL"),
+          ...r.families.map(fmt),
+        ]),
+      },
+      ...(noAdvanced.length
+        ? [
+            {
+              kind: "gap" as const,
+              title: "Muestras sin alteración argílica espectral cercana",
+              body:
+                noAdvanced.map((r) => r.assay.sample).join(", ") +
+                " no tienen alunita ni arcillas EMIT dentro de " +
+                CV_RADIUS_M +
+                " m. Puede deberse a cobertura vegetal, sombra topográfica, tamaño de la estructura (vetas de 1 m frente a píxeles de 60 m) o a un estilo de mineralización sin halo argílico.",
+              action:
+                "Mapeo de alteración en terreno y espectrometría portátil (SWIR) en los afloramientos muestreados antes de usar la señal satelital como criterio de exclusión.",
+            },
+          ]
+        : []),
+      ...(unlocated.length
+        ? [
+            {
+              kind: "gap" as const,
+              title: "Ensayes sin coordenadas publicadas",
+              body: unlocated.join(", ") + " no tienen punto georreferenciado y quedan fuera del cruce.",
+              action: "Registrar coordenadas GPS con datum declarado para cada muestra.",
+            },
+          ]
+        : []),
+      {
+        kind: "recommendation",
+        title: "Programa de validación de terreno",
+        body: "Visitar primero las detecciones de alunita y arcillas que coinciden en ambas escenas y no tienen ensaye a menos de 500 m; tomar muestras de roca con descripción de alteración y QA/QC (duplicados, blancos y estándares).",
+        priority: "high",
+      },
+    ],
+  };
+}
 
 export function cholquiGeoscienceSections(): DocSection[] {
   const candidates = JSON.parse(candidatesRaw) as {
@@ -15,6 +104,7 @@ export function cholquiGeoscienceSections(): DocSection[] {
   };
   const collars = parsePublishedDrillGrid(JSON.parse(drillRaw));
   return [
+    crossValidationSection(),
     {
       eyebrow: "Integración geocientífica",
       title: "Terreno, geofísica y límites de estimación",
