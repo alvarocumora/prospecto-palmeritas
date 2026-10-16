@@ -8307,6 +8307,146 @@ export type Database = {
           },
         ]
       }
+      investment_ticket_events: {
+        Row: {
+          actor_user_id: string | null
+          created_at: string
+          from_status: string | null
+          id: string
+          note: string | null
+          ticket_id: string
+          to_status: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          ticket_id: string
+          to_status: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          created_at?: string
+          from_status?: string | null
+          id?: string
+          note?: string | null
+          ticket_id?: string
+          to_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_ticket_events_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "investment_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      investment_tickets: {
+        Row: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          cancel_reason?: string | null
+          contract_hash?: string | null
+          contract_pdf_url?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          instrument_type?: string
+          investor_signature_name?: string | null
+          investor_user_id: string
+          listing_ref?: string | null
+          notes?: string | null
+          payment_proof_url?: string | null
+          payment_submitted_at?: string | null
+          payment_verified_at?: string | null
+          payment_verified_by?: string | null
+          risk_disclosure_accepted_at?: string | null
+          share_price?: number | null
+          shares_allocated?: number | null
+          signature_ip?: string | null
+          signed_at?: string | null
+          spv_id?: string | null
+          spv_position_id?: string | null
+          status?: string
+          ticket_code?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          cancel_reason?: string | null
+          contract_hash?: string | null
+          contract_pdf_url?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          instrument_type?: string
+          investor_signature_name?: string | null
+          investor_user_id?: string
+          listing_ref?: string | null
+          notes?: string | null
+          payment_proof_url?: string | null
+          payment_submitted_at?: string | null
+          payment_verified_at?: string | null
+          payment_verified_by?: string | null
+          risk_disclosure_accepted_at?: string | null
+          share_price?: number | null
+          shares_allocated?: number | null
+          signature_ip?: string | null
+          signed_at?: string | null
+          spv_id?: string | null
+          spv_position_id?: string | null
+          status?: string
+          ticket_code?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "investment_tickets_spv_id_fkey"
+            columns: ["spv_id"]
+            isOneToOne: false
+            referencedRelation: "spv_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "investment_tickets_spv_position_id_fkey"
+            columns: ["spv_position_id"]
+            isOneToOne: false
+            referencedRelation: "spv_positions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       investor_contacts: {
         Row: {
           created_at: string
@@ -20062,6 +20202,159 @@ export type Database = {
           severity: string
           status: string
         }[]
+      }
+      ticket_cancel: {
+        Args: { _reason?: string; _ticket_id: string }
+        Returns: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "investment_tickets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ticket_settle: {
+        Args: { _ticket_id: string }
+        Returns: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "investment_tickets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ticket_sign_contract: {
+        Args: {
+          _contract_hash: string
+          _contract_pdf_url?: string
+          _signature_name: string
+          _ticket_id: string
+        }
+        Returns: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "investment_tickets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ticket_submit_payment: {
+        Args: { _proof_url: string; _ticket_id: string }
+        Returns: {
+          amount: number
+          cancel_reason: string | null
+          contract_hash: string | null
+          contract_pdf_url: string | null
+          created_at: string
+          currency: string
+          id: string
+          instrument_type: string
+          investor_signature_name: string | null
+          investor_user_id: string
+          listing_ref: string | null
+          notes: string | null
+          payment_proof_url: string | null
+          payment_submitted_at: string | null
+          payment_verified_at: string | null
+          payment_verified_by: string | null
+          risk_disclosure_accepted_at: string | null
+          share_price: number | null
+          shares_allocated: number | null
+          signature_ip: string | null
+          signed_at: string | null
+          spv_id: string | null
+          spv_position_id: string | null
+          status: string
+          ticket_code: string
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "investment_tickets"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       trade_documents_checklist: {
         Args: { p_trade_id: string }
