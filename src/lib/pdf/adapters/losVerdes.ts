@@ -5,6 +5,7 @@
 import { publicUrl } from "@/lib/publicUrl";
 import type { TilamaReport } from "@/lib/tilama.functions";
 import type { ProjectDoc } from "../model";
+import { investmentRoundSection } from "./roundSection";
 
 export const LOS_VERDES_DOC_VERSION = "v3.0";
 
@@ -27,9 +28,9 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
   return {
     code: project.code,
     name: project.name,
-    subtitle: `${project.commodity ?? "Cu"} · Distrito de exploración con muestreo geoquímico sistemático`,
+    subtitle: `${project.commodity ?? "Cu"} · En explotación · 5.000 a 15.000 t/mes · muestreo geoquímico sistemático`,
     commodity: project.commodity ?? "Cu",
-    stage: "Exploración · muestreo de superficie",
+    stage: "Explotación · 5.000 a 15.000 t/mes",
     location: [project.region, project.country].filter(Boolean).join(", "),
     liveUrl: publicUrl("/terminal/losverdes"),
     docVersion: LOS_VERDES_DOC_VERSION,
@@ -99,6 +100,7 @@ export function buildLosVerdesDoc(report: TilamaReport): ProjectDoc {
       ],
     },
     sections: [
+      investmentRoundSection({ legalName: "Valle Escondido SpA", rut: "78.524.757-4" }),
       {
         eyebrow: "Catastro",
         title: "Concesiones del distrito",

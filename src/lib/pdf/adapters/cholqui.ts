@@ -2,6 +2,7 @@
  * Adaptador: antecedentes canónicos de Cholqui → modelo de documento global.
  * No inventa cifras: toda la información proviene de `features/franco/data/cholqui`.
  */
+import { investmentRoundSection } from "./roundSection";
 import { publicUrl } from "@/lib/publicUrl";
 import {
   CHOLQUI,
@@ -197,6 +198,7 @@ export function buildCholquiDoc(): ProjectDoc {
     ],
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
     sections: [
+      investmentRoundSection({ legalName: "Volcania Minerals SpA" }),
       ...cholquiGeoscienceSections(),
       {
         eyebrow: "Geología",

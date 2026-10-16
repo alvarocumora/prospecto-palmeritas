@@ -11,7 +11,6 @@ export function investmentRoundSection(o: { legalName: string; rut?: string }): 
     title: "Ronda y cómo invertir",
     lead: "Explotación en curso de 5.000 a 15.000 t/mes (rango declarado por el titular).",
     deck: true,
-    profiles: ["investment"],
     blocks: [
       {
         kind: "kv",
