@@ -34,3 +34,6 @@
 - [x] Cholqui: mineralogía NASA EMIT L2B (7 y 12 ene 2023) ortorrectificada con GLT oficial → 5 capas MODELADO en visor 2D (scripts/process_emit_l2bmin.py).
 - [x] Secreto EARTHDATA_TOKEN renovado.
 - [x] Los Verdes: mineralogía EMIT L2B (18 y 22 mar 2023) en visor 2D.
+
+- [x] Validación cruzada ensayes × EMIT en informe geocientífico de Cholqui
+- [ ] Siguiente capa satelital (Sentinel-1 SAR lineamientos o ASTER sílice) — espera elección del usuario
