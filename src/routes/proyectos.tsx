@@ -63,7 +63,7 @@ const SHOWCASE: Array<{code:string;slug:"palmeras"|"losverdes"|"cholqui"|"nahuel
     image: satLosVerdes.url,
     imageSource: "Satélite real · Esri World Imagery",
     coords: "32,03° S · 71,11° O",
-    stage: "Pre NI 43-101",
+    stage: "Explotación · 5.000–15.000 t/mes",
     stats: [
       ["17", "pertenencias mapeadas"],
       ["1.963", "ha en paquete"],
@@ -84,7 +84,7 @@ const SHOWCASE: Array<{code:string;slug:"palmeras"|"losverdes"|"cholqui"|"nahuel
     image: satCholqui.url,
     imageSource: "Satélite real · Esri World Imagery",
     coords: "33,84° S · 71,03° O",
-    stage: "Ronda de capital",
+    stage: "Explotación · 5.000–15.000 t/mes",
     stats: [
       ["14", "concesiones"],
       ["7", "ensayes"],
