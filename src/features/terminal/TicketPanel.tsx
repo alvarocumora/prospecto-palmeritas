@@ -333,6 +333,7 @@ function MyTicket({
               t,
               legalName,
               projectName,
+              signatureImage: loadSignatureImage(t.id),
               projectSlug:
                 INVESTABLE_PROJECTS.find((p) => p.name === projectName)?.slug ??
                 (projectName.toLowerCase().includes("verdes") ? "losverdes" : "cholqui"),
