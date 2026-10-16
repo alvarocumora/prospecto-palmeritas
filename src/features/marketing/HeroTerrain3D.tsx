@@ -28,7 +28,7 @@ const NOTES: Record<ProjectKey, string> = {
 function rampColor(t: number, out: THREE.Color) {
   const low = new THREE.Color("#1f3a4d");
   const mid = new THREE.Color("#8a6a45");
-  const high = new THREE.Color("#e9dcc6");
+  const high = new THREE.Color("#a8987e");
   return t < 0.5 ? out.copy(low).lerp(mid, t * 2) : out.copy(mid).lerp(high, (t - 0.5) * 2);
 }
 
@@ -106,7 +106,7 @@ export default function HeroTerrain3D() {
   // Never show a procedural fallback as if it were real terrain.
   const lvTile = losVerdes.data && losVerdes.data.source === "copernicus" ? losVerdes.data : null;
   const tile: TerrainTile | null = project === "cholqui" ? cholquiCadTerrain : lvTile;
-  const extent = tile?.extentMeters ?? 10000;
+  const extent = (tile?.extentMeters ?? 10000) * (project === "losverdes" ? 1.5 : 1);
 
   return (
     <div className="absolute inset-0">
