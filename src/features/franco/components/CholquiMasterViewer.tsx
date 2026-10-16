@@ -6,6 +6,7 @@ import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
 import { cholquiFieldGeophysics } from "@/lib/cholqui/geophysicsTerrain";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
+import { useAsterS1Layers } from "@/lib/cholqui/asterS1Layers";
 import { geoColors } from "@/lib/geospatial/visualTokens";
 // Catastro OFICIAL directo de SERNAGEOMIN (no el KMZ del operador).
 import concessionsRaw from "@/data/geo/cholqui_catastro_sngm.geojson?raw";
@@ -124,6 +125,7 @@ export function CholquiMasterViewer() {
   const { data: geophysics } = useProjectGeophysicsData(project?.id);
   const { data: satellitePreview } = useSentinelRasterPreview(project?.id);
   const emitLayers = useEmitMineralogyLayers("cholqui");
+  const asterS1Layers = useAsterS1Layers();
 
   return (
     <ProjectMasterViewer
@@ -149,6 +151,7 @@ export function CholquiMasterViewer() {
       contextLayers={[
         ...CAD_LAYERS,
         ...emitLayers,
+        ...asterS1Layers,
         ...(satellitePreview?.features.length
           ? [
               {
