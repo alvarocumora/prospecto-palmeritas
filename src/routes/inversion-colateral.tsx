@@ -21,7 +21,7 @@ export const Route = createFileRoute("/inversion-colateral")({
       {
         name: "description",
         content:
-          "Invierte desde $25 MM a UF + 12 % anual con interés mensual, respaldado por una parcela en el Maule.",
+          "Invierte desde $15 MM a UF + 12 % anual con interés mensual, respaldado por una parcela en el Maule.",
       },
       { property: "og:title", content: "Inversión minera con parcela en garantía · Geocapitals" },
       {
@@ -36,14 +36,14 @@ export const Route = createFileRoute("/inversion-colateral")({
 });
 
 const HIGHLIGHTS = [
-  { icon: Landmark, label: "Inversión mínima", value: "$25 MM" },
+  { icon: Landmark, label: "Inversión mínima", value: "$15 MM" },
   { icon: CalendarClock, label: "Tasa, pago mensual", value: "UF + 12 %" },
   { icon: ShieldCheck, label: "Garantía", value: "5.000 m² a 1 ha" },
   { icon: Repeat, label: "Renovación", value: "Cada 12 meses" },
 ];
 
 function PublicCollateralPage() {
-  const [sim, setSim] = useState({ amount: 25_000_000, months: 12 });
+  const [sim, setSim] = useState({ amount: 15_000_000, months: 12 });
 
   return (
     <div className="brand-light min-h-screen">

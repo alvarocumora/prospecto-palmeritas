@@ -14,9 +14,11 @@ import {
   submitTicketPayment,
   type TicketRow,
 } from "@/lib/tickets.functions";
+import { downloadInvestmentContractPdf } from "@/lib/pdf/investmentContractPdf";
 import {
   TICKET_STATUS_LABEL,
   TICKET_STEPS,
+  INVESTABLE_PROJECTS,
   contractText,
   fmtMoney,
   sha256Hex,
@@ -284,6 +286,24 @@ function MyTicket({
             </button>
           </div>
         </div>
+      )}
+
+      {t.contract_hash && (
+        <button
+          onClick={() =>
+            downloadInvestmentContractPdf({
+              t,
+              legalName,
+              projectName,
+              projectSlug:
+                INVESTABLE_PROJECTS.find((p) => p.name === projectName)?.slug ??
+                (projectName.toLowerCase().includes("verdes") ? "losverdes" : "cholqui"),
+            }).catch((e) => toast.error(e instanceof Error ? e.message : "Error al generar PDF"))
+          }
+          className="mt-3 inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
+        >
+          <FileSignature className="w-3.5 h-3.5" /> Descargar contrato firmado (PDF con QR)
+        </button>
       )}
 
       {t.status === "payment_pending" && (
