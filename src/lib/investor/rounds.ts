@@ -44,6 +44,13 @@ export function contractText(t: {
     `CONTRATO DE SUSCRIPCIÓN DE ACCIONES · ${t.ticket_code}`,
     `Sociedad: ${t.legalName} · Proyecto: ${t.projectName}`,
     `Monto: ${fmtMoney(t.amount, t.currency)} · Precio por acción: ${fmtMoney(t.share_price, t.currency)} · Acciones: ${t.shares_allocated ?? "—"}`,
+    ...(t.legalName.includes("Valle Escondido")
+      ? [
+          "Operadora: VALLE ESCONDIDO SpA (Minera Valle Escondido SpA), RUT 78.524.757-4, Las Condes, representada por su Gerente General don Álvaro Cumora Oliva Herrera.",
+          "Marco: Contrato Marco de Desarrollo, Inversión, Exclusividad y Venta del Proyecto Minero Integrado Tilama – Los Verdes (v1.1, borrador para revisión legal y notarial). Programa de inversión inicial de referencia CLP 200.000.000 (Anexo N°2). Renta minera a titulares: 10% del valor líquido pagado por ENAMI u otro comprador. Base de venta integral al propietario US$8.000.000 (Anexo N°5); estos montos son pactos contractuales, no tasación técnica ni recurso mineral.",
+          "Exclusividad, no elusión y confidencialidad según cláusulas Décimo Tercera, Vigésimo Cuarta y Vigésimo Quinta. Ley chilena; tribunales de Santiago.",
+        ]
+      : []),
     "El inversionista declara conocer que el proyecto se encuentra en etapa de exploración, que no existen recursos ni reservas certificados bajo NI 43-101 ni JORC, y que la información técnica combina hechos medidos, datos declarados por terceros e interpretaciones. No se garantiza rentabilidad. Los fondos se depositan en la cuenta indicada por la sociedad y la emisión de acciones queda sujeta a la verificación del pago por GeoCapitals.",
   ].join("\n");
 }
