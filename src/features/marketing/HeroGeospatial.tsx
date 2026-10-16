@@ -1,13 +1,9 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, Layers, Crosshair, Compass, Satellite, BarChart3, ClipboardCheck } from "lucide-react";
-import relief from "@/assets/hero-chile-relief.jpg";
+import { lazy, Suspense } from "react";
+import { ClientOnly } from "@tanstack/react-router";
 
-/** Proyectos reales del portafolio; posición aproximada en % del lienzo. */
-const MARKERS = [
-  { slug: "losverdes", name: "Los Verdes", region: "Coquimbo", x: 63, y: 30 },
-  { slug: "cholqui", name: "Cholqui", region: "RM", x: 62, y: 42 },
-  { slug: "palmeritas", name: "Palmeritas", region: "Atacama", x: 64, y: 12 },
-];
+const HeroTerrain3D = lazy(() => import("./HeroTerrain3D"));
 
 const VALUES = [
   { icon: Layers, label: "Datos geoespaciales", sub: "más ricos" },
@@ -32,38 +28,17 @@ const LEGEND = [
 export function HeroGeospatial() {
   return (
     <section className="relative overflow-hidden border-b border-border bg-background text-foreground min-h-[680px]">
-      <img src={relief} alt="Relieve satelital de Chile" className="absolute inset-y-0 right-0 h-full w-full object-cover opacity-80 md:w-[80%]" style={{ objectPosition: "45% top" }} />
-      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
+      <div className="absolute inset-y-0 right-0 w-full md:w-[62%]">
+        <ClientOnly fallback={null}>
+          <Suspense fallback={null}>
+            <HeroTerrain3D />
+          </Suspense>
+        </ClientOnly>
+      </div>
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:via-background/40" />
 
-      {/* Retículo táctico + marcadores reales */}
-      <svg aria-hidden className="absolute inset-0 h-full w-full text-signal-cyan" preserveAspectRatio="none">
-        {[90, 160, 240].map((r) => (
-          <circle key={r} cx="62%" cy="42%" r={r} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeDasharray="3 6" />
-        ))}
-        <line x1="62%" y1="0" x2="62%" y2="100%" stroke="currentColor" strokeOpacity={0.12} />
-        <line x1="0" y1="42%" x2="100%" y2="42%" stroke="currentColor" strokeOpacity={0.12} />
-      </svg>
-      <div className="absolute left-[67%] top-[50%] hidden md:block font-mono text-xs tracking-[0.5em] text-muted-foreground">CHILE</div>
-      {MARKERS.map((m) => (
-        <a
-          key={m.slug}
-          href={`/terminal/${m.slug}`}
-          className="group absolute hidden md:flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
-          style={{ left: `${m.x}%`, top: `${m.y}%` }}
-        >
-          <span className="relative flex h-4 w-4 items-center justify-center">
-            <span className="absolute h-4 w-4 animate-ping rounded-full bg-copper/40" />
-            <span className="h-0 w-0 border-x-[6px] border-b-[10px] border-x-transparent border-b-signal-amber" />
-          </span>
-          <span className="rounded-sm border border-border bg-background/80 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest opacity-70 backdrop-blur transition group-hover:opacity-100 group-hover:border-signal-cyan">
-            {m.name} · {m.region}
-          </span>
-        </a>
-      ))}
-
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-5 pt-20 pb-16 lg:grid-cols-[1.2fr_1fr] lg:pt-28">
-        <div>
+      <div className="pointer-events-none relative mx-auto grid max-w-7xl gap-10 px-5 pt-20 pb-16 lg:grid-cols-[1.2fr_1fr] lg:pt-28">
+        <div className="pointer-events-auto">
           <div className="font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
             Geocapitals · Inteligencia minera geoespacial
           </div>
@@ -96,7 +71,7 @@ export function HeroGeospatial() {
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-4 lg:justify-end">
+        <div className="pointer-events-auto flex flex-col items-end gap-4 lg:justify-start">
           <div className="w-full max-w-xs rounded-sm border border-border bg-background/70 p-4 backdrop-blur-md">
             <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Potencial mineral</div>
             <div className="mt-3 grid grid-cols-2 gap-2">
