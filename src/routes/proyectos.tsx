@@ -13,6 +13,9 @@ import losverdesImg from "@/assets/project-losverdes.jpg.asset.json";
 import cholquiImg from "@/assets/project-gianfranco.jpg.asset.json";
 import colateralImg from "@/assets/colateral/hualane-satelite.jpg";
 import nahuelbutaImg from "@/assets/project-nahuelbuta.jpg";
+import satLosVerdes from "@/assets/sat-losverdes.jpg.asset.json";
+import satCholqui from "@/assets/sat-cholqui.jpg.asset.json";
+import satNahuelbuta from "@/assets/sat-nahuelbuta.jpg.asset.json";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -38,7 +41,7 @@ export const Route = createFileRoute("/proyectos")({
 
 // Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
 // simulador y data room en una sola pantalla, sin saltos intermedios).
-const SHOWCASE = [
+const SHOWCASE: Array<{code:string;slug:"palmeras"|"losverdes"|"cholqui"|"nahuelbuta";name:string;region:string;commodity:string;image:string;imageSource?:string;coords?:string;stage:string;stats:string[][];bullets:string[]}> = [
   {
     code: "PALMERAS",
     slug: "palmeras" as const,
@@ -60,7 +63,9 @@ const SHOWCASE = [
     name: "Los Verdes",
     region: "Los Vilos · Choapa · Coquimbo",
     commodity: "Cu-Mo",
-    image: losverdesImg.url,
+    image: satLosVerdes.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "32,03° S · 71,11° O",
     stage: "Pre NI 43-101",
     stats: [
       ["17", "pertenencias mapeadas"],
@@ -79,7 +84,9 @@ const SHOWCASE = [
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    image: cholquiImg.url,
+    image: satCholqui.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "33,84° S · 71,03° O",
     stage: "Ronda de capital",
     stats: [
       ["14", "concesiones"],
@@ -98,7 +105,9 @@ const SHOWCASE = [
     name: "Nahuelbuta REE",
     region: "Arauco · Biobío / Malleco",
     commodity: "REE",
-    image: nahuelbutaImg,
+    image: satNahuelbuta.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "37,64° S · 73,20° O",
     stage: "Prospección (TRL 1-2)",
     stats: [
       ["34", "paños"],
@@ -156,13 +165,18 @@ function ProyectosPage() {
                 </span>
               </div>
               <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
-                Imagen referencial
+                {p.imageSource ?? "Imagen referencial"}
               </span>
               <div className="absolute bottom-3 left-4 right-4 text-white">
                 <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
                   {p.region}
                 </div>
                 <div className="font-display text-2xl leading-tight mt-0.5">{p.name}</div>
+                {p.coords && (
+                  <div className="text-[10px] font-mono tracking-wider opacity-75 mt-1">
+                    {p.coords} · WGS84
+                  </div>
+                )}
               </div>
             </Link>
             <div className="grid grid-cols-3 border-b border-hairline">
@@ -182,6 +196,23 @@ function ProyectosPage() {
                 </li>
               ))}
             </ul>
+            <div className="px-5 pt-4 flex flex-wrap gap-1.5">
+              {[
+                ["mapa", "Mapa 2D"],
+                ["satelital", "Satélite"],
+                ["dataroom", "Data room"],
+              ].map(([tab, label]) => (
+                <Link
+                  key={tab}
+                  to="/terminal/$slug"
+                  params={{ slug: p.slug }}
+                  search={{ tab: tab as "mapa" }}
+                  className="px-2 py-1 rounded border border-hairline text-[11px] font-mono uppercase tracking-wider text-content-subtle hover:border-accent-brand hover:text-accent-brand"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
             <div className="p-5 pt-4 grid grid-cols-2 gap-2">
               <Link
                 to="/terminal/$slug"
