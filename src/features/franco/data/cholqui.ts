@@ -78,7 +78,7 @@ export const CHOLQUI = {
   name: "Proyecto Cholqui",
   formerName: "Distrito Franco / Gianfranco",
   commodity: "Cu-Au-Ag",
-  stage: "Exploración · muestreo de superficie certificado",
+  stage: "Explotación · 5.000 a 15.000 t/mes",
   operator: "Volcania Minerals SpA",
   location: "Cholqui, Cajón de Panamá, Melipilla, Región Metropolitana, Chile",
   region: "Melipilla · Región Metropolitana",

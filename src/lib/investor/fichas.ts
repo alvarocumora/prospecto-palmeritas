@@ -110,7 +110,7 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     region: "Los Vilos · Provincia de Choapa · Coquimbo",
     country: "Chile",
     commodity: "Cu-Mo",
-    stage: "Exploración avanzada · pre-NI 43-101 / pre-JORC",
+    stage: "Explotación · 5.000 a 15.000 t/mes · pre-NI 43-101 / pre-JORC",
     stageDetail:
       "Cartera integrada multi-titular en Los Vilos; los polígonos y fases son una asociación declarada pendiente de verificación contractual.",
     liveTo: "/terminal/losverdes",
