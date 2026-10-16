@@ -4,3 +4,5 @@
 - Project terrain viewers share ProjectTerrain3D; CAD terrain enters through a browser-safe TerrainTile adapter with an explicit coverage mask and separate provenance, because declared/interpolated elevations must never be relabelled as official DEM or extrapolated across unsupported areas.
 - Rebuild Cholqui CAD terrain with scripts/build_cholqui_cad_terrain.py (numpy/scipy); retain source hash, interpolation constraints and datum disclosures so the derived grid is reproducible without backend changes.
 - Static terrain imagery uses stored asset pointers plus the provider's actual EPSG:4326 export extent, reprojected by imageDrape; preserve attribution and distinguish visual mosaics from analytical Sentinel rasters to prevent spatial stretching or false evidence claims.
+
+- Investment tickets: state machine enforced by trigger on investment_tickets; investors mutate only via SECURITY DEFINER RPCs (ticket_sign_contract/submit_payment/cancel), staff settles via ticket_settle which issues the spv_position — keeps ledger tamper-proof.
