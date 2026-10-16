@@ -153,17 +153,17 @@ function ProyectosPage() {
                 className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <div className="absolute top-3 left-3 flex gap-2">
+              <div className="absolute top-3 left-3 right-3 flex flex-wrap items-start gap-2">
                 <span className="px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-mono uppercase tracking-wider text-content">
                   {p.commodity}
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-accent-brand text-[10px] font-mono uppercase tracking-wider text-white">
                   {p.stage}
                 </span>
+                <span className="ml-auto px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
+                  {p.imageSource ?? "Imagen referencial"}
+                </span>
               </div>
-              <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
-                {p.imageSource ?? "Imagen referencial"}
-              </span>
               <div className="absolute bottom-3 left-4 right-4 text-white">
                 <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
                   {p.region}
