@@ -52,7 +52,18 @@ const OPTIONS: Array<{
 
 const COMMODITIES = ["Au", "Au-Cu", "Cu", "Cu-Mo", "Ag", "Pb-Zn", "Li", "Fe", "Otro"];
 const STANDARDS = ["NI 43-101", "JORC", "SAMREC", "CRIRSCO"];
-const INVESTOR_TYPES = ["family_office", "fund", "strategic", "angel", "other"];
+const INVESTOR_TYPES: Array<[string, string]> = [
+  ["individual", "Persona natural"],
+  ["family_office", "Family office"],
+  ["fund", "Fondo"],
+  ["strategic", "Inversionista estratégico"],
+  ["other", "Otro"],
+];
+const NDA_VERSION = "NCNDA-GC-2026.1";
+const NDA_TEXT =
+  "Me obligo a mantener confidencial toda la información técnica, legal y comercial recibida a través de Geocapitals, a no usarla con fines distintos a evaluar la inversión y a no contactar ni eludir a titulares, socios o contrapartes presentados por Geocapitals (no elusión) por 24 meses.";
+const RISK_TEXT =
+  "Entiendo que la exploración minera es de alto riesgo, que los antecedentes técnicos pueden ser declarados, derivados o interpretados, que no constituyen recursos ni reservas certificados bajo NI 43-101/JORC salvo indicación expresa, y que puedo perder la totalidad de lo invertido.";
 const SPECIALTIES = [
   "Geología",
   "Geofísica",
@@ -82,6 +93,11 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
     commodities: ["Au"] as string[],
     accepted_standards: ["NI 43-101"] as string[],
     website: "",
+    tax_id: "",
+    is_accredited: false,
+    accreditation_basis: "",
+    risk_accepted: false,
+    nda_signature: "",
     terms_accepted: false,
   });
 
@@ -163,6 +179,26 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           setSaving(false);
           return;
         }
+        if (!inv.tax_id.trim()) {
+          toast.error("Indica tu RUT o identificación tributaria.");
+          setSaving(false);
+          return;
+        }
+        if (!inv.risk_accepted) {
+          toast.error("Debes aceptar la declaración de riesgos.");
+          setSaving(false);
+          return;
+        }
+        const sig = inv.nda_signature.trim();
+        if (sig.toLowerCase() !== inv.full_name.trim().toLowerCase()) {
+          toast.error("Para firmar el NCNDA escribe tu nombre completo exactamente igual.");
+          setSaving(false);
+          return;
+        }
+        const signedAt = new Date().toISOString();
+        const ndaHash = await sha256Hex(
+          `${NDA_VERSION}|${NDA_TEXT}|${sig}|${inv.tax_id.trim()}|${user.id}|${signedAt}`,
+        );
         const { error } = await supabase.from("investor_profiles").upsert(
           {
             user_id: user.id,
@@ -175,8 +211,16 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             commodities: inv.commodities,
             accepted_standards: inv.accepted_standards,
             website: inv.website || null,
+            tax_id: inv.tax_id.trim(),
+            is_accredited: inv.is_accredited,
+            accreditation_basis: inv.is_accredited ? inv.accreditation_basis.trim() || null : null,
+            risk_disclosure_accepted_at: signedAt,
+            nda_signed_at: signedAt,
+            nda_signature_name: sig,
+            nda_hash: ndaHash,
+            nda_version: NDA_VERSION,
             review_status: "pending_review",
-            terms_accepted_at: new Date().toISOString(),
+            terms_accepted_at: signedAt,
           },
           { onConflict: "user_id" },
         );
