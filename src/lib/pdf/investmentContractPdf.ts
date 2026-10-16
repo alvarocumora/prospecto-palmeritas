@@ -5,7 +5,14 @@
 import type { TicketRow } from "@/lib/tickets.functions";
 import { brandQr, ensureBrandFonts, font, ink } from "@/lib/pdf/brand/kit";
 import { GC_COLOR } from "@/lib/pdf/brand/tokens";
-import { letterhead, folio, section, kvRow, verificationSeal, type Frame } from "@/lib/pdf/brand/institutional";
+import {
+  letterhead,
+  folio,
+  section,
+  kvRow,
+  verificationSeal,
+  type Frame,
+} from "@/lib/pdf/brand/institutional";
 import { contractText, fmtMoney } from "@/lib/investor/rounds";
 import { publicUrl } from "@/lib/publicUrl";
 
@@ -18,9 +25,19 @@ export async function downloadInvestmentContractPdf(o: {
   const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   await ensureBrandFonts(doc);
-  const f: Frame = { w: doc.internal.pageSize.getWidth(), h: doc.internal.pageSize.getHeight(), m: 48 };
+  const f: Frame = {
+    w: doc.internal.pageSize.getWidth(),
+    h: doc.internal.pageSize.getHeight(),
+    m: 48,
+  };
   const issued = new Date().toISOString().slice(0, 16).replace("T", " ") + " UTC";
-  const head = { unit: "Capital & Deals · Contratos", ref: o.t.ticket_code, version: "v1.1", issued, deferFooter: true };
+  const head = {
+    unit: "Capital & Deals · Contratos",
+    ref: o.t.ticket_code,
+    version: "v1.1",
+    issued,
+    deferFooter: true,
+  };
   letterhead(doc, f, { ...head, page: 1, total: 1 });
 
   let y = 84;
@@ -65,7 +82,15 @@ export async function downloadInvestmentContractPdf(o: {
   }
   y = section(doc, f, y + 4, "03", "Firma electrónica");
   y = kvRow(doc, f, y, "Firmante", o.t.investor_signature_name ?? "Pendiente");
-  y = kvRow(doc, f, y, "Fecha (UTC)", o.t.signed_at ? new Date(o.t.signed_at).toISOString().replace("T", " ").slice(0, 19) : "Pendiente");
+  y = kvRow(
+    doc,
+    f,
+    y,
+    "Fecha (UTC)",
+    o.t.signed_at
+      ? new Date(o.t.signed_at).toISOString().replace("T", " ").slice(0, 19)
+      : "Pendiente",
+  );
   y = kvRow(doc, f, y, "Huella SHA-256", o.t.contract_hash ?? "Pendiente");
   y += 6;
 
