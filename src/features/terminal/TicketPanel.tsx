@@ -23,6 +23,7 @@ import {
   fmtMoney,
   sha256Hex,
 } from "@/lib/investor/rounds";
+import { SignaturePad, saveSignatureImage, loadSignatureImage } from "./SignaturePad";
 
 export function TicketPanel({ spvCode, projectName }: { spvCode: string; projectName: string }) {
   const { user, loading } = useAuth();
@@ -42,6 +43,14 @@ export function TicketPanel({ spvCode, projectName }: { spvCode: string; project
   return <TicketPanelInner spvCode={spvCode} projectName={projectName} />;
 }
 
+const JOURNEY = [
+  ["01", "Perfil", "KYC y acuerdo de confidencialidad"],
+  ["02", "Ticket", "Monto y acciones de la ronda"],
+  ["03", "Contrato", "Lectura y firma manuscrita"],
+  ["04", "Depósito", "Comprobante a la sociedad"],
+  ["05", "Posición", "Certificado con sello QR"],
+] as const;
+
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <section className="mt-6 rounded-2xl border border-hairline bg-surface p-6">
@@ -49,6 +58,15 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Ticket className="w-4 h-4 text-accent-brand" />
         <Eyebrow>Ticket de inversión</Eyebrow>
       </div>
+      <ol className="mb-5 grid grid-cols-2 md:grid-cols-5 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline">
+        {JOURNEY.map(([n, t, d]) => (
+          <li key={n} className="bg-surface px-3 py-2">
+            <div className="font-mono text-[10px] text-accent-brand">{n}</div>
+            <div className="font-display text-sm text-content">{t}</div>
+            <div className="text-[11px] text-content-subtle leading-snug">{d}</div>
+          </li>
+        ))}
+      </ol>
       {children}
     </section>
   );
@@ -205,6 +223,10 @@ function MyTicket({
   const payFn = useServerFn(submitTicketPayment);
   const cancelFn = useServerFn(cancelTicket);
   const [sig, setSig] = useState("");
+  const [rut, setRut] = useState("");
+  const [agree, setAgree] = useState(false);
+  const [read, setRead] = useState(false);
+  const [sigImg, setSigImg] = useState<string | null>(null);
   const [proof, setProof] = useState("");
   const [busy, setBusy] = useState(false);
   const text = contractText({ ...t, legalName, projectName });
@@ -250,37 +272,57 @@ function MyTicket({
 
       {t.status === "contract_pending" && (
         <div className="mt-4">
-          <pre className="whitespace-pre-wrap text-xs bg-surface-2 border border-hairline rounded p-3 text-content">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-1">
+            Lee el contrato completo para habilitar la firma
+          </div>
+          <pre
+            onScroll={(e) => {
+              const el = e.currentTarget;
+              if (el.scrollTop + el.clientHeight >= el.scrollHeight - 12) setRead(true);
+            }}
+            ref={(el) => {
+              if (el && el.scrollHeight <= el.clientHeight + 12 && !read) setRead(true);
+            }}
+            className="max-h-72 overflow-y-auto whitespace-pre-wrap text-xs bg-surface-2 border border-hairline rounded p-3 text-content"
+          >
             {text}
           </pre>
-          <div className="mt-3 flex flex-wrap gap-2 items-center">
-            <FileSignature className="w-4 h-4 text-accent-brand" />
-            <input
-              placeholder="Nombre completo como firma"
-              value={sig}
-              onChange={(e) => setSig(e.target.value)}
-              className="flex-1 min-w-[200px] rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm"
-            />
-            <button
-              disabled={busy || sig.trim().length < 3}
-              onClick={() =>
-                run(
-                  async () =>
-                    signFn({
-                      data: {
-                        ticketId: t.id,
-                        signatureName: sig.trim(),
-                        contractHash: await sha256Hex(text),
-                      },
-                    }),
-                  "Contrato firmado",
-                )
-              }
-              className="rounded-md bg-accent-brand px-3 py-1.5 text-sm text-surface disabled:opacity-40"
-            >
-              Firmar
-            </button>
+          <div className="mt-4 grid md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <input
+                placeholder="Nombre completo"
+                value={sig}
+                onChange={(e) => setSig(e.target.value)}
+                className="w-full rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm"
+              />
+              <input
+                placeholder="RUT / Tax ID"
+                value={rut}
+                onChange={(e) => setRut(e.target.value)}
+                className="w-full rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm font-mono"
+              />
+              <label className="flex gap-2 text-xs text-content-subtle">
+                <input type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
+                Declaro haber leído el contrato y firmo en señal de aceptación.
+              </label>
+            </div>
+            <SignaturePad onChange={setSigImg} />
           </div>
+          <button
+            disabled={busy || !read || !agree || !sigImg || sig.trim().length < 3 || rut.trim().length < 5}
+            onClick={() =>
+              run(async () => {
+                const contractHash = await sha256Hex(text);
+                await signFn({
+                  data: { ticketId: t.id, signatureName: `${sig.trim()} · ${rut.trim()}`, contractHash },
+                });
+                saveSignatureImage(t.id, sigImg!);
+              }, "Contrato firmado")
+            }
+            className="mt-3 inline-flex items-center gap-2 rounded-md bg-accent-brand px-4 py-2 text-sm text-surface disabled:opacity-40"
+          >
+            <FileSignature className="w-4 h-4" /> Firmar contrato
+          </button>
         </div>
       )}
 
@@ -291,6 +333,7 @@ function MyTicket({
               t,
               legalName,
               projectName,
+              signatureImage: loadSignatureImage(t.id),
               projectSlug:
                 INVESTABLE_PROJECTS.find((p) => p.name === projectName)?.slug ??
                 (projectName.toLowerCase().includes("verdes") ? "losverdes" : "cholqui"),
