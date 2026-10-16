@@ -64,7 +64,7 @@ const NDA_VERSION = "NCNDA-GC-2026.1";
 const NDA_TEXT =
   "Me obligo a mantener confidencial toda la información técnica, legal y comercial recibida a través de Geocapitals, a no usarla con fines distintos a evaluar la inversión y a no contactar ni eludir a titulares, socios o contrapartes presentados por Geocapitals (no elusión) por 24 meses.";
 const RISK_TEXT =
-  "Entiendo que la exploración minera es de alto riesgo, que los antecedentes técnicos pueden ser declarados, derivados o interpretados, que no constituyen recursos ni reservas certificados bajo NI 43-101/JORC salvo indicación expresa, y que puedo perder la totalidad de lo invertido.";
+  "Entiendo que la inversión en proyectos mineros en explotación es de alto riesgo, que los antecedentes técnicos pueden ser declarados, derivados o interpretados, que no constituyen recursos ni reservas certificados bajo NI 43-101/JORC salvo indicación expresa, y que puedo perder la totalidad de lo invertido.";
 const SPECIALTIES = [
   "Geología",
   "Geofísica",

@@ -51,7 +51,7 @@ export function contractText(t: {
           "Exclusividad, no elusión y confidencialidad según cláusulas Décimo Tercera, Vigésimo Cuarta y Vigésimo Quinta. Ley chilena; tribunales de Santiago.",
         ]
       : []),
-    "El inversionista declara conocer que el proyecto se encuentra en etapa de exploración, que no existen recursos ni reservas certificados bajo NI 43-101 ni JORC, y que la información técnica combina hechos medidos, datos declarados por terceros e interpretaciones. No se garantiza rentabilidad. Los fondos se depositan en la cuenta indicada por la sociedad y la emisión de acciones queda sujeta a la verificación del pago por GeoCapitals.",
+    "El inversionista declara conocer que el proyecto se encuentra en etapa de explotación, que no existen recursos ni reservas certificados bajo NI 43-101 ni JORC, y que la información técnica combina hechos medidos, datos declarados por terceros e interpretaciones. No se garantiza rentabilidad. Los fondos se depositan en la cuenta indicada por la sociedad y la emisión de acciones queda sujeta a la verificación del pago por GeoCapitals.",
   ].join("\n");
 }
 

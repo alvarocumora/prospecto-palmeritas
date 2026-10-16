@@ -51,7 +51,7 @@ const SCENARIOS_STD: InvestmentScenario[] = [
     key: "conservador",
     label: "Conservador",
     multiple: 1.6,
-    note: "Avance parcial de exploración; venta temprana del activo.",
+    note: "Avance parcial de explotación; venta temprana del activo.",
   },
   {
     key: "base",
