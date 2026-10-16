@@ -104,7 +104,7 @@ function CollateralPage() {
   };
 
   const highlights = [
-    { icon: Landmark, label: "Inversión mínima", value: "$25 MM" },
+    { icon: Landmark, label: "Inversión mínima", value: "$15 MM" },
     { icon: CalendarClock, label: "Tasa · pago mensual", value: "UF + 12 %" },
     { icon: ShieldCheck, label: "Colateral", value: "5.000 m² – 1 ha" },
     { icon: Repeat, label: "Reinversión", value: "Cada 12 meses" },
@@ -246,7 +246,7 @@ function CollateralPage() {
               type="range"
               min={COLLATERAL_TERMS.minTicketClp}
               max={250_000_000}
-              step={5_000_000}
+              step={1_000_000}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
               className="w-full mt-2 accent-current text-accent-brand"

@@ -10,7 +10,7 @@ import type { ProjectDoc } from "@/lib/pdf/model";
 export const COLLATERAL_DOC_VERSION = "v1.0";
 
 export const COLLATERAL_TERMS = {
-  minTicketClp: 25_000_000,
+  minTicketClp: 15_000_000,
   annualRatePct: 12,
   indexation: "UF",
   interestPayment: "Mensual",
@@ -111,7 +111,7 @@ export const COLLATERAL_STEPS: Array<{ title: string; body: string }> = [
   },
   {
     title: "4. Transferencia del capital",
-    body: "Desde $25.000.000. El capital se destina a los proyectos mineros del portafolio Geocapitals.",
+    body: "Desde $15.000.000. El capital se destina a los proyectos mineros del portafolio Geocapitals.",
   },
   {
     title: "5. Pago mensual de intereses",
@@ -164,14 +164,14 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
     location: "Chile · colateral en Hualañé y Licantén, Maule",
     liveUrl: publicUrl("/proyectos"),
     docVersion: COLLATERAL_DOC_VERSION,
-    tags: ["UF + 12 % anual", "Interés mensual", "Desde $25 MM", "Parcela en garantía"],
+    tags: ["UF + 12 % anual", "Interés mensual", "Desde $15 MM", "Parcela en garantía"],
     kpis: [
-      { label: "Inversión mínima", value: "$25 MM", note: "Pesos chilenos" },
+      { label: "Inversión mínima", value: "$15 MM", note: "Pesos chilenos" },
       { label: "Tasa", value: "UF + 12 %", note: "Anual, capital reajustable en UF" },
       {
         label: "Pago de intereses",
         value: "Mensual",
-        note: `Ej.: ${fmtClp(example)}/mes sobre $25 MM + UF`,
+        note: `Ej.: ${fmtClp(example)}/mes sobre $15 MM + UF`,
       },
       { label: "Colateral", value: "5.000 m2 - 1 ha", note: "Parcela con rol individual, Maule" },
     ],

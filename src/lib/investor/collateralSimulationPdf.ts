@@ -100,6 +100,15 @@ export async function downloadCollateralSimulation(
     ["Forma del gravamen", "Hipoteca y prohibición de enajenar, sujeta a confirmación legal"],
   ] as Array<[string, string]>)
     y = kvRow(doc, F, y, k, v, 118);
+  for (const m of [12, 24, 36])
+    y = kvRow(
+      doc,
+      F,
+      y,
+      `Comparativo ${m} meses`,
+      `Intereses ${fmtClp(monthly * m)} · total recibido ${fmtClp(amount + monthly * m)} + UF`,
+      118,
+    );
   y += 12;
 
   y = section(doc, F, y, "02", "Calendario de intereses (nominal, sin reajuste UF)");

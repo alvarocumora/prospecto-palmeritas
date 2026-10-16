@@ -220,7 +220,7 @@ function ProyectosPage() {
             Hualañé y Licantén · Región del Maule
           </div>
           <p className="text-sm text-content-subtle mt-1 max-w-xl">
-            Desde $25 MM CLP, 12% anual en UF, respaldado por parcela con rol SII individual.
+            Desde $15 MM CLP, 12% anual en UF, respaldado por parcela con rol SII individual.
           </p>
         </div>
         <span className="mx-5 mb-5 md:mb-0 inline-flex items-center gap-1.5 text-sm text-accent-brand">

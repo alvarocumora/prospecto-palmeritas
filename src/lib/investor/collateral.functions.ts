@@ -32,7 +32,7 @@ const LeadSchema = z.object({
   name: z.string().trim().min(2).max(200),
   email: z.string().trim().email().max(320),
   phone: z.string().trim().max(40).optional().nullable(),
-  amountClp: z.number().int().min(25_000_000).max(5_000_000_000),
+  amountClp: z.number().int().min(15_000_000).max(5_000_000_000),
   months: z.number().int().min(1).max(120),
   projectPref: z
     .enum([...PROJECTS, "indiferente"])
