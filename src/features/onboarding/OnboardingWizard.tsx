@@ -33,7 +33,7 @@ const OPTIONS: Array<{
     icon: Briefcase,
     title: "Inversionista / Fondo",
     desc: "Acceso a deal flow, data rooms, reportes NI 43-101 firmados y watchlist catastral.",
-    next: { to: "/dashboard/deals", label: "Ver deal flow" },
+    next: { to: "/proyectos", label: "Ver proyectos y emitir ticket" },
   },
   {
     value: "mining_owner",
@@ -79,6 +79,7 @@ type Step = "role" | "details" | "done";
 export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
   const { user, profile, refreshProfile } = useAuth();
   const [step, setStep] = useState<Step>("role");
+  const [invStep, setInvStep] = useState(0);
   const [selected, setSelected] = useState<AccountType | null>(null);
   const [saving, setSaving] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -359,6 +360,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
 
         {selected === "investor" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {invStep === 0 && (<>
             <Field label="Nombre completo *">
               <Input value={inv.full_name} onChange={(v) => setInv({ ...inv, full_name: v })} />
             </Field>
@@ -384,6 +386,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 ))}
               </select>
             </Field>
+            </>)}{invStep === 1 && (<>
             <Field label="Ticket mín USD">
               <Input
                 type="number"
@@ -421,6 +424,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 placeholder="https://"
               />
             </Field>
+            </>)}{invStep === 0 && (<>
             <Field label="RUT / Tax ID *">
               <Input
                 value={inv.tax_id}
@@ -448,6 +452,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 />
               </Field>
             )}
+            </>)}{invStep === 2 && (<>
             <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
               <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
                 Declaración de riesgos
@@ -499,6 +504,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
                 post-cierre y no custodia fondos.
               </span>
             </label>
+            </>)}
           </div>
         )}
 
@@ -558,7 +564,35 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           </div>
         )}
 
-        <div className="flex justify-end mt-4">
+        {selected === "investor" && (
+          <ol className="mt-4 flex gap-2 text-[10px] font-mono uppercase tracking-wider">
+            {["1 · Identidad", "2 · Mandato", "3 · Acuerdos"].map((l, i) => (
+              <li key={l} className={`flex-1 border-t-2 pt-1 ${i <= invStep ? "border-gold text-foreground" : "border-border text-muted-foreground"}`}>
+                {l}
+              </li>
+            ))}
+          </ol>
+        )}
+        <div className="flex justify-end gap-2 mt-4">
+          {selected === "investor" && invStep > 0 && (
+            <button onClick={() => setInvStep(invStep - 1)} className="rounded border border-border px-4 py-2 text-xs font-mono">
+              Atrás
+            </button>
+          )}
+          {selected === "investor" && invStep < 2 ? (
+            <button
+              onClick={() => {
+                if (invStep === 0 && (!inv.full_name.trim() || !inv.tax_id.trim() || (inv.investor_type !== "individual" && !inv.company_name.trim()))) {
+                  toast.error("Completa nombre, RUT / Tax ID y empresa (si no eres persona natural).");
+                  return;
+                }
+                setInvStep(invStep + 1);
+              }}
+              className="inline-flex items-center gap-2 rounded bg-gold text-black px-4 py-2 text-xs font-mono font-semibold hover:bg-gold/90"
+            >
+              Continuar <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
           <button
             onClick={submitDetails}
             disabled={saving}
@@ -571,6 +605,7 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
             )}
             Completar onboarding
           </button>
+          )}
         </div>
       </section>
     );
