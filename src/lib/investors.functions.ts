@@ -30,7 +30,7 @@ export const listInvestorProfiles = createServerFn({ method: "GET" })
     let q = supabase
       .from("investor_profiles")
       .select(
-        "id, user_id, full_name, company_name, country, investor_type, ticket_min_usd, ticket_max_usd, commodities, accepted_standards, website, review_status, reviewed_at, reviewed_by, terms_accepted_at, created_at, notes",
+        "id, user_id, full_name, company_name, country, investor_type, ticket_min_usd, ticket_max_usd, commodities, accepted_standards, website, review_status, reviewed_at, reviewed_by, terms_accepted_at, created_at, notes, tax_id, is_accredited, accreditation_basis, risk_disclosure_accepted_at, nda_signed_at, nda_signature_name, nda_hash, nda_version",
       )
       .order("created_at", { ascending: false })
       .limit(200);

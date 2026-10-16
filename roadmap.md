@@ -39,4 +39,4 @@
 - [ ] Siguiente capa satelital (Sentinel-1 SAR lineamientos o ASTER sílice) — espera elección del usuario
 - [x] Cholqui: ASTER TIR sílice + Sentinel-1 lineamientos (scripts/process_aster_s1.py)
 
-- [ ] Flujo de inversiones: H1 base de datos ✓ · H2 onboarding · H3 configurador · H4 contrato · H5 paneles · H6 QA
+- [ ] Flujo de inversiones: H1 base de datos ✓ · H2 onboarding ✓ · H3 configurador · H4 contrato · H5 paneles · H6 QA
