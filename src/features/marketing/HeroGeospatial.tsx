@@ -46,10 +46,9 @@ export function HeroGeospatial() {
       </svg>
       <div className="absolute left-[67%] top-[50%] hidden md:block font-mono text-xs tracking-[0.5em] text-muted-foreground">CHILE</div>
       {MARKERS.map((m) => (
-        <Link
+        <a
           key={m.slug}
-          to="/terminal/$slug"
-          params={{ slug: m.slug }}
+          href={`/terminal/${m.slug}`}
           className="group absolute hidden md:flex -translate-x-1/2 -translate-y-1/2 items-center gap-2"
           style={{ left: `${m.x}%`, top: `${m.y}%` }}
         >
@@ -60,7 +59,7 @@ export function HeroGeospatial() {
           <span className="rounded-sm border border-border bg-background/80 px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest opacity-70 backdrop-blur transition group-hover:opacity-100 group-hover:border-signal-cyan">
             {m.name} · {m.region}
           </span>
-        </Link>
+        </a>
       ))}
 
       <div className="relative mx-auto grid max-w-7xl gap-10 px-5 pt-20 pb-16 lg:grid-cols-[1.2fr_1fr] lg:pt-28">
