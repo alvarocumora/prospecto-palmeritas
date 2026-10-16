@@ -9,7 +9,7 @@ import { Eyebrow } from "@/components/brand";
 import colateralCover from "@/assets/colateral/cover-maule.jpg";
 import hualaneSat from "@/assets/colateral/hualane-satelite.jpg";
 import velValle from "@/assets/colateral/vel-valle.jpg";
-import heroMining from "@/assets/hero-mining.jpg";
+import { HeroGeospatial } from "@/features/marketing/HeroGeospatial";
 import featureCatastro from "@/assets/feature-catastro.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 
@@ -24,60 +24,7 @@ export function MarketingLanding() {
     <div className="brand-light min-h-screen bg-surface text-content">
       <MarketingHeader />
 
-      {/* 1. HERO — fotografía de terreno real + retícula institucional */}
-      <section className="relative overflow-hidden border-b border-hairline bg-content text-surface">
-        <img
-          src={heroMining}
-          alt="Terreno minero en Chile"
-          className="absolute inset-0 w-full h-full object-cover opacity-45"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-content via-content/80 to-content/20" />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-[0.12]"
-          style={{
-            backgroundImage:
-              "linear-gradient(currentColor 1px, transparent 1px), linear-gradient(90deg, currentColor 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-          }}
-        />
-        <div className="relative max-w-6xl mx-auto px-5 pt-20 pb-16 sm:pt-28 sm:pb-24">
-          <div className="flex flex-wrap items-center gap-3 font-mono text-[10px] uppercase tracking-[0.25em] opacity-80">
-            <span>Geocapitals · Minería de Chile</span>
-            <span className="h-px w-8 bg-surface/50" />
-            <span>33°27′S · 70°40′W · WGS84</span>
-          </div>
-          <h1 className="mt-6 font-serif text-5xl sm:text-7xl leading-[1.02] max-w-4xl">
-            Invierte con respaldo real.
-            <span className="block italic opacity-80">Revisa cualquier concesión en segundos.</span>
-          </h1>
-          <p className="mt-6 text-lg opacity-80 max-w-2xl">
-            Inversión en minería garantizada con bienes raíces, e inteligencia catastral sobre datos
-            oficiales de SERNAGEOMIN.
-          </p>
-
-          <div className="mt-12 grid md:grid-cols-2 gap-4">
-            <DoorCard
-              image={hualaneSat}
-              icon={<ShieldCheck className="w-5 h-5" />}
-              tag="Para inversionistas"
-              title="Inversión con colateral inmobiliario"
-              body="Desde $25 MM · UF + 12 % anual con pago mensual · parcela con rol propio en garantía."
-              cta="Simular mi inversión"
-              to="/inversion-colateral"
-            />
-            <DoorCard
-              image={featureCatastro}
-              icon={<Map className="w-5 h-5" />}
-              tag="Para mineros, geólogos y abogados"
-              title="Catastro minero profesional"
-              body="Titular, vigencia, superficie y ubicación de cualquier concesión. Alertas y fichas descargables."
-              cta="Buscar una concesión"
-              href="#catastro"
-            />
-          </div>
-        </div>
-      </section>
+      <HeroGeospatial />
 
       {/* Franja de rigor */}
       <section className="border-b border-hairline bg-surface-2">

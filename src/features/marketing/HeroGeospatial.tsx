@@ -4,9 +4,9 @@ import relief from "@/assets/hero-chile-relief.jpg";
 
 /** Proyectos reales del portafolio; posición aproximada en % del lienzo. */
 const MARKERS = [
-  { slug: "losverdes", name: "Los Verdes", region: "Coquimbo", x: 63, y: 38 },
-  { slug: "cholqui", name: "Cholqui", region: "RM", x: 66, y: 56 },
-  { slug: "palmeritas", name: "Palmeritas", region: "Atacama", x: 61, y: 22 },
+  { slug: "losverdes", name: "Los Verdes", region: "Coquimbo", x: 63, y: 30 },
+  { slug: "cholqui", name: "Cholqui", region: "RM", x: 62, y: 42 },
+  { slug: "palmeritas", name: "Palmeritas", region: "Atacama", x: 64, y: 12 },
 ];
 
 const VALUES = [
@@ -32,19 +32,19 @@ const LEGEND = [
 export function HeroGeospatial() {
   return (
     <section className="relative overflow-hidden border-b border-border bg-background text-foreground min-h-[680px]">
-      <img src={relief} alt="Relieve satelital de Chile" className="absolute inset-0 h-full w-full object-cover opacity-80" />
+      <img src={relief} alt="Relieve satelital de Chile" className="absolute inset-y-0 right-0 h-full w-full object-cover opacity-80 md:w-[80%]" style={{ objectPosition: "45% top" }} />
       <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
 
       {/* Retículo táctico + marcadores reales */}
       <svg aria-hidden className="absolute inset-0 h-full w-full text-signal-cyan" preserveAspectRatio="none">
         {[90, 160, 240].map((r) => (
-          <circle key={r} cx="66%" cy="56%" r={r} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeDasharray="3 6" />
+          <circle key={r} cx="62%" cy="42%" r={r} fill="none" stroke="currentColor" strokeOpacity={0.18} strokeDasharray="3 6" />
         ))}
-        <line x1="66%" y1="0" x2="66%" y2="100%" stroke="currentColor" strokeOpacity={0.12} />
-        <line x1="0" y1="56%" x2="100%" y2="56%" stroke="currentColor" strokeOpacity={0.12} />
+        <line x1="62%" y1="0" x2="62%" y2="100%" stroke="currentColor" strokeOpacity={0.12} />
+        <line x1="0" y1="42%" x2="100%" y2="42%" stroke="currentColor" strokeOpacity={0.12} />
       </svg>
-      <div className="absolute left-[71%] top-[62%] hidden md:block font-mono text-xs tracking-[0.5em] text-muted-foreground">CHILE</div>
+      <div className="absolute left-[67%] top-[50%] hidden md:block font-mono text-xs tracking-[0.5em] text-muted-foreground">CHILE</div>
       {MARKERS.map((m) => (
         <Link
           key={m.slug}
