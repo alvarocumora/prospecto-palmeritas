@@ -21,7 +21,7 @@ const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDig
 export function MiningInvestShowcase() {
   const navigate = useNavigate();
   const [slug, setSlug] = useState<(typeof PROJECTS)[number]["slug"]>("cholqui");
-  const [amount, setAmount] = useState(ROUND.minTicket);
+  const [amount, setAmount] = useState<number>(ROUND.minTicket);
   const shares = Math.floor(amount / ROUND.sharePrice);
   const pct = (shares / ROUND.shares) * 100;
   const valid = amount >= ROUND.minTicket && amount <= ROUND.target;
@@ -72,6 +72,7 @@ export function MiningInvestShowcase() {
                 <Link
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
+                  search={{ tab: "mapa" }}
                   onClick={(e) => e.stopPropagation()}
                   className="mt-4 inline-flex items-center gap-1 text-sm text-accent-brand hover:underline"
                 >
