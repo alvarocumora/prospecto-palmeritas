@@ -246,7 +246,7 @@ function CollateralPage() {
               type="range"
               min={COLLATERAL_TERMS.minTicketClp}
               max={250_000_000}
-              step={5_000_000}
+              step={1_000_000}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value))}
               className="w-full mt-2 accent-current text-accent-brand"
