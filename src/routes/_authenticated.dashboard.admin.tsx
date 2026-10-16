@@ -116,6 +116,12 @@ function AdminPage() {
         >
           <ShieldAlert className="w-3.5 h-3.5" /> Inversionistas (KYC)
         </a>
+        <a
+          href="/dashboard/admin/investments"
+          className="px-3 py-2 text-xs font-mono inline-flex items-center gap-1.5 border-b-2 border-transparent text-muted-foreground hover:text-gold whitespace-nowrap"
+        >
+          <ShieldAlert className="w-3.5 h-3.5" /> Rondas y tickets
+        </a>
       </nav>
 
       {tab === "overview" && <Overview />}

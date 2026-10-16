@@ -17,6 +17,8 @@ import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { ProjectOpportunities } from "./ProjectOpportunities";
+import { TicketPanel } from "./TicketPanel";
+import { spvCodeForSlug } from "@/lib/investor/rounds";
 const TerminalSatellitePanel = lazy(() =>
   import("./TerminalSatellitePanel").then((m) => ({ default: m.TerminalSatellitePanel })),
 );
@@ -466,6 +468,9 @@ function SimuladorTab({ project }: { project: TerminalProject }) {
       <Suspense fallback={<Loading label="Cargando simulador" />}>
         <TerminalSimulator ficha={project.ficha} />
       </Suspense>
+      {spvCodeForSlug(project.slug) && (
+        <TicketPanel spvCode={spvCodeForSlug(project.slug)!} projectName={project.name} />
+      )}
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando escenarios" />}>
           <div className="mt-6 space-y-6">

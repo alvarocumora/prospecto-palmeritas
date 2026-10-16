@@ -15,6 +15,13 @@
       "when": 1792116848419,
       "tag": "0001_investor_profiles_kyc_nda",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1792117718621,
+      "tag": "0002_spv_ticket_round_settings",
+      "breakpoints": true
     }
   ]
 }
