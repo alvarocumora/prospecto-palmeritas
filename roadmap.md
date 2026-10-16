@@ -37,3 +37,4 @@
 
 - [x] Validación cruzada ensayes × EMIT en informe geocientífico de Cholqui
 - [ ] Siguiente capa satelital (Sentinel-1 SAR lineamientos o ASTER sílice) — espera elección del usuario
+- [x] Cholqui: ASTER TIR sílice + Sentinel-1 lineamientos (scripts/process_aster_s1.py)
