@@ -8588,6 +8588,7 @@ export type Database = {
       investor_profiles: {
         Row: {
           accepted_standards: string[]
+          accreditation_basis: string | null
           commodities: string[]
           company_name: string
           country: string
@@ -8595,12 +8596,19 @@ export type Database = {
           full_name: string
           id: string
           investor_type: string
+          is_accredited: boolean
+          nda_hash: string | null
+          nda_signature_name: string | null
+          nda_signed_at: string | null
+          nda_version: string | null
           notes: string | null
           phone: string | null
           rejection_reason: string | null
           review_status: Database["public"]["Enums"]["review_status"]
           reviewed_at: string | null
           reviewed_by: string | null
+          risk_disclosure_accepted_at: string | null
+          tax_id: string | null
           terms_accepted_at: string | null
           ticket_max_usd: number | null
           ticket_min_usd: number | null
@@ -8610,6 +8618,7 @@ export type Database = {
         }
         Insert: {
           accepted_standards?: string[]
+          accreditation_basis?: string | null
           commodities?: string[]
           company_name: string
           country: string
@@ -8617,12 +8626,19 @@ export type Database = {
           full_name: string
           id?: string
           investor_type: string
+          is_accredited?: boolean
+          nda_hash?: string | null
+          nda_signature_name?: string | null
+          nda_signed_at?: string | null
+          nda_version?: string | null
           notes?: string | null
           phone?: string | null
           rejection_reason?: string | null
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          risk_disclosure_accepted_at?: string | null
+          tax_id?: string | null
           terms_accepted_at?: string | null
           ticket_max_usd?: number | null
           ticket_min_usd?: number | null
@@ -8632,6 +8648,7 @@ export type Database = {
         }
         Update: {
           accepted_standards?: string[]
+          accreditation_basis?: string | null
           commodities?: string[]
           company_name?: string
           country?: string
@@ -8639,12 +8656,19 @@ export type Database = {
           full_name?: string
           id?: string
           investor_type?: string
+          is_accredited?: boolean
+          nda_hash?: string | null
+          nda_signature_name?: string | null
+          nda_signed_at?: string | null
+          nda_version?: string | null
           notes?: string | null
           phone?: string | null
           rejection_reason?: string | null
           review_status?: Database["public"]["Enums"]["review_status"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          risk_disclosure_accepted_at?: string | null
+          tax_id?: string | null
           terms_accepted_at?: string | null
           ticket_max_usd?: number | null
           ticket_min_usd?: number | null
