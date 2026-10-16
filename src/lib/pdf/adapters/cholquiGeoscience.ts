@@ -1,4 +1,8 @@
-import { CHOLQUI_ASSAYS, CHOLQUI_ASSAY_REPORTS, CHOLQUI_POINTS } from "@/features/franco/data/cholqui";
+import {
+  CHOLQUI_ASSAYS,
+  CHOLQUI_ASSAY_REPORTS,
+  CHOLQUI_POINTS,
+} from "@/features/franco/data/cholqui";
 import {
   CHOLQUI_COORDINATE_NOTICE,
   CHOLQUI_INTERPOLATION_NOTICE,
@@ -28,8 +32,12 @@ function crossValidationSection(): DocSection {
   const rows = crossValidate(points, emit.features, families, CV_RADIUS_M);
   const withSignal = rows.filter((r) => r.convergent.length > 0).length;
   const fmt = (f: { nearestM: number | null; countWithin: number }) =>
-    f.nearestM == null ? "—" : f.nearestM + " m" + (f.countWithin ? " (" + f.countWithin + ")" : "");
-  const noAdvanced = rows.filter((r) => !r.convergent.includes("alunita") && !r.convergent.includes("arcillas"));
+    f.nearestM == null
+      ? "—"
+      : f.nearestM + " m" + (f.countWithin ? " (" + f.countWithin + ")" : "");
+  const noAdvanced = rows.filter(
+    (r) => !r.convergent.includes("alunita") && !r.convergent.includes("arcillas"),
+  );
   return {
     eyebrow: "Validación cruzada",
     title: "Ensayes certificados frente a mineralogía espectral EMIT",
@@ -51,7 +59,12 @@ function crossValidationSection(): DocSection {
       {
         kind: "appendixTable",
         title: "Distancia a la detección EMIT más cercana (n.º dentro de " + CV_RADIUS_M + " m)",
-        head: ["Muestra", "Cu %", "Au g/t", ...families.map((f) => f[0].toUpperCase() + f.slice(1))],
+        head: [
+          "Muestra",
+          "Cu %",
+          "Au g/t",
+          ...families.map((f) => f[0].toUpperCase() + f.slice(1)),
+        ],
         widths: [0.13, 0.1, 0.1, ...families.map(() => 0.67 / families.length)],
         provenance: "DERIVED",
         source: "Ensayes CERTIFICADOS × EMIT MODELADO; distancia haversine",
@@ -82,7 +95,9 @@ function crossValidationSection(): DocSection {
             {
               kind: "gap" as const,
               title: "Ensayes sin coordenadas publicadas",
-              body: unlocated.join(", ") + " no tienen punto georreferenciado y quedan fuera del cruce.",
+              body:
+                unlocated.join(", ") +
+                " no tienen punto georreferenciado y quedan fuera del cruce.",
               action: "Registrar coordenadas GPS con datum declarado para cada muestra.",
             },
           ]

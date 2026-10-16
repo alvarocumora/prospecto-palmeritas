@@ -79,10 +79,15 @@ export function projectTerrainPoint(
     y0 = Math.floor(y);
   const x1 = Math.min(tile.size - 1, x0 + 1),
     y1 = Math.min(tile.size - 1, y0 + 1);
-  if (tile.source === "cad_contours" &&
-      (!tile.validMask || tile.validMask.length !== tile.size * tile.size ||
-       [y0 * tile.size + x0, y0 * tile.size + x1, y1 * tile.size + x0, y1 * tile.size + x1]
-         .some((index) => !tile.validMask?.[index]))) return null;
+  if (
+    tile.source === "cad_contours" &&
+    (!tile.validMask ||
+      tile.validMask.length !== tile.size * tile.size ||
+      [y0 * tile.size + x0, y0 * tile.size + x1, y1 * tile.size + x0, y1 * tile.size + x1].some(
+        (index) => !tile.validMask?.[index],
+      ))
+  )
+    return null;
   const values = [
     tile.heights[y0 * tile.size + x0],
     tile.heights[y0 * tile.size + x1],

@@ -1,5 +1,13 @@
 import { Link } from "@tanstack/react-router";
-import { ArrowRight, Layers, Crosshair, Compass, Satellite, BarChart3, ClipboardCheck } from "lucide-react";
+import {
+  ArrowRight,
+  Layers,
+  Crosshair,
+  Compass,
+  Satellite,
+  BarChart3,
+  ClipboardCheck,
+} from "lucide-react";
 import { lazy, Suspense } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 
@@ -49,22 +57,32 @@ export function HeroGeospatial() {
             </span>
           </h1>
           <p className="mt-6 max-w-xl text-lg text-muted-foreground">
-            Explora proyectos mineros de Chile con catastro oficial, satélite real y relieve 3D en una sola plataforma.
+            Explora proyectos mineros de Chile con catastro oficial, satélite real y relieve 3D en
+            una sola plataforma.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link to="/catastro/mapa" className="inline-flex items-center gap-2 rounded-sm bg-copper px-6 py-3 text-sm font-medium text-background transition hover:opacity-90">
+            <Link
+              to="/catastro/mapa"
+              className="inline-flex items-center gap-2 rounded-sm bg-copper px-6 py-3 text-sm font-medium text-background transition hover:opacity-90"
+            >
               Explorar oportunidades mineras <ArrowRight className="h-4 w-4" />
             </Link>
-            <Link to="/inversion-colateral" className="inline-flex items-center gap-2 rounded-sm border border-border px-6 py-3 text-sm transition hover:border-signal-cyan">
+            <Link
+              to="/inversion-colateral"
+              className="inline-flex items-center gap-2 rounded-sm border border-border px-6 py-3 text-sm transition hover:border-signal-cyan"
+            >
               Invertir con colateral
             </Link>
           </div>
           <div className="mt-10 flex flex-wrap gap-6">
             {VALUES.map(({ icon: I, label, sub }) => (
               <div key={label} className="flex items-center gap-3">
-                <span className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-signal-cyan"><I className="h-4 w-4" /></span>
+                <span className="flex h-9 w-9 items-center justify-center rounded-sm border border-border text-signal-cyan">
+                  <I className="h-4 w-4" />
+                </span>
                 <div className="font-mono text-[10px] uppercase tracking-widest leading-tight">
-                  {label}<div className="text-muted-foreground">{sub}</div>
+                  {label}
+                  <div className="text-muted-foreground">{sub}</div>
                 </div>
               </div>
             ))}
@@ -73,7 +91,9 @@ export function HeroGeospatial() {
 
         <div className="pointer-events-auto flex flex-col items-end gap-4 lg:justify-start">
           <div className="w-full max-w-xs rounded-sm border border-border bg-background/70 p-4 backdrop-blur-md">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Potencial mineral</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Potencial mineral
+            </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
               {LEGEND.map((l) => (
                 <div key={l.label} className="flex items-center gap-2 text-xs">
@@ -83,12 +103,19 @@ export function HeroGeospatial() {
             </div>
           </div>
           <div className="w-full max-w-xs rounded-sm border border-border bg-background/70 p-4 backdrop-blur-md">
-            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">Geo-inteligencia</div>
+            <div className="font-mono text-[10px] uppercase tracking-[0.25em] text-muted-foreground">
+              Geo-inteligencia
+            </div>
             <ul className="mt-3 divide-y divide-border">
               {INTEL.map(({ icon: I, label, to }) => (
                 <li key={label}>
-                  <Link to={to} className="flex items-center justify-between py-2 text-sm transition hover:text-signal-cyan">
-                    <span className="flex items-center gap-2"><I className="h-4 w-4 text-signal-cyan" /> {label}</span>
+                  <Link
+                    to={to}
+                    className="flex items-center justify-between py-2 text-sm transition hover:text-signal-cyan"
+                  >
+                    <span className="flex items-center gap-2">
+                      <I className="h-4 w-4 text-signal-cyan" /> {label}
+                    </span>
                     <ArrowRight className="h-3.5 w-3.5 opacity-50" />
                   </Link>
                 </li>

@@ -73,6 +73,10 @@ export function crossValidate(
         maxDepthWithin: maxDepth,
       };
     });
-    return { assay, families: fam, convergent: fam.filter((f) => f.countWithin > 0).map((f) => f.familia) };
+    return {
+      assay,
+      families: fam,
+      convergent: fam.filter((f) => f.countWithin > 0).map((f) => f.familia),
+    };
   });
 }

@@ -110,8 +110,14 @@ export function PublicGeoLayerControls({
                     disabled={terrain.blocked}
                     aria-label={`Mostrar ${terrain.label ?? "topografía DEM Copernicus"}`}
                   />
-                  <span className="flex-1">{terrain.label ?? "Topografía · DEM Copernicus GLO-30"}</span>
-                  <EvidenceBadge kind={terrain.evidence ?? "OFICIAL"} scale={terrain.scale ?? "~30 m"} size="xs" />
+                  <span className="flex-1">
+                    {terrain.label ?? "Topografía · DEM Copernicus GLO-30"}
+                  </span>
+                  <EvidenceBadge
+                    kind={terrain.evidence ?? "OFICIAL"}
+                    scale={terrain.scale ?? "~30 m"}
+                    size="xs"
+                  />
                 </label>
                 <label className="mt-2 flex items-center gap-2 text-[10px] text-muted-foreground">
                   Opacidad

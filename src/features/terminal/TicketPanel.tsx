@@ -97,7 +97,9 @@ function TicketPanelInner({ spvCode, projectName }: { spvCode: string; projectNa
 
   const amt = Number(amount);
   const shares = spv.share_price && amt > 0 ? amt / Number(spv.share_price) : 0;
-  const pct = spv.round_size ? Math.min(100, (data.committed / Number(spv.round_size)) * 100) : null;
+  const pct = spv.round_size
+    ? Math.min(100, (data.committed / Number(spv.round_size)) * 100)
+    : null;
   const active = data.mine.filter((t) => t.status !== "cancelled" && t.status !== "settled");
 
   return (
@@ -143,12 +145,14 @@ function TicketPanelInner({ spvCode, projectName }: { spvCode: string; projectNa
             </div>
             <label className="mt-3 flex gap-2 text-xs text-content-subtle">
               <input type="checkbox" checked={risk} onChange={(e) => setRisk(e.target.checked)} />
-              Entiendo que es un proyecto en exploración, sin recursos ni reservas certificados
-              (NI 43-101 / JORC), y que no se garantiza rentabilidad.
+              Entiendo que es un proyecto en exploración, sin recursos ni reservas certificados (NI
+              43-101 / JORC), y que no se garantiza rentabilidad.
             </label>
           </div>
           <button
-            disabled={!risk || !(amt >= Number(spv.min_ticket ?? 0)) || amt <= 0 || create.isPending}
+            disabled={
+              !risk || !(amt >= Number(spv.min_ticket ?? 0)) || amt <= 0 || create.isPending
+            }
             onClick={() => create.mutate()}
             className="rounded-md bg-accent-brand px-4 py-2 text-sm text-surface disabled:opacity-40"
           >
@@ -303,7 +307,10 @@ function MyTicket({
               <button
                 disabled={busy || proof.trim().length < 4}
                 onClick={() =>
-                  run(() => payFn({ data: { ticketId: t.id, proof: proof.trim() } }), "Comprobante enviado")
+                  run(
+                    () => payFn({ data: { ticketId: t.id, proof: proof.trim() } }),
+                    "Comprobante enviado",
+                  )
                 }
                 className="rounded-md bg-accent-brand px-3 py-1.5 text-sm text-surface disabled:opacity-40"
               >
@@ -318,7 +325,11 @@ function MyTicket({
         <button
           disabled={busy}
           onClick={() =>
-            run(() => cancelFn({ data: { ticketId: t.id, reason: "Cancelado por el inversionista" } }), "Ticket cancelado")
+            run(
+              () =>
+                cancelFn({ data: { ticketId: t.id, reason: "Cancelado por el inversionista" } }),
+              "Ticket cancelado",
+            )
           }
           className="mt-3 text-xs text-content-subtle hover:text-content underline"
         >
