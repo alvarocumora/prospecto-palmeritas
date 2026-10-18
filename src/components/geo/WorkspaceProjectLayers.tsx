@@ -1,65 +1,23 @@
 import type { Map as LeafletMap } from "leaflet";
-import { lazy, Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import type { Feature, FeatureCollection, Geometry } from "geojson";
 import type { Project } from "@/hooks/useProjects";
 import { useMiningConcessions } from "@/hooks/useMiningConcessions";
 import { useProjectGeophysicsData } from "@/hooks/useProjectGeophysicsData";
 import { useExplorationTargets } from "@/hooks/useExplorationTargets";
-import { resolveProjectViewerProfile } from "@/lib/geospatial/projectViewerProfiles";
+import { getPublicProjectById } from "@/lib/projects/catalog";
+import { UnifiedProjectScene, ProjectSceneFrame } from "./UnifiedProjectScene";
+import { bundleSceneLayers } from "@/components/geoscene/bundleAdapter";
 import { resolveProjectTenure } from "@/lib/geospatial/projectTenure";
 import { buildPublicGeoManifest, type PublicGeoBundle } from "@/lib/geospatial/publicGeoContract";
 import { ProjectMasterViewer } from "./ProjectMasterViewer";
-import { ProjectTerrain3D } from "./ProjectTerrain3D";
+
 import type { ProjectView } from "@/lib/projects/navigation";
 
-const Cholqui2D = lazy(() =>
-  import("@/features/franco/components/CholquiMasterViewer").then((m) => ({
-    default: m.CholquiMasterViewer,
-  })),
-);
-const Cholqui3D = lazy(() =>
-  import("@/features/franco/components/CholquiTerrain3D").then((m) => ({
-    default: m.CholquiTerrain3D,
-  })),
-);
-const Palmeras2D = lazy(() =>
-  import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({
-    default: m.PalmerasMasterViewer,
-  })),
-);
-const Palmeras3D = lazy(() =>
-  import("@/features/palmeras/Palmeras3D").then((m) => ({ default: m.Palmeras3D })),
-);
-const LosVerdes2D = lazy(() =>
-  import("@/features/losverdes/LosVerdesMasterViewer").then((m) => ({
-    default: m.LosVerdesMasterViewer,
-  })),
-);
-const LosVerdes3D = lazy(() =>
-  import("@/features/losverdes/LosVerdes3D").then((m) => ({ default: m.LosVerdes3D })),
-);
-
 export function WorkspaceProjectLayers({ project, view }: { project: Project; view: ProjectView }) {
-  const profile = resolveProjectViewerProfile(project)?.key;
-  const Component =
-    profile === "cholqui" && project.id === "e5360f13-1647-4e44-bb13-c0614e6f39fe"
-      ? view === "2d"
-        ? Cholqui2D
-        : Cholqui3D
-      : profile === "palmeras" && project.id === "8dc8e288-b22c-4bd4-9626-bb7fb85d1745"
-        ? view === "2d"
-          ? Palmeras2D
-          : Palmeras3D
-        : profile === "losverdes" && project.id === "7a499b02-ecdf-447b-8956-b106fe4ec087"
-          ? view === "2d"
-            ? LosVerdes2D
-            : LosVerdes3D
-          : null;
-  return (
-    <Suspense fallback={<p className="p-4 text-content-subtle">Cargando visor compartido…</p>}>
-      {Component ? <Component /> : <PortfolioLayers project={project} view={view} />}
-    </Suspense>
-  );
+  const slug = getPublicProjectById(project.id)?.slug;
+  return slug ? <UnifiedProjectScene slug={slug} view={view} />
+    : <PortfolioLayers project={project} view={view} unified />;
 }
 
 export function PortfolioLayers({
@@ -67,11 +25,13 @@ export function PortfolioLayers({
   view,
   onMapReady,
   basemapOverride,
+  unified = false,
 }: {
   project: Project;
   view: ProjectView;
   onMapReady?: (map: LeafletMap) => void;
   basemapOverride?: "satellite" | "topo" | null;
+  unified?: boolean;
 }) {
   const portfolio = useMiningConcessions(project.id);
   const geophysics = useProjectGeophysicsData(project.id);
@@ -169,7 +129,10 @@ export function PortfolioLayers({
       <p className="p-4 text-content-subtle">No fue posible consultar la cartera de concesiones.</p>
     );
   const center = { lat: project.center_lat, lng: project.center_lng };
-  return view === "2d" ? (
+  if (unified || view === "3d") return <ProjectSceneFrame
+    project={{ id: project.id, name: project.name, center: evidenceBundle.center }}
+    layers={bundleSceneLayers(evidenceBundle)} view={view} />;
+  return (
     <ProjectMasterViewer
       onMapReady={onMapReady}
       basemapOverride={basemapOverride}
@@ -186,14 +149,6 @@ export function PortfolioLayers({
           features: targetFeatures,
         },
       ]}
-    />
-  ) : (
-    <ProjectTerrain3D
-      evidenceBundle={evidenceBundle}
-      slug={project.name}
-      projectId={project.id}
-      center={center}
-      concessions={concessions}
     />
   );
 }
