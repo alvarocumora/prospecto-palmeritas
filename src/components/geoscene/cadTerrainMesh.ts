@@ -1,4 +1,5 @@
 import type { CadTerrainTile } from "@/lib/geospatial/terrainTile";
+import { terrainGridCoordinate } from "@/lib/geospatial/terrainCoordinates";
 
 /**
  * Builds a triangle mesh (metre offsets from the tile centre, absolute elevation)
@@ -10,6 +11,7 @@ export type CadTerrainMesh = {
   positions: Float32Array;
   normals: Float32Array;
   colors: Float32Array;
+  texCoords: Float32Array;
   indices: Uint32Array;
   cellCount: number;
 };
@@ -17,13 +19,14 @@ export type CadTerrainMesh = {
 const LOW: [number, number, number] = [0.42, 0.47, 0.36];
 const HIGH: [number, number, number] = [0.86, 0.8, 0.68];
 
-export function buildCadTerrainMesh(tile: CadTerrainTile): CadTerrainMesh {
+export function buildCadTerrainMesh(tile: CadTerrainTile, imageBbox?: [number, number, number, number]): CadTerrainMesh {
   const { size, extentMeters, heights, validMask, referenceElevationM } = tile;
   const step = extentMeters / (size - 1);
   const half = extentMeters / 2;
   const n = size * size;
   const positions = new Float32Array(n * 3);
   const colors = new Float32Array(n * 4);
+  const texCoords = new Float32Array(n * 2);
   const range = Math.max(1, tile.maxH - tile.minH);
 
   for (let row = 0; row < size; row++) {
@@ -38,6 +41,12 @@ export function buildCadTerrainMesh(tile: CadTerrainTile): CadTerrainMesh {
       colors[i * 4 + 1] = LOW[1] + (HIGH[1] - LOW[1]) * t;
       colors[i * 4 + 2] = LOW[2] + (HIGH[2] - LOW[2]) * t;
       colors[i * 4 + 3] = 1;
+      if (imageBbox) {
+        const [west, south, east, north] = imageBbox;
+        const [lng, lat] = terrainGridCoordinate(Number(tile.centerLat), Number(tile.centerLng), size, extentMeters, col, row);
+        texCoords[i * 2] = (lng - west) / (east - west);
+        texCoords[i * 2 + 1] = (north - lat) / (north - south);
+      }
     }
   }
 
@@ -74,5 +83,5 @@ export function buildCadTerrainMesh(tile: CadTerrainTile): CadTerrainMesh {
     }
   }
 
-  return { positions, normals, colors, indices: Uint32Array.from(idx), cellCount };
+  return { positions, normals, colors, texCoords, indices: Uint32Array.from(idx), cellCount };
 }

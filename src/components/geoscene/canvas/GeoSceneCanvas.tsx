@@ -188,7 +188,7 @@ export function GeoSceneCanvas({
   );
 
   const cadTerrain = project?.cadTerrain ?? null;
-  const cadMesh = useMemo(() => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile) : null), [cadTerrain]);
+  const cadMesh = useMemo(() => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null), [cadTerrain]);
   const cadTerrainLayer = useMemo(() => {
     if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
     const { tile } = cadTerrain;
@@ -201,11 +201,13 @@ export function GeoSceneCanvas({
         attributes: {
           positions: { value: cadMesh.positions, size: 3 },
           normals: { value: cadMesh.normals, size: 3 },
-          colors: { value: cadMesh.colors, size: 4 },
+          ...(cadTerrain.imagery ? { texCoords: { value: cadMesh.texCoords, size: 2 } }
+            : { colors: { value: cadMesh.colors, size: 4 } }),
         },
         indices: { value: cadMesh.indices, size: 1 },
       } as never,
       getPosition: (d: { position: [number, number, number] }) => d.position,
+      texture: cadTerrain.imagery?.url,
       getColor: [255, 255, 255, 235],
       opacity: 0.92,
       material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
@@ -445,7 +447,7 @@ export function GeoSceneCanvas({
       data-geo-scene-mode={mode}
       data-geo-terrain-source={cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"}
     >
-      <div ref={mapDiv} className="absolute inset-0" />
+      <div className="absolute inset-0"><div ref={mapDiv} className="h-full w-full" /></div>
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-bg-panel/80 backdrop-blur">
           <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
@@ -458,6 +460,7 @@ export function GeoSceneCanvas({
         <details className="absolute bottom-12 right-3 z-10 max-w-[min(24rem,calc(100%-1.5rem))] max-h-[35%] overflow-auto rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
           <summary className="cursor-pointer font-semibold text-foreground">Relieve CAD · DERIVADO de curvas DECLARADAS</summary>
           <span className="block">{cadTerrain.notice}</span>
+          {cadTerrain.imagery && <span className="block mt-1">{cadTerrain.imagery.attribution} · {cadTerrain.imagery.notice}</span>}
         </details>
       )}
       <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">
