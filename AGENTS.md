@@ -6,3 +6,4 @@
 - Static terrain imagery uses stored asset pointers plus the provider's actual EPSG:4326 export extent, reprojected by imageDrape; preserve attribution and distinguish visual mosaics from analytical Sentinel rasters to prevent spatial stretching or false evidence claims.
 
 - Investment tickets: state machine enforced by trigger on investment_tickets; investors mutate only via SECURITY DEFINER RPCs (ticket_sign_contract/submit_payment/cancel), staff settles via ticket_settle which issues the spv_position — keeps ledger tamper-proof.
+- 3D viewing uses one engine: GeoScene3D (MapLibre + deck.gl) plus ProjectTerrain3D for CAD/DEM terrain; legacy three.js viewers are retired — never reintroduce parallel renderers, add canonical layers instead.
