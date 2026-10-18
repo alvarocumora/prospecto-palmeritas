@@ -5,6 +5,7 @@ import {
   type GeoEvidenceClass,
   type GeoLayerDefinition,
 } from "@/lib/geospatial/layerRegistry";
+import type { CadTerrainTile } from "@/lib/geospatial/terrainTile";
 
 /**
  * Project-supplied GeoJSON layers for GeoScene3D (cadastre, pedimentos, hitos…).
@@ -24,6 +25,11 @@ export type GeoSceneProject = {
   /** [lng, lat] WGS84 */
   center: [number, number];
   bbox?: [number, number, number, number] | null;
+  /**
+   * CAD-derived terrain. Replaces the global DEM inside the scene (never fused),
+   * rendered only where the coverage mask is supported.
+   */
+  cadTerrain?: { tile: CadTerrainTile; notice: string };
 };
 
 export type ResolvedProjectLayer = GeoSceneProjectLayer & { definition: GeoLayerDefinition };
