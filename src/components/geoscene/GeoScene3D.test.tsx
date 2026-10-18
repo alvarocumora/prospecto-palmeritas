@@ -2,15 +2,6 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { GeoScene3D } from "./GeoScene3D";
 
-vi.mock("@/components/Geology3DViewer", () => ({
-  Geology3DViewer: () => <div data-testid="surface-viewer" />,
-}));
-vi.mock("@/components/geology3d/SatToSubsurface3DViewer", () => ({
-  SatToSubsurface3DViewer: () => <div data-testid="subsurface-viewer" />,
-}));
-vi.mock("@/features/mag3d/MagAnomaly3DPro", () => ({
-  MagAnomaly3DPro: () => <div data-testid="mag-viewer" />,
-}));
 vi.mock("./SceneCopilot", () => ({
   SceneCopilot: () => <div data-testid="scene-copilot" />,
 }));
@@ -26,9 +17,9 @@ describe("GeoScene3D", () => {
     expect(screen.queryByText(/legacy/i)).not.toBeInTheDocument();
   });
 
-  it("keeps the legacy engine available only when explicitly requested", () => {
-    render(<GeoScene3D mode="surface" showLegacyEngineSwitch />);
-    expect(screen.getByText(/legacy/i)).toBeInTheDocument();
+  it("always renders the single deck.gl engine (legacy three.js retired)", async () => {
+    render(<GeoScene3D mode="subsurface" variant="mag" />);
+    expect(await screen.findByTestId("deckgl-subsurface")).toBeInTheDocument();
   });
 
   it("renders resource stub when mode=resource", () => {
