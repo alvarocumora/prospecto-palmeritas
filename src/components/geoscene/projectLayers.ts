@@ -17,6 +17,8 @@ export type GeoSceneProjectLayer = {
   data: FeatureCollection;
   /** Optional dataset source line (e.g. "KML del titular"). */
   source?: string;
+  /** Dense derived overlays may load disabled; the operator can enable them. */
+  defaultVisible?: boolean;
 };
 
 export type GeoSceneProject = {
@@ -29,7 +31,9 @@ export type GeoSceneProject = {
    * CAD-derived terrain. Replaces the global DEM inside the scene (never fused),
    * rendered only where the coverage mask is supported.
    */
-  cadTerrain?: { tile: CadTerrainTile; notice: string };
+  cadTerrain?: { tile: CadTerrainTile; notice: string; imagery?: {
+    url: string; bbox: [number, number, number, number]; attribution: string; notice: string;
+  } };
 };
 
 export type ResolvedProjectLayer = GeoSceneProjectLayer & { definition: GeoLayerDefinition };
@@ -88,5 +92,9 @@ export function projectLayerTooltip(
     `Fuente: ${layer.source ?? (properties?.fuente as string | undefined) ?? d.sourceSystem}`,
   ];
   if (d.caution) lines.push(d.caution);
+  for (const key of ["procedencia", "advertencia", "lab", "report_id", "cu_total_pct", "au_gpt"]) {
+    const value = properties?.[key];
+    if (value != null && value !== "") lines.push(`${key}: ${String(value)}`);
+  }
   return lines.join("\n");
 }

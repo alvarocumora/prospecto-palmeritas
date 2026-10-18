@@ -12,7 +12,8 @@ import {
   MapPin,
   ShieldCheck,
 } from "lucide-react";
-import { Eyebrow } from "@/components/brand";
+import { Eyebrow, BrandButton } from "@/components/brand";
+import { UnifiedProjectScene } from "@/components/geo/UnifiedProjectScene";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -34,19 +35,9 @@ import {
 } from "./terminalProjects";
 
 // Visores y paneles pesados: se cargan sólo cuando su pestaña está activa.
-const CholquiMasterViewer = lazy(() =>
-  import("@/features/franco/components/CholquiMasterViewer").then((m) => ({
-    default: m.CholquiMasterViewer,
-  })),
-);
 const CholquiTargetsSummary = lazy(() =>
   import("@/features/franco/components/CholquiTargetsSummary").then((m) => ({
     default: m.CholquiTargetsSummary,
-  })),
-);
-const CholquiTerrain3D = lazy(() =>
-  import("@/features/franco/components/CholquiTerrain3D").then((m) => ({
-    default: m.CholquiTerrain3D,
   })),
 );
 const CholquiFieldProgramPanel = lazy(() =>
@@ -80,19 +71,6 @@ const CholquiRoundPanel = lazy(() =>
     default: m.CholquiRoundPanel,
   })),
 );
-const LosVerdesMasterViewer = lazy(() =>
-  import("@/features/losverdes/LosVerdesMasterViewer").then((m) => ({
-    default: m.LosVerdesMasterViewer,
-  })),
-);
-const LosVerdes3D = lazy(() =>
-  import("@/features/losverdes/LosVerdes3D").then((m) => ({ default: m.LosVerdes3D })),
-);
-const NahuelbutaMasterViewer = lazy(() =>
-  import("@/features/nahuelbuta/NahuelbutaMasterViewer").then((m) => ({
-    default: m.NahuelbutaMasterViewer,
-  })),
-);
 const NahuelbutaSatellitePanel = lazy(() =>
   import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({
     default: m.NahuelbutaSatellitePanel,
@@ -107,17 +85,6 @@ const NahuelbutaThesisPanel = lazy(() =>
   import("@/features/nahuelbuta/NahuelbutaPanels").then((m) => ({
     default: m.NahuelbutaThesisPanel,
   })),
-);
-const PalmerasMasterViewer = lazy(() =>
-  import("@/features/palmeras/PalmerasMasterViewer").then((m) => ({
-    default: m.PalmerasMasterViewer,
-  })),
-);
-const Palmeras3D = lazy(() =>
-  import("@/features/palmeras/Palmeras3D").then((m) => ({ default: m.Palmeras3D })),
-);
-const Nahuelbuta3D = lazy(() =>
-  import("@/features/nahuelbuta/Nahuelbuta3D").then((m) => ({ default: m.Nahuelbuta3D })),
 );
 
 function Loading({ label }: { label: string }) {
@@ -264,126 +231,41 @@ function MapaTab({
   view: ProjectView;
   setView: (view: ProjectView) => void;
 }) {
-  if (project.slug === "cholqui") {
-    return (
-      <Suspense fallback={<Loading label="Cargando visor" />}>
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-          <p className="text-[11px] text-content-subtle max-w-xl">
-            Misma evidencia en dos lecturas: planimétrica para tenencia y catastro, y relieve real
-            para leer los halos y las trazas de sondaje en profundidad.
-          </p>
-          <div className="inline-flex rounded-full border border-hairline bg-white p-1">
-            {(
-              [
-                ["2d", "Planimétrico", MapIcon],
-                ["3d", "Terreno y evidencia 3D", Box],
-              ] as Array<["2d" | "3d", string, typeof MapIcon]>
-            ).map(([key, label, Icon]) => (
-              <button
-                key={key}
-                type="button"
-                aria-pressed={view === key}
-                onClick={() => setView(key)}
-                className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-                  view === key
-                    ? "bg-accent-brand text-white"
-                    : "text-content-subtle hover:text-content"
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <Suspense fallback={<Loading label="Cargando visor" />}>
-          {view === "2d" ? <CholquiMasterViewer /> : <CholquiTerrain3D />}
-        </Suspense>
-
+  return (
+    <>
+      <ViewToggle view={view} onChange={setView} />
+      <UnifiedProjectScene slug={project.slug} view={view} />
+      {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando programa" />}>
           <div className="mt-6 space-y-6">
-            {view === "2d" && (
-              <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-hairline bg-surface p-4">
-                <p className="max-w-xl text-xs text-content-subtle">
-                  El informe técnico y el deck incorporan capturas separadas de teledetección y
-                  geofísica desde las capas del visor 2D.
-                </p>
-                <ProjectDocsMenu
-                  label="Exportar mapas e informe"
-                  build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()}
-                />
-              </div>
-            )}
+            <ProjectDocsMenu label="Exportar mapas e informe"
+              build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()} />
             <CholquiTargetsSummary />
             <CholquiFieldProgramPanel />
           </div>
         </Suspense>
-      </Suspense>
-    );
-  }
-
-  if (project.slug === "nahuelbuta") {
-    return (
-      <Suspense fallback={<Loading label="Cargando visor" />}>
-        <ViewToggle view={view} onChange={setView} />
-        <Suspense fallback={<Loading label="Cargando visor" />}>
-          {view === "2d" ? <NahuelbutaMasterViewer /> : <Nahuelbuta3D />}
-        </Suspense>
+      )}
+      {project.slug === "nahuelbuta" && (
         <Suspense fallback={<Loading label="Cargando antecedentes" />}>
-          <div className="mt-6 space-y-6">
-            <NahuelbutaSatellitePanel />
-            <NahuelbutaTenurePanel />
-          </div>
+          <div className="mt-6 space-y-6"><NahuelbutaSatellitePanel /><NahuelbutaTenurePanel /></div>
         </Suspense>
-      </Suspense>
-    );
-  }
-
-  if (project.slug === "losverdes") {
-    return (
-      <Suspense fallback={<Loading label="Cargando visor" />}>
-        <ViewToggle view={view} onChange={setView} />
-        <Suspense fallback={<Loading label="Cargando visor" />}>
-          {view === "2d" ? <LosVerdesMasterViewer /> : <LosVerdes3D />}
-        </Suspense>
-      </Suspense>
-    );
-  }
-  return (
-    <Suspense fallback={<Loading label="Cargando visor" />}>
-      <ViewToggle view={view} onChange={setView} />
-      <Suspense fallback={<Loading label="Cargando visor" />}>
-        {view === "2d" ? <PalmerasMasterViewer /> : <Palmeras3D />}
-      </Suspense>
-    </Suspense>
+      )}
+    </>
   );
 }
 
-/** Selector 2D/3D idéntico para todos los proyectos del terminal. */
-function ViewToggle({ view, onChange }: { view: "2d" | "3d"; onChange: (v: "2d" | "3d") => void }) {
+function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
     <div className="flex justify-end mb-4">
-      <div className="inline-flex rounded-full border border-hairline bg-white p-1">
-        {(
-          [
-            ["2d", "Planimétrico", MapIcon],
-            ["3d", "Relieve 3D", Box],
-          ] as Array<["2d" | "3d", string, typeof MapIcon]>
-        ).map(([key, label, Icon]) => (
-          <button
-            key={key}
-            type="button"
-            aria-pressed={view === key}
-            onClick={() => onChange(key)}
-            className={`inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-[11px] font-mono uppercase tracking-wider transition-colors ${
-              view === key ? "bg-accent-brand text-white" : "text-content-subtle hover:text-content"
-            }`}
-          >
-            <Icon className="w-3.5 h-3.5" />
-            {label}
-          </button>
-        ))}
+      <div className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded">
+        {(["2d", "3d"] as const).map((key) => {
+          const Icon = key === "2d" ? MapIcon : Box;
+          return <BrandButton key={key} type="button" size="sm"
+            variant={view === key ? "primary" : "ghost"}
+            aria-pressed={view === key} onClick={() => onChange(key)}>
+            <Icon />{key === "2d" ? "Planta" : "Perspectiva"}
+          </BrandButton>;
+        })}
       </div>
     </div>
   );

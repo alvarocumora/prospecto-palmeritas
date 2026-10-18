@@ -30,4 +30,14 @@ describe("CAD terrain mesh for GeoScene3D", () => {
     expect(mesh.positions[1]).toBe(100);
     expect(mesh.positions[0]).toBe(-100);
   });
+  it("uses the image's actual geographic extent without changing terrain or coverage", () => {
+    const source = tile(Array(9).fill(true));
+    const plain = buildCadTerrainMesh(source);
+    const draped = buildCadTerrainMesh(source, [-71.001, -33.801, -70.999, -33.799]);
+    expect(draped.positions).toEqual(plain.positions);
+    expect(draped.indices).toEqual(plain.indices);
+    expect(draped.texCoords[8]).toBeCloseTo(0.5);
+    expect(draped.texCoords[9]).toBeCloseTo(0.5);
+    expect(draped.texCoords[1]).toBeLessThan(draped.texCoords[13]);
+  });
 });
