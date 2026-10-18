@@ -2,6 +2,7 @@ import type { FeatureCollection } from "geojson";
 import type { GeoSceneProject, GeoSceneProjectLayer } from "@/components/geoscene/projectLayers";
 import { buildCholquiPublicGeoBundle } from "./cholquiPublicGeo";
 import { cholquiCadTerrain, cholquiCadTerrainNotice } from "@/lib/cholqui/cadTerrain";
+import { bundleSceneLayers } from "@/components/geoscene/bundleAdapter";
 
 const SCENE_IDS = [
   "territory.cadastre",
@@ -24,13 +25,14 @@ export function buildCholquiSceneInput(): {
 } {
   const bundle = buildCholquiPublicGeoBundle();
   return {
-    project: { id: bundle.manifest.project.id, name: "Cholqui", center: bundle.center,
+    project: { id: "e5360f13-1647-4e44-bb13-c0614e6f39fe", name: "Cholqui", center: bundle.center,
       bbox: bundle.bbox,
       cadTerrain: { tile: cholquiCadTerrain, notice: cholquiCadTerrainNotice },
     },
-    layers: SCENE_IDS.flatMap((id) => {
-      const data = bundle.layers[id];
-      return data ? [{ id, data: data as unknown as FeatureCollection, source: SOURCES[id] }] : [];
-    }),
+    layers: bundleSceneLayers(bundle).map((layer) => ({
+      ...layer,
+      source: SCENE_IDS.includes(layer.id as (typeof SCENE_IDS)[number])
+        ? SOURCES[layer.id as (typeof SCENE_IDS)[number]] : undefined,
+    })),
   };
 }
