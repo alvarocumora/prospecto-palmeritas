@@ -40,6 +40,7 @@ export function buildCholquiSceneInput(): {
     },
     layers: bundleSceneLayers(bundle).map((layer) => ({
       ...layer,
+      defaultVisible: ["territory.cadastre", "territory.mojones", "sampling.assays", "geology.structures"].includes(layer.id),
       source: SCENE_IDS.includes(layer.id as (typeof SCENE_IDS)[number])
         ? SOURCES[layer.id as (typeof SCENE_IDS)[number]] : undefined,
     })),

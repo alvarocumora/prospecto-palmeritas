@@ -11,6 +11,7 @@ import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
+import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 
 const CholquiScene = lazy(() => import("./scenes/CholquiScene").then((m) => ({ default: m.CholquiScene })));
 const NahuelbutaScene = lazy(() => import("./scenes/NahuelbutaScene").then((m) => ({ default: m.NahuelbutaScene })));
@@ -34,6 +35,7 @@ export function UnifiedProjectScene({ slug, view }: { slug: CanonicalProjectSlug
 }
 
 function LosVerdesScene({ view }: { view: ProjectView }) {
+  const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
   const query = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchData() });
   const input = useMemo(() => {
@@ -43,8 +45,14 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
     const manifest = buildPublicGeoManifest({ id, name: "Los Verdes", center_lat: data.center[1], center_lng: data.center[0] },
       ["territory.cadastre", "remote_sensing.sentinel2_alteration", "geophysics.anomalies", "sampling.results", "targets.exploration"]);
     const bundle = buildLosVerdesPublicGeoBundle(manifest, data);
-    return { project: { id, name: "Los Verdes", center: data.center, bbox: data.bbox }, layers: bundleSceneLayers(bundle) };
-  }, [query.data]);
+    const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
+    if (emit.length) layers.push({ id: "remote_sensing.hyperspectral", defaultVisible: false,
+      source: "NASA EMIT L2B · GLT oficial; estimación espectral MODELADA, no ensaye ni recurso",
+      data: { type: "FeatureCollection", features: emit.flatMap((layer) => layer.features.features.map((feature) => ({ ...feature,
+        properties: { ...feature.properties, nombre: layer.label, procedencia: "modelled", advertencia: layer.caution },
+      }))) } });
+    return { project: { id, name: "Los Verdes", center: data.center, bbox: data.bbox }, layers };
+  }, [query.data, emit]);
   if (query.isError) return <p role="alert" className="p-6 text-content-subtle">No fue posible cargar las capas de Los Verdes.</p>;
   if (!input) return <div className="h-[620px] grid place-items-center text-content-subtle">Cargando capas de Los Verdes…</div>;
   return <ProjectSceneFrame {...input} view={view} />;

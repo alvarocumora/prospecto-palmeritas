@@ -43,7 +43,10 @@ export function GeoScene3D({
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(
     () => {
       const ids = initialGeoSceneLayerIds(initialPreset);
-      for (const layer of projectLayers ?? []) ids.add(layer.id);
+      for (const layer of projectLayers ?? []) {
+        if (layer.defaultVisible === false) ids.delete(layer.id);
+        else ids.add(layer.id);
+      }
       return ids;
     },
   );
@@ -52,7 +55,7 @@ export function GeoScene3D({
     const added = (projectLayers ?? []).filter((layer) => !seenProjectLayers.current.has(layer.id));
     if (!added.length) return;
     for (const layer of added) seenProjectLayers.current.add(layer.id);
-    setEnabledLayerIds((current) => new Set([...current, ...added.map((layer) => layer.id)]));
+    setEnabledLayerIds((current) => new Set([...current, ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id)]));
   }, [projectLayers]);
 
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
