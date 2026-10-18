@@ -4,6 +4,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
+import { GeoJsonLayer } from "@deck.gl/layers";
 import { Loader2 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -20,11 +21,22 @@ import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import { sceneBindingsForMode, sceneLayerEnabled } from "../layerPolicy";
 import type { GeoSceneFilters, GeoSceneMode } from "../types";
 import { sceneFilterManifest } from "../filterPolicy";
+import {
+  evidenceColor,
+  isDashedEvidence,
+  projectLayerTooltip,
+  resolveProjectLayers,
+  type GeoSceneProject,
+  type GeoSceneProjectLayer,
+  type ResolvedProjectLayer,
+} from "../projectLayers";
 
 interface Props {
   mode: GeoSceneMode;
   visibleLayerIds: ReadonlySet<string>;
   filters?: GeoSceneFilters;
+  project?: GeoSceneProject;
+  projectLayers?: GeoSceneProjectLayer[];
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -78,8 +90,17 @@ function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
   };
 }
 
-export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
-  const { active } = useProjects();
+export function GeoSceneCanvas({
+  mode,
+  visibleLayerIds,
+  filters,
+  project,
+  projectLayers,
+}: Props) {
+  const { active: activeProject } = useProjects();
+  const active = project
+    ? { id: project.id, center_lng: project.center[0], center_lat: project.center[1] }
+    : activeProject;
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const overlayRef = useRef<MapboxOverlay | null>(null);
@@ -154,6 +175,36 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     wireframesVisible,
   );
 
+  const resolvedProjectLayers = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
+  const projectGeoLayers = useMemo(() => {
+    if (mode === "resource") return [];
+    return resolvedProjectLayers
+      .filter((layer) => visibleLayerIds.has(layer.id))
+      .map((layer) => {
+        const color = evidenceColor(layer.definition.evidence);
+        const dashed = isDashedEvidence(layer.definition.evidence);
+        return new GeoJsonLayer({
+          id: `project:${layer.id}`,
+          data: layer.data as never,
+          pickable: true,
+          stroked: true,
+          filled: true,
+          getFillColor: [color[0], color[1], color[2], dashed ? 20 : 45],
+          getLineColor: color,
+          getLineWidth: dashed ? 1.5 : 2.5,
+          lineWidthUnits: "pixels",
+          pointType: "circle",
+          getPointRadius: 6,
+          pointRadiusUnits: "pixels",
+          pointRadiusMinPixels: 4,
+          parameters: { depthTest: false } as never,
+          updateTriggers: { getLineColor: layer.definition.evidence },
+          // keep a reference for tooltips
+          ...({ geoProjectLayer: layer } as Record<string, unknown>),
+        });
+      });
+  }, [mode, resolvedProjectLayers, visibleLayerIds]);
+
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
 
@@ -176,9 +227,24 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
     map.on("load", () => {
-      const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
+      const overlay = new MapboxOverlay({
+        interleaved: false,
+        layers: [],
+        getTooltip: (info: {
+          layer?: { props?: Record<string, unknown> } | null;
+          object?: { properties?: Record<string, unknown> } | null;
+        }) => {
+          const projectLayer = info.layer?.props?.geoProjectLayer as ResolvedProjectLayer | undefined;
+          if (!projectLayer || !info.object) return null;
+          return projectLayerTooltip(projectLayer, info.object.properties);
+        },
+      } as never);
       map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
+      if (project?.bbox) {
+        const [w, so, e, n] = project.bbox;
+        map.fitBounds([[w, so], [e, n]], { padding: 60, pitch: 55, bearing: -20, duration: 0 });
+      }
       syncSnapshotViewState();
       setReady(true);
     });
@@ -221,6 +287,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   }, [ready, terrainVisible]);
 
   useEffect(() => {
+    if (project?.bbox) return;
     if (!mapRef.current || !active?.center_lat || !active?.center_lng) return;
     mapRef.current.flyTo({
       center: [Number(active.center_lng), Number(active.center_lat)],
@@ -233,6 +300,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
     const layers = [
+      ...projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
       ...holeColumnLayers,
@@ -243,6 +311,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     overlayRef.current.setProps({ layers });
   }, [
     ready,
+    projectGeoLayers,
     targetsLayer,
     satAnomaliesLayer,
     holeColumnLayers,
@@ -273,6 +342,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const layerCount = useMemo(
     () =>
       [
+        ...projectGeoLayers,
         targetsLayer,
         satAnomaliesLayer,
         ...holeColumnLayers,
@@ -281,6 +351,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
         anomaliesLayer,
       ].filter(Boolean).length,
     [
+      projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
       holeColumnLayers,
@@ -293,11 +364,15 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   const canonicalManifest = useMemo(() => {
     const rendered = sceneBindingsForMode(mode)
       .filter((binding) => visibleLayerIds.has(binding.canonicalId))
-      .map((binding) => binding.canonicalId);
-    return Array.from(new Set(["basemap.esri_imagery", ...rendered]))
+      .map((binding) => binding.canonicalId as string);
+    const projectIds =
+      mode === "resource"
+        ? []
+        : resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.id as string);
+    return Array.from(new Set(["basemap.esri_imagery", ...rendered, ...projectIds]))
       .sort()
       .join(",");
-  }, [mode, visibleLayerIds]);
+  }, [mode, visibleLayerIds, resolvedProjectLayers]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
