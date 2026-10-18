@@ -51,4 +51,13 @@ describe("GeoScene3D", () => {
     await waitFor(() => expect(canvas.getAttribute("data-layers")).toContain("sampling.assays"));
     expect(canvas.getAttribute("data-layers")).not.toContain("territory.cadastre");
   });
+  it("loads dense spectral overlays disabled without dropping their controls", async () => {
+    render(<GeoScene3D projectLayers={[{ id: "remote_sensing.hyperspectral", defaultVisible: false,
+      data: { type: "FeatureCollection", features: [] } }]} />);
+    const canvas = await screen.findByTestId("deckgl-surface");
+    expect(canvas.getAttribute("data-layers")).not.toContain("remote_sensing.hyperspectral");
+    fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
+    fireEvent.click(screen.getByRole("button", { name: /Productos hiperespectrales/ }));
+    expect(canvas.getAttribute("data-layers")).toContain("remote_sensing.hyperspectral");
+  });
 });

@@ -418,8 +418,18 @@ export function GeoSceneCanvas({
   );
 
   const canonicalManifest = useMemo(() => {
+    const availableBindings: Record<string, boolean> = {
+      terrain: terrainVisible,
+      targets: Boolean(targetsLayer),
+      satellite_anomalies: Boolean(satAnomaliesLayer),
+      drillholes_completed: completedCollarCount + completedTrajectoryCount > 0,
+      drillholes_proposed: proposedCollarCount + proposedTrajectoryCount > 0,
+      drill_intercepts: interceptCount > 0,
+      geophysics_anomalies: Boolean(anomaliesLayer),
+      geology_wireframes: wireframeCount > 0,
+    };
     const rendered = sceneBindingsForMode(mode)
-      .filter((binding) => visibleLayerIds.has(binding.canonicalId))
+      .filter((binding) => visibleLayerIds.has(binding.canonicalId) && availableBindings[binding.key])
       .map((binding) => binding.canonicalId as string);
     const projectIds =
       mode === "resource"
@@ -428,7 +438,9 @@ export function GeoSceneCanvas({
     return Array.from(new Set(["basemap.esri_imagery", ...rendered, ...projectIds]))
       .sort()
       .join(",");
-  }, [mode, visibleLayerIds, resolvedProjectLayers]);
+  }, [mode, visibleLayerIds, resolvedProjectLayers, terrainVisible, targetsLayer, satAnomaliesLayer,
+    completedCollarCount, completedTrajectoryCount, proposedCollarCount, proposedTrajectoryCount,
+    interceptCount, anomaliesLayer, wireframeCount]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
