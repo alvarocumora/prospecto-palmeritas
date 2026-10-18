@@ -5,6 +5,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { GeoJsonLayer } from "@deck.gl/layers";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
+import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { Loader2 } from "lucide-react";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -175,6 +178,31 @@ export function GeoSceneCanvas({
     wireframesVisible,
   );
 
+  const cadTerrain = project?.cadTerrain ?? null;
+  const cadMesh = useMemo(() => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile) : null), [cadTerrain]);
+  const cadTerrainLayer = useMemo(() => {
+    if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
+    const { tile } = cadTerrain;
+    return new SimpleMeshLayer({
+      id: "project:cad-terrain",
+      data: [{ position: [0, 0, 0] }],
+      coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
+      coordinateOrigin: [Number(tile.centerLng), Number(tile.centerLat), 0],
+      mesh: {
+        attributes: {
+          positions: { value: cadMesh.positions, size: 3 },
+          normals: { value: cadMesh.normals, size: 3 },
+          colors: { value: cadMesh.colors, size: 4 },
+        },
+        indices: { value: cadMesh.indices, size: 1 },
+      } as never,
+      getPosition: (d: { position: [number, number, number] }) => d.position,
+      getColor: [255, 255, 255, 235],
+      opacity: 0.92,
+      material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
+    });
+  }, [cadTerrain, cadMesh, terrainVisible, mode]);
+
   const resolvedProjectLayers = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
@@ -275,7 +303,8 @@ export function GeoSceneCanvas({
     if (!ready || !mapRef.current) return;
     try {
       mapRef.current.setTerrain(
-        terrainVisible ? { source: "terrainDEM", exaggeration: 1.5 } : null,
+        // CAD terrain replaces the global DEM; the two are never fused.
+        terrainVisible && !cadTerrain ? { source: "terrainDEM", exaggeration: 1.5 } : null,
       );
     } catch {
       try {
@@ -284,7 +313,7 @@ export function GeoSceneCanvas({
         // Fail-safe: canvas 2D con pitch.
       }
     }
-  }, [ready, terrainVisible]);
+  }, [ready, terrainVisible, cadTerrain]);
 
   useEffect(() => {
     if (project?.bbox) return;
@@ -300,6 +329,7 @@ export function GeoSceneCanvas({
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
     const layers = [
+      cadTerrainLayer,
       ...projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
@@ -311,6 +341,7 @@ export function GeoSceneCanvas({
     overlayRef.current.setProps({ layers });
   }, [
     ready,
+    cadTerrainLayer,
     projectGeoLayers,
     targetsLayer,
     satAnomaliesLayer,
@@ -342,6 +373,7 @@ export function GeoSceneCanvas({
   const layerCount = useMemo(
     () =>
       [
+        cadTerrainLayer,
         ...projectGeoLayers,
         targetsLayer,
         satAnomaliesLayer,
@@ -351,6 +383,7 @@ export function GeoSceneCanvas({
         anomaliesLayer,
       ].filter(Boolean).length,
     [
+      cadTerrainLayer,
       projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
@@ -389,6 +422,7 @@ export function GeoSceneCanvas({
       data-geo-filters={filterManifest}
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
+      data-geo-terrain-source={cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"}
     >
       <div ref={mapDiv} className="absolute inset-0" />
       {!ready && (
@@ -397,6 +431,12 @@ export function GeoSceneCanvas({
             <Loader2 className="w-4 h-4 animate-spin text-gold" />
             Inicializando canvas 3D…
           </div>
+        </div>
+      )}
+      {cadTerrainLayer && cadTerrain && (
+        <div className="absolute bottom-12 right-3 z-10 max-w-sm rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
+          <span className="font-semibold text-foreground">Relieve CAD · DERIVADO de curvas DECLARADAS</span>
+          <span className="block">{cadTerrain.notice}</span>
         </div>
       )}
       <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">
