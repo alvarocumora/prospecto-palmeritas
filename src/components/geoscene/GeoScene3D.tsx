@@ -29,14 +29,20 @@ export function GeoScene3D({
   className = "",
   initialPreset = "official_3d",
   filters,
+  project,
+  projectLayers,
 }: GeoSceneProps) {
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() =>
-    initialGeoSceneLayerIds(initialPreset),
+  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(
+    () => {
+      const ids = initialGeoSceneLayerIds(initialPreset);
+      for (const layer of projectLayers ?? []) ids.add(layer.id);
+      return ids;
+    },
   );
 
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
@@ -84,7 +90,13 @@ export function GeoScene3D({
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
           {mode !== "resource" && (
-            <GeoSceneCanvas mode={mode} visibleLayerIds={enabledLayerIds} filters={filters} />
+            <GeoSceneCanvas
+              mode={mode}
+              visibleLayerIds={enabledLayerIds}
+              filters={filters}
+              project={project}
+              projectLayers={projectLayers}
+            />
           )}
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
@@ -97,6 +109,7 @@ export function GeoScene3D({
           open={layerPanelOpen}
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
+          extraLayerIds={projectLayers?.map((layer) => layer.id)}
         />
       )}
 

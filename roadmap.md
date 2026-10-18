@@ -43,7 +43,7 @@
 
 ## Migración total a GeoScene3D (visores de proyecto)
 - [x] Fase 0: visitantes públicos ya no generan errores 401 al abrir Cholqui (capa satelital privada solo con sesión).
-- [ ] Fase 1: GeoScene3D acepta proyecto/centro explícito y capas GeoJSON de catastro, pedimentos e hitos con procedencia.
+- [x] Fase 1: GeoScene3D acepta proyecto/centro explícito y capas GeoJSON de catastro, pedimentos e hitos con procedencia.
 - [ ] Fase 2: relieve CAD de Cholqui como fuente de terreno en GeoScene3D (máscara de cobertura, sin extrapolar).
 - [ ] Fase 3: terminal usa una sola instancia con cámara Planta/Perspectiva y capas persistentes; retirar Leaflet y R3F de los terminales.
 - [ ] Fase 4: Los Verdes, Nahuelbuta y Palmeras sobre el mismo visor; QA visual y pruebas.

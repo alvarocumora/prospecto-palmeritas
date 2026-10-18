@@ -1,6 +1,6 @@
 import { Layers3, X } from "lucide-react";
 import { EvidenceBadge } from "@/components/ui-system";
-import type { CanonicalGeoLayerId, GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
+import { getGeoLayer, type CanonicalGeoLayerId, type GeoLayerDefinition, type GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
 import { sceneDefinitionsForMode } from "../layerPolicy";
 import type { GeoSceneMode } from "../types";
 
@@ -21,16 +21,22 @@ export function SceneLayerPanel({
   open,
   onClose,
   onToggle,
+  extraLayerIds,
 }: {
   mode: GeoSceneMode;
   enabled: ReadonlySet<string>;
   open: boolean;
   onClose: () => void;
   onToggle: (id: CanonicalGeoLayerId) => void;
+  extraLayerIds?: readonly CanonicalGeoLayerId[];
 }) {
   if (!open) return null;
 
-  const definitions = sceneDefinitionsForMode(mode);
+  const base = sceneDefinitionsForMode(mode);
+  const extras = mode === "resource" ? [] : (extraLayerIds ?? [])
+    .map((id) => getGeoLayer(id))
+    .filter((d): d is GeoLayerDefinition => Boolean(d) && !base.some((b) => b.id === d!.id));
+  const definitions = [...extras, ...base];
   const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
 
   return (
