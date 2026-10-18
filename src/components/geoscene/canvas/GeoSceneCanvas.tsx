@@ -9,6 +9,9 @@ import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { Loader2 } from "lucide-react";
+import type { ProjectView } from "@/lib/projects/navigation";
+import { projectCamera } from "../cameraPolicy";
+import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useProjects } from "@/hooks/useProjects";
@@ -35,6 +38,7 @@ import {
 } from "../projectLayers";
 
 interface Props {
+  view?: ProjectView;
   mode: GeoSceneMode;
   visibleLayerIds: ReadonlySet<string>;
   filters?: GeoSceneFilters;
@@ -94,6 +98,7 @@ function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
 }
 
 export function GeoSceneCanvas({
+  view = "3d",
   mode,
   visibleLayerIds,
   filters,
@@ -101,6 +106,7 @@ export function GeoSceneCanvas({
   projectLayers,
 }: Props) {
   const { active: activeProject } = useProjects();
+  const { user } = useAuth();
   const active = project
     ? { id: project.id, center_lng: project.center[0], center_lat: project.center[1] }
     : activeProject;
@@ -129,14 +135,17 @@ export function GeoSceneCanvas({
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geophysics_anomalies");
   const wireframesVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
+  // Public bundles supply public evidence; private scene hooks stay session-scoped.
+  const privateProjectId = user ? active?.id ?? null : null;
+  const hasProjectLayer = (id: string) => projectLayers?.some((layer) => layer.id === id) ?? false;
 
-  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, targetsVisible, filters);
+  const { layer: targetsLayer } = useTargetsLayer(privateProjectId, targetsVisible && !hasProjectLayer("targets.exploration"), filters);
   const {
     layers: holeColumnLayers,
     completedCount: completedCollarCount,
     proposedCount: proposedCollarCount,
   } = useDrillHolesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     {
@@ -152,7 +161,7 @@ export function GeoSceneCanvas({
     proposedCount: proposedTrajectoryCount,
     interceptCount,
   } = useDrillTrajectoriesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     {
@@ -164,15 +173,15 @@ export function GeoSceneCanvas({
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
-    active?.id ?? null,
-    geophysicsVisible,
+    privateProjectId,
+    geophysicsVisible && !hasProjectLayer("geophysics.anomalies"),
   );
   const { layer: satAnomaliesLayer, count: satAnomaliesCount } = useSatAnomaliesLayer(
-    active?.id ?? null,
-    satelliteVisible,
+    privateProjectId,
+    satelliteVisible && !hasProjectLayer("remote_sensing.sentinel2_alteration"),
   );
   const { layers: wireframeLayers, count: wireframeCount } = useWireframesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     wireframesVisible,
@@ -245,8 +254,7 @@ export function GeoSceneCanvas({
       style: MAP_STYLE,
       center,
       zoom: 11,
-      pitch: 55,
-      bearing: -20,
+      ...projectCamera(view),
       maxPitch: 80,
       attributionControl: { compact: true },
     });
@@ -271,7 +279,7 @@ export function GeoSceneCanvas({
       overlayRef.current = overlay;
       if (project?.bbox) {
         const [w, so, e, n] = project.bbox;
-        map.fitBounds([[w, so], [e, n]], { padding: 60, pitch: 55, bearing: -20, duration: 0 });
+        map.fitBounds([[w, so], [e, n]], { padding: 45, ...projectCamera(view), duration: 0 });
       }
       syncSnapshotViewState();
       setReady(true);
@@ -301,6 +309,19 @@ export function GeoSceneCanvas({
 
   useEffect(() => {
     if (!ready || !mapRef.current) return;
+    mapRef.current.easeTo({ ...projectCamera(view), duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500 });
+  }, [ready, view]);
+
+  useEffect(() => {
+    const element = mapDiv.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() => mapRef.current?.resize());
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
     try {
       mapRef.current.setTerrain(
         // CAD terrain replaces the global DEM; the two are never fused.
@@ -321,7 +342,7 @@ export function GeoSceneCanvas({
     mapRef.current.flyTo({
       center: [Number(active.center_lng), Number(active.center_lat)],
       zoom: 11,
-      pitch: 55,
+      ...projectCamera(view),
       duration: 1200,
     });
   }, [active?.id, active?.center_lat, active?.center_lng]);
@@ -361,14 +382,14 @@ export function GeoSceneCanvas({
       mapRef.current.flyTo({
         center: [anchor.lng, anchor.lat],
         zoom: 14.5,
-        pitch: 65,
+        ...projectCamera(view),
         speed: 1.4,
         essential: true,
       });
     };
     window.addEventListener(SCENE_FOCUS_EVENT, handler);
     return () => window.removeEventListener(SCENE_FOCUS_EVENT, handler);
-  }, []);
+  }, [view]);
 
   const layerCount = useMemo(
     () =>
@@ -415,7 +436,7 @@ export function GeoSceneCanvas({
     <div
       className="relative h-full w-full"
       data-geo-engine="deckgl"
-      data-geo-mode="3d"
+      data-geo-mode={view}
       data-geo-project-id={active?.id ?? undefined}
       data-geo-crs="EPSG:4326"
       data-geo-layer-ids={canonicalManifest}
@@ -434,10 +455,10 @@ export function GeoSceneCanvas({
         </div>
       )}
       {cadTerrainLayer && cadTerrain && (
-        <div className="absolute bottom-12 right-3 z-10 max-w-sm rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
-          <span className="font-semibold text-foreground">Relieve CAD · DERIVADO de curvas DECLARADAS</span>
+        <details className="absolute bottom-12 right-3 z-10 max-w-[min(24rem,calc(100%-1.5rem))] max-h-[35%] overflow-auto rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
+          <summary className="cursor-pointer font-semibold text-foreground">Relieve CAD · DERIVADO de curvas DECLARADAS</summary>
           <span className="block">{cadTerrain.notice}</span>
-        </div>
+        </details>
       )}
       <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}

@@ -1,5 +1,6 @@
 import type { GeoViewerPresetId } from "@/lib/geospatial/layerRegistry";
 import type { GeoSceneProject, GeoSceneProjectLayer } from "./projectLayers";
+import type { ProjectView } from "@/lib/projects/navigation";
 
 // GeoScene3D — tipos compartidos del visor canónico.
 // Motor único MapLibre + deck.gl; los visores three.js heredados fueron retirados.
@@ -26,6 +27,8 @@ export type GeoSceneFilters = {
 };
 
 export type GeoSceneProps = {
+  view?: ProjectView;
+  showCopilot?: boolean;
   mode?: GeoSceneMode;
   variant?: GeoSceneVariant;
   showModeTabs?: boolean;

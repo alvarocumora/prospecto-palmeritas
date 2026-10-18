@@ -3,6 +3,7 @@ import { EvidenceBadge } from "@/components/ui-system";
 import { getGeoLayer, type CanonicalGeoLayerId, type GeoLayerDefinition, type GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
 import { sceneDefinitionsForMode } from "../layerPolicy";
 import type { GeoSceneMode } from "../types";
+import { BrandButton } from "@/components/brand";
 
 const DOMAIN_LABEL: Partial<Record<GeoLayerDomain, string>> = {
   territory: "Territorio",
@@ -35,12 +36,12 @@ export function SceneLayerPanel({
   const base = sceneDefinitionsForMode(mode);
   const extras = mode === "resource" ? [] : (extraLayerIds ?? [])
     .map((id) => getGeoLayer(id))
-    .filter((d): d is GeoLayerDefinition => Boolean(d) && !base.some((b) => b.id === d!.id));
+    .filter((d): d is GeoLayerDefinition => d != null && !base.some((b) => b.id === d.id));
   const definitions = [...extras, ...base];
   const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
 
   return (
-    <div className="absolute left-3 top-14 z-30 max-h-[75vh] w-[21rem] overflow-y-auto rounded border border-border bg-bg-secondary/95 p-3 font-mono text-xs shadow-xl backdrop-blur">
+    <div className="absolute left-3 top-14 z-30 max-h-[70%] w-[min(21rem,calc(100%-1.5rem))] overflow-y-auto rounded border border-border bg-bg-secondary/95 p-3 font-mono text-xs shadow-xl backdrop-blur">
       <div className="mb-3 flex items-start justify-between gap-2 border-b border-border pb-2">
         <div>
           <div className="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide text-foreground">
@@ -51,14 +52,14 @@ export function SceneLayerPanel({
             GeoScene3D · {mode}
           </div>
         </div>
-        <button
+        <BrandButton variant="ghost" size="sm"
           type="button"
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground"
           aria-label="Cerrar capas 3D"
         >
           <X className="h-3.5 w-3.5" />
-        </button>
+        </BrandButton>
       </div>
 
       {domains.map((domain) => (
@@ -72,11 +73,12 @@ export function SceneLayerPanel({
               .map((definition) => {
                 const active = enabled.has(definition.id);
                 return (
-                  <button
+                  <BrandButton variant="ghost" size="sm"
                     type="button"
                     key={definition.id}
                     onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
-                    className={`w-full rounded border p-2 text-left transition-colors ${
+                    aria-pressed={active}
+                    className={`h-auto w-full block whitespace-normal rounded border p-2 text-left transition-colors ${
                       active
                         ? "border-gold/60 bg-gold/5"
                         : "border-border bg-background/30 hover:border-foreground/30"
@@ -107,7 +109,7 @@ export function SceneLayerPanel({
                         {definition.caution}
                       </div>
                     )}
-                  </button>
+                  </BrandButton>
                 );
               })}
           </div>
