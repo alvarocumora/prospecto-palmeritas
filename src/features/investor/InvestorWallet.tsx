@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Wallet, Coins, Clock, FileText } from "lucide-react";
+import { Wallet, Coins, Clock, FileText, Download } from "lucide-react";
 import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
+import { useCurrency } from "@/lib/currency";
+import { supabase } from "@/integrations/supabase/client";
 
 type W = Awaited<ReturnType<typeof getMyWallet>>;
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
@@ -23,22 +25,55 @@ const STAGE_LABEL: Record<string, string> = {
 export function InvestorWallet() {
   const [w, setW] = useState<W | null>(null);
   const [rounds, setRounds] = useState<PublicRound[]>([]);
+  const [busy, setBusy] = useState(false);
+  const { usdClp } = useCurrency();
   useEffect(() => {
     getMyWallet().then(setW).catch(() => setW(null));
     getPublicRounds().then(setRounds).catch(() => setRounds([]));
   }, []);
+  const clp = (n: number) =>
+    usdClp ? `≈ CLP ${Math.round(n * usdClp).toLocaleString("es-CL")}` : undefined;
+
+  const downloadStatement = async () => {
+    if (!w) return;
+    setBusy(true);
+    try {
+      const { data } = await supabase.auth.getUser();
+      const u = data.user;
+      const holder = (u?.user_metadata?.full_name as string) || u?.email || "Inversionista";
+      const { generateInvestmentStatement } = await import("@/lib/pdf/investmentStatementPdf");
+      await generateInvestmentStatement({
+        holder,
+        positions: w.positions,
+        tickets: w.tickets
+          .filter((t) => !["settled", "cancelled", "rejected"].includes(t.status))
+          .map((t) => ({ ...t, status: STAGE_LABEL[t.status] ?? t.status })),
+        usdClp,
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
 
   return (
     <section data-theme="im-light" className="mb-6 border border-hairline bg-surface text-content">
-      <header className="p-5 border-b border-hairline flex items-center gap-2">
+      <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
         <Wallet className="w-4 h-4 text-accent-brand" />
         <h2 className="font-serif text-xl">Mi wallet</h2>
+        <button
+          type="button"
+          onClick={() => void downloadStatement()}
+          disabled={!w || busy}
+          className="ml-auto inline-flex items-center gap-1.5 border border-accent-brand px-3 py-1.5 text-xs text-accent-brand hover:bg-accent-brand hover:text-surface disabled:opacity-40"
+        >
+          <Download className="w-3.5 h-3.5" /> {busy ? "Generando…" : "Cartola PDF"}
+        </button>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-hairline">
-        <Kpi label="Capital en posiciones" value={usd(w?.totals.invested ?? 0)} />
+        <Kpi label="Capital en posiciones" value={usd(w?.totals.invested ?? 0)} note={clp(w?.totals.invested ?? 0)} />
         <Kpi label="Participaciones" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
-        <Kpi label="Órdenes en curso" value={usd(w?.totals.pending ?? 0)} />
+        <Kpi label="Órdenes en curso" value={usd(w?.totals.pending ?? 0)} note={clp(w?.totals.pending ?? 0)} />
       </div>
 
       <div className="p-5">
@@ -134,11 +169,12 @@ export function InvestorWallet() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="bg-surface p-4">
       <div className="text-[11px] text-content-muted">{label}</div>
       <div className="font-serif text-2xl mt-1">{value}</div>
+      {note && <div className="text-[11px] text-content-muted font-mono mt-0.5">{note}</div>}
     </div>
   );
 }

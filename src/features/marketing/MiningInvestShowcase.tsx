@@ -98,7 +98,9 @@ export function MiningInvestShowcase() {
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
               <Calculator className="w-3.5 h-3.5" /> Simulación · {PROJECTS.find((p) => p.slug === slug)?.name}
             </div>
-            <label className="block mt-5 text-sm">Monto a invertir (USD)</label>
+            <label className="block mt-5 text-sm">
+              Monto a invertir (USD) · desde {usd(ROUND.minTicket)} (≈ CLP 15 millones)
+            </label>
             <input
               type="number"
               min={ROUND.minTicket}
@@ -108,7 +110,7 @@ export function MiningInvestShowcase() {
               className="mt-2 w-full border border-hairline bg-surface px-3 py-2 font-mono text-lg"
             />
             <div className="mt-2 flex flex-wrap gap-2">
-              {[25000, 50000, 100000, 250000].map((v) => (
+              {[15000, 30000, 50000, 100000].map((v) => (
                 <button
                   key={v}
                   type="button"
