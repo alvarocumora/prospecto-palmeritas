@@ -49,6 +49,49 @@ export function InvestorWallet() {
     }
   };
 
+  const downloadContract = async (ticketId: string, project: string) => {
+    try {
+      const { data: t, error } = await supabase
+        .from("investment_tickets")
+        .select("*")
+        .eq("id", ticketId)
+        .single();
+      if (error || !t) throw new Error("No se pudo leer el ticket");
+      const { data: spv } = await supabase
+        .from("spv_entities")
+        .select("legal_name")
+        .eq("id", t.spv_id)
+        .maybeSingle();
+      let signatureImage: string | null = null;
+      try {
+        const { getTicketSignatureUrl } = await import("@/lib/ticketSignature.functions");
+        const { url } = await getTicketSignatureUrl({ data: { ticketId } });
+        if (url) {
+          const blob = await (await fetch(url)).blob();
+          signatureImage = await new Promise<string>((res, rej) => {
+            const r = new FileReader();
+            r.onload = () => res(r.result as string);
+            r.onerror = rej;
+            r.readAsDataURL(blob);
+          });
+        }
+      } catch {
+        /* sin trazo almacenado */
+      }
+      const { downloadInvestmentContractPdf } = await import("@/lib/pdf/investmentContractPdf");
+      await downloadInvestmentContractPdf({
+        t: t as never,
+        legalName: spv?.legal_name ?? "Valle Escondido SpA",
+        projectName: project,
+        projectSlug: project.toLowerCase().includes("verdes") ? "losverdes" : "cholqui",
+        signatureImage,
+      });
+    } catch (e) {
+      const { toast } = await import("sonner");
+      toast.error(e instanceof Error ? e.message : "Error al generar el contrato");
+    }
+  };
+
   return (
     <section data-theme="im-light" className="mb-6 border border-hairline bg-surface text-content">
       <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
@@ -141,8 +184,19 @@ export function InvestorWallet() {
                         </span>
                         {t.project} · {usd(t.amount)}
                       </span>
-                      <span className="text-xs inline-flex items-center gap-1 text-accent-brand">
-                        <Clock className="w-3 h-3" /> {TICKET_STATUS_LABEL[t.status] ?? t.status}
+                      <span className="text-xs inline-flex items-center gap-3 text-accent-brand">
+                        {["signed", "payment_pending", "settled"].includes(t.status) && (
+                          <button
+                            type="button"
+                            onClick={() => void downloadContract(t.id, t.project)}
+                            className="inline-flex items-center gap-1 hover:underline"
+                          >
+                            <FileText className="w-3 h-3" /> Contrato firmado
+                          </button>
+                        )}
+                        <span className="inline-flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {TICKET_STATUS_LABEL[t.status] ?? t.status}
+                        </span>
                       </span>
                     </div>
                     {t.status !== "cancelled" && idx >= 0 && (
