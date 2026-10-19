@@ -36,7 +36,7 @@ export const PROJECT_TERMS: Record<ProjectTerms["slug"], ProjectTerms> = {
 };
 
 /** Porcentaje del capital total de la SPV que representa un número de acciones de la ronda. */
-export function pctOfSpvCapital(shares: number, roundShares = ROUND.shares): number {
+export function pctOfSpvCapital(shares: number, roundShares: number = ROUND.shares): number {
   return (shares / roundShares) * SPV_ROUND_EQUITY_PCT;
 }
 
