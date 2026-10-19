@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { ArrowRight, Calculator, Check } from "lucide-react";
+import { getTerminalProject } from "@/features/terminal/terminalProjects";
 import { Eyebrow } from "@/components/brand";
 import { savePendingTicket, ROUND } from "@/features/investor/pendingTicket";
 import {
@@ -88,7 +89,7 @@ export function MiningInvestShowcase() {
                     Ronda {usd(rounds.find((r) => r.slug === p.slug)?.target ?? ROUND.target)}
                   </span>
                 </div>
-                <div className="mt-1 text-xs text-content-muted">{p.region}</div>
+                <div className="mt-1 text-xs text-content-muted">{getTerminalProject(p.slug)?.ficha.region ?? "Ubicación por verificar"}</div>
                 <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.15em]">
                   Explotación · 5.000–15.000 t/mes
                 </div>

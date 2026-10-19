@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, FileSearch, Layers, MapPin, Mountain, Wallet } from "lucide-react";
+import { ArrowRight, FileSearch, Layers, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
@@ -10,7 +10,12 @@ import { listMyHoldings } from "@/lib/tokenization.functions";
 import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { PROJECT_TERMS } from "@/features/investor/projectTerms";
-import { EvidenceBadge } from "@/components/ui-system";
+import { BrandButton } from "@/components/brand";
+import { InvestmentCard } from "@/features/investor/InvestmentCard";
+import { getTerminalProject } from "@/features/terminal/terminalProjects";
+import { confirmedPositionSummary, money } from "@/features/investor/investmentPresentation";
+import cholquiCover from "@/assets/sat-cholqui.jpg.asset.json";
+import verdesCover from "@/assets/sat-losverdes.jpg.asset.json";
 import { ActiveProjectCard } from "./ActiveProjectCard";
 
 const usd = (value: number) => "USD " + value.toLocaleString("es-CL", { maximumFractionDigits: 0 });
@@ -22,11 +27,6 @@ const statusLabels: Record<string, string> = {
   approved: "Aprobado",
   pending_review: "En revisión",
   rejected: "Requiere revisión",
-};
-
-const PROJECT_META: Record<string, { region: string; mineral: string }> = {
-  cholqui: { region: "Valle de Choapa, Región de Coquimbo", mineral: "Cu · Au · Ag" },
-  losverdes: { region: "Tilama, Región de Coquimbo", mineral: "Cu · Au" },
 };
 
 export function InvestorHome({ name, children }: { name: string; children?: ReactNode }) {
@@ -60,6 +60,8 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
     staleTime: 60_000,
   });
 
+  const positions = wallet.data ? confirmedPositionSummary(wallet.data.positions) : null;
+  const capitalLabel = positions ? [...positions.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones" : null;
   const data = history.data;
   const inquiries = data?.inquiries ?? [];
   const confirmed = (holdings.data ?? []).filter((holding) => holding.status === "confirmed");
@@ -74,13 +76,13 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
   return (
     <div data-theme="im-light" className="min-h-full bg-surface text-content">
       <main className="mx-auto max-w-7xl space-y-6 p-4 pb-24 md:p-7">
-        <header className="space-y-4 rounded-xl border border-hairline bg-surface-elevated p-5 md:p-7">
+        <header className="space-y-4 border-b border-hairline pb-6">
           <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-subtle">
             Geocapitals · Espacio del inversionista
           </p>
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <h1 className="font-display text-3xl text-content md:text-4xl">
+              <h1 className="font-serif text-3xl text-content md:text-4xl">
                 Hola{formattedName ? `, ${formattedName}` : ""}.
               </h1>
               <p className="mt-2 max-w-xl text-sm text-content-subtle">
@@ -98,15 +100,15 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           {/* Hero de patrimonio: solo posiciones SPV confirmadas; "—" mientras carga */}
           <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3">
             <PatrimonioCell
-              label="Patrimonio en posiciones SPV"
-              value={wallet.data ? usd(wallet.data.totals.invested) : wallet.isError ? "No disponible" : "—"}
+              label="Capital aportado · posiciones confirmadas"
+              value={wallet.data ? capitalLabel ?? "—" : wallet.isError ? "No disponible" : "—"}
               note="Solo posiciones liquidadas y confirmadas por el equipo."
             />
             <PatrimonioCell
               label="Acciones confirmadas"
               value={
                 wallet.data
-                  ? wallet.data.totals.shares.toLocaleString("es-CL")
+                  ? positions?.shares.toLocaleString("es-CL") ?? "—"
                   : wallet.isError
                     ? "No disponible"
                     : "—"
@@ -128,7 +130,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
         </header>
 
         {children && (
-          <details className="rounded-xl border border-hairline bg-surface">
+          <details className="rounded-lg border border-hairline bg-surface">
             <summary className="cursor-pointer list-none px-4 py-3 text-sm font-medium text-content marker:hidden">
               <span className="mr-2 rounded-full bg-accent-brand-subtle px-2 py-1 font-mono text-[10px] uppercase tracking-wider text-accent-brand">
                 Perfil
@@ -146,7 +148,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-subtle">
                 Explorar
               </p>
-              <h2 className="mt-1 font-display text-xl text-content">Proyectos en ronda</h2>
+              <h2 className="mt-1 font-serif text-xl text-content">Proyectos en ronda</h2>
             </div>
             <Link to="/proyectos" className="text-sm text-accent-brand hover:underline">
               Catálogo completo
@@ -155,15 +157,15 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           {rounds.isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1].map((i) => (
-                <div key={i} className="h-44 animate-pulse rounded-xl border border-hairline bg-surface-2" />
+                <div key={i} className="h-44 animate-pulse rounded-lg border border-hairline bg-surface-2" />
               ))}
             </div>
           ) : rounds.isError ? (
-            <p role="status" className="rounded-xl border border-hairline p-5 text-sm text-content-subtle">
+            <p role="status" className="rounded-lg border border-hairline p-5 text-sm text-content-subtle">
               No pudimos cargar las rondas.{" "}
-              <button className="text-accent-brand underline" onClick={() => void rounds.refetch()}>
+              <BrandButton variant="ghost" className="text-accent-brand underline" onClick={() => void rounds.refetch()}>
                 Reintentar
-              </button>
+              </BrandButton>
             </p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -218,9 +220,9 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
-          <section className="rounded-xl border border-hairline bg-surface-3">
+          <section className="rounded-lg border border-hairline bg-surface-3">
             <header className="flex justify-between gap-3 border-b border-hairline p-5">
-              <h2 className="font-display text-xl">Tu seguimiento</h2>
+              <h2 className="font-serif text-xl">Tu seguimiento</h2>
               <Link to="/dashboard/investments" className="text-sm text-accent-brand hover:underline">
                 Ver portafolio
               </Link>
@@ -228,9 +230,9 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
             {history.isError ? (
               <div role="status" className="p-5 text-sm text-content-subtle">
                 No pudimos cargar tu historial.{" "}
-                <button className="text-accent-brand underline" onClick={() => void history.refetch()}>
+                <BrandButton variant="ghost" className="text-accent-brand underline" onClick={() => void history.refetch()}>
                   Reintentar
-                </button>
+                </BrandButton>
               </div>
             ) : history.isLoading ? (
               <p role="status" className="p-5 text-sm text-content-subtle">
@@ -278,12 +280,12 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
               </div>
             )}
           </section>
-          <section className="space-y-5 rounded-xl border border-hairline bg-surface-3 p-5">
+          <section className="space-y-5 rounded-lg border border-hairline bg-surface-3 p-5">
             <div>
               <p className="font-mono text-[10px] uppercase text-content-subtle">
                 Perfil de inversión
               </p>
-              <h2 className="mt-2 font-display text-xl">
+              <h2 className="mt-2 font-serif text-xl">
                 {data?.profile
                   ? (statusLabels[data.profile.review_status] ?? data.profile.review_status)
                   : history.isError
@@ -320,9 +322,9 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
             {holdings.isError && (
               <p role="status" className="text-xs text-content-subtle">
                 No pudimos consultar las participaciones.{" "}
-                <button onClick={() => void holdings.refetch()} className="text-accent-brand underline">
+                <BrandButton variant="ghost" onClick={() => void holdings.refetch()} className="text-accent-brand underline">
                   Reintentar
-                </button>
+                </BrandButton>
               </p>
             )}
           </section>
@@ -350,7 +352,7 @@ function PatrimonioCell({
   return (
     <div className="bg-surface-3 p-4 md:p-5">
       <p className="text-[11px] text-content-subtle">{label}</p>
-      <p className="mt-1 font-display text-2xl text-content md:text-3xl">{value}</p>
+      <p className="mt-1 font-serif text-2xl text-content md:text-3xl">{value}</p>
       <p className="mt-1 text-[11px] text-content-subtle">{note}</p>
     </div>
   );
@@ -358,55 +360,13 @@ function PatrimonioCell({
 
 function RoundCard({ round }: { round: PublicRound }) {
   const terms = PROJECT_TERMS[round.slug];
-  const meta = PROJECT_META[round.slug];
-  return (
-    <article className="flex flex-col rounded-xl border border-hairline bg-surface-3 p-5 transition-colors hover:border-accent-brand">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h3 className="truncate font-display text-lg text-content">{round.name}</h3>
-          {meta && (
-            <p className="mt-0.5 flex items-center gap-1 text-[11px] font-mono text-content-subtle">
-              <MapPin className="h-3 w-3 shrink-0" /> {meta.region} · {meta.mineral}
-            </p>
-          )}
-        </div>
-        <span className="shrink-0 rounded-full bg-surface-2 px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider text-content-subtle">
-          {round.open ? "Ronda abierta" : "Ronda cerrada"}
-        </span>
-      </div>
-      {terms && (
-        <p className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-content-subtle">
-          <span className="inline-flex items-center gap-1">
-            <Mountain className="h-3.5 w-3.5" />
-            {terms.hectares.direct.toLocaleString("es-CL")} ha directas ·{" "}
-            {terms.hectares.district.toLocaleString("es-CL")} ha distrito
-          </span>
-          <EvidenceBadge kind="PROPUESTO" scale="declarado por el titular" />
-        </p>
-      )}
-      <div className="mt-3">
-        <RoundProgress round={round} compact />
-      </div>
-      <div className="mt-4 flex items-center gap-3 border-t border-hairline pt-4">
-        <Link
-          to="/terminal/$slug"
-          params={{ slug: round.slug }}
-          search={{ tab: "simulador" }}
-          className="inline-flex items-center gap-1.5 rounded-md bg-accent-brand px-3.5 py-2 text-xs font-medium text-accent-brand-contrast"
-        >
-          Ver ficha e invertir <ArrowRight className="h-3.5 w-3.5" />
-        </Link>
-        <Link
-          to="/terminal/$slug"
-          params={{ slug: round.slug }}
-          search={{ tab: "mapa" }}
-          className="text-xs text-accent-brand hover:underline"
-        >
-          Visor 3D
-        </Link>
-      </div>
-    </article>
-  );
+  const ficha = getTerminalProject(round.slug)?.ficha;
+  return <InvestmentCard title={round.name} region={ficha?.region ?? "Ubicación por verificar"} commodity={ficha?.commodity ?? ""} stage={round.open ? "Ronda abierta · explotación declarada" : "Ronda cerrada · explotación declarada"}
+    image={round.slug === "cholqui" ? cholquiCover.url : verdesCover.url} imageLabel="Imagen de archivo · procedencia por verificar" slug={round.slug}>
+    <p className="text-xs text-content-muted"><span className="font-mono">{terms.hectares.direct.toLocaleString("es-CL")} ha directas · {terms.hectares.district.toLocaleString("es-CL")} ha distrito</span><br />DECLARADO · titular · tenencia sujeta a verificación</p>
+    <RoundProgress round={round} compact />
+    <p className="text-[10px] text-content-muted">Inversión privada, riesgo de pérdida y liquidez limitada. Sin recursos certificados NI 43-101/JORC.</p>
+  </InvestmentCard>;
 }
 
 function InvestorMetric({
@@ -421,12 +381,12 @@ function InvestorMetric({
   description: string;
 }) {
   return (
-    <section className="rounded-xl border border-hairline bg-surface-3 p-5">
+    <section className="rounded-lg border border-hairline bg-surface-3 p-5">
       <div className="flex items-center gap-2 text-xs text-content-subtle">
         {icon}
         {title}
       </div>
-      <p className="mt-3 font-display text-2xl">{value}</p>
+      <p className="mt-3 font-serif text-2xl">{value}</p>
       <p className="mt-2 text-xs text-content-subtle">{description}</p>
     </section>
   );
