@@ -78,6 +78,68 @@ async function postSearch(stacUrl: string, body: Record<string, unknown>): Promi
   return res.json();
 }
 
+type StacSearchLink = {
+  rel?: string;
+  href?: string;
+  method?: string;
+  body?: Record<string, unknown>;
+  merge?: boolean;
+};
+type StacSearchResponse = { features?: unknown[]; links?: StacSearchLink[] };
+
+// GEO-02: tope de páginas STAC a seguir por búsqueda — evita un loop sin fin
+// o un costo de red inesperado si un backend devuelve "next" indefinidamente.
+const MAX_STAC_PAGES = 10;
+
+/**
+ * Sigue los links rel="next" del STAC API (GET o POST, con o sin merge de
+ * body) hasta juntar `targetCount` features o agotar las páginas. Antes
+ * `searchStac` solo pedía una página (limit fijo) y nunca paginaba más allá
+ * — con AOIs/periodos grandes eso dejaba escenas reales sin ver.
+ */
+export async function fetchStacFeatures(
+  stacUrl: string,
+  initialBody: Record<string, unknown>,
+  targetCount: number,
+): Promise<{ features: unknown[]; error: string | null }> {
+  const features: unknown[] = [];
+  let body = initialBody;
+  let url = `${stacUrl}/search`;
+  let method: "GET" | "POST" = "POST";
+  for (let page = 0; page < MAX_STAC_PAGES && features.length < targetCount; page++) {
+    let json: StacSearchResponse;
+    try {
+      const res =
+        method === "POST"
+          ? await fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Accept: "application/geo+json" },
+              body: JSON.stringify(body),
+            })
+          : await fetch(url, { headers: { Accept: "application/geo+json" } });
+      if (!res.ok) {
+        const message = `STAC search failed [${res.status}]: ${await res.text().catch(() => "")}`;
+        return features.length > 0 ? { features, error: null } : { features, error: message };
+      }
+      json = (await res.json()) as StacSearchResponse;
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "STAC_FETCH_FAILED";
+      return features.length > 0 ? { features, error: null } : { features, error: message };
+    }
+    features.push(...(json.features ?? []));
+    const next = (json.links ?? []).find((link) => link.rel === "next" && link.href);
+    if (!next?.href) break;
+    url = next.href;
+    if (next.method === "POST") {
+      method = "POST";
+      body = next.merge ? { ...body, ...(next.body ?? {}) } : (next.body ?? body);
+    } else {
+      method = "GET";
+    }
+  }
+  return { features: features.slice(0, targetCount), error: null };
+}
+
 function normalizeFeature(f: unknown, collection: string): StacItem {
   const feat = (f ?? {}) as StacFeature;
   const props = (feat.properties ?? {}) as Record<string, unknown>;
@@ -147,12 +209,17 @@ export const searchStac = createServerFn({ method: "POST" })
     }
 
     let items: StacItem[] = [];
+    let searchError: string | null = null;
     try {
-      const result = (await postSearch(cfg.stac, body)) as { features?: unknown[] };
-      items = (result.features ?? []).map((f) => normalizeFeature(f, cfg.id));
+      const { features, error } = await fetchStacFeatures(cfg.stac, body, data.limit);
+      items = features.map((f) => normalizeFeature(f, cfg.id));
+      searchError = error;
     } catch (err) {
       console.error("STAC search error", err);
       return { items: [] as StacItem[], error: (err as Error).message };
+    }
+    if (items.length === 0 && searchError) {
+      return { items: [] as StacItem[], error: searchError };
     }
 
     // Cache result in stac_acquisitions (best effort, ignore conflicts)
