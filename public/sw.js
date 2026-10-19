@@ -3,7 +3,7 @@
    - CacheFirst for map tiles (Esri + OSM) so terreno offline funciona en zonas ya vistas
    - Never caches /api/*, /_*, /~oauth, /sw.js, /version.json, JS/CSS assets
 */
-const VERSION = "geocap-sw-v2";
+const VERSION = "geocap-sw-v3";
 const TILE_CACHE = `geocap-tiles-${VERSION}`;
 const HTML_CACHE = `geocap-html-${VERSION}`;
 const MAX_TILES = 800;
@@ -98,6 +98,16 @@ self.addEventListener("fetch", (event) => {
     url.pathname === "/service-worker.js" ||
     url.pathname === "/version.json" ||
     url.pathname === "/manifest.webmanifest"
+  )
+    return;
+
+  // Private/auth surfaces (cartola, KYC, documentos, admin, auth): never cache HTML
+  if (
+    url.pathname.startsWith("/auth") ||
+    url.pathname.startsWith("/dashboard/investments") ||
+    url.pathname.startsWith("/dashboard/documentos") ||
+    url.pathname.startsWith("/dashboard/admin") ||
+    url.pathname.startsWith("/onboarding")
   )
     return;
 
