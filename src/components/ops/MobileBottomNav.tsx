@@ -38,14 +38,25 @@ export function MobileBottomNav({
     ];
     return (
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-14 bg-surface/95 backdrop-blur border-t border-hairline flex items-stretch"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur border-t border-hairline flex items-stretch"
+        style={{
+          height: "calc(56px + env(safe-area-inset-bottom))",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
         role="navigation"
         aria-label="Navegación del inversionista"
       >
         {slots.map((s) => {
           const Icon = s.icon;
-          const active = location.pathname === s.to;
+          const vista = (location.search as Record<string, unknown>)?.vista;
+          const samePath = location.pathname === s.to;
+          // Portafolio activo solo sin vista=wallet; Wallet solo con vista=wallet.
+          const active =
+            s.label === "Wallet"
+              ? samePath && vista === "wallet"
+              : s.label === "Portafolio"
+                ? samePath && vista !== "wallet"
+                : samePath;
           return (
             <Link
               key={s.label}
