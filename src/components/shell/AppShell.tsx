@@ -21,19 +21,19 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
     label: "Inversión & Capital",
     items: [
       {
-        to: "/inversion-colateral",
-        label: "Inversión con colateral",
-        desc: "Renta fija respaldada por inmuebles",
-      },
-      {
         to: "/proyectos",
-        label: "Proyectos mineros",
-        desc: "Oportunidades verificadas para invertir",
+        label: "Proyectos en explotación",
+        desc: "Cholqui y Los Verdes · ronda SPV desde USD 15.000",
       },
       {
         to: "/inversionistas",
-        label: "Para inversionistas",
-        desc: "Data room, memorándum y proceso",
+        label: "Cómo invertir",
+        desc: "Ficha → simulación → KYC y firma → cartola",
+      },
+      {
+        to: "/inversion-colateral",
+        label: "Renta fija con colateral",
+        desc: "UF + 12 % con parcela en garantía",
       },
     ],
   },

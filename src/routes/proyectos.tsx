@@ -146,8 +146,25 @@ function ProyectosPage() {
       title="Activos reales operando sobre Geocapitals"
       intro="Una muestra de los proyectos mineros que usan la plataforma para integrar catastro, exploración, monitoreo satelital y documentación técnica."
     >
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="publicar">
-        {SHOWCASE.map((p) => (
+      {[
+        {
+          key: "explotacion",
+          eyebrow: "Ronda abierta · desde USD 15.000",
+          title: "Proyectos en explotación",
+          items: SHOWCASE.filter((p) => p.stage.startsWith("Explotación")),
+        },
+        {
+          key: "exploracion",
+          eyebrow: "Sin ronda abierta",
+          title: "Prospectos en exploración",
+          items: SHOWCASE.filter((p) => !p.stage.startsWith("Explotación")),
+        },
+      ].map((g) => (
+      <section key={g.key} className="mb-12">
+        <Eyebrow className="mb-2">{g.eyebrow}</Eyebrow>
+        <h2 className="font-serif text-2xl text-content mb-5">{g.title}</h2>
+      <div className="grid md:grid-cols-2 gap-6" id={g.key === "explotacion" ? "publicar" : undefined}>
+        {g.items.map((p) => (
           <article
             key={p.code}
             className="group rounded-2xl border border-hairline bg-white overflow-hidden flex flex-col hover:border-accent-brand hover:shadow-[0_24px_48px_-28px_rgba(11,42,91,0.4)] transition"
@@ -243,6 +260,8 @@ function ProyectosPage() {
           </article>
         ))}
       </div>
+      </section>
+      ))}
 
       <Link
         to="/inversion-colateral"
