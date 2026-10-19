@@ -10,7 +10,7 @@ import { Reveal } from "./Reveal";
 const FAQS = [
   {
     q: "¿Cuál es la inversión mínima para acceder a proyectos?",
-    a: "El ticket mínimo depende del proyecto y del vehículo de inversión (equity, royalty u offtake). La mayoría de deals arrancan en USD 25.000 para tickets exploratorios y USD 250.000 para participaciones institucionales.",
+    a: "El ticket mínimo depende del proyecto y del vehículo de inversión (equity, royalty u offtake). La mayoría de deals arrancan en USD 15.000 (≈ CLP 15 millones) y USD 250.000 para participaciones institucionales.",
   },
   {
     q: "¿En qué países operan actualmente?",

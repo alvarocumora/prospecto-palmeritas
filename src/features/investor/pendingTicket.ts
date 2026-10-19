@@ -4,7 +4,7 @@ export const ROUND = {
   target: 1_500_000,
   shares: 15_000,
   sharePrice: 100,
-  minTicket: 25_000,
+  minTicket: 15_000,
 } as const;
 
 export type PendingTicket = {
