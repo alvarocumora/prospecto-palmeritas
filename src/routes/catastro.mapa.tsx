@@ -583,7 +583,9 @@ function NationalCatastroMap() {
     <PublicCatastroShell>
       <div className="relative h-[calc(100dvh-3.5rem)] overflow-hidden">
         {/* Mapa a pantalla completa */}
-        <div ref={mapRef} className="absolute inset-0 z-0" />
+        <div className="absolute inset-0 z-0">
+          <div ref={mapRef} className="h-full w-full" />
+        </div>
 
         {/* Panel flotante: búsqueda + filtros + resultados */}
         <div className="absolute top-2 left-2 right-2 sm:right-auto sm:w-[360px] z-[500] flex flex-col gap-2 max-h-[calc(100%-1rem)] print:hidden">
