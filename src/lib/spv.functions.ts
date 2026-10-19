@@ -165,6 +165,53 @@ export const getSpvOverview = createServerFn({ method: "GET" })
     };
   });
 
+export type CapTableSpv = {
+  id: string;
+  project_code: string;
+  legal_name: string;
+  total_shares: number;
+  currency: string;
+};
+
+export type CapTablePosition = {
+  id: string;
+  spv_id: string;
+  investor_name: string;
+  investor_email: string | null;
+  shares: number;
+  amount_paid: number;
+  currency: string;
+  status: string;
+  subscribed_on: string;
+};
+
+/** Cap table consolidado de varios proyectos, para el panel admin (solo staff). */
+export const getCapTableAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ codes: z.array(z.string()).max(10) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (!(await isStaff(supabase, userId))) throw new Error("No autorizado");
+    const { data: spvs } = await supabase
+      .from("spv_entities")
+      .select("id, project_code, legal_name, total_shares, currency")
+      .in("project_code", data.codes);
+    const ids = (spvs ?? []).map((s: { id: string }) => s.id);
+    const { data: positions } = ids.length
+      ? await supabase
+          .from("spv_positions")
+          .select(
+            "id, spv_id, investor_name, investor_email, shares, amount_paid, currency, status, subscribed_on",
+          )
+          .in("spv_id", ids)
+          .order("subscribed_on", { ascending: true })
+      : { data: [] };
+    return {
+      spvs: (spvs ?? []) as CapTableSpv[],
+      positions: (positions ?? []) as CapTablePosition[],
+    };
+  });
+
 const UpsertSpv = z.object({
   projectCode: z.string().min(2).max(40),
   legalName: z.string().min(2).max(200),

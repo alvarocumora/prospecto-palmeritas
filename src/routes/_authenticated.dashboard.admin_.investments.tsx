@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Download, Loader2 } from "lucide-react";
 import {
   listTicketsAdmin,
   saveRoundSettings,
@@ -11,7 +11,30 @@ import {
   type RoundSpv,
   type TicketRow,
 } from "@/lib/tickets.functions";
+import { getCapTableAdmin, type CapTablePosition, type CapTableSpv } from "@/lib/spv.functions";
 import { INVESTABLE_PROJECTS, TICKET_STATUS_LABEL, fmtMoney } from "@/lib/investor/rounds";
+
+function pctOf(shares: number, total: number): string {
+  if (!total) return "—";
+  return `${((shares / total) * 100).toFixed(4)} %`;
+}
+
+function csvCell(v: string | number): string {
+  const s = String(v);
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function downloadCsv(filename: string, content: string) {
+  const blob = new Blob(["﻿" + content], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
 
 export const Route = createFileRoute("/_authenticated/dashboard/admin_/investments")({
   head: () => ({
@@ -70,6 +93,8 @@ function AdminInvestmentsPage() {
                 />
               ))}
             </div>
+
+            <CapTableSection />
 
             <div className="mt-8 flex items-center gap-2">
               <h2 className="font-display text-xl mr-auto">Tickets</h2>
@@ -246,6 +271,113 @@ function RoundCard({
         </button>
       </div>
     </section>
+  );
+}
+
+function CapTableSection() {
+  const capFn = useServerFn(getCapTableAdmin);
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["admin-cap-table"],
+    queryFn: () => capFn({ data: { codes: [...CODES] } }),
+  });
+
+  function exportCsv(spvs: CapTableSpv[], positions: CapTablePosition[]) {
+    const byId = new Map(spvs.map((s) => [s.id, s]));
+    const header = [
+      "Proyecto",
+      "Inversionista",
+      "Correo",
+      "Acciones",
+      "% del total",
+      "Monto",
+      "Moneda",
+      "Fecha",
+      "Estado",
+    ];
+    const rows = positions.map((p) => {
+      const s = byId.get(p.spv_id);
+      return [
+        s?.project_code ?? "—",
+        p.investor_name,
+        p.investor_email ?? "",
+        p.shares,
+        s ? pctOf(Number(p.shares), Number(s.total_shares)) : "—",
+        p.amount_paid,
+        p.currency,
+        p.subscribed_on,
+        p.status === "active" ? "Vigente" : "Anulado",
+      ];
+    });
+    const csv = [header, ...rows].map((r) => r.map(csvCell).join(",")).join("\n");
+    downloadCsv(`cap-table-${new Date().toISOString().slice(0, 10)}.csv`, csv);
+  }
+
+  return (
+    <div className="mt-8">
+      <div className="flex items-center gap-2">
+        <h2 className="font-display text-xl mr-auto">Cap table</h2>
+        {data && data.positions.length > 0 && (
+          <button
+            onClick={() => exportCsv(data.spvs, data.positions)}
+            className="inline-flex items-center gap-1.5 rounded border border-hairline px-2.5 py-1.5 text-xs text-content-subtle hover:border-accent-brand hover:text-accent-brand"
+          >
+            <Download className="w-3.5 h-3.5" />
+            Exportar CSV
+          </button>
+        )}
+      </div>
+      {isLoading && <Loader2 className="mt-3 w-5 h-5 animate-spin" />}
+      {error && <p className="mt-3 text-sm text-destructive">{(error as Error).message}</p>}
+      {data &&
+        (data.positions.length === 0 ? (
+          <p className="mt-3 text-sm text-content-subtle">Sin posiciones registradas todavía.</p>
+        ) : (
+          <div className="mt-3 overflow-x-auto rounded-2xl border border-hairline">
+            <table className="w-full text-sm min-w-[800px]">
+              <thead>
+                <tr className="text-left text-[11px] font-mono uppercase tracking-wider text-content-subtle border-b border-hairline">
+                  <th className="p-3">Proyecto</th>
+                  <th className="p-3">Inversionista</th>
+                  <th className="p-3 text-right">Acciones</th>
+                  <th className="p-3 text-right">%</th>
+                  <th className="p-3 text-right">Monto</th>
+                  <th className="p-3">Fecha</th>
+                  <th className="p-3">Estado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.positions.map((p) => {
+                  const s = data.spvs.find((x) => x.id === p.spv_id);
+                  return (
+                    <tr key={p.id} className="border-b border-hairline/70 align-top">
+                      <td className="p-3 font-mono">{s?.project_code ?? "—"}</td>
+                      <td className="p-3">
+                        {p.investor_name}
+                        {p.investor_email && (
+                          <div className="text-xs text-content-subtle">{p.investor_email}</div>
+                        )}
+                      </td>
+                      <td className="p-3 text-right font-mono">
+                        {Number(p.shares).toLocaleString("es-CL")}
+                      </td>
+                      <td className="p-3 text-right font-mono text-content-subtle">
+                        {s ? pctOf(Number(p.shares), Number(s.total_shares)) : "—"}
+                      </td>
+                      <td className="p-3 text-right font-mono">
+                        {fmtMoney(p.amount_paid, p.currency)}
+                      </td>
+                      <td className="p-3 font-mono text-content-subtle">{p.subscribed_on}</td>
+                      <td className="p-3 text-content-subtle">
+                        {p.status === "active" ? "Vigente" : "Anulado"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ))}
+    </div>
   );
 }
 
