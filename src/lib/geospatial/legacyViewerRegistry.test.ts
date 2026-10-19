@@ -21,12 +21,14 @@ describe("legacy viewer retirement registry", () => {
         "losverdes-public-scene",
         "losverdes-strategic-map",
         "losverdes-engine3d",
+        "cholqui-master-viewer",
+        "cholqui-terrain-3d",
       ]),
     );
     const active = legacyViewersByStatus("active_compatibility").map((viewer) => viewer.id);
     expect(active).toContain("project-master-viewer");
-    expect(active).toContain("cholqui-master-viewer");
-    expect(active).toContain("cholqui-terrain-3d");
+    expect(active).not.toContain("cholqui-master-viewer");
+    expect(active).not.toContain("cholqui-terrain-3d");
   });
 
   it("does not mark a viewer deletable while a parity blocker remains", () => {

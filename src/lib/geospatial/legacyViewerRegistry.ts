@@ -23,10 +23,10 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "cholqui-master-viewer",
     path: "src/features/franco/components/CholquiMasterViewer.tsx",
-    status: "active_compatibility",
+    status: "retired",
     successor: "ProjectMasterViewer + ProjectTerrain3D",
     uniqueCapability: "Historical all-in-one Cholqui public renderer",
-    blocker: null,
+    blocker: "Removed 2026-10-19: zero live consumers found in src/.",
   },
   {
     id: "satellite-map-viewer",
@@ -97,10 +97,11 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "cholqui-terrain-3d",
     path: "src/features/franco/components/CholquiTerrain3D.tsx",
-    status: "active_compatibility",
-    successor: "ProjectMasterViewer + ProjectTerrain3D",
+    status: "retired",
+    successor: "GeoScene3D via UnifiedProjectScene (CholquiScene)",
     uniqueCapability: "react-three-fiber Cholqui terrain renderer for the terminal 3D tab",
-    blocker: null,
+    blocker:
+      "Removed 2026-10-19: zero live consumers found in src/ — the terminal's Cholqui 3D tab already renders through CholquiScene -> GeoScene3D.",
   },
 ];
 
