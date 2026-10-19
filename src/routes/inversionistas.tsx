@@ -96,8 +96,8 @@ function InvPage() {
             {
               i: FileSignature,
               n: "3",
-              t: "Firma el NDA",
-              d: "Firma electrónica en minutos y acceso al data room completo.",
+              t: "KYC y firma",
+              d: "Perfil en 3 pasos y contrato de suscripción firmado con QR.",
             },
             {
               i: Wallet,
