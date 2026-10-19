@@ -8,6 +8,7 @@ import { GeoJsonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
+import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { projectCamera } from "../cameraPolicy";
@@ -44,6 +45,7 @@ interface Props {
   filters?: GeoSceneFilters;
   project?: GeoSceneProject;
   projectLayers?: GeoSceneProjectLayer[];
+  layerOpacity?: Readonly<Record<string, number>>;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -104,6 +106,7 @@ export function GeoSceneCanvas({
   filters,
   project,
   projectLayers,
+  layerOpacity,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -230,14 +233,24 @@ export function GeoSceneCanvas({
       .map((layer) => {
         const color = evidenceColor(layer.definition.evidence);
         const dashed = isDashedEvidence(layer.definition.evidence);
+        const spectral = SPECTRAL_LAYER_IDS.has(layer.id);
+        const rgb: [number, number, number] = [color[0], color[1], color[2]];
         return new GeoJsonLayer({
           id: `project:${layer.id}`,
           data: layer.data as never,
           pickable: true,
           stroked: true,
           filled: true,
-          getFillColor: [color[0], color[1], color[2], dashed ? 20 : 45],
-          getLineColor: color,
+          opacity: layerOpacity?.[layer.id] ?? 1,
+          getFillColor: spectral
+            ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
+            : [color[0], color[1], color[2], dashed ? 20 : 45],
+          getLineColor: spectral
+            ? (f: { properties?: Record<string, unknown> }) => {
+                const c = spectralFill(f.properties, rgb);
+                return [c[0], c[1], c[2], 230];
+              }
+            : color,
           getLineWidth: dashed ? 1.5 : 2.5,
           lineWidthUnits: "pixels",
           pointType: "circle",
@@ -250,7 +263,7 @@ export function GeoSceneCanvas({
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, resolvedProjectLayers, visibleLayerIds]);
+  }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity]);
 
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
