@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { SPECTRAL_LAYER_IDS, legendClasses } from "./spectralStyle";
 import { BrandButton } from "@/components/brand";
 import { Loader2, Sparkles, Crosshair, X, Layers3 } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
@@ -62,6 +63,16 @@ export function GeoScene3D({
     );
   }, [projectLayers]);
 
+  const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
+  const spectralLegend = useMemo(() => {
+    const seen = new Map<string, [number, number, number]>();
+    for (const layer of projectLayers ?? []) {
+      if (!SPECTRAL_LAYER_IDS.has(layer.id) || !enabledLayerIds.has(layer.id)) continue;
+      for (const item of legendClasses(layer.data)) seen.set(item.label, item.color);
+    }
+    return [...seen].map(([label, color]) => ({ label, color }));
+  }, [projectLayers, enabledLayerIds]);
+
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
     setEnabledLayerIds((current) => {
       const next = new Set(current);
@@ -118,6 +129,7 @@ export function GeoScene3D({
               filters={filters}
               project={project}
               projectLayers={projectLayers}
+              layerOpacity={layerOpacity}
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
@@ -132,8 +144,35 @@ export function GeoScene3D({
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
           extraLayerIds={projectLayers?.map((layer) => layer.id)}
+          opacity={layerOpacity}
+          onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
         />
       }
+
+      {spectralLegend.length > 0 && (
+        <div
+          className="absolute bottom-10 right-3 z-20 max-w-[16rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          aria-label="Leyenda espectral"
+        >
+          <div className="mb-1.5 uppercase tracking-wider text-muted-foreground">
+            Firmas espectrales · modeladas
+          </div>
+          <ul className="space-y-1">
+            {spectralLegend.map((item) => (
+              <li key={item.label} className="flex items-center gap-2 text-foreground">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: `rgb(${item.color.join(",")})` }}
+                />
+                {item.label}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+            Intensidad = opacidad del polígono. Hipótesis de priorización, no ensayes ni recursos.
+          </p>
+        </div>
+      )}
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (
