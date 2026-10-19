@@ -15,6 +15,7 @@ import {
 import { toast } from "sonner";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
 import { PendingTicketBanner } from "@/features/investor/PendingTicketBanner";
+import { InvestorWallet } from "@/features/investor/InvestorWallet";
 
 export const Route = createFileRoute("/_authenticated/dashboard/investments")({
   head: () => ({ meta: [{ title: "Mis inversiones — Geocapitals" }] }),
@@ -74,6 +75,7 @@ function MyInvestmentsPage() {
       </header>
 
       <PendingTicketBanner />
+      <InvestorWallet />
 
       <Link
         to="/dashboard/inversion-colateral"

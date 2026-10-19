@@ -1,5 +1,7 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
+import { RoundProgress } from "@/features/investor/RoundProgress";
 import { ArrowRight, Calculator, Check } from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { savePendingTicket, ROUND } from "@/features/investor/pendingTicket";
@@ -25,6 +27,12 @@ export function MiningInvestShowcase() {
   const shares = Math.floor(amount / ROUND.sharePrice);
   const pct = (shares / ROUND.shares) * 100;
   const valid = amount >= ROUND.minTicket && amount <= ROUND.target;
+  const [rounds, setRounds] = useState<PublicRound[]>([]);
+  const [rate, setRate] = useState(15);
+  useEffect(() => {
+    getPublicRounds().then(setRounds).catch(() => setRounds([]));
+  }, []);
+  const yearly = (amount * rate) / 100;
 
   const emit = () => {
     if (!valid) return;
@@ -69,6 +77,10 @@ export function MiningInvestShowcase() {
                 <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.15em]">
                   Explotación · 5.000–15.000 t/mes
                 </div>
+                {(() => {
+                  const r = rounds.find((x) => x.slug === p.slug);
+                  return r ? <RoundProgress round={r} compact /> : null;
+                })()}
                 <Link
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
@@ -117,6 +129,32 @@ export function MiningInvestShowcase() {
                 <dd className="font-serif text-3xl">{pct.toFixed(2)} %</dd>
               </div>
             </dl>
+            <div className="mt-5 border-t border-hairline pt-4">
+              <div className="flex items-center justify-between text-xs text-content-muted">
+                <span>Escenario objetivo anual (UF +)</span>
+                <span className="font-mono">{rate} %</span>
+              </div>
+              <input
+                type="range"
+                min={15}
+                max={20}
+                step={1}
+                value={rate}
+                onChange={(e) => setRate(Number(e.target.value))}
+                className="mt-2 w-full accent-[var(--accent-brand)]"
+                aria-label="Escenario de rentabilidad"
+              />
+              <dl className="mt-3 grid grid-cols-2 gap-4">
+                <div>
+                  <dt className="text-xs text-content-muted">Escenario mensual</dt>
+                  <dd className="font-serif text-2xl">{usd(yearly / 12)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-content-muted">Escenario anual</dt>
+                  <dd className="font-serif text-2xl">{usd(yearly)}</dd>
+                </div>
+              </dl>
+            </div>
             {!valid && (
               <p className="mt-3 text-xs text-accent-brand">
                 Ticket mínimo {usd(ROUND.minTicket)}, máximo {usd(ROUND.target)}.
@@ -131,7 +169,7 @@ export function MiningInvestShowcase() {
               Emitir ticket <ArrowRight className="w-4 h-4" />
             </button>
             <p className="mt-3 text-[11px] text-content-muted leading-relaxed">
-              Simulación referencial. No constituye oferta pública; la inversión minera conlleva
+              Simulación referencial: escenario objetivo, no rentabilidad garantizada. No constituye oferta pública; la inversión minera conlleva
               riesgo de pérdida de capital. La emisión requiere registro, KYC y firma del contrato.
             </p>
           </div>
