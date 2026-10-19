@@ -44,7 +44,7 @@ export const getPublicRounds = createServerFn({ method: "GET" }).handler(
         target: Number(spv?.round_size ?? 1_500_000),
         shares: Number(spv?.round_shares ?? 15_000),
         sharePrice: Number(spv?.share_price ?? 100),
-        minTicket: Number(spv?.min_ticket ?? 25_000),
+        minTicket: Number(spv?.min_ticket ?? 15_000),
         open: !!spv?.tickets_open,
         committed: Number(s?.committed ?? 0),
         settled: Number(s?.settled ?? 0),

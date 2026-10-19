@@ -169,11 +169,12 @@ export function InvestorWallet() {
   );
 }
 
-function Kpi({ label, value }: { label: string; value: string }) {
+function Kpi({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="bg-surface p-4">
       <div className="text-[11px] text-content-muted">{label}</div>
       <div className="font-serif text-2xl mt-1">{value}</div>
+      {note && <div className="text-[11px] text-content-muted font-mono mt-0.5">{note}</div>}
     </div>
   );
 }
