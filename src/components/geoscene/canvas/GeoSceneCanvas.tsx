@@ -9,6 +9,8 @@ import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
+import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
+import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { projectCamera } from "../cameraPolicy";
@@ -38,6 +40,12 @@ import {
   type ResolvedProjectLayer,
 } from "../projectLayers";
 
+export interface ProcessedSceneOverlay {
+  data: FeatureCollection;
+  index: ProcessedIndex;
+  opacity: number;
+}
+
 interface Props {
   view?: ProjectView;
   mode: GeoSceneMode;
@@ -46,6 +54,7 @@ interface Props {
   project?: GeoSceneProject;
   projectLayers?: GeoSceneProjectLayer[];
   layerOpacity?: Readonly<Record<string, number>>;
+  processedScene?: ProcessedSceneOverlay | null;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
