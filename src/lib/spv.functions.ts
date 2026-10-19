@@ -5,6 +5,13 @@
  *  - El inversionista sólo ve su propia posición (RLS + filtro explícito).
  *  - El alta/edición/anulación de posiciones es sólo para staff GeoCapitals,
  *    verificado en el servidor con `is_geocapitals_staff`.
+ *
+ * saveSpvPosition es la vía MANUAL del cap table (posiciones heredadas o
+ * fundadores, sin ticket asociado): no pasa por la máquina de estados de
+ * investment_tickets ni por ticket_settle. Queda su propio audit trail en
+ * spv_position_events (ver getPositionEvents). No usarla para cargar una
+ * inversión que debería originarse como ticket — esa siempre se liquida
+ * con ticket_settle, que es quien emite la spv_position real.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
