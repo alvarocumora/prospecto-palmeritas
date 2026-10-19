@@ -44,8 +44,11 @@ describe("project workspace isolation", () => {
     render(<ProjectWorkspaceViewer projectId="second" mode="3d" />);
     expect(screen.getByTestId("scene")).toBeInTheDocument();
     expect(screen.queryByTestId("map")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /2d/i })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /3d/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Planta" })).toHaveAttribute("aria-pressed", "false");
+    expect(screen.getByRole("button", { name: "Perspectiva" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("can leave mode selection to the project section navigation", () => {
@@ -55,7 +58,7 @@ describe("project workspace isolation", () => {
     );
     expect(screen.getByTestId("scene")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Proyecto B" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /2d/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: /3d/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Planta" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Perspectiva" })).not.toBeInTheDocument();
   });
 });

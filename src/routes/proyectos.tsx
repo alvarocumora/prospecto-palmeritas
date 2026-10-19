@@ -9,10 +9,10 @@ import { getPublicListings } from "@/lib/publicListings.functions";
 import { ListingsMap } from "@/features/proyectos/ListingsMap";
 import { QueryError } from "@/components/ui/QueryError";
 import palmerasImg from "@/assets/project-palmeras.jpg.asset.json";
-import losverdesImg from "@/assets/project-losverdes.jpg.asset.json";
-import cholquiImg from "@/assets/project-gianfranco.jpg.asset.json";
 import colateralImg from "@/assets/colateral/hualane-satelite.jpg";
-import nahuelbutaImg from "@/assets/project-nahuelbuta.jpg";
+import satLosVerdes from "@/assets/sat-losverdes.jpg.asset.json";
+import satCholqui from "@/assets/sat-cholqui.jpg.asset.json";
+import satNahuelbuta from "@/assets/sat-nahuelbuta.jpg.asset.json";
 
 export const Route = createFileRoute("/proyectos")({
   head: () => ({
@@ -38,7 +38,19 @@ export const Route = createFileRoute("/proyectos")({
 
 // Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
 // simulador y data room en una sola pantalla, sin saltos intermedios).
-const SHOWCASE = [
+const SHOWCASE: Array<{
+  code: string;
+  slug: "palmeras" | "losverdes" | "cholqui" | "nahuelbuta";
+  name: string;
+  region: string;
+  commodity: string;
+  image: string;
+  imageSource?: string;
+  coords?: string;
+  stage: string;
+  stats: string[][];
+  bullets: string[];
+}> = [
   {
     code: "PALMERAS",
     slug: "palmeras" as const,
@@ -60,8 +72,10 @@ const SHOWCASE = [
     name: "Los Verdes",
     region: "Los Vilos · Choapa · Coquimbo",
     commodity: "Cu-Mo",
-    image: losverdesImg.url,
-    stage: "Pre NI 43-101",
+    image: satLosVerdes.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "32,03° S · 71,11° O",
+    stage: "Explotación · 5.000–15.000 t/mes",
     stats: [
       ["17", "pertenencias mapeadas"],
       ["1.963", "ha en paquete"],
@@ -79,8 +93,10 @@ const SHOWCASE = [
     name: "Proyecto Cholqui",
     region: "Melipilla · R. Metropolitana",
     commodity: "Cu-Au-Ag",
-    image: cholquiImg.url,
-    stage: "Ronda de capital",
+    image: satCholqui.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "33,84° S · 71,03° O",
+    stage: "Explotación · 5.000–15.000 t/mes",
     stats: [
       ["14", "concesiones"],
       ["7", "ensayes"],
@@ -98,7 +114,9 @@ const SHOWCASE = [
     name: "Nahuelbuta REE",
     region: "Arauco · Biobío / Malleco",
     commodity: "REE",
-    image: nahuelbutaImg,
+    image: satNahuelbuta.url,
+    imageSource: "Satélite real · Esri World Imagery",
+    coords: "37,64° S · 73,20° O",
     stage: "Prospección (TRL 1-2)",
     stats: [
       ["34", "paños"],
@@ -147,22 +165,27 @@ function ProyectosPage() {
                 className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <div className="absolute top-3 left-3 flex gap-2">
+              <div className="absolute top-3 left-3 right-3 flex flex-wrap items-start gap-2">
                 <span className="px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-mono uppercase tracking-wider text-content">
                   {p.commodity}
                 </span>
                 <span className="px-2 py-0.5 rounded-full bg-accent-brand text-[10px] font-mono uppercase tracking-wider text-white">
                   {p.stage}
                 </span>
+                <span className="ml-auto px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
+                  {p.imageSource ?? "Imagen referencial"}
+                </span>
               </div>
-              <span className="absolute top-3 right-3 px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
-                Imagen referencial
-              </span>
               <div className="absolute bottom-3 left-4 right-4 text-white">
                 <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
                   {p.region}
                 </div>
                 <div className="font-display text-2xl leading-tight mt-0.5">{p.name}</div>
+                {p.coords && (
+                  <div className="text-[10px] font-mono tracking-wider opacity-75 mt-1">
+                    {p.coords} · WGS84
+                  </div>
+                )}
               </div>
             </Link>
             <div className="grid grid-cols-3 border-b border-hairline">
@@ -182,6 +205,23 @@ function ProyectosPage() {
                 </li>
               ))}
             </ul>
+            <div className="px-5 pt-4 flex flex-wrap gap-1.5">
+              {[
+                ["mapa", "Mapa 2D"],
+                ["satelital", "Satélite"],
+                ["dataroom", "Data room"],
+              ].map(([tab, label]) => (
+                <Link
+                  key={tab}
+                  to="/terminal/$slug"
+                  params={{ slug: p.slug }}
+                  search={{ tab: tab as "mapa" }}
+                  className="px-2 py-1 rounded border border-hairline text-[11px] font-mono uppercase tracking-wider text-content-subtle hover:border-accent-brand hover:text-accent-brand"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
             <div className="p-5 pt-4 grid grid-cols-2 gap-2">
               <Link
                 to="/terminal/$slug"

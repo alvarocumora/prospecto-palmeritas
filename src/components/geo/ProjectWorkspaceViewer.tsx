@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { BrandButton } from "@/components/brand";
 import { Box, Map as MapIcon } from "lucide-react";
 import { WorkspaceProjectLayers } from "./WorkspaceProjectLayers";
 import { useProjects } from "@/hooks/useProjects";
@@ -73,7 +74,9 @@ export function ProjectWorkspaceViewer({
               {(["2d", "3d"] as const).map((key) => {
                 const Icon = key === "2d" ? MapIcon : Box;
                 return (
-                  <button
+                  <BrandButton
+                    size="sm"
+                    variant={view === key ? "primary" : "ghost"}
                     key={key}
                     type="button"
                     onClick={() => changeMode(key)}
@@ -82,8 +85,8 @@ export function ProjectWorkspaceViewer({
                       view === key ? "border-primary text-primary" : "border-border"
                     }`}
                   >
-                    <Icon className="h-3 w-3" /> {key.toUpperCase()}
-                  </button>
+                    <Icon className="h-3 w-3" /> {key === "2d" ? "Planta" : "Perspectiva"}
+                  </BrandButton>
                 );
               })}
             </div>

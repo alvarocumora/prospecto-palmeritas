@@ -25,7 +25,22 @@ export const Route = createFileRoute("/_authenticated/projects/$projectId/$secti
       });
     }
   },
-  head: () => ({ meta: [{ title: "Workspace de proyecto — Geocapitals" }] }),
+  head: () => ({
+    meta: [
+      { title: "Workspace geocientífico de proyecto — Geocapitals" },
+      {
+        name: "description",
+        content: "Territorio, evidencia geocientífica y documentos del proyecto en Geocapitals.",
+      },
+      { property: "og:title", content: "Workspace geocientífico de proyecto — Geocapitals" },
+      {
+        property: "og:description",
+        content: "Territorio, evidencia geocientífica y documentos del proyecto en Geocapitals.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  }),
   component: WorkspaceRoute,
 });
 

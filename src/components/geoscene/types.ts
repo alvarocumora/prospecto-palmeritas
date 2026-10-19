@@ -1,9 +1,9 @@
 import type { GeoViewerPresetId } from "@/lib/geospatial/layerRegistry";
+import type { GeoSceneProject, GeoSceneProjectLayer } from "./projectLayers";
+import type { ProjectView } from "@/lib/projects/navigation";
 
 // GeoScene3D — tipos compartidos del visor canónico.
-// Sprint 2: API pública unificada; internamente delega a visores existentes
-// (Geology3DViewer / SatToSubsurface3DViewer / MagAnomaly3DPro / BlockModel3DViewer)
-// que serán portados a hooks de capas deck.gl en sprints siguientes.
+// Motor único MapLibre + deck.gl; los visores three.js heredados fueron retirados.
 
 export type GeoSceneMode = "surface" | "subsurface" | "resource";
 
@@ -15,7 +15,7 @@ export const MODE_LABELS: Record<GeoSceneMode, { label: string; sub: string }> =
   resource: { label: "Resource", sub: "Bloques · clasificación · pit shells" },
 };
 
-export type GeoSceneEngine = "legacy" | "deckgl";
+export type GeoSceneEngine = "deckgl";
 
 export type GeoSceneFilters = {
   /** Filter exploration targets by campaign when the entity supports campaign_id. */
@@ -27,16 +27,18 @@ export type GeoSceneFilters = {
 };
 
 export type GeoSceneProps = {
+  view?: ProjectView;
+  showCopilot?: boolean;
   mode?: GeoSceneMode;
   variant?: GeoSceneVariant;
   showModeTabs?: boolean;
   className?: string;
-  /** Motor de renderizado. GeoCapitals usa deck.gl por defecto; legacy queda para QA explícito. */
-  engine?: GeoSceneEngine;
   /** Preset canónico inicial de capas 3D. */
   initialPreset?: GeoViewerPresetId;
-  /** Expone el selector legacy/deck.gl sólo para QA y migración. */
-  showLegacyEngineSwitch?: boolean;
   /** Operational filters shared with the 2D map/saved views. */
   filters?: GeoSceneFilters;
+  /** Explicit project/center; overrides the globally active project. */
+  project?: GeoSceneProject;
+  /** Project GeoJSON layers (cadastre, pedimentos, hitos) with registry provenance. */
+  projectLayers?: GeoSceneProjectLayer[];
 };

@@ -43,8 +43,8 @@ export function LosVerdesTenureSummaryPanel() {
       <p className="mt-4 border-t border-hairline pt-3 text-xs leading-relaxed text-content-subtle">
         La asociación al proyecto es declarada y multi-titular; no acredita propiedad, opción ni
         contrato vigente. Las 300 ha en trámite y el saldo distrital requieren verificación
-        documental. Proyecto en fase de exploración pre-NI 43-101 / pre-JORC, sin recursos ni
-        reservas certificados. Conteos de targets, anomalías y muestras se consultan en el visor y
+        documental. Proyecto en explotación, pre-NI 43-101 / pre-JORC, sin recursos ni reservas
+        certificados. Conteos de targets, anomalías y muestras se consultan en el visor y
         corresponden a registros georreferenciados disponibles.
       </p>
     </section>

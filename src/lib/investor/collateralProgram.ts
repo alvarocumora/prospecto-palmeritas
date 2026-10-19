@@ -356,7 +356,7 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
           {
             kind: "bullets",
             items: [
-              "Proyectos de exploración y pequeña minería del portafolio Geocapitals (Cholqui, Los Verdes y otros activos publicados).",
+              "Proyectos de explotación y pequeña minería del portafolio Geocapitals (Cholqui, Los Verdes y otros activos publicados).",
               "Cada proyecto tiene su terminal con mapa, ensayes, catastro y data room en geocapitals.com.",
               "Reporte periódico del avance de los proyectos al inversionista.",
             ],

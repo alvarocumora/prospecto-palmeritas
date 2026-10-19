@@ -10,6 +10,7 @@ import colateralCover from "@/assets/colateral/cover-maule.jpg";
 import hualaneSat from "@/assets/colateral/hualane-satelite.jpg";
 import velValle from "@/assets/colateral/vel-valle.jpg";
 import { HeroGeospatial } from "@/features/marketing/HeroGeospatial";
+import { MiningInvestShowcase } from "@/features/marketing/MiningInvestShowcase";
 import featureCatastro from "@/assets/feature-catastro.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 
@@ -41,6 +42,8 @@ export function MarketingLanding() {
           ))}
         </div>
       </section>
+
+      <MiningInvestShowcase />
 
       {/* 2. INVERSIONISTAS */}
       <section id="colateral" className="border-b border-hairline">

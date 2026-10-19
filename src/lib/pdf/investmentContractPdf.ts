@@ -21,6 +21,7 @@ export async function downloadInvestmentContractPdf(o: {
   legalName: string;
   projectName: string;
   projectSlug: string;
+  signatureImage?: string | null;
 }) {
   const { default: jsPDF } = await import("jspdf");
   const doc = new jsPDF({ unit: "pt", format: "a4" });
@@ -92,6 +93,15 @@ export async function downloadInvestmentContractPdf(o: {
       : "Pendiente",
   );
   y = kvRow(doc, f, y, "Huella SHA-256", o.t.contract_hash ?? "Pendiente");
+  if (o.signatureImage) {
+    doc.addImage(o.signatureImage, "PNG", f.m, y + 4, 180, 60);
+    doc.setDrawColor(...GC_COLOR.hairline);
+    doc.line(f.m, y + 66, f.m + 200, y + 66);
+    font(doc, "body", "normal", 7.5);
+    ink(doc, GC_COLOR.slate);
+    doc.text("Firma manuscrita capturada en la plataforma", f.m, y + 78);
+    y += 86;
+  }
   y += 6;
 
   const url = publicUrl(`/terminal/${o.projectSlug}?tab=simulador`);

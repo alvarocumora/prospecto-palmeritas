@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
+import { PendingTicketBanner } from "@/features/investor/PendingTicketBanner";
 
 export const Route = createFileRoute("/_authenticated/dashboard/investments")({
   head: () => ({ meta: [{ title: "Mis inversiones — Geocapitals" }] }),
@@ -71,6 +72,8 @@ function MyInvestmentsPage() {
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Recargar
         </button>
       </header>
+
+      <PendingTicketBanner />
 
       <Link
         to="/dashboard/inversion-colateral"

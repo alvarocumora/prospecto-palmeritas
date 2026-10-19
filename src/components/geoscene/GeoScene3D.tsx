@@ -1,8 +1,9 @@
-import { lazy, Suspense, useEffect, useState } from "react";
-import { Loader2, Sparkles, Crosshair, X, Layers, Box, Layers3 } from "lucide-react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { BrandButton } from "@/components/brand";
+import { Loader2, Sparkles, Crosshair, X, Layers3 } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
-import { MODE_LABELS, type GeoSceneEngine, type GeoSceneMode, type GeoSceneProps } from "./types";
+import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
 import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchors";
 import { SceneLayerPanel } from "./controls/SceneLayerPanel";
 import { initialGeoSceneLayerIds } from "./layerPolicy";
@@ -10,20 +11,6 @@ import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
-);
-
-// Lazy-load de visores legacy: cada modo solo carga su engine cuando se activa.
-// Sprint 3+: estos se reescriben como capas deck.gl sobre un canvas único.
-const Geology3DViewer = lazy(() =>
-  import("@/components/Geology3DViewer").then((m) => ({ default: m.Geology3DViewer })),
-);
-const SatToSubsurface3DViewer = lazy(() =>
-  import("@/components/geology3d/SatToSubsurface3DViewer").then((m) => ({
-    default: m.SatToSubsurface3DViewer,
-  })),
-);
-const MagAnomaly3DPro = lazy(() =>
-  import("@/features/mag3d/MagAnomaly3DPro").then((m) => ({ default: m.MagAnomaly3DPro })),
 );
 
 /**
@@ -34,29 +21,46 @@ const MagAnomaly3DPro = lazy(() =>
  * - subsurface: vetas + pórfidos + sondajes + anomalías mag extruidas
  * - resource:   bloques + pit shells + leyes
  *
- * Sprint 2: shell unificado que delega a visores existentes.
- * Sprint 3+: consolidación interna en capas deck.gl sobre MapLibre.
+ * Motor único: MapLibre + deck.gl. Los visores three.js heredados fueron retirados.
  */
 export function GeoScene3D({
+  view = "3d",
+  showCopilot = true,
   mode: modeProp,
   variant = "default",
   showModeTabs = true,
   className = "",
-  engine: engineProp,
   initialPreset = "official_3d",
-  showLegacyEngineSwitch = false,
   filters,
+  project,
+  projectLayers,
 }: GeoSceneProps) {
   const [internalMode, setInternalMode] = useState<GeoSceneMode>(modeProp ?? "surface");
-  const [internalEngine, setInternalEngine] = useState<GeoSceneEngine>(engineProp ?? "deckgl");
   const mode = modeProp ?? internalMode;
-  const engine = engineProp ?? internalEngine;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() =>
-    initialGeoSceneLayerIds(initialPreset),
-  );
+  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
+    const ids = initialGeoSceneLayerIds(initialPreset);
+    for (const layer of projectLayers ?? []) {
+      if (layer.defaultVisible === false) ids.delete(layer.id);
+      else ids.add(layer.id);
+    }
+    return ids;
+  });
+  const seenProjectLayers = useRef(new Set(projectLayers?.map((layer) => layer.id)));
+  useEffect(() => {
+    const added = (projectLayers ?? []).filter((layer) => !seenProjectLayers.current.has(layer.id));
+    if (!added.length) return;
+    for (const layer of added) seenProjectLayers.current.add(layer.id);
+    setEnabledLayerIds(
+      (current) =>
+        new Set([
+          ...current,
+          ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id),
+        ]),
+    );
+  }, [projectLayers]);
 
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
     setEnabledLayerIds((current) => {
@@ -79,80 +83,57 @@ export function GeoScene3D({
   return (
     <div className={`relative h-full w-full bg-bg-panel ${className}`}>
       {/* Top bar */}
-      {showModeTabs && (
-        <div className="absolute top-3 right-3 z-20 flex items-center gap-2">
+      {
+        <div className="absolute top-3 right-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-end items-center gap-2">
           <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1">
             <Sparkles className="w-3 h-3 text-gold" />
             GeoScene3D · {meta.sub}
           </div>
-          {engine === "deckgl" && (
-            <button
+          {
+            <BrandButton
               type="button"
+              size="sm"
+              variant="outline"
               onClick={() => setLayerPanelOpen((value) => !value)}
               className="inline-flex items-center gap-1 rounded border border-border bg-bg-secondary/95 px-2 py-1 font-mono text-[10px] uppercase text-foreground backdrop-blur hover:bg-accent"
               title="Capas 3D canónicas"
+              aria-label="Capas del proyecto"
+              aria-expanded={layerPanelOpen}
             >
               <Layers3 className="h-3 w-3" /> capas
-            </button>
-          )}
-          {!engineProp && showLegacyEngineSwitch && (
-            <div className="flex items-center rounded border border-border bg-bg-secondary/95 backdrop-blur overflow-hidden text-[10px] font-mono uppercase">
-              <button
-                type="button"
-                onClick={() => setInternalEngine("deckgl")}
-                className={`inline-flex items-center gap-1 px-2 py-1 ${
-                  engine === "deckgl"
-                    ? "bg-gold text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                title="Motor unificado MapLibre + deck.gl con terreno real"
-              >
-                <Layers className="w-3 h-3" /> deck.gl
-              </button>
-              <button
-                type="button"
-                onClick={() => setInternalEngine("legacy")}
-                className={`inline-flex items-center gap-1 px-2 py-1 border-l border-border ${
-                  engine === "legacy"
-                    ? "bg-gold text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-                title="Motor heredado (three.js)"
-              >
-                <Box className="w-3 h-3" /> legacy
-              </button>
-            </div>
-          )}
-          <ModeTabs mode={mode} onChange={setInternalMode} />
+            </BrandButton>
+          }
+          {showModeTabs && <ModeTabs mode={mode} onChange={setInternalMode} />}
         </div>
-      )}
+      }
 
       {/* Scene */}
       <div className="absolute inset-0">
         <Suspense fallback={<SceneLoading />}>
-          {engine === "deckgl" && mode !== "resource" && (
-            <GeoSceneCanvas mode={mode} visibleLayerIds={enabledLayerIds} filters={filters} />
+          {mode !== "resource" && (
+            <GeoSceneCanvas
+              view={view}
+              mode={mode}
+              visibleLayerIds={enabledLayerIds}
+              filters={filters}
+              project={project}
+              projectLayers={projectLayers}
+            />
           )}
-          {engine === "legacy" && mode === "surface" && (
-            <Geology3DViewer className="h-full w-full" />
-          )}
-          {engine === "legacy" && mode === "subsurface" && variant !== "mag" && (
-            <SatToSubsurface3DViewer />
-          )}
-          {engine === "legacy" && mode === "subsurface" && variant === "mag" && <MagAnomaly3DPro />}
           {mode === "resource" && <ResourceModeStub />}
         </Suspense>
       </div>
 
-      {engine === "deckgl" && (
+      {
         <SceneLayerPanel
           mode={mode}
           enabled={enabledLayerIds}
           open={layerPanelOpen}
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
+          extraLayerIds={projectLayers?.map((layer) => layer.id)}
         />
-      )}
+      }
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (
@@ -174,7 +155,7 @@ export function GeoScene3D({
       )}
 
       {/* Contextual AI copilot */}
-      <SceneCopilot mode={mode} variant={variant} />
+      {showCopilot && <SceneCopilot mode={mode} variant={variant} />}
     </div>
   );
 }

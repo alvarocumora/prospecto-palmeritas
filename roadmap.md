@@ -40,3 +40,10 @@
 - [x] Cholqui: ASTER TIR sílice + Sentinel-1 lineamientos (scripts/process_aster_s1.py)
 
 - [ ] Flujo de inversiones: H1 base de datos ✓ · H2 onboarding ✓ · H3 configurador ✓ (Cholqui y Los Verdes: 15.000 acciones a USD 100, meta USD 1.500.000, mínimo USD 25.000; ambas rondas cerradas) · H4 contrato con QR y página pública de verificación · H5 QA de flujo completo en navegador · Abrir rondas cuando el usuario lo decida
+
+## Migración total a GeoScene3D (visores de proyecto)
+- [x] Fase 0: visitantes públicos ya no generan errores 401 al abrir Cholqui (capa satelital privada solo con sesión).
+- [x] Fase 1: GeoScene3D acepta proyecto/centro explícito y capas GeoJSON de catastro, pedimentos e hitos con procedencia.
+- [x] Fase 2: relieve CAD de Cholqui como fuente de terreno en GeoScene3D (máscara de cobertura, sin extrapolar).
+- [x] Fase 3 global: terminal y workspace usan una sola instancia GeoScene3D con cámara Planta/Perspectiva y capas persistentes para Cholqui, Los Verdes, Nahuelbuta, Palmeras y otros proyectos; conservar procedencia sin modificar backend.
+- [x] Verificar fase 3 global: cuatro terminales públicos, acceso Cholqui con sesión real, relieve CAD con imagen real, persistencia de cámara/capas y vista móvil sin desbordamiento. Ensayes, EMIT y radar conservados; capas espectrales densas disponibles a pedido.

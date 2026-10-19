@@ -33,7 +33,7 @@ const OPTIONS: Array<{
     icon: Briefcase,
     title: "Inversionista / Fondo",
     desc: "Acceso a deal flow, data rooms, reportes NI 43-101 firmados y watchlist catastral.",
-    next: { to: "/dashboard/deals", label: "Ver deal flow" },
+    next: { to: "/proyectos", label: "Ver proyectos y emitir ticket" },
   },
   {
     value: "mining_owner",
@@ -64,7 +64,7 @@ const NDA_VERSION = "NCNDA-GC-2026.1";
 const NDA_TEXT =
   "Me obligo a mantener confidencial toda la información técnica, legal y comercial recibida a través de Geocapitals, a no usarla con fines distintos a evaluar la inversión y a no contactar ni eludir a titulares, socios o contrapartes presentados por Geocapitals (no elusión) por 24 meses.";
 const RISK_TEXT =
-  "Entiendo que la exploración minera es de alto riesgo, que los antecedentes técnicos pueden ser declarados, derivados o interpretados, que no constituyen recursos ni reservas certificados bajo NI 43-101/JORC salvo indicación expresa, y que puedo perder la totalidad de lo invertido.";
+  "Entiendo que la inversión en proyectos mineros en explotación es de alto riesgo, que los antecedentes técnicos pueden ser declarados, derivados o interpretados, que no constituyen recursos ni reservas certificados bajo NI 43-101/JORC salvo indicación expresa, y que puedo perder la totalidad de lo invertido.";
 const SPECIALTIES = [
   "Geología",
   "Geofísica",
@@ -79,6 +79,7 @@ type Step = "role" | "details" | "done";
 export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
   const { user, profile, refreshProfile } = useAuth();
   const [step, setStep] = useState<Step>("role");
+  const [invStep, setInvStep] = useState(0);
   const [selected, setSelected] = useState<AccountType | null>(null);
   const [saving, setSaving] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -359,146 +360,166 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
 
         {selected === "investor" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <Field label="Nombre completo *">
-              <Input value={inv.full_name} onChange={(v) => setInv({ ...inv, full_name: v })} />
-            </Field>
-            <Field label="Empresa / Fondo *">
-              <Input
-                value={inv.company_name}
-                onChange={(v) => setInv({ ...inv, company_name: v })}
-              />
-            </Field>
-            <Field label="País">
-              <Input value={inv.country} onChange={(v) => setInv({ ...inv, country: v })} />
-            </Field>
-            <Field label="Tipo de inversor">
-              <select
-                value={inv.investor_type}
-                onChange={(e) => setInv({ ...inv, investor_type: e.target.value })}
-                className={selectCls}
-              >
-                {INVESTOR_TYPES.map(([v, l]) => (
-                  <option key={v} value={v}>
-                    {l}
-                  </option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Ticket mín USD">
-              <Input
-                type="number"
-                value={inv.ticket_min_usd}
-                onChange={(v) => setInv({ ...inv, ticket_min_usd: v })}
-              />
-            </Field>
-            <Field label="Ticket máx USD">
-              <Input
-                type="number"
-                value={inv.ticket_max_usd}
-                onChange={(v) => setInv({ ...inv, ticket_max_usd: v })}
-              />
-            </Field>
-            <Field label="Commodities" full>
-              <Chips
-                options={COMMODITIES}
-                selected={inv.commodities}
-                onToggle={(v) => setInv({ ...inv, commodities: toggleArr(inv.commodities, v) })}
-              />
-            </Field>
-            <Field label="Estándares aceptados" full>
-              <Chips
-                options={STANDARDS}
-                selected={inv.accepted_standards}
-                onToggle={(v) =>
-                  setInv({ ...inv, accepted_standards: toggleArr(inv.accepted_standards, v) })
-                }
-              />
-            </Field>
-            <Field label="Sitio web" full>
-              <Input
-                value={inv.website}
-                onChange={(v) => setInv({ ...inv, website: v })}
-                placeholder="https://"
-              />
-            </Field>
-            <Field label="RUT / Tax ID *">
-              <Input
-                value={inv.tax_id}
-                onChange={(v) => setInv({ ...inv, tax_id: v })}
-                placeholder="76.xxx.xxx-x"
-              />
-            </Field>
-            <Field label="Inversionista calificado">
-              <label className="flex items-center gap-2 text-xs text-muted-foreground h-[34px]">
-                <input
-                  type="checkbox"
-                  checked={inv.is_accredited}
-                  onChange={(e) => setInv({ ...inv, is_accredited: e.target.checked })}
-                  className="accent-gold"
-                />
-                Declaro ser inversionista calificado / acreditado
-              </label>
-            </Field>
-            {inv.is_accredited && (
-              <Field label="Fundamento de la calificación" full>
-                <Input
-                  value={inv.accreditation_basis}
-                  onChange={(v) => setInv({ ...inv, accreditation_basis: v })}
-                  placeholder="Ej.: NCG 216 CMF, patrimonio, inversionista institucional…"
-                />
-              </Field>
+            {invStep === 0 && (
+              <>
+                <Field label="Nombre completo *">
+                  <Input value={inv.full_name} onChange={(v) => setInv({ ...inv, full_name: v })} />
+                </Field>
+                <Field label="Empresa / Fondo *">
+                  <Input
+                    value={inv.company_name}
+                    onChange={(v) => setInv({ ...inv, company_name: v })}
+                  />
+                </Field>
+                <Field label="País">
+                  <Input value={inv.country} onChange={(v) => setInv({ ...inv, country: v })} />
+                </Field>
+                <Field label="Tipo de inversor">
+                  <select
+                    value={inv.investor_type}
+                    onChange={(e) => setInv({ ...inv, investor_type: e.target.value })}
+                    className={selectCls}
+                  >
+                    {INVESTOR_TYPES.map(([v, l]) => (
+                      <option key={v} value={v}>
+                        {l}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </>
             )}
-            <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
-              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
-                Declaración de riesgos
-              </div>
-              <p className="text-xs text-muted-foreground">{RISK_TEXT}</p>
-              <label className="flex items-start gap-2 text-xs cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={inv.risk_accepted}
-                  onChange={(e) => setInv({ ...inv, risk_accepted: e.target.checked })}
-                  className="mt-0.5 accent-gold"
-                />
-                He leído y acepto la declaración de riesgos.
-              </label>
-            </div>
-            <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
-              <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
-                Acuerdo de confidencialidad y no elusión ({NDA_VERSION})
-              </div>
-              <p className="text-xs text-muted-foreground">{NDA_TEXT}</p>
-              <Field label="Firma: escribe tu nombre completo *" full>
-                <Input
-                  value={inv.nda_signature}
-                  onChange={(v) => setInv({ ...inv, nda_signature: v })}
-                  placeholder={inv.full_name || "Nombre completo"}
-                />
-              </Field>
-              <p className="text-[10px] font-mono text-muted-foreground">
-                Se registra fecha y hora UTC y una huella SHA-256 de la firma.
-              </p>
-            </div>
-            <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
-              <input
-                type="checkbox"
-                checked={inv.terms_accepted}
-                onChange={(e) => setInv({ ...inv, terms_accepted: e.target.checked })}
-                className="mt-0.5 accent-gold"
-              />
-              <span>
-                Acepto los{" "}
-                <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">
-                  Términos
-                </a>
-                , la{" "}
-                <a href="/legal/privacidad" target="_blank" className="text-gold hover:underline">
-                  Política de privacidad
-                </a>{" "}
-                y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de éxito
-                post-cierre y no custodia fondos.
-              </span>
-            </label>
+            {invStep === 1 && (
+              <>
+                <Field label="Ticket mín USD">
+                  <Input
+                    type="number"
+                    value={inv.ticket_min_usd}
+                    onChange={(v) => setInv({ ...inv, ticket_min_usd: v })}
+                  />
+                </Field>
+                <Field label="Ticket máx USD">
+                  <Input
+                    type="number"
+                    value={inv.ticket_max_usd}
+                    onChange={(v) => setInv({ ...inv, ticket_max_usd: v })}
+                  />
+                </Field>
+                <Field label="Commodities" full>
+                  <Chips
+                    options={COMMODITIES}
+                    selected={inv.commodities}
+                    onToggle={(v) => setInv({ ...inv, commodities: toggleArr(inv.commodities, v) })}
+                  />
+                </Field>
+                <Field label="Estándares aceptados" full>
+                  <Chips
+                    options={STANDARDS}
+                    selected={inv.accepted_standards}
+                    onToggle={(v) =>
+                      setInv({ ...inv, accepted_standards: toggleArr(inv.accepted_standards, v) })
+                    }
+                  />
+                </Field>
+                <Field label="Sitio web" full>
+                  <Input
+                    value={inv.website}
+                    onChange={(v) => setInv({ ...inv, website: v })}
+                    placeholder="https://"
+                  />
+                </Field>
+              </>
+            )}
+            {invStep === 0 && (
+              <>
+                <Field label="RUT / Tax ID *">
+                  <Input
+                    value={inv.tax_id}
+                    onChange={(v) => setInv({ ...inv, tax_id: v })}
+                    placeholder="76.xxx.xxx-x"
+                  />
+                </Field>
+                <Field label="Inversionista calificado">
+                  <label className="flex items-center gap-2 text-xs text-muted-foreground h-[34px]">
+                    <input
+                      type="checkbox"
+                      checked={inv.is_accredited}
+                      onChange={(e) => setInv({ ...inv, is_accredited: e.target.checked })}
+                      className="accent-gold"
+                    />
+                    Declaro ser inversionista calificado / acreditado
+                  </label>
+                </Field>
+                {inv.is_accredited && (
+                  <Field label="Fundamento de la calificación" full>
+                    <Input
+                      value={inv.accreditation_basis}
+                      onChange={(v) => setInv({ ...inv, accreditation_basis: v })}
+                      placeholder="Ej.: NCG 216 CMF, patrimonio, inversionista institucional…"
+                    />
+                  </Field>
+                )}
+              </>
+            )}
+            {invStep === 2 && (
+              <>
+                <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
+                  <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+                    Declaración de riesgos
+                  </div>
+                  <p className="text-xs text-muted-foreground">{RISK_TEXT}</p>
+                  <label className="flex items-start gap-2 text-xs cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={inv.risk_accepted}
+                      onChange={(e) => setInv({ ...inv, risk_accepted: e.target.checked })}
+                      className="mt-0.5 accent-gold"
+                    />
+                    He leído y acepto la declaración de riesgos.
+                  </label>
+                </div>
+                <div className="md:col-span-2 rounded border border-border p-3 space-y-2">
+                  <div className="text-[10px] uppercase tracking-wider font-mono text-muted-foreground">
+                    Acuerdo de confidencialidad y no elusión ({NDA_VERSION})
+                  </div>
+                  <p className="text-xs text-muted-foreground">{NDA_TEXT}</p>
+                  <Field label="Firma: escribe tu nombre completo *" full>
+                    <Input
+                      value={inv.nda_signature}
+                      onChange={(v) => setInv({ ...inv, nda_signature: v })}
+                      placeholder={inv.full_name || "Nombre completo"}
+                    />
+                  </Field>
+                  <p className="text-[10px] font-mono text-muted-foreground">
+                    Se registra fecha y hora UTC y una huella SHA-256 de la firma.
+                  </p>
+                </div>
+                <label className="md:col-span-2 flex items-start gap-2 text-xs text-muted-foreground cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={inv.terms_accepted}
+                    onChange={(e) => setInv({ ...inv, terms_accepted: e.target.checked })}
+                    className="mt-0.5 accent-gold"
+                  />
+                  <span>
+                    Acepto los{" "}
+                    <a href="/legal/terminos" target="_blank" className="text-gold hover:underline">
+                      Términos
+                    </a>
+                    , la{" "}
+                    <a
+                      href="/legal/privacidad"
+                      target="_blank"
+                      className="text-gold hover:underline"
+                    >
+                      Política de privacidad
+                    </a>{" "}
+                    y el procedimiento <strong>KYC/AML</strong>. Geocapitals cobra una comisión de
+                    éxito post-cierre y no custodia fondos.
+                  </span>
+                </label>
+              </>
+            )}
           </div>
         )}
 
@@ -558,19 +579,61 @@ export function OnboardingWizard({ onComplete }: { onComplete?: () => void }) {
           </div>
         )}
 
-        <div className="flex justify-end mt-4">
-          <button
-            onClick={submitDetails}
-            disabled={saving}
-            className="inline-flex items-center gap-2 rounded bg-gold text-black px-4 py-2 text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50"
-          >
-            {saving ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <CheckCircle2 className="w-3.5 h-3.5" />
-            )}
-            Completar onboarding
-          </button>
+        {selected === "investor" && (
+          <ol className="mt-4 flex gap-2 text-[10px] font-mono uppercase tracking-wider">
+            {["1 · Identidad", "2 · Mandato", "3 · Acuerdos"].map((l, i) => (
+              <li
+                key={l}
+                className={`flex-1 border-t-2 pt-1 ${i <= invStep ? "border-gold text-foreground" : "border-border text-muted-foreground"}`}
+              >
+                {l}
+              </li>
+            ))}
+          </ol>
+        )}
+        <div className="flex justify-end gap-2 mt-4">
+          {selected === "investor" && invStep > 0 && (
+            <button
+              onClick={() => setInvStep(invStep - 1)}
+              className="rounded border border-border px-4 py-2 text-xs font-mono"
+            >
+              Atrás
+            </button>
+          )}
+          {selected === "investor" && invStep < 2 ? (
+            <button
+              onClick={() => {
+                if (
+                  invStep === 0 &&
+                  (!inv.full_name.trim() ||
+                    !inv.tax_id.trim() ||
+                    (inv.investor_type !== "individual" && !inv.company_name.trim()))
+                ) {
+                  toast.error(
+                    "Completa nombre, RUT / Tax ID y empresa (si no eres persona natural).",
+                  );
+                  return;
+                }
+                setInvStep(invStep + 1);
+              }}
+              className="inline-flex items-center gap-2 rounded bg-gold text-black px-4 py-2 text-xs font-mono font-semibold hover:bg-gold/90"
+            >
+              Continuar <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          ) : (
+            <button
+              onClick={submitDetails}
+              disabled={saving}
+              className="inline-flex items-center gap-2 rounded bg-gold text-black px-4 py-2 text-xs font-mono font-semibold hover:bg-gold/90 disabled:opacity-50"
+            >
+              {saving ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <CheckCircle2 className="w-3.5 h-3.5" />
+              )}
+              Completar onboarding
+            </button>
+          )}
         </div>
       </section>
     );

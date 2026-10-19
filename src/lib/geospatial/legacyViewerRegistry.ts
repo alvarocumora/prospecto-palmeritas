@@ -39,7 +39,7 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "geology-3d-viewer",
     path: "src/components/Geology3DViewer.tsx",
-    status: "qa_only",
+    status: "retired",
     successor: "GeoScene3D",
     uniqueCapability: "Historical Three.js comparison renderer",
     blocker: "Keep only while explicit legacy QA switch exists",
@@ -47,7 +47,7 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "sat-to-subsurface-3d",
     path: "src/components/geology3d/SatToSubsurface3DViewer.tsx",
-    status: "qa_only",
+    status: "retired",
     successor: "GeoScene3D subsurface mode",
     uniqueCapability: "Legacy conceptual satellite-to-subsurface heuristics",
     blocker: "Do not promote heuristic bodies without traceable interpreted/proposed evidence",
@@ -55,7 +55,7 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "map-3d-view",
     path: "src/components/map/Map3DView.tsx",
-    status: "reference_only",
+    status: "retired",
     successor: "GeoScene3D",
     uniqueCapability: "Historical props-based Operations 3D renderer",
     blocker: "Keep for one QA window until Actions CI can validate the canonical replacement",
@@ -63,7 +63,7 @@ export const LEGACY_VIEWER_REGISTRY: readonly LegacyViewerRecord[] = [
   {
     id: "lv5-page5-preview",
     path: "src/features/lv5/Lv5Page5Preview.tsx",
-    status: "reference_only",
+    status: "retired",
     successor: "CanonicalProjectViewer(profile=losverdes)",
     uniqueCapability: "Historical LV5 lithostratigraphic presentation",
     blocker:

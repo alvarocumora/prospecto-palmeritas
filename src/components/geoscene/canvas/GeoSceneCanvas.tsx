@@ -4,7 +4,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
+import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { Loader2 } from "lucide-react";
+import type { ProjectView } from "@/lib/projects/navigation";
+import { projectCamera } from "../cameraPolicy";
+import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useProjects } from "@/hooks/useProjects";
@@ -20,11 +27,23 @@ import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import { sceneBindingsForMode, sceneLayerEnabled } from "../layerPolicy";
 import type { GeoSceneFilters, GeoSceneMode } from "../types";
 import { sceneFilterManifest } from "../filterPolicy";
+import {
+  evidenceColor,
+  isDashedEvidence,
+  projectLayerTooltip,
+  resolveProjectLayers,
+  type GeoSceneProject,
+  type GeoSceneProjectLayer,
+  type ResolvedProjectLayer,
+} from "../projectLayers";
 
 interface Props {
+  view?: ProjectView;
   mode: GeoSceneMode;
   visibleLayerIds: ReadonlySet<string>;
   filters?: GeoSceneFilters;
+  project?: GeoSceneProject;
+  projectLayers?: GeoSceneProjectLayer[];
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -78,8 +97,19 @@ function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
   };
 }
 
-export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
-  const { active } = useProjects();
+export function GeoSceneCanvas({
+  view = "3d",
+  mode,
+  visibleLayerIds,
+  filters,
+  project,
+  projectLayers,
+}: Props) {
+  const { active: activeProject } = useProjects();
+  const { user } = useAuth();
+  const active = project
+    ? { id: project.id, center_lng: project.center[0], center_lat: project.center[1] }
+    : activeProject;
   const mapDiv = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const overlayRef = useRef<MapboxOverlay | null>(null);
@@ -105,14 +135,21 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geophysics_anomalies");
   const wireframesVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
+  // Public bundles supply public evidence; private scene hooks stay session-scoped.
+  const privateProjectId = user ? (active?.id ?? null) : null;
+  const hasProjectLayer = (id: string) => projectLayers?.some((layer) => layer.id === id) ?? false;
 
-  const { layer: targetsLayer } = useTargetsLayer(active?.id ?? null, targetsVisible, filters);
+  const { layer: targetsLayer } = useTargetsLayer(
+    privateProjectId,
+    targetsVisible && !hasProjectLayer("targets.exploration"),
+    filters,
+  );
   const {
     layers: holeColumnLayers,
     completedCount: completedCollarCount,
     proposedCount: proposedCollarCount,
   } = useDrillHolesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     {
@@ -128,7 +165,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     proposedCount: proposedTrajectoryCount,
     interceptCount,
   } = useDrillTrajectoriesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     {
@@ -140,19 +177,80 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
-    active?.id ?? null,
-    geophysicsVisible,
+    privateProjectId,
+    geophysicsVisible && !hasProjectLayer("geophysics.anomalies"),
   );
   const { layer: satAnomaliesLayer, count: satAnomaliesCount } = useSatAnomaliesLayer(
-    active?.id ?? null,
-    satelliteVisible,
+    privateProjectId,
+    satelliteVisible && !hasProjectLayer("remote_sensing.sentinel2_alteration"),
   );
   const { layers: wireframeLayers, count: wireframeCount } = useWireframesLayer(
-    active?.id ?? null,
+    privateProjectId,
     centerLng,
     centerLat,
     wireframesVisible,
   );
+
+  const cadTerrain = project?.cadTerrain ?? null;
+  const cadMesh = useMemo(
+    () => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null),
+    [cadTerrain],
+  );
+  const cadTerrainLayer = useMemo(() => {
+    if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
+    const { tile } = cadTerrain;
+    return new SimpleMeshLayer({
+      id: "project:cad-terrain",
+      data: [{ position: [0, 0, 0] }],
+      coordinateSystem: COORDINATE_SYSTEM.METER_OFFSETS,
+      coordinateOrigin: [Number(tile.centerLng), Number(tile.centerLat), 0],
+      mesh: {
+        attributes: {
+          positions: { value: cadMesh.positions, size: 3 },
+          normals: { value: cadMesh.normals, size: 3 },
+          ...(cadTerrain.imagery
+            ? { texCoords: { value: cadMesh.texCoords, size: 2 } }
+            : { colors: { value: cadMesh.colors, size: 4 } }),
+        },
+        indices: { value: cadMesh.indices, size: 1 },
+      } as never,
+      getPosition: (d: { position: [number, number, number] }) => d.position,
+      texture: cadTerrain.imagery?.url,
+      getColor: [255, 255, 255, 235],
+      opacity: 0.92,
+      material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
+    });
+  }, [cadTerrain, cadMesh, terrainVisible, mode]);
+
+  const resolvedProjectLayers = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
+  const projectGeoLayers = useMemo(() => {
+    if (mode === "resource") return [];
+    return resolvedProjectLayers
+      .filter((layer) => visibleLayerIds.has(layer.id))
+      .map((layer) => {
+        const color = evidenceColor(layer.definition.evidence);
+        const dashed = isDashedEvidence(layer.definition.evidence);
+        return new GeoJsonLayer({
+          id: `project:${layer.id}`,
+          data: layer.data as never,
+          pickable: true,
+          stroked: true,
+          filled: true,
+          getFillColor: [color[0], color[1], color[2], dashed ? 20 : 45],
+          getLineColor: color,
+          getLineWidth: dashed ? 1.5 : 2.5,
+          lineWidthUnits: "pixels",
+          pointType: "circle",
+          getPointRadius: 6,
+          pointRadiusUnits: "pixels",
+          pointRadiusMinPixels: 4,
+          parameters: { depthTest: false } as never,
+          updateTriggers: { getLineColor: layer.definition.evidence },
+          // keep a reference for tooltips
+          ...({ geoProjectLayer: layer } as Record<string, unknown>),
+        });
+      });
+  }, [mode, resolvedProjectLayers, visibleLayerIds]);
 
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
@@ -166,8 +264,7 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
       style: MAP_STYLE,
       center,
       zoom: 11,
-      pitch: 55,
-      bearing: -20,
+      ...projectCamera(view),
       maxPitch: 80,
       attributionControl: { compact: true },
     });
@@ -176,9 +273,31 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
     map.on("load", () => {
-      const overlay = new MapboxOverlay({ interleaved: false, layers: [] });
+      const overlay = new MapboxOverlay({
+        interleaved: false,
+        layers: [],
+        getTooltip: (info: {
+          layer?: { props?: Record<string, unknown> } | null;
+          object?: { properties?: Record<string, unknown> } | null;
+        }) => {
+          const projectLayer = info.layer?.props?.geoProjectLayer as
+            ResolvedProjectLayer | undefined;
+          if (!projectLayer || !info.object) return null;
+          return projectLayerTooltip(projectLayer, info.object.properties);
+        },
+      } as never);
       map.addControl(overlay as unknown as maplibregl.IControl);
       overlayRef.current = overlay;
+      if (project?.bbox) {
+        const [w, so, e, n] = project.bbox;
+        map.fitBounds(
+          [
+            [w, so],
+            [e, n],
+          ],
+          { padding: 45, ...projectCamera(view), duration: 0 },
+        );
+      }
       syncSnapshotViewState();
       setReady(true);
     });
@@ -207,9 +326,26 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
 
   useEffect(() => {
     if (!ready || !mapRef.current) return;
+    mapRef.current.easeTo({
+      ...projectCamera(view),
+      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500,
+    });
+  }, [ready, view]);
+
+  useEffect(() => {
+    const element = mapDiv.current;
+    if (!element) return;
+    const observer = new ResizeObserver(() => mapRef.current?.resize());
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
     try {
       mapRef.current.setTerrain(
-        terrainVisible ? { source: "terrainDEM", exaggeration: 1.5 } : null,
+        // CAD terrain replaces the global DEM; the two are never fused.
+        terrainVisible && !cadTerrain ? { source: "terrainDEM", exaggeration: 1.5 } : null,
       );
     } catch {
       try {
@@ -218,14 +354,15 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
         // Fail-safe: canvas 2D con pitch.
       }
     }
-  }, [ready, terrainVisible]);
+  }, [ready, terrainVisible, cadTerrain]);
 
   useEffect(() => {
+    if (project?.bbox) return;
     if (!mapRef.current || !active?.center_lat || !active?.center_lng) return;
     mapRef.current.flyTo({
       center: [Number(active.center_lng), Number(active.center_lat)],
       zoom: 11,
-      pitch: 55,
+      ...projectCamera(view),
       duration: 1200,
     });
   }, [active?.id, active?.center_lat, active?.center_lng]);
@@ -233,6 +370,8 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   useEffect(() => {
     if (!ready || !overlayRef.current) return;
     const layers = [
+      cadTerrainLayer,
+      ...projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
       ...holeColumnLayers,
@@ -243,6 +382,8 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     overlayRef.current.setProps({ layers });
   }, [
     ready,
+    cadTerrainLayer,
+    projectGeoLayers,
     targetsLayer,
     satAnomaliesLayer,
     holeColumnLayers,
@@ -261,18 +402,20 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
       mapRef.current.flyTo({
         center: [anchor.lng, anchor.lat],
         zoom: 14.5,
-        pitch: 65,
+        ...projectCamera(view),
         speed: 1.4,
         essential: true,
       });
     };
     window.addEventListener(SCENE_FOCUS_EVENT, handler);
     return () => window.removeEventListener(SCENE_FOCUS_EVENT, handler);
-  }, []);
+  }, [view]);
 
   const layerCount = useMemo(
     () =>
       [
+        cadTerrainLayer,
+        ...projectGeoLayers,
         targetsLayer,
         satAnomaliesLayer,
         ...holeColumnLayers,
@@ -281,6 +424,8 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
         anomaliesLayer,
       ].filter(Boolean).length,
     [
+      cadTerrainLayer,
+      projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
       holeColumnLayers,
@@ -291,13 +436,43 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
   );
 
   const canonicalManifest = useMemo(() => {
+    const availableBindings: Record<string, boolean> = {
+      terrain: terrainVisible,
+      targets: Boolean(targetsLayer),
+      satellite_anomalies: Boolean(satAnomaliesLayer),
+      drillholes_completed: completedCollarCount + completedTrajectoryCount > 0,
+      drillholes_proposed: proposedCollarCount + proposedTrajectoryCount > 0,
+      drill_intercepts: interceptCount > 0,
+      geophysics_anomalies: Boolean(anomaliesLayer),
+      geology_wireframes: wireframeCount > 0,
+    };
     const rendered = sceneBindingsForMode(mode)
-      .filter((binding) => visibleLayerIds.has(binding.canonicalId))
-      .map((binding) => binding.canonicalId);
-    return Array.from(new Set(["basemap.esri_imagery", ...rendered]))
+      .filter(
+        (binding) => visibleLayerIds.has(binding.canonicalId) && availableBindings[binding.key],
+      )
+      .map((binding) => binding.canonicalId as string);
+    const projectIds =
+      mode === "resource"
+        ? []
+        : resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.id as string);
+    return Array.from(new Set(["basemap.esri_imagery", ...rendered, ...projectIds]))
       .sort()
       .join(",");
-  }, [mode, visibleLayerIds]);
+  }, [
+    mode,
+    visibleLayerIds,
+    resolvedProjectLayers,
+    terrainVisible,
+    targetsLayer,
+    satAnomaliesLayer,
+    completedCollarCount,
+    completedTrajectoryCount,
+    proposedCollarCount,
+    proposedTrajectoryCount,
+    interceptCount,
+    anomaliesLayer,
+    wireframeCount,
+  ]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
@@ -307,15 +482,20 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
     <div
       className="relative h-full w-full"
       data-geo-engine="deckgl"
-      data-geo-mode="3d"
+      data-geo-mode={view}
       data-geo-project-id={active?.id ?? undefined}
       data-geo-crs="EPSG:4326"
       data-geo-layer-ids={canonicalManifest}
       data-geo-filters={filterManifest}
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
+      data-geo-terrain-source={
+        cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"
+      }
     >
-      <div ref={mapDiv} className="absolute inset-0" />
+      <div className="absolute inset-0">
+        <div ref={mapDiv} className="h-full w-full" />
+      </div>
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-bg-panel/80 backdrop-blur">
           <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
@@ -323,6 +503,19 @@ export function GeoSceneCanvas({ mode, visibleLayerIds, filters }: Props) {
             Inicializando canvas 3D…
           </div>
         </div>
+      )}
+      {cadTerrainLayer && cadTerrain && (
+        <details className="absolute bottom-12 right-3 z-10 max-w-[min(24rem,calc(100%-1.5rem))] max-h-[35%] overflow-auto rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
+          <summary className="cursor-pointer font-semibold text-foreground">
+            Relieve CAD · DERIVADO de curvas DECLARADAS
+          </summary>
+          <span className="block">{cadTerrain.notice}</span>
+          {cadTerrain.imagery && (
+            <span className="block mt-1">
+              {cadTerrain.imagery.attribution} · {cadTerrain.imagery.notice}
+            </span>
+          )}
+        </details>
       )}
       <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">
         deck.gl · {layerCount} capa{layerCount === 1 ? "" : "s"} · modo {mode}
