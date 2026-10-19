@@ -132,7 +132,11 @@ export function InvestorWallet() {
         <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted mb-3">
           Activos
         </h3>
-        {!w || w.positions.length === 0 ? (
+        {!w ? (
+          <p role="status" className="text-sm text-content-muted">
+            Consultando tus posiciones…
+          </p>
+        ) : w.positions.length === 0 ? (
           <p className="text-sm text-content-muted">
             Aún no tienes participaciones confirmadas. Aparecerán aquí cuando el equipo liquide tu
             ticket.
