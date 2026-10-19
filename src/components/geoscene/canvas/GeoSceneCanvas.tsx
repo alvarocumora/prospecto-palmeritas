@@ -325,8 +325,24 @@ export function GeoSceneCanvas({
   }, []);
 
   useEffect(() => {
-    if (!ready || !mapRef.current) return;
-    mapRef.current.easeTo({
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    // Planta locks the camera to nadir so mouse/touch gestures cannot drift
+    // the view into perspective while the selector says "Planta".
+    const plan = view === "2d";
+    map.setMaxPitch(plan ? 0 : 80);
+    if (plan) {
+      map.dragRotate.disable();
+      map.touchZoomRotate.disableRotation();
+      map.touchPitch.disable();
+      map.keyboard.disableRotation();
+    } else {
+      map.dragRotate.enable();
+      map.touchZoomRotate.enableRotation();
+      map.touchPitch.enable();
+      map.keyboard.enableRotation();
+    }
+    map.easeTo({
       ...projectCamera(view),
       duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500,
     });
@@ -345,7 +361,10 @@ export function GeoSceneCanvas({
     try {
       mapRef.current.setTerrain(
         // CAD terrain replaces the global DEM; the two are never fused.
-        terrainVisible && !cadTerrain ? { source: "terrainDEM", exaggeration: 1.5 } : null,
+        // In Planta the DEM is not rendered (layer selection is preserved).
+        terrainVisible && !cadTerrain && view === "3d"
+          ? { source: "terrainDEM", exaggeration: 1.5 }
+          : null,
       );
     } catch {
       try {
@@ -354,7 +373,7 @@ export function GeoSceneCanvas({
         // Fail-safe: canvas 2D con pitch.
       }
     }
-  }, [ready, terrainVisible, cadTerrain]);
+  }, [ready, terrainVisible, cadTerrain, view]);
 
   useEffect(() => {
     if (project?.bbox) return;
