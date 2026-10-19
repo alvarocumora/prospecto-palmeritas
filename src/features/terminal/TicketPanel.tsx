@@ -343,7 +343,9 @@ function MyTicket({
                     data: { ticketId: t.id },
                   });
                   const blob = await (await fetch(sigImg!)).blob();
-                  const up = await supabase.storage.from(bucket).uploadToSignedUrl(path, token, blob);
+                  const up = await supabase.storage
+                    .from(bucket)
+                    .uploadToSignedUrl(path, token, blob);
                   if (up.error) throw up.error;
                 } catch {
                   /* el trazo queda igual disponible en este navegador (localStorage) */
