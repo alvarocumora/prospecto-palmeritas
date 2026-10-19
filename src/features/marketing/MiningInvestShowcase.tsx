@@ -24,10 +24,15 @@ export function MiningInvestShowcase() {
   const navigate = useNavigate();
   const [slug, setSlug] = useState<(typeof PROJECTS)[number]["slug"]>("cholqui");
   const [amount, setAmount] = useState<number>(ROUND.minTicket);
-  const shares = Math.floor(amount / ROUND.sharePrice);
-  const pct = (shares / ROUND.shares) * 100;
-  const valid = amount >= ROUND.minTicket && amount <= ROUND.target;
   const [rounds, setRounds] = useState<PublicRound[]>([]);
+  const current = rounds.find((r) => r.slug === slug);
+  const minTicket = current?.minTicket ?? ROUND.minTicket;
+  const sharePrice = current?.sharePrice ?? ROUND.sharePrice;
+  const totalShares = current?.shares ?? ROUND.shares;
+  const target = current?.target ?? ROUND.target;
+  const shares = Math.floor(amount / sharePrice);
+  const pct = (shares / totalShares) * 100;
+  const valid = amount >= minTicket && amount <= target;
   const [rate, setRate] = useState(15);
   useEffect(() => {
     getPublicRounds()
@@ -74,7 +79,7 @@ export function MiningInvestShowcase() {
                 <div className="flex items-center justify-between gap-3">
                   <div className="font-serif text-2xl">{p.name}</div>
                   <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand border border-accent-brand px-2 py-0.5">
-                    Ronda {usd(ROUND.target)}
+                    Ronda {usd(rounds.find((r) => r.slug === p.slug)?.target ?? ROUND.target)}
                   </span>
                 </div>
                 <div className="mt-1 text-xs text-content-muted">{p.region}</div>
@@ -104,12 +109,12 @@ export function MiningInvestShowcase() {
               {PROJECTS.find((p) => p.slug === slug)?.name}
             </div>
             <label className="block mt-5 text-sm">
-              Monto a invertir (USD) · desde {usd(ROUND.minTicket)} (≈ CLP 15 millones)
+              Monto a invertir (USD) · desde {usd(minTicket)}
             </label>
             <input
               type="number"
-              min={ROUND.minTicket}
-              step={ROUND.sharePrice}
+              min={minTicket}
+              step={sharePrice}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value) || 0)}
               className="mt-2 w-full border border-hairline bg-surface px-3 py-2 font-mono text-lg"
@@ -164,7 +169,7 @@ export function MiningInvestShowcase() {
             </div>
             {!valid && (
               <p className="mt-3 text-xs text-accent-brand">
-                Ticket mínimo {usd(ROUND.minTicket)}, máximo {usd(ROUND.target)}.
+                Ticket mínimo {usd(minTicket)}, máximo {usd(target)}.
               </p>
             )}
             <button
