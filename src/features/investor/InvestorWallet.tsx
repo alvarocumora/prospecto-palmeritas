@@ -11,7 +11,7 @@ import { TICKET_STATUS_LABEL, TICKET_STEPS } from "@/lib/investor/rounds";
 type W = Awaited<ReturnType<typeof getMyWallet>>;
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
-/** Vista tipo wallet: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
+/** Cartola institucional: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
 export function InvestorWallet() {
   const [w, setW] = useState<W | null>(null);
   const [rounds, setRounds] = useState<PublicRound[]>([]);
@@ -52,8 +52,8 @@ export function InvestorWallet() {
   return (
     <section data-theme="im-light" className="mb-6 border border-hairline bg-surface text-content">
       <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
-        <Wallet className="w-4 h-4 text-accent-brand" />
-        <h2 className="font-serif text-xl">Mi wallet</h2>
+        <Landmark className="w-4 h-4 text-accent-brand" />
+        <h2 className="font-serif text-xl">Cartola de posiciones</h2>
         <button
           type="button"
           onClick={() => void downloadStatement()}
@@ -70,7 +70,7 @@ export function InvestorWallet() {
           value={usd(w?.totals.invested ?? 0)}
           note={clp(w?.totals.invested ?? 0)}
         />
-        <Kpi label="Participaciones" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
+        <Kpi label="Acciones serie preferente" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
         <Kpi
           label="Órdenes en curso"
           value={usd(w?.totals.pending ?? 0)}
