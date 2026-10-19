@@ -136,10 +136,14 @@ export function GeoSceneCanvas({
   const wireframesVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
   // Public bundles supply public evidence; private scene hooks stay session-scoped.
-  const privateProjectId = user ? active?.id ?? null : null;
+  const privateProjectId = user ? (active?.id ?? null) : null;
   const hasProjectLayer = (id: string) => projectLayers?.some((layer) => layer.id === id) ?? false;
 
-  const { layer: targetsLayer } = useTargetsLayer(privateProjectId, targetsVisible && !hasProjectLayer("targets.exploration"), filters);
+  const { layer: targetsLayer } = useTargetsLayer(
+    privateProjectId,
+    targetsVisible && !hasProjectLayer("targets.exploration"),
+    filters,
+  );
   const {
     layers: holeColumnLayers,
     completedCount: completedCollarCount,
@@ -188,7 +192,10 @@ export function GeoSceneCanvas({
   );
 
   const cadTerrain = project?.cadTerrain ?? null;
-  const cadMesh = useMemo(() => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null), [cadTerrain]);
+  const cadMesh = useMemo(
+    () => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null),
+    [cadTerrain],
+  );
   const cadTerrainLayer = useMemo(() => {
     if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
     const { tile } = cadTerrain;
@@ -201,7 +208,8 @@ export function GeoSceneCanvas({
         attributes: {
           positions: { value: cadMesh.positions, size: 3 },
           normals: { value: cadMesh.normals, size: 3 },
-          ...(cadTerrain.imagery ? { texCoords: { value: cadMesh.texCoords, size: 2 } }
+          ...(cadTerrain.imagery
+            ? { texCoords: { value: cadMesh.texCoords, size: 2 } }
             : { colors: { value: cadMesh.colors, size: 4 } }),
         },
         indices: { value: cadMesh.indices, size: 1 },
@@ -272,7 +280,8 @@ export function GeoSceneCanvas({
           layer?: { props?: Record<string, unknown> } | null;
           object?: { properties?: Record<string, unknown> } | null;
         }) => {
-          const projectLayer = info.layer?.props?.geoProjectLayer as ResolvedProjectLayer | undefined;
+          const projectLayer = info.layer?.props?.geoProjectLayer as
+            ResolvedProjectLayer | undefined;
           if (!projectLayer || !info.object) return null;
           return projectLayerTooltip(projectLayer, info.object.properties);
         },
@@ -281,7 +290,13 @@ export function GeoSceneCanvas({
       overlayRef.current = overlay;
       if (project?.bbox) {
         const [w, so, e, n] = project.bbox;
-        map.fitBounds([[w, so], [e, n]], { padding: 45, ...projectCamera(view), duration: 0 });
+        map.fitBounds(
+          [
+            [w, so],
+            [e, n],
+          ],
+          { padding: 45, ...projectCamera(view), duration: 0 },
+        );
       }
       syncSnapshotViewState();
       setReady(true);
@@ -311,7 +326,10 @@ export function GeoSceneCanvas({
 
   useEffect(() => {
     if (!ready || !mapRef.current) return;
-    mapRef.current.easeTo({ ...projectCamera(view), duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500 });
+    mapRef.current.easeTo({
+      ...projectCamera(view),
+      duration: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 500,
+    });
   }, [ready, view]);
 
   useEffect(() => {
@@ -429,7 +447,9 @@ export function GeoSceneCanvas({
       geology_wireframes: wireframeCount > 0,
     };
     const rendered = sceneBindingsForMode(mode)
-      .filter((binding) => visibleLayerIds.has(binding.canonicalId) && availableBindings[binding.key])
+      .filter(
+        (binding) => visibleLayerIds.has(binding.canonicalId) && availableBindings[binding.key],
+      )
       .map((binding) => binding.canonicalId as string);
     const projectIds =
       mode === "resource"
@@ -438,9 +458,21 @@ export function GeoSceneCanvas({
     return Array.from(new Set(["basemap.esri_imagery", ...rendered, ...projectIds]))
       .sort()
       .join(",");
-  }, [mode, visibleLayerIds, resolvedProjectLayers, terrainVisible, targetsLayer, satAnomaliesLayer,
-    completedCollarCount, completedTrajectoryCount, proposedCollarCount, proposedTrajectoryCount,
-    interceptCount, anomaliesLayer, wireframeCount]);
+  }, [
+    mode,
+    visibleLayerIds,
+    resolvedProjectLayers,
+    terrainVisible,
+    targetsLayer,
+    satAnomaliesLayer,
+    completedCollarCount,
+    completedTrajectoryCount,
+    proposedCollarCount,
+    proposedTrajectoryCount,
+    interceptCount,
+    anomaliesLayer,
+    wireframeCount,
+  ]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
     [filters?.campaignId, filters?.highGradeOnly, filters?.timeCursor],
@@ -457,9 +489,13 @@ export function GeoSceneCanvas({
       data-geo-filters={filterManifest}
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
-      data-geo-terrain-source={cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"}
+      data-geo-terrain-source={
+        cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"
+      }
     >
-      <div className="absolute inset-0"><div ref={mapDiv} className="h-full w-full" /></div>
+      <div className="absolute inset-0">
+        <div ref={mapDiv} className="h-full w-full" />
+      </div>
       {!ready && (
         <div className="absolute inset-0 flex items-center justify-center bg-bg-panel/80 backdrop-blur">
           <div className="flex items-center gap-2 text-xs font-mono text-muted-foreground">
@@ -470,9 +506,15 @@ export function GeoSceneCanvas({
       )}
       {cadTerrainLayer && cadTerrain && (
         <details className="absolute bottom-12 right-3 z-10 max-w-[min(24rem,calc(100%-1.5rem))] max-h-[35%] overflow-auto rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
-          <summary className="cursor-pointer font-semibold text-foreground">Relieve CAD · DERIVADO de curvas DECLARADAS</summary>
+          <summary className="cursor-pointer font-semibold text-foreground">
+            Relieve CAD · DERIVADO de curvas DECLARADAS
+          </summary>
           <span className="block">{cadTerrain.notice}</span>
-          {cadTerrain.imagery && <span className="block mt-1">{cadTerrain.imagery.attribution} · {cadTerrain.imagery.notice}</span>}
+          {cadTerrain.imagery && (
+            <span className="block mt-1">
+              {cadTerrain.imagery.attribution} · {cadTerrain.imagery.notice}
+            </span>
+          )}
         </details>
       )}
       <div className="absolute bottom-3 right-3 z-10 rounded border border-border bg-bg-secondary/90 px-2 py-1 font-mono text-[10px] text-muted-foreground backdrop-blur">

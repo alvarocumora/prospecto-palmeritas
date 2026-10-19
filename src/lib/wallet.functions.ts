@@ -102,7 +102,9 @@ export const getMyWallet = createServerFn({ method: "GET" })
     const [{ data: t }, { data: pos }] = await Promise.all([
       supabase
         .from("investment_tickets")
-        .select("id, ticket_code, spv_id, amount, currency, shares_allocated, status, signed_at, created_at")
+        .select(
+          "id, ticket_code, spv_id, amount, currency, shares_allocated, status, signed_at, created_at",
+        )
         .eq("investor_user_id", userId)
         .order("created_at", { ascending: false }),
       supabase

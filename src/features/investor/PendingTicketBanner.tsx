@@ -20,7 +20,10 @@ export function PendingTicketBanner() {
           Completa tu perfil (3 pasos) y emite el ticket desde la ficha del proyecto.
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-xs font-mono">
-          <Link to="/dashboard" className="rounded border border-border px-3 py-1.5 hover:border-gold/60">
+          <Link
+            to="/dashboard"
+            className="rounded border border-border px-3 py-1.5 hover:border-gold/60"
+          >
             1 · Completar perfil
           </Link>
           <Link

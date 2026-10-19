@@ -28,8 +28,12 @@ export function InvestorWallet() {
   const [busy, setBusy] = useState(false);
   const { usdClp } = useCurrency();
   useEffect(() => {
-    getMyWallet().then(setW).catch(() => setW(null));
-    getPublicRounds().then(setRounds).catch(() => setRounds([]));
+    getMyWallet()
+      .then(setW)
+      .catch(() => setW(null));
+    getPublicRounds()
+      .then(setRounds)
+      .catch(() => setRounds([]));
   }, []);
   const clp = (n: number) =>
     usdClp ? `≈ CLP ${Math.round(n * usdClp).toLocaleString("es-CL")}` : undefined;
@@ -71,9 +75,17 @@ export function InvestorWallet() {
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-hairline">
-        <Kpi label="Capital en posiciones" value={usd(w?.totals.invested ?? 0)} note={clp(w?.totals.invested ?? 0)} />
+        <Kpi
+          label="Capital en posiciones"
+          value={usd(w?.totals.invested ?? 0)}
+          note={clp(w?.totals.invested ?? 0)}
+        />
         <Kpi label="Participaciones" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
-        <Kpi label="Órdenes en curso" value={usd(w?.totals.pending ?? 0)} note={clp(w?.totals.pending ?? 0)} />
+        <Kpi
+          label="Órdenes en curso"
+          value={usd(w?.totals.pending ?? 0)}
+          note={clp(w?.totals.pending ?? 0)}
+        />
       </div>
 
       <div className="p-5">
@@ -96,13 +108,20 @@ export function InvestorWallet() {
                   <span className="text-[11px] text-content-muted">Explotación</span>
                 </div>
                 <div className="mt-2 font-serif text-lg">{p.project}</div>
-                <div className="mt-2 font-serif text-2xl">{p.shares.toLocaleString("es-CL")} acciones</div>
+                <div className="mt-2 font-serif text-2xl">
+                  {p.shares.toLocaleString("es-CL")} acciones
+                </div>
                 <div className="text-xs text-content-muted">
                   {usd(p.amount_paid)}
                   {p.pctOfSpv != null ? ` · ${p.pctOfSpv.toFixed(3)} % de la SPV` : ""}
                 </div>
                 {p.document_url && (
-                  <a href={p.document_url} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1 text-xs text-accent-brand hover:underline">
+                  <a
+                    href={p.document_url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
+                  >
                     <FileText className="w-3.5 h-3.5" /> Certificado
                   </a>
                 )}
@@ -123,7 +142,9 @@ export function InvestorWallet() {
                   <li key={t.id} className="p-3">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
                       <span>
-                        <span className="font-mono text-xs text-content-muted mr-2">{t.ticket_code}</span>
+                        <span className="font-mono text-xs text-content-muted mr-2">
+                          {t.ticket_code}
+                        </span>
                         {t.project} · {usd(t.amount)}
                       </span>
                       <span className="text-xs inline-flex items-center gap-1 text-accent-brand">
@@ -133,7 +154,10 @@ export function InvestorWallet() {
                     {idx >= 0 && (
                       <div className="mt-2 grid grid-cols-5 gap-1">
                         {STAGES.map((s, i) => (
-                          <div key={s} className={`h-1 ${i <= idx ? "bg-accent-brand" : "bg-hairline"}`} />
+                          <div
+                            key={s}
+                            className={`h-1 ${i <= idx ? "bg-accent-brand" : "bg-hairline"}`}
+                          />
                         ))}
                       </div>
                     )}
@@ -154,7 +178,12 @@ export function InvestorWallet() {
                 <div key={r.code} className="border border-hairline p-4">
                   <div className="flex items-center justify-between">
                     <span className="font-serif text-lg">{r.name}</span>
-                    <Link to="/terminal/$slug" params={{ slug: r.slug }} search={{ tab: "mapa" }} className="text-xs text-accent-brand hover:underline">
+                    <Link
+                      to="/terminal/$slug"
+                      params={{ slug: r.slug }}
+                      search={{ tab: "mapa" }}
+                      className="text-xs text-accent-brand hover:underline"
+                    >
                       Ver proyecto
                     </Link>
                   </div>

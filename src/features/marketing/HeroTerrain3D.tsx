@@ -52,7 +52,8 @@ function TerrainMesh({ tile, texture }: { tile: TerrainTile; texture: THREE.Text
       const src = g.index!.array;
       const keep: number[] = [];
       for (let i = 0; i < src.length; i += 3)
-        if (mask[src[i]] && mask[src[i + 1]] && mask[src[i + 2]]) keep.push(src[i], src[i + 1], src[i + 2]);
+        if (mask[src[i]] && mask[src[i + 1]] && mask[src[i + 2]])
+          keep.push(src[i], src[i + 1], src[i + 2]);
       g.setIndex(keep);
     }
     g.computeVertexNormals();
@@ -93,7 +94,12 @@ export default function HeroTerrain3D() {
   useEffect(() => {
     let cancelled = false;
     loadImageDrape(
-      { url: satelliteAsset.url, bbox: satelliteMetadata.bbox, attribution: satelliteMetadata.attribution, source: satelliteMetadata.source },
+      {
+        url: satelliteAsset.url,
+        bbox: satelliteMetadata.bbox,
+        attribution: satelliteMetadata.attribution,
+        source: satelliteMetadata.source,
+      },
       cholquiCadTerrain,
     )
       .then((t) => !cancelled && setTexture(t))
@@ -114,16 +120,29 @@ export default function HeroTerrain3D() {
         <Canvas
           key={project}
           dpr={[1, 1.5]}
-          camera={{ position: [extent * 0.55, extent * 0.42, extent * 0.62], fov: 40, near: 10, far: extent * 6 }}
+          camera={{
+            position: [extent * 0.55, extent * 0.42, extent * 0.62],
+            fov: 40,
+            near: 10,
+            far: extent * 6,
+          }}
         >
           <ambientLight intensity={0.7} />
           <directionalLight position={[extent, extent, extent * 0.3]} intensity={1.6} />
           <TerrainMesh tile={tile} texture={project === "cholqui" ? texture : null} />
-          <OrbitControls autoRotate autoRotateSpeed={0.4} enableZoom={false} enablePan={false} maxPolarAngle={Math.PI / 2.3} />
+          <OrbitControls
+            autoRotate
+            autoRotateSpeed={0.4}
+            enableZoom={false}
+            enablePan={false}
+            maxPolarAngle={Math.PI / 2.3}
+          />
         </Canvas>
       ) : (
         <div className="flex h-full items-center justify-center font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
-          {losVerdes.isError || losVerdes.data ? "Relieve de Los Verdes no disponible ahora" : "Cargando relieve…"}
+          {losVerdes.isError || losVerdes.data
+            ? "Relieve de Los Verdes no disponible ahora"
+            : "Cargando relieve…"}
         </div>
       )}
       <div className="absolute bottom-4 right-4 left-4 flex flex-wrap items-end justify-between gap-3 pointer-events-none">

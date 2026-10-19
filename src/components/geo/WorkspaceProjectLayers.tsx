@@ -16,8 +16,11 @@ import type { ProjectView } from "@/lib/projects/navigation";
 
 export function WorkspaceProjectLayers({ project, view }: { project: Project; view: ProjectView }) {
   const slug = getPublicProjectById(project.id)?.slug;
-  return slug ? <UnifiedProjectScene slug={slug} view={view} />
-    : <PortfolioLayers project={project} view={view} unified />;
+  return slug ? (
+    <UnifiedProjectScene slug={slug} view={view} />
+  ) : (
+    <PortfolioLayers project={project} view={view} unified />
+  );
 }
 
 export function PortfolioLayers({
@@ -129,9 +132,14 @@ export function PortfolioLayers({
       <p className="p-4 text-content-subtle">No fue posible consultar la cartera de concesiones.</p>
     );
   const center = { lat: project.center_lat, lng: project.center_lng };
-  if (unified || view === "3d") return <ProjectSceneFrame
-    project={{ id: project.id, name: project.name, center: evidenceBundle.center }}
-    layers={bundleSceneLayers(evidenceBundle)} view={view} />;
+  if (unified || view === "3d")
+    return (
+      <ProjectSceneFrame
+        project={{ id: project.id, name: project.name, center: evidenceBundle.center }}
+        layers={bundleSceneLayers(evidenceBundle)}
+        view={view}
+      />
+    );
   return (
     <ProjectMasterViewer
       onMapReady={onMapReady}

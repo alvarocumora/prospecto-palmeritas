@@ -238,8 +238,10 @@ function MapaTab({
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando programa" />}>
           <div className="mt-6 space-y-6">
-            <ProjectDocsMenu label="Exportar mapas e informe"
-              build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()} />
+            <ProjectDocsMenu
+              label="Exportar mapas e informe"
+              build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()}
+            />
             <CholquiTargetsSummary />
             <CholquiFieldProgramPanel />
           </div>
@@ -247,7 +249,10 @@ function MapaTab({
       )}
       {project.slug === "nahuelbuta" && (
         <Suspense fallback={<Loading label="Cargando antecedentes" />}>
-          <div className="mt-6 space-y-6"><NahuelbutaSatellitePanel /><NahuelbutaTenurePanel /></div>
+          <div className="mt-6 space-y-6">
+            <NahuelbutaSatellitePanel />
+            <NahuelbutaTenurePanel />
+          </div>
         </Suspense>
       )}
     </>
@@ -260,11 +265,19 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
       <div className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded">
         {(["2d", "3d"] as const).map((key) => {
           const Icon = key === "2d" ? MapIcon : Box;
-          return <BrandButton key={key} type="button" size="sm"
-            variant={view === key ? "primary" : "ghost"}
-            aria-pressed={view === key} onClick={() => onChange(key)}>
-            <Icon />{key === "2d" ? "Planta" : "Perspectiva"}
-          </BrandButton>;
+          return (
+            <BrandButton
+              key={key}
+              type="button"
+              size="sm"
+              variant={view === key ? "primary" : "ghost"}
+              aria-pressed={view === key}
+              onClick={() => onChange(key)}
+            >
+              <Icon />
+              {key === "2d" ? "Planta" : "Perspectiva"}
+            </BrandButton>
+          );
         })}
       </div>
     </div>

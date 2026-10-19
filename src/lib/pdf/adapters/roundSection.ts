@@ -18,7 +18,7 @@ export function investmentRoundSection(o: { legalName: string; rut?: string }): 
           ["Sociedad", o.rut ? `${o.legalName} · RUT ${o.rut}` : o.legalName],
           ["Meta de la ronda", "USD 1.500.000"],
           ["Acciones ofrecidas", "15.000 a USD 100 por acción"],
-          ["Ticket mínimo", "USD 25.000"],
+          ["Ticket mínimo", "USD 15.000"],
         ],
       },
       {

@@ -1,8 +1,18 @@
 // Ticket simulado en la landing, guardado en el navegador hasta que el
 // inversionista se registre y aterrice en Mis inversiones.
-export const ROUND = { target: 1_500_000, shares: 15_000, sharePrice: 100, minTicket: 15_000 } as const;
+export const ROUND = {
+  target: 1_500_000,
+  shares: 15_000,
+  sharePrice: 100,
+  minTicket: 15_000,
+} as const;
 
-export type PendingTicket = { slug: "cholqui" | "losverdes"; amount: number; shares: number; at: string };
+export type PendingTicket = {
+  slug: "cholqui" | "losverdes";
+  amount: number;
+  shares: number;
+  at: string;
+};
 
 const KEY = "gc-pending-ticket";
 

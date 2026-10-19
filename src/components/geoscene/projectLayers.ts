@@ -31,9 +31,16 @@ export type GeoSceneProject = {
    * CAD-derived terrain. Replaces the global DEM inside the scene (never fused),
    * rendered only where the coverage mask is supported.
    */
-  cadTerrain?: { tile: CadTerrainTile; notice: string; imagery?: {
-    url: string; bbox: [number, number, number, number]; attribution: string; notice: string;
-  } };
+  cadTerrain?: {
+    tile: CadTerrainTile;
+    notice: string;
+    imagery?: {
+      url: string;
+      bbox: [number, number, number, number];
+      attribution: string;
+      notice: string;
+    };
+  };
 };
 
 export type ResolvedProjectLayer = GeoSceneProjectLayer & { definition: GeoLayerDefinition };

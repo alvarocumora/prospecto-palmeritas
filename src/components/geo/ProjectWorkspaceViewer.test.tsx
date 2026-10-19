@@ -45,7 +45,10 @@ describe("project workspace isolation", () => {
     expect(screen.getByTestId("scene")).toBeInTheDocument();
     expect(screen.queryByTestId("map")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Planta" })).toHaveAttribute("aria-pressed", "false");
-    expect(screen.getByRole("button", { name: "Perspectiva" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByRole("button", { name: "Perspectiva" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 
   it("can leave mode selection to the project section navigation", () => {

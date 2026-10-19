@@ -38,7 +38,19 @@ export const Route = createFileRoute("/proyectos")({
 
 // Las cards aterrizan directo en el TERMINAL del activo (mapa, tesis,
 // simulador y data room en una sola pantalla, sin saltos intermedios).
-const SHOWCASE: Array<{code:string;slug:"palmeras"|"losverdes"|"cholqui"|"nahuelbuta";name:string;region:string;commodity:string;image:string;imageSource?:string;coords?:string;stage:string;stats:string[][];bullets:string[]}> = [
+const SHOWCASE: Array<{
+  code: string;
+  slug: "palmeras" | "losverdes" | "cholqui" | "nahuelbuta";
+  name: string;
+  region: string;
+  commodity: string;
+  image: string;
+  imageSource?: string;
+  coords?: string;
+  stage: string;
+  stats: string[][];
+  bullets: string[];
+}> = [
   {
     code: "PALMERAS",
     slug: "palmeras" as const,

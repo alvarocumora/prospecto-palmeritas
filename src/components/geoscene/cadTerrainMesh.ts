@@ -19,7 +19,10 @@ export type CadTerrainMesh = {
 const LOW: [number, number, number] = [0.42, 0.47, 0.36];
 const HIGH: [number, number, number] = [0.86, 0.8, 0.68];
 
-export function buildCadTerrainMesh(tile: CadTerrainTile, imageBbox?: [number, number, number, number]): CadTerrainMesh {
+export function buildCadTerrainMesh(
+  tile: CadTerrainTile,
+  imageBbox?: [number, number, number, number],
+): CadTerrainMesh {
   const { size, extentMeters, heights, validMask, referenceElevationM } = tile;
   const step = extentMeters / (size - 1);
   const half = extentMeters / 2;
@@ -43,7 +46,14 @@ export function buildCadTerrainMesh(tile: CadTerrainTile, imageBbox?: [number, n
       colors[i * 4 + 3] = 1;
       if (imageBbox) {
         const [west, south, east, north] = imageBbox;
-        const [lng, lat] = terrainGridCoordinate(Number(tile.centerLat), Number(tile.centerLng), size, extentMeters, col, row);
+        const [lng, lat] = terrainGridCoordinate(
+          Number(tile.centerLat),
+          Number(tile.centerLng),
+          size,
+          extentMeters,
+          col,
+          row,
+        );
         texCoords[i * 2] = (lng - west) / (east - west);
         texCoords[i * 2 + 1] = (north - lat) / (north - south);
       }

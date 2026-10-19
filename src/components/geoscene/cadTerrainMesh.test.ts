@@ -18,7 +18,9 @@ const tile = (mask: boolean[]): CadTerrainTile => ({
 
 describe("CAD terrain mesh for GeoScene3D", () => {
   it("emits only cells fully inside the coverage mask (no extrapolation)", () => {
-    const mesh = buildCadTerrainMesh(tile([true, true, false, true, true, false, false, false, false]));
+    const mesh = buildCadTerrainMesh(
+      tile([true, true, false, true, true, false, false, false, false]),
+    );
     expect(mesh.cellCount).toBe(1);
     expect(mesh.indices.length).toBe(6);
   });

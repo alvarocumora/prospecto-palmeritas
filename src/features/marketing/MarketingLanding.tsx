@@ -45,7 +45,6 @@ export function MarketingLanding() {
 
       <MiningInvestShowcase />
 
-
       {/* 2. INVERSIONISTAS */}
       <section id="colateral" className="border-b border-hairline">
         <div className="max-w-6xl mx-auto px-5 py-16 sm:py-20 grid lg:grid-cols-[1.1fr_1fr] gap-10 items-center">

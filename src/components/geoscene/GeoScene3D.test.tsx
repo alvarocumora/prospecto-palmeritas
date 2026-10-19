@@ -6,7 +6,21 @@ vi.mock("./SceneCopilot", () => ({
   SceneCopilot: () => <div data-testid="scene-copilot" />,
 }));
 vi.mock("./canvas/GeoSceneCanvas", () => ({
-  GeoSceneCanvas: ({ mode, view, visibleLayerIds }: { mode: string; view: string; visibleLayerIds: Set<string> }) => <div data-testid={`deckgl-${mode}`} data-view={view} data-layers={[...visibleLayerIds].join(",")} />,
+  GeoSceneCanvas: ({
+    mode,
+    view,
+    visibleLayerIds,
+  }: {
+    mode: string;
+    view: string;
+    visibleLayerIds: Set<string>;
+  }) => (
+    <div
+      data-testid={`deckgl-${mode}`}
+      data-view={view}
+      data-layers={[...visibleLayerIds].join(",")}
+    />
+  ),
 }));
 
 describe("GeoScene3D", () => {
@@ -28,8 +42,15 @@ describe("GeoScene3D", () => {
     expect(screen.getByText(/Resource mode/i)).toBeInTheDocument();
   });
   it("keeps the same canvas and layer selection when switching planta/perspectiva", async () => {
-    const props = { showModeTabs: false, projectLayers: [{ id: "territory.cadastre" as const,
-      data: { type: "FeatureCollection" as const, features: [] } }] };
+    const props = {
+      showModeTabs: false,
+      projectLayers: [
+        {
+          id: "territory.cadastre" as const,
+          data: { type: "FeatureCollection" as const, features: [] },
+        },
+      ],
+    };
     const { rerender } = render(<GeoScene3D {...props} view="2d" />);
     const canvas = await screen.findByTestId("deckgl-surface");
     fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
@@ -43,17 +64,35 @@ describe("GeoScene3D", () => {
   });
   it("adds asynchronously loaded layers without re-enabling layers the operator disabled", async () => {
     const data = { type: "FeatureCollection" as const, features: [] };
-    const { rerender } = render(<GeoScene3D projectLayers={[{ id: "territory.cadastre", data }]} />);
+    const { rerender } = render(
+      <GeoScene3D projectLayers={[{ id: "territory.cadastre", data }]} />,
+    );
     const canvas = await screen.findByTestId("deckgl-surface");
     fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
     fireEvent.click(screen.getByRole("button", { name: /Catastro SERNAGEOMIN/ }));
-    rerender(<GeoScene3D projectLayers={[{ id: "territory.cadastre", data }, { id: "sampling.assays", data }]} />);
+    rerender(
+      <GeoScene3D
+        projectLayers={[
+          { id: "territory.cadastre", data },
+          { id: "sampling.assays", data },
+        ]}
+      />,
+    );
     await waitFor(() => expect(canvas.getAttribute("data-layers")).toContain("sampling.assays"));
     expect(canvas.getAttribute("data-layers")).not.toContain("territory.cadastre");
   });
   it("loads dense spectral overlays disabled without dropping their controls", async () => {
-    render(<GeoScene3D projectLayers={[{ id: "remote_sensing.hyperspectral", defaultVisible: false,
-      data: { type: "FeatureCollection", features: [] } }]} />);
+    render(
+      <GeoScene3D
+        projectLayers={[
+          {
+            id: "remote_sensing.hyperspectral",
+            defaultVisible: false,
+            data: { type: "FeatureCollection", features: [] },
+          },
+        ]}
+      />,
+    );
     const canvas = await screen.findByTestId("deckgl-surface");
     expect(canvas.getAttribute("data-layers")).not.toContain("remote_sensing.hyperspectral");
     fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));

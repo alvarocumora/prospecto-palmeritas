@@ -74,7 +74,9 @@ export function ProjectWorkspaceViewer({
               {(["2d", "3d"] as const).map((key) => {
                 const Icon = key === "2d" ? MapIcon : Box;
                 return (
-                  <BrandButton size="sm" variant={view === key ? "primary" : "ghost"}
+                  <BrandButton
+                    size="sm"
+                    variant={view === key ? "primary" : "ghost"}
                     key={key}
                     type="button"
                     onClick={() => changeMode(key)}

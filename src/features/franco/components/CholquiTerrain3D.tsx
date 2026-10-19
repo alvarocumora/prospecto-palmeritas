@@ -33,8 +33,10 @@ export function CholquiTerrain3D() {
     <ProjectTerrain3D
       slug="Cholqui"
       projectId="e5360f13-1647-4e44-bb13-c0614e6f39fe"
-      center={{ lat: cholquiCadTerrain.centerLat ?? CHOLQUI.center.lat,
-        lng: cholquiCadTerrain.centerLng ?? CHOLQUI.center.lng }}
+      center={{
+        lat: cholquiCadTerrain.centerLat ?? CHOLQUI.center.lat,
+        lng: cholquiCadTerrain.centerLng ?? CHOLQUI.center.lng,
+      }}
       extentMeters={cholquiCadTerrain.extentMeters}
       demSize={257}
       terrainTile={cholquiCadTerrain}

@@ -30,7 +30,9 @@ export function MiningInvestShowcase() {
   const [rounds, setRounds] = useState<PublicRound[]>([]);
   const [rate, setRate] = useState(15);
   useEffect(() => {
-    getPublicRounds().then(setRounds).catch(() => setRounds([]));
+    getPublicRounds()
+      .then(setRounds)
+      .catch(() => setRounds([]));
   }, []);
   const yearly = (amount * rate) / 100;
 
@@ -64,7 +66,9 @@ export function MiningInvestShowcase() {
                 type="button"
                 onClick={() => setSlug(p.slug)}
                 className={`text-left border p-5 bg-surface transition-colors ${
-                  slug === p.slug ? "border-accent-brand" : "border-hairline hover:border-content-muted"
+                  slug === p.slug
+                    ? "border-accent-brand"
+                    : "border-hairline hover:border-content-muted"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -96,7 +100,8 @@ export function MiningInvestShowcase() {
 
           <div className="border border-hairline bg-surface-2 p-6">
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
-              <Calculator className="w-3.5 h-3.5" /> Simulación · {PROJECTS.find((p) => p.slug === slug)?.name}
+              <Calculator className="w-3.5 h-3.5" /> Simulación ·{" "}
+              {PROJECTS.find((p) => p.slug === slug)?.name}
             </div>
             <label className="block mt-5 text-sm">
               Monto a invertir (USD) · desde {usd(ROUND.minTicket)} (≈ CLP 15 millones)
@@ -171,8 +176,9 @@ export function MiningInvestShowcase() {
               Emitir ticket <ArrowRight className="w-4 h-4" />
             </button>
             <p className="mt-3 text-[11px] text-content-muted leading-relaxed">
-              Simulación referencial: escenario objetivo, no rentabilidad garantizada. No constituye oferta pública; la inversión minera conlleva
-              riesgo de pérdida de capital. La emisión requiere registro, KYC y firma del contrato.
+              Simulación referencial: escenario objetivo, no rentabilidad garantizada. No constituye
+              oferta pública; la inversión minera conlleva riesgo de pérdida de capital. La emisión
+              requiere registro, KYC y firma del contrato.
             </p>
           </div>
         </div>

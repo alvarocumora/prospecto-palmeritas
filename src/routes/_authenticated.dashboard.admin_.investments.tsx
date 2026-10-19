@@ -17,7 +17,11 @@ export const Route = createFileRoute("/_authenticated/dashboard/admin_/investmen
   head: () => ({
     meta: [
       { title: "Admin · Rondas y tickets — Geocapitals" },
-      { name: "description", content: "Configura las rondas de Cholqui y Los Verdes y gestiona los tickets de inversión." },
+      {
+        name: "description",
+        content:
+          "Configura las rondas de Cholqui y Los Verdes y gestiona los tickets de inversión.",
+      },
       { property: "og:title", content: "Admin · Rondas y tickets — Geocapitals" },
       { property: "og:description", content: "Mesa de control de tickets de inversión por SPV." },
       { property: "og:type", content: "website" },
@@ -40,7 +44,10 @@ function AdminInvestmentsPage() {
   return (
     <div data-theme="im-light" className="min-h-screen bg-surface text-content">
       <div className="container mx-auto p-4 md:p-6 max-w-7xl">
-        <Link to="/dashboard/admin" className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content">
+        <Link
+          to="/dashboard/admin"
+          className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
+        >
           <ArrowLeft className="w-3 h-3" /> Admin
         </Link>
         <h1 className="font-display text-2xl md:text-3xl mt-1">Rondas y tickets de inversión</h1>
@@ -104,7 +111,17 @@ function num(v: string): number | null {
   return v.trim() && Number.isFinite(n) && n > 0 ? n : null;
 }
 
-function RoundCard({ code, name, spv, tickets }: { code: string; name: string; spv: RoundSpv | null; tickets: TicketRow[] }) {
+function RoundCard({
+  code,
+  name,
+  spv,
+  tickets,
+}: {
+  code: string;
+  name: string;
+  spv: RoundSpv | null;
+  tickets: TicketRow[];
+}) {
   const qc = useQueryClient();
   const saveFn = useServerFn(saveRoundSettings);
   const [f, setF] = useState({
@@ -143,8 +160,12 @@ function RoundCard({ code, name, spv, tickets }: { code: string; name: string; s
     onError: (e) => toast.error(e instanceof Error ? e.message : "Error"),
   });
   const mine = spv ? tickets.filter((t) => t.spv_id === spv.id) : [];
-  const committed = mine.filter((t) => !["cancelled", "draft"].includes(t.status)).reduce((s, t) => s + Number(t.amount), 0);
-  const settled = mine.filter((t) => t.status === "settled").reduce((s, t) => s + Number(t.amount), 0);
+  const committed = mine
+    .filter((t) => !["cancelled", "draft"].includes(t.status))
+    .reduce((s, t) => s + Number(t.amount), 0);
+  const settled = mine
+    .filter((t) => t.status === "settled")
+    .reduce((s, t) => s + Number(t.amount), 0);
 
   const input = (k: keyof typeof f, label: string, type = "text") => (
     <label className="text-xs text-content-subtle">
@@ -162,15 +183,20 @@ function RoundCard({ code, name, spv, tickets }: { code: string; name: string; s
     <section className="rounded-2xl border border-hairline bg-surface p-5">
       <div className="flex items-start justify-between gap-2">
         <div>
-          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-brand">{code}</div>
+          <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-brand">
+            {code}
+          </div>
           <h3 className="font-display text-lg">{name}</h3>
         </div>
-        <span className={`text-xs rounded px-2 py-0.5 border ${spv?.tickets_open ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}>
+        <span
+          className={`text-xs rounded px-2 py-0.5 border ${spv?.tickets_open ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}
+        >
           {spv ? (spv.tickets_open ? "Ronda abierta" : "Ronda cerrada") : "SPV sin registrar"}
         </span>
       </div>
       <div className="mt-2 text-xs font-mono text-content-subtle">
-        Comprometido {fmtMoney(committed, f.currency)} · Liquidado {fmtMoney(settled, f.currency)} · {mine.length} tickets
+        Comprometido {fmtMoney(committed, f.currency)} · Liquidado {fmtMoney(settled, f.currency)} ·{" "}
+        {mine.length} tickets
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
         {input("legalName", "Razón social SPV")}
@@ -204,7 +230,11 @@ function RoundCard({ code, name, spv, tickets }: { code: string; name: string; s
       </label>
       <div className="mt-3 flex items-center justify-between">
         <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={f.open} onChange={(e) => setF({ ...f, open: e.target.checked })} />
+          <input
+            type="checkbox"
+            checked={f.open}
+            onChange={(e) => setF({ ...f, open: e.target.checked })}
+          />
           Abrir ronda a tickets
         </label>
         <button
@@ -226,7 +256,14 @@ function TicketsTable({
 }: {
   tickets: TicketRow[];
   spvs: RoundSpv[];
-  profiles: Array<{ user_id: string; full_name: string; company_name: string | null; tax_id: string | null; review_status: string; is_accredited: boolean | null }>;
+  profiles: Array<{
+    user_id: string;
+    full_name: string;
+    company_name: string | null;
+    tax_id: string | null;
+    review_status: string;
+    is_accredited: boolean | null;
+  }>;
 }) {
   const qc = useQueryClient();
   const actFn = useServerFn(staffTicketAction);
@@ -250,7 +287,8 @@ function TicketsTable({
     }
   }
 
-  if (!tickets.length) return <p className="mt-4 text-sm text-content-subtle">Sin tickets en esta vista.</p>;
+  if (!tickets.length)
+    return <p className="mt-4 text-sm text-content-subtle">Sin tickets en esta vista.</p>;
 
   return (
     <div className="mt-3 overflow-x-auto rounded-2xl border border-hairline">
@@ -277,25 +315,43 @@ function TicketsTable({
                 <td className="p-3">{spv?.project_code ?? "—"}</td>
                 <td className="p-3">
                   <div>{p?.full_name ?? "Sin perfil"}</div>
-                  <div className="text-xs text-content-subtle">{[p?.company_name, p?.tax_id].filter(Boolean).join(" · ")}</div>
+                  <div className="text-xs text-content-subtle">
+                    {[p?.company_name, p?.tax_id].filter(Boolean).join(" · ")}
+                  </div>
                 </td>
-                <td className="p-3 text-xs">{p?.review_status === "approved" ? "Aprobado" : p?.review_status === "rejected" ? "Rechazado" : "Pendiente"}</td>
+                <td className="p-3 text-xs">
+                  {p?.review_status === "approved"
+                    ? "Aprobado"
+                    : p?.review_status === "rejected"
+                      ? "Rechazado"
+                      : "Pendiente"}
+                </td>
                 <td className="p-3 font-mono">
                   {fmtMoney(t.amount, t.currency)}
-                  <div className="text-xs text-content-subtle">{Number(t.shares_allocated ?? 0).toLocaleString("es-CL")} acc.</div>
+                  <div className="text-xs text-content-subtle">
+                    {Number(t.shares_allocated ?? 0).toLocaleString("es-CL")} acc.
+                  </div>
                 </td>
                 <td className="p-3 text-xs">{TICKET_STATUS_LABEL[t.status] ?? t.status}</td>
-                <td className="p-3 text-xs break-all max-w-[180px]">{t.payment_proof_url ?? "—"}</td>
+                <td className="p-3 text-xs break-all max-w-[180px]">
+                  {t.payment_proof_url ?? "—"}
+                </td>
                 <td className="p-3">
                   <div className="flex flex-wrap gap-1.5">
                     {t.status === "pending_kyc" && (
-                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "issue_contract")}>Emitir contrato</Btn>
+                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "issue_contract")}>
+                        Emitir contrato
+                      </Btn>
                     )}
                     {t.status === "payment_pending" && t.payment_proof_url && (
-                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "settle")}>Confirmar pago y liquidar</Btn>
+                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "settle")}>
+                        Confirmar pago y liquidar
+                      </Btn>
                     )}
                     {!["settled", "cancelled"].includes(t.status) && (
-                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "cancel")} muted>Cancelar</Btn>
+                      <Btn disabled={busy === t.id} onClick={() => act(t.id, "cancel")} muted>
+                        Cancelar
+                      </Btn>
                     )}
                   </div>
                 </td>
@@ -308,7 +364,17 @@ function TicketsTable({
   );
 }
 
-function Btn({ children, onClick, disabled, muted }: { children: React.ReactNode; onClick: () => void; disabled?: boolean; muted?: boolean }) {
+function Btn({
+  children,
+  onClick,
+  disabled,
+  muted,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+  disabled?: boolean;
+  muted?: boolean;
+}) {
   return (
     <button
       disabled={disabled}

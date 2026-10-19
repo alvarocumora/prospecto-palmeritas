@@ -15,9 +15,21 @@ export function RoundProgress({ round, compact }: { round: PublicRound; compact?
           de {usd(round.target)} · {committedPct.toFixed(1)} %
         </span>
       </div>
-      <div className="mt-2 h-2 w-full bg-hairline relative overflow-hidden" role="progressbar" aria-valuenow={Math.round(committedPct)} aria-valuemin={0} aria-valuemax={100}>
-        <div className="absolute inset-y-0 left-0 bg-accent-brand/35" style={{ width: `${committedPct}%` }} />
-        <div className="absolute inset-y-0 left-0 bg-accent-brand" style={{ width: `${settledPct}%` }} />
+      <div
+        className="mt-2 h-2 w-full bg-hairline relative overflow-hidden"
+        role="progressbar"
+        aria-valuenow={Math.round(committedPct)}
+        aria-valuemin={0}
+        aria-valuemax={100}
+      >
+        <div
+          className="absolute inset-y-0 left-0 bg-accent-brand/35"
+          style={{ width: `${committedPct}%` }}
+        />
+        <div
+          className="absolute inset-y-0 left-0 bg-accent-brand"
+          style={{ width: `${settledPct}%` }}
+        />
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-[11px] text-content-muted">
         <span>{round.investors} tickets</span>

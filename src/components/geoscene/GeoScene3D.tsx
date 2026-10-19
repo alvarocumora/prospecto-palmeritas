@@ -40,22 +40,26 @@ export function GeoScene3D({
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(
-    () => {
-      const ids = initialGeoSceneLayerIds(initialPreset);
-      for (const layer of projectLayers ?? []) {
-        if (layer.defaultVisible === false) ids.delete(layer.id);
-        else ids.add(layer.id);
-      }
-      return ids;
-    },
-  );
+  const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
+    const ids = initialGeoSceneLayerIds(initialPreset);
+    for (const layer of projectLayers ?? []) {
+      if (layer.defaultVisible === false) ids.delete(layer.id);
+      else ids.add(layer.id);
+    }
+    return ids;
+  });
   const seenProjectLayers = useRef(new Set(projectLayers?.map((layer) => layer.id)));
   useEffect(() => {
     const added = (projectLayers ?? []).filter((layer) => !seenProjectLayers.current.has(layer.id));
     if (!added.length) return;
     for (const layer of added) seenProjectLayers.current.add(layer.id);
-    setEnabledLayerIds((current) => new Set([...current, ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id)]));
+    setEnabledLayerIds(
+      (current) =>
+        new Set([
+          ...current,
+          ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id),
+        ]),
+    );
   }, [projectLayers]);
 
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
@@ -79,13 +83,13 @@ export function GeoScene3D({
   return (
     <div className={`relative h-full w-full bg-bg-panel ${className}`}>
       {/* Top bar */}
-      {(
+      {
         <div className="absolute top-3 right-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-end items-center gap-2">
           <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1">
             <Sparkles className="w-3 h-3 text-gold" />
             GeoScene3D · {meta.sub}
           </div>
-          {(
+          {
             <BrandButton
               type="button"
               size="sm"
@@ -98,10 +102,10 @@ export function GeoScene3D({
             >
               <Layers3 className="h-3 w-3" /> capas
             </BrandButton>
-          )}
+          }
           {showModeTabs && <ModeTabs mode={mode} onChange={setInternalMode} />}
         </div>
-      )}
+      }
 
       {/* Scene */}
       <div className="absolute inset-0">
@@ -120,7 +124,7 @@ export function GeoScene3D({
         </Suspense>
       </div>
 
-      {(
+      {
         <SceneLayerPanel
           mode={mode}
           enabled={enabledLayerIds}
@@ -129,7 +133,7 @@ export function GeoScene3D({
           onToggle={toggleCanonicalLayer}
           extraLayerIds={projectLayers?.map((layer) => layer.id)}
         />
-      )}
+      }
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (

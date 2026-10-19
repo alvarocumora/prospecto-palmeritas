@@ -12,7 +12,8 @@ describe("Cholqui declared CAD terrain", () => {
     expect(grid.contourCount).toBe(892);
     expect(cholquiCadTerrain.heights).toHaveLength(grid.size * grid.size);
     expect(cholquiCadTerrain.validMask.filter(Boolean)).toHaveLength(grid.validNodeCount);
-    const elevations = grid.heights.filter((height): height is number => height != null)
+    const elevations = grid.heights
+      .filter((height): height is number => height != null)
       .map((height) => height + grid.referenceElevationM);
     expect(Math.min(...elevations)).toBeGreaterThanOrEqual(grid.sourceMinElevationM - 0.001);
     expect(Math.max(...elevations)).toBeLessThanOrEqual(grid.sourceMaxElevationM + 0.001);
@@ -22,11 +23,21 @@ describe("Cholqui declared CAD terrain", () => {
     let supported = 0;
     for (let row = 0; row < grid.size - 1; row++) {
       for (let column = 0; column < grid.size - 1; column++) {
-        const coordinate = terrainGridCoordinate(grid.centerLat, grid.centerLng, grid.size,
-          grid.extentMeters, column + 0.5, row + 0.5);
+        const coordinate = terrainGridCoordinate(
+          grid.centerLat,
+          grid.centerLng,
+          grid.size,
+          grid.extentMeters,
+          column + 0.5,
+          row + 0.5,
+        );
         const point = projectTerrainPoint(cholquiCadTerrain, ...coordinate);
-        const indices = [row * grid.size + column, row * grid.size + column + 1,
-          (row + 1) * grid.size + column, (row + 1) * grid.size + column + 1];
+        const indices = [
+          row * grid.size + column,
+          row * grid.size + column + 1,
+          (row + 1) * grid.size + column,
+          (row + 1) * grid.size + column + 1,
+        ];
         if (indices.every((index) => cholquiCadTerrain.validMask[index])) {
           expect(point).not.toBeNull();
           supported++;
@@ -34,6 +45,8 @@ describe("Cholqui declared CAD terrain", () => {
       }
     }
     expect(supported).toBeGreaterThan(20000);
-    expect(projectTerrainPoint({ ...cholquiCadTerrain, validMask: [] }, grid.centerLng, grid.centerLat)).toBeNull();
+    expect(
+      projectTerrainPoint({ ...cholquiCadTerrain, validMask: [] }, grid.centerLng, grid.centerLat),
+    ).toBeNull();
   });
 });

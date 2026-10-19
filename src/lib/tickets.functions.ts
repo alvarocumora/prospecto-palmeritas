@@ -208,9 +208,7 @@ export const listTicketsAdmin = createServerFn({ method: "GET" })
           .in("spv_id", ids)
           .order("created_at", { ascending: false })
       : { data: [] };
-    const userIds = Array.from(
-      new Set((tickets ?? []).map((t: TicketRow) => t.investor_user_id)),
-    );
+    const userIds = Array.from(new Set((tickets ?? []).map((t: TicketRow) => t.investor_user_id)));
     const { data: profiles } = userIds.length
       ? await supabase
           .from("investor_profiles")

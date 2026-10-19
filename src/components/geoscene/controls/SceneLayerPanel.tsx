@@ -1,6 +1,11 @@
 import { Layers3, X } from "lucide-react";
 import { EvidenceBadge } from "@/components/ui-system";
-import { getGeoLayer, type CanonicalGeoLayerId, type GeoLayerDefinition, type GeoLayerDomain } from "@/lib/geospatial/layerRegistry";
+import {
+  getGeoLayer,
+  type CanonicalGeoLayerId,
+  type GeoLayerDefinition,
+  type GeoLayerDomain,
+} from "@/lib/geospatial/layerRegistry";
 import { sceneDefinitionsForMode } from "../layerPolicy";
 import type { GeoSceneMode } from "../types";
 import { BrandButton } from "@/components/brand";
@@ -34,9 +39,12 @@ export function SceneLayerPanel({
   if (!open) return null;
 
   const base = sceneDefinitionsForMode(mode);
-  const extras = mode === "resource" ? [] : (extraLayerIds ?? [])
-    .map((id) => getGeoLayer(id))
-    .filter((d): d is GeoLayerDefinition => d != null && !base.some((b) => b.id === d.id));
+  const extras =
+    mode === "resource"
+      ? []
+      : (extraLayerIds ?? [])
+          .map((id) => getGeoLayer(id))
+          .filter((d): d is GeoLayerDefinition => d != null && !base.some((b) => b.id === d.id));
   const definitions = [...extras, ...base];
   const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
 
@@ -52,7 +60,9 @@ export function SceneLayerPanel({
             GeoScene3D · {mode}
           </div>
         </div>
-        <BrandButton variant="ghost" size="sm"
+        <BrandButton
+          variant="ghost"
+          size="sm"
           type="button"
           onClick={onClose}
           className="text-muted-foreground hover:text-foreground"
@@ -73,7 +83,9 @@ export function SceneLayerPanel({
               .map((definition) => {
                 const active = enabled.has(definition.id);
                 return (
-                  <BrandButton variant="ghost" size="sm"
+                  <BrandButton
+                    variant="ghost"
+                    size="sm"
                     type="button"
                     key={definition.id}
                     onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
