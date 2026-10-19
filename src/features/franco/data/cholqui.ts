@@ -717,7 +717,7 @@ export const CHOLQUI_ROUND = {
   valuationHighUsd: 6_000_000,
   valuationMethod: "Comparables + flujo a tarifa ENAMI 1,5–2,5 % Cu soluble",
   roundSizeUsd: 1_000_000,
-  minTicketUsd: 25_000,
+  minTicketUsd: 15_000,
   instrument: "Equity SpA",
   equityOfferedPct: 15,
   horizonYears: 4,
