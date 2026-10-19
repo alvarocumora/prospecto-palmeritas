@@ -7,6 +7,8 @@ import { z } from "zod";
 import { satelliteEvidence, validSatelliteBbox } from "@/lib/satellite/evidence";
 import { requireCatastroRole } from "@/lib/access/roleMiddleware";
 import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import { stacItemToDatasetDraft } from "@/services/geoscience/stacAdapter";
+import type { StacItem as RawStacItem } from "@/types/stac";
 
 type HyperRow = Tables<"hyperspectral_products">;
 type InsarRow = Tables<"insar_displacement">;
@@ -209,9 +211,11 @@ export const searchStac = createServerFn({ method: "POST" })
     }
 
     let items: StacItem[] = [];
+    let rawFeatures: unknown[] = [];
     let searchError: string | null = null;
     try {
       const { features, error } = await fetchStacFeatures(cfg.stac, body, data.limit);
+      rawFeatures = features;
       items = features.map((f) => normalizeFeature(f, cfg.id));
       searchError = error;
     } catch (err) {
@@ -252,6 +256,33 @@ export const searchStac = createServerFn({ method: "POST" })
         ignoreDuplicates: true,
       });
       if (error) console.warn("stac_acquisitions cache failed:", error.message);
+    }
+
+    // Cross-link into the unified geoscience_datasets registry (best effort).
+    // stac_acquisitions keeps the raw scene cache above; this registers the
+    // same scenes with the shared provenance/QA shape other domains use.
+    if (rawFeatures.length > 0) {
+      const drafts = rawFeatures.slice(0, 50).flatMap((f) => {
+        try {
+          const rawItem = f as RawStacItem;
+          return [
+            stacItemToDatasetDraft(
+              { ...rawItem, collection: rawItem.collection ?? cfg.id },
+              data.projectId,
+            ),
+          ];
+        } catch (err) {
+          console.warn("stacItemToDatasetDraft failed:", (err as Error).message);
+          return [];
+        }
+      });
+      if (drafts.length > 0) {
+        const { error } = await supabase.from("geoscience_datasets").upsert(drafts, {
+          onConflict: "project_id,dataset_type,name,version",
+          ignoreDuplicates: true,
+        });
+        if (error) console.warn("geoscience_datasets cross-link failed:", error.message);
+      }
     }
 
     return { items, error: null };
