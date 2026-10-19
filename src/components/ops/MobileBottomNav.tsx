@@ -1,9 +1,10 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Briefcase, Handshake, FileSignature, Menu } from "lucide-react";
+import { LayoutDashboard, Briefcase, Handshake, FileSignature, Menu, Compass, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Slot = {
   to?: string;
+  search?: Record<string, string>;
   icon: typeof LayoutDashboard;
   label: string;
   badge?: number;
@@ -14,11 +15,65 @@ type Slot = {
 export function MobileBottomNav({
   onMoreClick,
   catastroAlerts = 0,
+  variant = "default",
 }: {
   onMoreClick: () => void;
   catastroAlerts?: number;
+  /** "investor": navegación contextual de 4 destinos para rol inversionista. */
+  variant?: "default" | "investor";
 }) {
   const location = useLocation();
+
+  if (variant === "investor") {
+    const slots: Slot[] = [
+      { to: "/dashboard", icon: LayoutDashboard, label: "Inicio" },
+      { to: "/proyectos", icon: Compass, label: "Explorar" },
+      { to: "/dashboard/investments", icon: Briefcase, label: "Portafolio" },
+      {
+        to: "/dashboard/investments",
+        search: { vista: "wallet" },
+        icon: Wallet,
+        label: "Wallet",
+      },
+    ];
+    return (
+      <nav
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-14 bg-surface/95 backdrop-blur border-t border-hairline flex items-stretch"
+        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        role="navigation"
+        aria-label="Navegación del inversionista"
+      >
+        {slots.map((s) => {
+          const Icon = s.icon;
+          const active = location.pathname === s.to;
+          return (
+            <Link
+              key={s.label}
+              to={s.to}
+              search={s.search as never}
+              className="relative flex-1 min-h-[44px] flex flex-col items-center justify-center active:scale-95 transition-transform"
+            >
+              <span
+                className={cn(
+                  "absolute top-0 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full transition-colors",
+                  active ? "bg-accent-brand" : "bg-transparent",
+                )}
+              />
+              <Icon className={cn("w-5 h-5", active ? "text-accent-brand" : "text-content-subtle")} />
+              <span
+                className={cn(
+                  "text-[10px] font-mono mt-0.5",
+                  active ? "text-accent-brand" : "text-content-subtle",
+                )}
+              >
+                {s.label}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
+    );
+  }
 
   // Deals-first: el negocio a un tap; mapa/3D/catastro viven en "Más".
   const slots: Slot[] = [

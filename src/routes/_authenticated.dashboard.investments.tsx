@@ -19,6 +19,8 @@ import { InvestorWallet } from "@/features/investor/InvestorWallet";
 
 export const Route = createFileRoute("/_authenticated/dashboard/investments")({
   head: () => ({ meta: [{ title: "Mis inversiones — Geocapitals" }] }),
+  validateSearch: (s: Record<string, unknown>): { vista?: string } =>
+    typeof s.vista === "string" ? { vista: s.vista } : {},
   component: MyInvestmentsPage,
 });
 
@@ -50,6 +52,12 @@ function MyInvestmentsPage() {
   useEffect(() => {
     void load();
   }, [load]);
+
+  const { vista } = Route.useSearch();
+  useEffect(() => {
+    if (vista !== "wallet") return;
+    document.getElementById("cartola")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [vista, loading]);
 
   return (
     <div className="container mx-auto p-4 md:p-6 max-w-7xl">
