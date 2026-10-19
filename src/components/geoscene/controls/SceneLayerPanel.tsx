@@ -28,6 +28,8 @@ export function SceneLayerPanel({
   onClose,
   onToggle,
   extraLayerIds,
+  opacity,
+  onOpacity,
 }: {
   mode: GeoSceneMode;
   enabled: ReadonlySet<string>;
@@ -35,6 +37,8 @@ export function SceneLayerPanel({
   onClose: () => void;
   onToggle: (id: CanonicalGeoLayerId) => void;
   extraLayerIds?: readonly CanonicalGeoLayerId[];
+  opacity?: Readonly<Record<string, number>>;
+  onOpacity?: (id: string, value: number) => void;
 }) {
   if (!open) return null;
 
@@ -83,11 +87,11 @@ export function SceneLayerPanel({
               .map((definition) => {
                 const active = enabled.has(definition.id);
                 return (
+                  <div key={definition.id} className="space-y-1">
                   <BrandButton
                     variant="ghost"
                     size="sm"
                     type="button"
-                    key={definition.id}
                     onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
                     aria-pressed={active}
                     className={`h-auto w-full block whitespace-normal rounded border p-2 text-left transition-colors ${
@@ -122,6 +126,25 @@ export function SceneLayerPanel({
                       </div>
                     )}
                   </BrandButton>
+                  {active && onOpacity && definition.domain === "remote_sensing" && (
+                    <label className="flex items-center gap-2 px-2 text-[9px] uppercase tracking-wider text-muted-foreground">
+                      Opacidad
+                      <input
+                        type="range"
+                        min={10}
+                        max={100}
+                        step={5}
+                        value={Math.round((opacity?.[definition.id] ?? 1) * 100)}
+                        onChange={(e) => onOpacity(definition.id, Number(e.target.value) / 100)}
+                        aria-label={`Opacidad ${definition.label}`}
+                        className="flex-1 accent-[hsl(var(--primary))]"
+                      />
+                      <span className="w-8 text-right font-mono">
+                        {Math.round((opacity?.[definition.id] ?? 1) * 100)}%
+                      </span>
+                    </label>
+                  )}
+                  </div>
                 );
               })}
           </div>
