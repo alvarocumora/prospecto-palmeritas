@@ -484,7 +484,11 @@ function NationalCatastroMap() {
           syncUrlRef.current();
           void refreshRef.current();
         });
+        const ro = new ResizeObserver(() => map?.resize());
+        ro.observe(mapRef.current);
+        map.once("remove", () => ro.disconnect());
         map.on("load", () => {
+          map!.resize();
           setMapReady(true);
           void refreshRef.current();
         });
