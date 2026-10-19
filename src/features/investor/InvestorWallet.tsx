@@ -5,21 +5,10 @@ import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.fun
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { useCurrency } from "@/lib/currency";
 import { supabase } from "@/integrations/supabase/client";
+import { TICKET_STATUS_LABEL, TICKET_STEPS } from "@/lib/investor/rounds";
 
 type W = Awaited<ReturnType<typeof getMyWallet>>;
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
-
-const STAGES = ["submitted", "contract_issued", "signed", "payment_submitted", "settled"];
-const STAGE_LABEL: Record<string, string> = {
-  draft: "Borrador",
-  submitted: "En revisión",
-  contract_issued: "Contrato emitido",
-  signed: "Firmado",
-  payment_submitted: "Pago en revisión",
-  settled: "En wallet",
-  cancelled: "Cancelado",
-  rejected: "Rechazado",
-};
 
 /** Vista tipo wallet: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
 export function InvestorWallet() {
@@ -51,7 +40,7 @@ export function InvestorWallet() {
         positions: w.positions,
         tickets: w.tickets
           .filter((t) => !["settled", "cancelled", "rejected"].includes(t.status))
-          .map((t) => ({ ...t, status: STAGE_LABEL[t.status] ?? t.status })),
+          .map((t) => ({ ...t, status: TICKET_STATUS_LABEL[t.status] ?? t.status })),
         usdClp,
       });
     } finally {
@@ -137,7 +126,11 @@ export function InvestorWallet() {
             </h3>
             <ul className="divide-y divide-hairline border border-hairline">
               {w.tickets.map((t) => {
-                const idx = STAGES.indexOf(t.status);
+                const idx = TICKET_STEPS.indexOf(
+                  (t.status === "signed"
+                    ? "payment_pending"
+                    : t.status) as (typeof TICKET_STEPS)[number],
+                );
                 return (
                   <li key={t.id} className="p-3">
                     <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
@@ -148,12 +141,12 @@ export function InvestorWallet() {
                         {t.project} · {usd(t.amount)}
                       </span>
                       <span className="text-xs inline-flex items-center gap-1 text-accent-brand">
-                        <Clock className="w-3 h-3" /> {STAGE_LABEL[t.status] ?? t.status}
+                        <Clock className="w-3 h-3" /> {TICKET_STATUS_LABEL[t.status] ?? t.status}
                       </span>
                     </div>
-                    {idx >= 0 && (
-                      <div className="mt-2 grid grid-cols-5 gap-1">
-                        {STAGES.map((s, i) => (
+                    {t.status !== "cancelled" && idx >= 0 && (
+                      <div className="mt-2 grid grid-cols-4 gap-1">
+                        {TICKET_STEPS.map((s, i) => (
                           <div
                             key={s}
                             className={`h-1 ${i <= idx ? "bg-accent-brand" : "bg-hairline"}`}
