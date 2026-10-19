@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Wallet, Coins, Clock, FileText, Download } from "lucide-react";
+import { Landmark, Clock, FileText, Download } from "lucide-react";
+import { seriesForCode } from "@/features/investor/projectTerms";
 import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { useCurrency } from "@/lib/currency";
@@ -90,9 +91,9 @@ export function InvestorWallet() {
           <div className="grid sm:grid-cols-2 gap-3">
             {w.positions.map((p) => (
               <article key={p.id} className="border border-hairline p-4 bg-surface-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-accent-brand flex items-center gap-1">
-                    <Coins className="w-3.5 h-3.5" /> {p.token}-SPV
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-accent-brand flex items-center gap-1">
+                    <Landmark className="w-3.5 h-3.5" /> {seriesForCode(p.project === "Cholqui" ? "CHOLQUI" : "LV")}
                   </span>
                   <span className="text-[11px] text-content-muted">Explotación</span>
                 </div>
