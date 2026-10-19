@@ -198,7 +198,7 @@ export function buildCholquiDoc(): ProjectDoc {
     ],
     milestones: CHOLQUI_ROUND.milestones.map((m) => ({ when: m.when, what: m.what })),
     sections: [
-      investmentRoundSection({ legalName: "Volcania Minerals SpA" }),
+      investmentRoundSection({ legalName: "Valle Escondido SpA" }),
       ...cholquiGeoscienceSections(),
       {
         eyebrow: "Geología",
