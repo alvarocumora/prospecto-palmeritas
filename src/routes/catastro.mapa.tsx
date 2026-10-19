@@ -342,7 +342,10 @@ function NationalCatastroMap() {
     });
     const res = await fetch(`${url}/query?${params}`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = (await res.json()) as { features?: ConcesionFeature[]; error?: { message?: string } };
+    const json = (await res.json()) as {
+      features?: ConcesionFeature[];
+      error?: { message?: string };
+    };
     if (json.error) throw new Error(json.error.message ?? "error ArcGIS");
     return json.features ?? [];
   };
