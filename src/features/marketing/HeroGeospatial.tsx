@@ -61,19 +61,25 @@ export function HeroGeospatial() {
             una sola plataforma.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to="/catastro/mapa"
+            <a
+              href="#invertir"
               className="inline-flex items-center gap-2 rounded-sm bg-copper px-6 py-3 text-sm font-medium text-background transition hover:opacity-90"
             >
-              Explorar oportunidades mineras <ArrowRight className="h-4 w-4" />
-            </Link>
+              Ver proyectos en explotación <ArrowRight className="h-4 w-4" />
+            </a>
             <Link
-              to="/inversion-colateral"
+              to="/proyectos"
               className="inline-flex items-center gap-2 rounded-sm border border-border px-6 py-3 text-sm transition hover:border-signal-cyan"
             >
-              Invertir con colateral
+              Catálogo de proyectos
             </Link>
           </div>
+          <Link
+            to="/inversion-colateral"
+            className="mt-3 inline-block text-xs font-mono uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            Alternativa: renta fija con parcela en garantía →
+          </Link>
           <div className="mt-10 flex flex-wrap gap-6">
             {VALUES.map(({ icon: I, label, sub }) => (
               <div key={label} className="flex items-center gap-3">
