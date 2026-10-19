@@ -45,7 +45,15 @@ export function MobileBottomNav({
       >
         {slots.map((s) => {
           const Icon = s.icon;
-          const active = location.pathname === s.to;
+          const vista = (location.search as Record<string, unknown>)?.vista;
+          const samePath = location.pathname === s.to;
+          // Portafolio activo solo sin vista=wallet; Wallet solo con vista=wallet.
+          const active =
+            s.label === "Wallet"
+              ? samePath && vista === "wallet"
+              : s.label === "Portafolio"
+                ? samePath && vista !== "wallet"
+                : samePath;
           return (
             <Link
               key={s.label}
