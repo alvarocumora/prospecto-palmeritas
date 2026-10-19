@@ -221,13 +221,25 @@ const PAISES: Record<
   },
 };
 
-/** Paleta cartográfica institucional (Leaflet necesita valores literales). */
+/** Paleta cartográfica institucional (el motor WebGL necesita valores literales). */
 const MAP_COLORS = {
   constituida: "#0F69B4",
   tramite: "#E0A21B",
   eliminada: "#8a94a3",
   otro: "#5b6b80",
 };
+
+/** Expresión MapLibre equivalente a colorForSituacion. */
+const SITUACION_EXPR = [
+  "case",
+  ["in", "ELIMIN", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
+  MAP_COLORS.eliminada,
+  ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
+  MAP_COLORS.tramite,
+  ["in", "CONSTITU", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
+  MAP_COLORS.constituida,
+  MAP_COLORS.otro,
+] as unknown as import("maplibre-gl").ExpressionSpecification;
 
 /** Color por situación legal (señal de due-diligence). */
 function colorForSituacion(situacion: unknown): string {
@@ -250,17 +262,20 @@ function NationalCatastroMap() {
   const navigate = Route.useNavigate();
 
   const mapRef = useRef<HTMLDivElement>(null);
-  // Refs a objetos Leaflet para actualizarlos sin reinicializar el mapa.
-  const mapObjRef = useRef<unknown>(null);
-  const layerRef = useRef<unknown>(null);
-  const elimLayerRef = useRef<unknown>(null);
-  const baseLayerRef = useRef<unknown>(null);
+  // Motor canónico MapLibre GL (mismo que el visor del terminal).
+  const mapObjRef = useRef<import("maplibre-gl").Map | null>(null);
+  const featuresRef = useRef<{ vigentes: ConcesionFeature[]; eliminadas: ConcesionFeature[] }>({
+    vigentes: [],
+    eliminadas: [],
+  });
+  const fetchSeq = useRef(0);
 
   const [q, setQ] = useState("");
   const [needsZoom, setNeedsZoom] = useState(false);
   const [layerLoading, setLayerLoading] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [featureCount, setFeatureCount] = useState<number | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   const [tipo, setTipo] = useState<TipoFilter>(search.tipo ?? "all");
   const [situacion, setSituacion] = useState<SituacionFilter>(search.sit ?? "all");
@@ -270,18 +285,13 @@ function NationalCatastroMap() {
   const [panelOpen, setPanelOpen] = useState(true);
   const [selected, setSelected] = useState<SelectedProps | null>(null);
   const [pais, setPais] = useState<Pais>(search.pais ?? "CL");
-  const foreignLayerRef = useRef<unknown>(null);
   const [analysisSelection, setAnalysisSelection] = useState<SelectedProps[]>([]);
 
-  // Espejo del estado para escribir la URL desde eventos del mapa sin closures viejos.
   const stateRef = useRef({ tipo, situacion, basemap, showEliminadas, navigate, pais });
   stateRef.current = { tipo, situacion, basemap, showEliminadas, navigate, pais };
 
   const syncUrl = () => {
-    const map = mapObjRef.current as {
-      getCenter: () => { lat: number; lng: number };
-      getZoom: () => number;
-    } | null;
+    const map = mapObjRef.current;
     if (!map) return;
     const st = stateRef.current;
     const c = map.getCenter();
@@ -290,7 +300,7 @@ function NationalCatastroMap() {
       search: {
         lat: Number(c.lat.toFixed(5)),
         lng: Number(c.lng.toFixed(5)),
-        z: map.getZoom(),
+        z: Math.round(map.getZoom() * 100) / 100,
         tipo: st.tipo === "all" ? undefined : st.tipo,
         sit: st.situacion === "all" ? undefined : st.situacion,
         base: st.basemap === "satelite" ? undefined : st.basemap,
@@ -313,226 +323,246 @@ function NationalCatastroMap() {
     mutationFn: (term: string) => global$({ data: { country: pais, q: term } }),
   });
 
+  /** Consulta SERNAGEOMIN (ArcGIS REST, GeoJSON) por extensión visible. */
+  const queryExtent = async (url: string, where: string) => {
+    const map = mapObjRef.current!;
+    const b = map.getBounds();
+    const params = new URLSearchParams({
+      where,
+      geometry: [b.getWest(), b.getSouth(), b.getEast(), b.getNorth()].join(","),
+      geometryType: "esriGeometryEnvelope",
+      inSR: "4326",
+      spatialRel: "esriSpatialRelIntersects",
+      outFields: "*",
+      outSR: "4326",
+      geometryPrecision: "5",
+      maxAllowableOffset: String(Math.max(0.00001, 360 / 2 ** (map.getZoom() + 9))),
+      resultRecordCount: "2000",
+      f: "geojson",
+    });
+    const res = await fetch(`${url}/query?${params}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = (await res.json()) as { features?: ConcesionFeature[]; error?: { message?: string } };
+    if (json.error) throw new Error(json.error.message ?? "error ArcGIS");
+    return json.features ?? [];
+  };
+
+  const refreshFeatures = async () => {
+    const map = mapObjRef.current;
+    if (!map) return;
+    const st = stateRef.current;
+    const tooFar = map.getZoom() < LAYER_MIN_ZOOM;
+    setNeedsZoom(tooFar);
+    const setData = (id: string, features: ConcesionFeature[]) =>
+      (map.getSource(id) as import("maplibre-gl").GeoJSONSource | undefined)?.setData({
+        type: "FeatureCollection",
+        features: features as never,
+      });
+    if (tooFar || st.pais !== "CL") {
+      featuresRef.current = { vigentes: [], eliminadas: [] };
+      setData("concesiones", []);
+      setData("eliminadas", []);
+      setFeatureCount(null);
+      return;
+    }
+    const seq = ++fetchSeq.current;
+    setLayerLoading(true);
+    try {
+      const [vigentes, eliminadas] = await Promise.all([
+        queryExtent(SNGM_CONCESIONES_URL, buildWhere(st.tipo, st.situacion)),
+        st.showEliminadas ? queryExtent(SNGM_ELIMINADAS_POLY_URL, "1=1") : Promise.resolve([]),
+      ]);
+      if (seq !== fetchSeq.current) return;
+      featuresRef.current = { vigentes, eliminadas };
+      setData("concesiones", vigentes);
+      setData("eliminadas", eliminadas);
+      setFeatureCount(vigentes.length);
+      setMapError(null);
+    } catch (e) {
+      if (seq !== fetchSeq.current) return;
+      const msg = e instanceof Error ? e.message : "error de red";
+      setMapError(`SERNAGEOMIN no respondió: ${msg}. Reintenta al mover el mapa.`);
+    } finally {
+      if (seq === fetchSeq.current) setLayerLoading(false);
+    }
+  };
+  const refreshRef = useRef(refreshFeatures);
+  refreshRef.current = refreshFeatures;
+
   // Init del mapa (una sola vez).
   useEffect(() => {
-    let cleanup: (() => void) | undefined;
+    let map: import("maplibre-gl").Map | null = null;
+    let cancelled = false;
     (async () => {
       if (!mapRef.current) return;
       try {
-        const L = (await import("leaflet")).default;
-        await import("leaflet/dist/leaflet.css");
-        const EL = await import("esri-leaflet");
+        const maplibregl = (await import("maplibre-gl")).default;
+        await import("maplibre-gl/dist/maplibre-gl.css");
+        if (cancelled || !mapRef.current) return;
         const hasCoords = search.lat != null && search.lng != null;
-        const map = L.map(mapRef.current, {
-          center: hasCoords ? [search.lat!, search.lng!] : PAISES[stateRef.current.pais].center,
-          zoom: search.z ?? PAISES[stateRef.current.pais].zoom,
-          zoomControl: false,
-        });
-        mapObjRef.current = map;
-        L.control.zoom({ position: "bottomright" }).addTo(map);
-
-        const base = L.tileLayer(BASEMAPS[stateRef.current.basemap], {
-          attribution: "Esri · SERNAGEOMIN",
-          maxZoom: 19,
-        }).addTo(map);
-        baseLayerRef.current = base;
-        // Toponimia sobre el satélite (mismo estilo que la vista proyecto).
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: "© OpenStreetMap",
-          maxZoom: 19,
-          opacity: 0.35,
-        }).addTo(map);
-
-        const concesiones = EL.featureLayer({
-          url: SNGM_CONCESIONES_URL,
-          minZoom: LAYER_MIN_ZOOM,
-          precision: 5,
-          simplifyFactor: 0.5,
-          where: buildWhere(stateRef.current.tipo, stateRef.current.situacion),
-          style: (feature: { properties?: Record<string, unknown> }) => {
-            const c = colorForSituacion(feature?.properties?.SITUACION_CONCESION);
-            return { color: c, weight: 0.9, fillColor: c, fillOpacity: 0.12 };
+        const start = PAISES[stateRef.current.pais];
+        map = new maplibregl.Map({
+          container: mapRef.current,
+          center: hasCoords ? [search.lng!, search.lat!] : [start.center[1], start.center[0]],
+          zoom: search.z ?? start.zoom,
+          pitch: 0,
+          maxPitch: 0,
+          dragRotate: false,
+          attributionControl: { compact: true },
+          style: {
+            version: 8,
+            sources: {
+              base: {
+                type: "raster",
+                tiles: [BASEMAPS[stateRef.current.basemap]],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: "Esri · SERNAGEOMIN",
+              },
+              osm: {
+                type: "raster",
+                tiles: ["https://tile.openstreetmap.org/{z}/{x}/{y}.png"],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: "© OpenStreetMap",
+              },
+              concesiones: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
+              eliminadas: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
+            },
+            layers: [
+              { id: "base", type: "raster", source: "base" },
+              { id: "osm", type: "raster", source: "osm", paint: { "raster-opacity": 0.35 } },
+              {
+                id: "eliminadas-fill",
+                type: "fill",
+                source: "eliminadas",
+                paint: { "fill-color": MAP_COLORS.eliminada, "fill-opacity": 0.08 },
+              },
+              {
+                id: "eliminadas-line",
+                type: "line",
+                source: "eliminadas",
+                paint: {
+                  "line-color": MAP_COLORS.eliminada,
+                  "line-width": 0.7,
+                  "line-dasharray": [3, 3],
+                },
+              },
+              {
+                id: "concesiones-fill",
+                type: "fill",
+                source: "concesiones",
+                paint: { "fill-color": SITUACION_EXPR, "fill-opacity": 0.12 },
+              },
+              {
+                id: "concesiones-line",
+                type: "line",
+                source: "concesiones",
+                paint: { "line-color": SITUACION_EXPR, "line-width": 0.9 },
+              },
+            ],
           },
         });
-        layerRef.current = concesiones;
+        map.touchZoomRotate.disableRotation();
+        map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
+        mapObjRef.current = map;
 
-        concesiones.on("click", (e: unknown) => {
-          const ev = e as {
-            layer?: { feature?: { properties?: Record<string, unknown> } };
-            propagatedFrom?: { feature?: { properties?: Record<string, unknown> } };
-          };
-          const props = ev.layer?.feature?.properties ?? ev.propagatedFrom?.feature?.properties;
+        map.on("click", "concesiones-fill", (e) => {
+          const props = e.features?.[0]?.properties;
           if (props) setSelected(props);
         });
-
-        const syncZoomHint = () => setNeedsZoom(map.getZoom() < LAYER_MIN_ZOOM);
-        map.on("zoomend", syncZoomHint);
-        map.on("moveend", () => syncUrlRef.current());
-        syncZoomHint();
-        concesiones.on("loading", () => setLayerLoading(true));
-        concesiones.on("load", () => {
-          setLayerLoading(false);
-          let n = 0;
-          (concesiones.eachFeature as (cb: () => void) => void)(() => (n += 1));
-          setFeatureCount(n);
+        map.on("click", "eliminadas-fill", (e) => {
+          if (map!.queryRenderedFeatures(e.point, { layers: ["concesiones-fill"] }).length) return;
+          const props = e.features?.[0]?.properties;
+          if (props) setSelected({ ...props, SITUACION_CONCESION: "ELIMINADA" });
         });
-        concesiones.on("requesterror", (e: unknown) => {
-          setLayerLoading(false);
-          const msg = (e as { error?: { message?: string } })?.error?.message ?? "error de red";
-          setMapError(`SERNAGEOMIN no respondió: ${msg}. Reintenta al mover el mapa.`);
+        for (const id of ["concesiones-fill", "eliminadas-fill"]) {
+          map.on("mouseenter", id, () => (map!.getCanvas().style.cursor = "pointer"));
+          map.on("mouseleave", id, () => (map!.getCanvas().style.cursor = ""));
+        }
+        map.on("moveend", () => {
+          syncUrlRef.current();
+          void refreshRef.current();
         });
-        concesiones.on("requestsuccess", () => setMapError(null));
-        if (stateRef.current.pais === "CL") concesiones.addTo(map);
-
-        cleanup = () => map.remove();
+        map.on("load", () => {
+          setMapReady(true);
+          void refreshRef.current();
+        });
       } catch (e) {
         console.error("[catastro.mapa] init failed", e);
         setMapError(e instanceof Error ? e.message : "No se pudo inicializar el mapa.");
       }
     })();
-    return () => cleanup?.();
+    return () => {
+      cancelled = true;
+      map?.remove();
+      mapObjRef.current = null;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Aplicar filtros a la capa viva (setWhere) sin reinicializar + reflejar en URL.
+  // Filtros / eliminadas: reconsulta sin reinicializar + URL.
   useEffect(() => {
-    const layer = layerRef.current as { setWhere?: (w: string) => void } | null;
-    layer?.setWhere?.(buildWhere(tipo, situacion));
+    if (!mapReady) return;
+    void refreshRef.current();
     syncUrlRef.current();
-  }, [tipo, situacion]);
+  }, [mapReady, tipo, situacion, showEliminadas]);
 
-  // Cambio de jurisdicción: capa oficial del país + vuelo a su región minera.
+  // Cambio de jurisdicción: capa oficial del país (MapServer export) + vuelo.
   const firstPais = useRef(true);
   useEffect(() => {
-    const map = mapObjRef.current as {
-      flyTo: (c: [number, number], z: number, o?: object) => void;
-      hasLayer: (l: unknown) => boolean;
-      addLayer: (l: unknown) => void;
-      removeLayer: (l: unknown) => void;
-    } | null;
-    let cancelled = false;
-    (async () => {
-      // Espera a que el mapa exista (init asíncrono).
-      for (let i = 0; i < 40 && !mapObjRef.current; i++)
-        await new Promise((r) => setTimeout(r, 100));
-      const m = (mapObjRef.current as typeof map) ?? map;
-      if (!m || cancelled) return;
-      const cfg = PAISES[pais];
-      (foreignLayerRef.current as { remove?: () => void } | null)?.remove?.();
-      foreignLayerRef.current = null;
-      const cl = layerRef.current;
-      if (pais === "CL") {
-        if (cl && !m.hasLayer(cl)) m.addLayer(cl);
-      } else {
-        if (cl && m.hasLayer(cl)) m.removeLayer(cl);
-        if (showEliminadas) setShowEliminadas(false);
-        const EL = await import("esri-leaflet");
-        if (cancelled || !cfg.mapServer) return;
-        const dyn = (
-          EL as unknown as {
-            dynamicMapLayer: (o: object) => { addTo: (m: unknown) => unknown; remove: () => void };
-          }
-        ).dynamicMapLayer({
-          url: cfg.mapServer,
-          layers: [cfg.layer ?? 0],
-          opacity: 0.75,
-          f: "image",
-        });
-        dyn.addTo(m);
-        foreignLayerRef.current = dyn;
-      }
-      if (!firstPais.current) m.flyTo(cfg.center, cfg.zoom, { duration: 1.2 });
-      firstPais.current = false;
-      mutation.reset();
-      globalMutation.reset();
-      setSelected(null);
-      syncUrlRef.current();
-    })();
-    return () => {
-      cancelled = true;
-    };
+    const map = mapObjRef.current;
+    if (!mapReady || !map) return;
+    const cfg = PAISES[pais];
+    if (map.getLayer("foreign")) map.removeLayer("foreign");
+    if (map.getSource("foreign")) map.removeSource("foreign");
+    if (pais !== "CL" && cfg.mapServer) {
+      if (showEliminadas) setShowEliminadas(false);
+      map.addSource("foreign", {
+        type: "raster",
+        tiles: [
+          `${cfg.mapServer}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:${cfg.layer ?? 0}&f=image`,
+        ],
+        tileSize: 256,
+        attribution: cfg.inst,
+      });
+      map.addLayer(
+        { id: "foreign", type: "raster", source: "foreign", paint: { "raster-opacity": 0.75 } },
+        "eliminadas-fill",
+      );
+    }
+    if (!firstPais.current)
+      map.flyTo({ center: [cfg.center[1], cfg.center[0]], zoom: cfg.zoom, duration: 1200 });
+    firstPais.current = false;
+    mutation.reset();
+    globalMutation.reset();
+    setSelected(null);
+    void refreshRef.current();
+    syncUrlRef.current();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pais]);
+  }, [pais, mapReady]);
 
   // Cambio de basemap.
   useEffect(() => {
     const map = mapObjRef.current;
-    const old = baseLayerRef.current as { remove?: () => void } | null;
-    if (!map || typeof window === "undefined") return;
-    (async () => {
-      const L = (await import("leaflet")).default;
-      const next = L.tileLayer(BASEMAPS[basemap], {
-        attribution: "Esri · SERNAGEOMIN",
-        maxZoom: 19,
-      });
-      next.addTo(map as never);
-      (next as unknown as { bringToBack: () => void }).bringToBack();
-      old?.remove?.();
-      baseLayerRef.current = next;
-    })();
+    if (!mapReady || !map) return;
+    const src = map.getSource("base") as import("maplibre-gl").RasterTileSource | undefined;
+    src?.setTiles([BASEMAPS[basemap]]);
     syncUrlRef.current();
-  }, [basemap]);
-
-  // Overlay de concesiones eliminadas (terreno liberado).
-  useEffect(() => {
-    const map = mapObjRef.current;
-    if (!map || typeof window === "undefined") return;
-    let cancelled = false;
-    (async () => {
-      if (showEliminadas) {
-        if (elimLayerRef.current) return;
-        const EL = await import("esri-leaflet");
-        if (cancelled) return;
-        const elim = EL.featureLayer({
-          url: SNGM_ELIMINADAS_POLY_URL,
-          minZoom: LAYER_MIN_ZOOM,
-          precision: 5,
-          simplifyFactor: 0.5,
-          where: "1=1",
-          style: () => ({
-            color: MAP_COLORS.eliminada,
-            weight: 0.7,
-            dashArray: "3,3",
-            fillColor: MAP_COLORS.eliminada,
-            fillOpacity: 0.08,
-          }),
-        });
-        elim.on("click", (e: unknown) => {
-          const ev = e as { layer?: { feature?: { properties?: Record<string, unknown> } } };
-          if (ev.layer?.feature?.properties)
-            setSelected({ ...ev.layer.feature.properties, SITUACION_CONCESION: "ELIMINADA" });
-        });
-        elim.addTo(map as never);
-        elimLayerRef.current = elim;
-      } else if (elimLayerRef.current) {
-        (elimLayerRef.current as { remove: () => void }).remove();
-        elimLayerRef.current = null;
-      }
-    })();
-    syncUrlRef.current();
-    return () => {
-      cancelled = true;
-    };
-  }, [showEliminadas]);
+  }, [basemap, mapReady]);
 
   const locate = () => {
-    const map = mapObjRef.current as { locate?: (o: Record<string, unknown>) => void } | null;
-    map?.locate?.({ setView: true, maxZoom: 13 });
+    const map = mapObjRef.current;
+    if (!map || !navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition((pos) =>
+      map.flyTo({ center: [pos.coords.longitude, pos.coords.latitude], zoom: 13 }),
+    );
   };
 
   const exportData = (fmt: "geojson" | "csv") => {
-    const collect = (ref: unknown): ConcesionFeature[] => {
-      const out: ConcesionFeature[] = [];
-      const layer = ref as { eachFeature?: (cb: (l: unknown) => void) => void } | null;
-      layer?.eachFeature?.((l) => {
-        const f = (l as { feature?: ConcesionFeature }).feature;
-        if (f) out.push(f);
-      });
-      return out;
-    };
     const feats = [
-      ...collect(layerRef.current),
-      ...(showEliminadas ? collect(elimLayerRef.current) : []),
+      ...featuresRef.current.vigentes,
+      ...(showEliminadas ? featuresRef.current.eliminadas : []),
     ];
     if (feats.length === 0) return;
     const content = fmt === "geojson" ? featuresToGeoJSON(feats) : featuresToCSV(feats);
