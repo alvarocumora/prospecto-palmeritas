@@ -14,6 +14,11 @@ import {
   submitTicketPayment,
   type TicketRow,
 } from "@/lib/tickets.functions";
+import {
+  getTicketSignatureUrl,
+  requestTicketSignatureUpload,
+} from "@/lib/ticketSignature.functions";
+import { supabase } from "@/integrations/supabase/client";
 import { downloadInvestmentContractPdf } from "@/lib/pdf/investmentContractPdf";
 import {
   TICKET_STATUS_LABEL,
@@ -226,6 +231,8 @@ function MyTicket({
   const signFn = useServerFn(signTicket);
   const payFn = useServerFn(submitTicketPayment);
   const cancelFn = useServerFn(cancelTicket);
+  const requestSignatureUploadFn = useServerFn(requestTicketSignatureUpload);
+  const getSignatureUrlFn = useServerFn(getTicketSignatureUrl);
   const [sig, setSig] = useState("");
   const [rut, setRut] = useState("");
   const [agree, setAgree] = useState(false);
@@ -331,6 +338,18 @@ function MyTicket({
                   },
                 });
                 saveSignatureImage(t.id, sigImg!);
+                try {
+                  const { bucket, path, token } = await requestSignatureUploadFn({
+                    data: { ticketId: t.id },
+                  });
+                  const blob = await (await fetch(sigImg!)).blob();
+                  const up = await supabase.storage
+                    .from(bucket)
+                    .uploadToSignedUrl(path, token, blob);
+                  if (up.error) throw up.error;
+                } catch {
+                  /* el trazo queda igual disponible en este navegador (localStorage) */
+                }
               }, "Contrato firmado")
             }
             className="mt-3 inline-flex items-center gap-2 rounded-md bg-accent-brand px-4 py-2 text-sm text-surface disabled:opacity-40"
@@ -342,17 +361,32 @@ function MyTicket({
 
       {t.contract_hash && (
         <button
-          onClick={() =>
+          onClick={async () => {
+            let signatureImage = loadSignatureImage(t.id);
+            try {
+              const { url } = await getSignatureUrlFn({ data: { ticketId: t.id } });
+              if (url) {
+                const blob = await (await fetch(url)).blob();
+                signatureImage = await new Promise<string>((resolve, reject) => {
+                  const reader = new FileReader();
+                  reader.onload = () => resolve(reader.result as string);
+                  reader.onerror = reject;
+                  reader.readAsDataURL(blob);
+                });
+              }
+            } catch {
+              /* sin trazo en el servidor: se usa el de este navegador si existe */
+            }
             downloadInvestmentContractPdf({
               t,
               legalName,
               projectName,
-              signatureImage: loadSignatureImage(t.id),
+              signatureImage,
               projectSlug:
                 INVESTABLE_PROJECTS.find((p) => p.name === projectName)?.slug ??
                 (projectName.toLowerCase().includes("verdes") ? "losverdes" : "cholqui"),
-            }).catch((e) => toast.error(e instanceof Error ? e.message : "Error al generar PDF"))
-          }
+            }).catch((e) => toast.error(e instanceof Error ? e.message : "Error al generar PDF"));
+          }}
           className="mt-3 inline-flex items-center gap-1 text-xs text-accent-brand hover:underline"
         >
           <FileSignature className="w-3.5 h-3.5" /> Descargar contrato firmado (PDF con QR)
