@@ -105,7 +105,9 @@ export function MiningInvestShowcase() {
                   </div>
                   <div className="bg-surface p-2">
                     <dt className="text-[10px] text-content-muted">Entrega</dt>
-                    <dd className="text-[11px] leading-tight">{PROJECT_TERMS[p.slug].delivery[0]}</dd>
+                    <dd className="text-[11px] leading-tight">
+                      {PROJECT_TERMS[p.slug].delivery[0]}
+                    </dd>
                   </div>
                 </dl>
                 <div className="mt-1 text-[10px] text-content-muted">
@@ -165,7 +167,9 @@ export function MiningInvestShowcase() {
               </div>
               <div>
                 <dt className="text-xs text-content-muted">Capital de la SPV</dt>
-                <dd className="font-serif text-3xl">{pctOfSpvCapital(shares, totalShares).toFixed(2)} %</dd>
+                <dd className="font-serif text-3xl">
+                  {pctOfSpvCapital(shares, totalShares).toFixed(2)} %
+                </dd>
               </div>
               <div>
                 <dt className="text-xs text-content-muted">De la ronda</dt>
@@ -173,7 +177,8 @@ export function MiningInvestShowcase() {
               </div>
             </dl>
             <p className="mt-2 font-mono text-[11px] text-content-muted">
-              Valuación de referencia {usd(REFERENCE_VALUATION_USD)} · ronda = {SPV_ROUND_EQUITY_PCT} % del capital
+              Valuación de referencia {usd(REFERENCE_VALUATION_USD)} · ronda ={" "}
+              {SPV_ROUND_EQUITY_PCT} % del capital
             </p>
             <div className="mt-5 border-t border-hairline pt-4">
               <div className="flex items-center justify-between text-xs text-content-muted">

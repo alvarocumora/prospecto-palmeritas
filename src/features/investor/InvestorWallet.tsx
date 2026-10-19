@@ -70,7 +70,10 @@ export function InvestorWallet() {
           value={usd(w?.totals.invested ?? 0)}
           note={clp(w?.totals.invested ?? 0)}
         />
-        <Kpi label="Acciones serie preferente" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
+        <Kpi
+          label="Acciones serie preferente"
+          value={(w?.totals.shares ?? 0).toLocaleString("es-CL")}
+        />
         <Kpi
           label="Órdenes en curso"
           value={usd(w?.totals.pending ?? 0)}
@@ -93,7 +96,8 @@ export function InvestorWallet() {
               <article key={p.id} className="border border-hairline p-4 bg-surface-2">
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-accent-brand flex items-center gap-1">
-                    <Landmark className="w-3.5 h-3.5" /> {seriesForCode(p.project === "Cholqui" ? "CHOLQUI" : "LV")}
+                    <Landmark className="w-3.5 h-3.5" />{" "}
+                    {seriesForCode(p.project === "Cholqui" ? "CHOLQUI" : "LV")}
                   </span>
                   <span className="text-[11px] text-content-muted">Explotación</span>
                 </div>
