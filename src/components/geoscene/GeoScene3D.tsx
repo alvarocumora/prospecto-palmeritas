@@ -9,6 +9,9 @@ import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchor
 import { SceneLayerPanel } from "./controls/SceneLayerPanel";
 import { initialGeoSceneLayerIds } from "./layerPolicy";
 import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
+import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
+import { useProjects } from "@/hooks/useProjects";
+import { PROCESSED_INDICES, RAMP_CSS, indexRange, type ProcessedIndex } from "./processedSceneStyle";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -64,6 +67,20 @@ export function GeoScene3D({
   }, [projectLayers]);
 
   const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
+  const { active: activeProject } = useProjects();
+  const processedQuery = useSentinelRasterPreview(project?.id ?? activeProject?.id);
+  const processedData = processedQuery.data ?? null;
+  const [processedOn, setProcessedOn] = useState(true);
+  const [processedIndex, setProcessedIndex] = useState<ProcessedIndex>("ironOxideRatio");
+  const [processedOpacity, setProcessedOpacity] = useState(0.7);
+  const processedRange = useMemo(
+    () => indexRange(processedData, processedIndex),
+    [processedData, processedIndex],
+  );
+  const processedScene =
+    processedData && processedOn && processedData.features.length
+      ? { data: processedData, index: processedIndex, opacity: processedOpacity }
+      : null;
   const spectralLegend = useMemo(() => {
     const seen = new Map<string, [number, number, number]>();
     for (const layer of projectLayers ?? []) {
@@ -130,6 +147,7 @@ export function GeoScene3D({
               project={project}
               projectLayers={projectLayers}
               layerOpacity={layerOpacity}
+              processedScene={processedScene}
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
@@ -170,6 +188,61 @@ export function GeoScene3D({
           </ul>
           <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
             Intensidad = opacidad del polígono. Hipótesis de priorización, no ensayes ni recursos.
+          </p>
+        </div>
+      )}
+
+      {processedData && processedData.features.length > 0 && mode !== "resource" && (
+        <div
+          className="absolute bottom-10 left-14 z-20 w-[15rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          aria-label="Escena Sentinel-2 procesada"
+        >
+          <label className="flex items-center gap-2 uppercase tracking-wider text-foreground">
+            <input
+              type="checkbox"
+              checked={processedOn}
+              onChange={(e) => setProcessedOn(e.target.checked)}
+            />
+            Sentinel-2 L2A procesada
+          </label>
+          {processedOn && (
+            <div className="mt-2 space-y-2">
+              <select
+                value={processedIndex}
+                onChange={(e) => setProcessedIndex(e.target.value as ProcessedIndex)}
+                className="w-full rounded border border-border bg-background px-1.5 py-1 text-[10px] text-foreground"
+                aria-label="Índice espectral"
+              >
+                {PROCESSED_INDICES.map((i) => (
+                  <option key={i.key} value={i.key}>
+                    {i.label}
+                  </option>
+                ))}
+              </select>
+              <div>
+                <div className="h-2 w-full rounded-sm" style={{ background: RAMP_CSS }} />
+                <div className="mt-0.5 flex justify-between text-muted-foreground">
+                  <span>{processedRange[0].toFixed(3)}</span>
+                  <span>{processedRange[1].toFixed(3)}</span>
+                </div>
+              </div>
+              <label className="flex items-center gap-2 text-muted-foreground">
+                Opacidad
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={processedOpacity}
+                  onChange={(e) => setProcessedOpacity(Number(e.target.value))}
+                  className="flex-1"
+                />
+              </label>
+            </div>
+          )}
+          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+            MODELADO · índice derivado de reflectancia real. No identifica minerales ni reemplaza
+            ensayes.
           </p>
         </div>
       )}

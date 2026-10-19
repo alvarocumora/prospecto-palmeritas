@@ -9,6 +9,8 @@ import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
+import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
+import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { projectCamera } from "../cameraPolicy";
@@ -38,6 +40,12 @@ import {
   type ResolvedProjectLayer,
 } from "../projectLayers";
 
+export interface ProcessedSceneOverlay {
+  data: FeatureCollection;
+  index: ProcessedIndex;
+  opacity: number;
+}
+
 interface Props {
   view?: ProjectView;
   mode: GeoSceneMode;
@@ -46,6 +54,7 @@ interface Props {
   project?: GeoSceneProject;
   projectLayers?: GeoSceneProjectLayer[];
   layerOpacity?: Readonly<Record<string, number>>;
+  processedScene?: ProcessedSceneOverlay | null;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -107,6 +116,7 @@ export function GeoSceneCanvas({
   project,
   projectLayers,
   layerOpacity,
+  processedScene,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -265,6 +275,30 @@ export function GeoSceneCanvas({
       });
   }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity]);
 
+  // Escena Sentinel-2 procesada por el pipeline del proyecto (índices reales,
+  // malla de visualización). Se drapea sobre DEM/CAD sin test de profundidad.
+  const processedLayer = useMemo(() => {
+    if (!processedScene || mode === "resource") return null;
+    const { data, index, opacity } = processedScene;
+    const range = indexRange(data, index);
+    return new GeoJsonLayer({
+      id: "project:sentinel2-processed",
+      data: data as never,
+      pickable: true,
+      stroked: false,
+      filled: true,
+      opacity,
+      getFillColor: (f: { properties?: Record<string, unknown> }) => {
+        const v = Number(f.properties?.[index]);
+        if (!Number.isFinite(v) || v === -9999) return [0, 0, 0, 0];
+        const c = rampColor(v, range);
+        return [c[0], c[1], c[2], 210];
+      },
+      parameters: { depthTest: false } as never,
+      updateTriggers: { getFillColor: [index, range[0], range[1]] },
+    });
+  }, [processedScene, mode]);
+
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
 
@@ -403,6 +437,7 @@ export function GeoSceneCanvas({
     if (!ready || !overlayRef.current) return;
     const layers = [
       cadTerrainLayer,
+      processedLayer,
       ...projectGeoLayers,
       targetsLayer,
       satAnomaliesLayer,
@@ -415,6 +450,7 @@ export function GeoSceneCanvas({
   }, [
     ready,
     cadTerrainLayer,
+    processedLayer,
     projectGeoLayers,
     targetsLayer,
     satAnomaliesLayer,
