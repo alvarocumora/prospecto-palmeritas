@@ -38,8 +38,11 @@ export function MobileBottomNav({
     ];
     return (
       <nav
-        className="md:hidden fixed bottom-0 left-0 right-0 z-40 h-14 bg-surface/95 backdrop-blur border-t border-hairline flex items-stretch"
-        style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+        className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-surface/95 backdrop-blur border-t border-hairline flex items-stretch"
+        style={{
+          height: "calc(56px + env(safe-area-inset-bottom))",
+          paddingBottom: "env(safe-area-inset-bottom)",
+        }}
         role="navigation"
         aria-label="Navegación del inversionista"
       >
