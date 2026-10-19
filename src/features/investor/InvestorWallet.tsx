@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Wallet, Coins, Clock, FileText, Download } from "lucide-react";
+import { Landmark, Clock, FileText, Download } from "lucide-react";
+import { seriesForCode } from "@/features/investor/projectTerms";
 import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { useCurrency } from "@/lib/currency";
@@ -10,7 +11,7 @@ import { TICKET_STATUS_LABEL, TICKET_STEPS } from "@/lib/investor/rounds";
 type W = Awaited<ReturnType<typeof getMyWallet>>;
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
-/** Vista tipo wallet: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
+/** Cartola institucional: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
 export function InvestorWallet() {
   const [w, setW] = useState<W | null>(null);
   const [rounds, setRounds] = useState<PublicRound[]>([]);
@@ -51,8 +52,8 @@ export function InvestorWallet() {
   return (
     <section data-theme="im-light" className="mb-6 border border-hairline bg-surface text-content">
       <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
-        <Wallet className="w-4 h-4 text-accent-brand" />
-        <h2 className="font-serif text-xl">Mi wallet</h2>
+        <Landmark className="w-4 h-4 text-accent-brand" />
+        <h2 className="font-serif text-xl">Cartola de posiciones</h2>
         <button
           type="button"
           onClick={() => void downloadStatement()}
@@ -69,7 +70,7 @@ export function InvestorWallet() {
           value={usd(w?.totals.invested ?? 0)}
           note={clp(w?.totals.invested ?? 0)}
         />
-        <Kpi label="Participaciones" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
+        <Kpi label="Acciones serie preferente" value={(w?.totals.shares ?? 0).toLocaleString("es-CL")} />
         <Kpi
           label="Órdenes en curso"
           value={usd(w?.totals.pending ?? 0)}
@@ -90,9 +91,9 @@ export function InvestorWallet() {
           <div className="grid sm:grid-cols-2 gap-3">
             {w.positions.map((p) => (
               <article key={p.id} className="border border-hairline p-4 bg-surface-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-accent-brand flex items-center gap-1">
-                    <Coins className="w-3.5 h-3.5" /> {p.token}-SPV
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-accent-brand flex items-center gap-1">
+                    <Landmark className="w-3.5 h-3.5" /> {seriesForCode(p.project === "Cholqui" ? "CHOLQUI" : "LV")}
                   </span>
                   <span className="text-[11px] text-content-muted">Explotación</span>
                 </div>
