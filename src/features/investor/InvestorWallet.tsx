@@ -60,7 +60,7 @@ export function InvestorWallet() {
       const { data: spv } = await supabase
         .from("spv_entities")
         .select("legal_name")
-        .eq("id", t.spv_id)
+        .eq("id", t.spv_id ?? "")
         .maybeSingle();
       let signatureImage: string | null = null;
       try {
