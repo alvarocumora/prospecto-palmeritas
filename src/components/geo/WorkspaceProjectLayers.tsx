@@ -11,6 +11,7 @@ import { bundleSceneLayers } from "@/components/geoscene/bundleAdapter";
 import { resolveProjectTenure } from "@/lib/geospatial/projectTenure";
 import { buildPublicGeoManifest, type PublicGeoBundle } from "@/lib/geospatial/publicGeoContract";
 import { ProjectMasterViewer } from "./ProjectMasterViewer";
+import { useSatelliteContextLayers } from "@/hooks/useSatelliteContextLayers";
 
 import type { ProjectView } from "@/lib/projects/navigation";
 
@@ -39,6 +40,7 @@ export function PortfolioLayers({
   const portfolio = useMiningConcessions(project.id);
   const geophysics = useProjectGeophysicsData(project.id);
   const { targets } = useExplorationTargets(project.id);
+  const { layers: satelliteLayers } = useSatelliteContextLayers(project.id);
   const concessions = useMemo(
     () =>
       resolveProjectTenure(
@@ -156,6 +158,7 @@ export function PortfolioLayers({
           evidence: "DECLARADO",
           features: targetFeatures,
         },
+        ...satelliteLayers,
       ]}
     />
   );
