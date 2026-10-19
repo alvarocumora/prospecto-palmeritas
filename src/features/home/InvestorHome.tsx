@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { ArrowRight, FileSearch, Layers, MapPin, Mountain, Wallet } from "lucide-react";
+import { ArrowRight, FileSearch, Layers, Wallet } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjects } from "@/hooks/useProjects";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
@@ -10,7 +10,6 @@ import { listMyHoldings } from "@/lib/tokenization.functions";
 import { getMyWallet, getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
 import { PROJECT_TERMS } from "@/features/investor/projectTerms";
-import { EvidenceBadge } from "@/components/ui-system";
 import { BrandButton } from "@/components/brand";
 import { InvestmentCard } from "@/features/investor/InvestmentCard";
 import { getTerminalProject } from "@/features/terminal/terminalProjects";
@@ -83,7 +82,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           </p>
           <div className="flex flex-wrap items-end justify-between gap-5">
             <div>
-              <h1 className="font-display text-3xl text-content md:text-4xl">
+              <h1 className="font-serif text-3xl text-content md:text-4xl">
                 Hola{formattedName ? `, ${formattedName}` : ""}.
               </h1>
               <p className="mt-2 max-w-xl text-sm text-content-subtle">
@@ -149,7 +148,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
               <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-subtle">
                 Explorar
               </p>
-              <h2 className="mt-1 font-display text-xl text-content">Proyectos en ronda</h2>
+              <h2 className="mt-1 font-serif text-xl text-content">Proyectos en ronda</h2>
             </div>
             <Link to="/proyectos" className="text-sm text-accent-brand hover:underline">
               Catálogo completo
@@ -223,7 +222,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
         <div className="grid gap-5 lg:grid-cols-[1.5fr_1fr]">
           <section className="rounded-lg border border-hairline bg-surface-3">
             <header className="flex justify-between gap-3 border-b border-hairline p-5">
-              <h2 className="font-display text-xl">Tu seguimiento</h2>
+              <h2 className="font-serif text-xl">Tu seguimiento</h2>
               <Link to="/dashboard/investments" className="text-sm text-accent-brand hover:underline">
                 Ver portafolio
               </Link>
@@ -286,7 +285,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
               <p className="font-mono text-[10px] uppercase text-content-subtle">
                 Perfil de inversión
               </p>
-              <h2 className="mt-2 font-display text-xl">
+              <h2 className="mt-2 font-serif text-xl">
                 {data?.profile
                   ? (statusLabels[data.profile.review_status] ?? data.profile.review_status)
                   : history.isError
@@ -353,7 +352,7 @@ function PatrimonioCell({
   return (
     <div className="bg-surface-3 p-4 md:p-5">
       <p className="text-[11px] text-content-subtle">{label}</p>
-      <p className="mt-1 font-display text-2xl text-content md:text-3xl">{value}</p>
+      <p className="mt-1 font-serif text-2xl text-content md:text-3xl">{value}</p>
       <p className="mt-1 text-[11px] text-content-subtle">{note}</p>
     </div>
   );
@@ -387,7 +386,7 @@ function InvestorMetric({
         {icon}
         {title}
       </div>
-      <p className="mt-3 font-display text-2xl">{value}</p>
+      <p className="mt-3 font-serif text-2xl">{value}</p>
       <p className="mt-2 text-xs text-content-subtle">{description}</p>
     </section>
   );

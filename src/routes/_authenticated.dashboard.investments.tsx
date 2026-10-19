@@ -7,9 +7,7 @@ import {
   CheckCircle2,
   Clock,
   XCircle,
-  DollarSign,
   FileText,
-  Wallet,
   CircleDashed,
 } from "lucide-react";
 import { BrandButton } from "@/components/brand";
@@ -168,44 +166,6 @@ function KycCard({ data }: { data: Data }) {
         <Info k="Motivo rechazo" v={p.rejection_reason ?? "—"} />
       </dl>
     </section>
-  );
-}
-
-function TotalsRow({ totals }: { totals: Data["totals"] }) {
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
-      <KpiCard Icon={Wallet} label="Total pagado" value={fmtUsd(totals.paidUsd)} tone="teal" />
-      <KpiCard
-        Icon={DollarSign}
-        label="Compromiso total"
-        value={fmtUsd(totals.committedUsd)}
-        tone="gold"
-      />
-      <KpiCard Icon={FileText} label="Operaciones" value={String(totals.count)} tone="muted" />
-    </div>
-  );
-}
-
-function KpiCard({
-  Icon,
-  label,
-  value,
-  tone,
-}: {
-  Icon: typeof Wallet;
-  label: string;
-  value: string;
-  tone: "teal" | "gold" | "muted";
-}) {
-  const cls =
-    tone === "teal" ? "text-accent-brand" : tone === "gold" ? "text-accent-brand" : "text-content-muted";
-  return (
-    <div className="rounded border border-hairline bg-surface-3 p-4">
-      <div className="flex items-center gap-2 text-[11px] font-mono uppercase text-content-muted">
-        <Icon className={`w-3.5 h-3.5 ${cls}`} /> {label}
-      </div>
-      <div className={`text-xl font-bold mt-2 ${cls}`}>{value}</div>
-    </div>
   );
 }
 

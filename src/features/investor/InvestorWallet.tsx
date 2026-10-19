@@ -11,7 +11,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { TICKET_STATUS_LABEL, TICKET_STEPS } from "@/lib/investor/rounds";
 
 type W = Awaited<ReturnType<typeof getMyWallet>>;
-const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
 /** Cartola institucional: saldo, participaciones SPV por proyecto, órdenes en curso y avance de rondas. */
 export function InvestorWallet() {
@@ -35,6 +34,7 @@ export function InvestorWallet() {
   useEffect(() => { void load(); void loadRounds(); }, [load, loadRounds]);
   const confirmed = w ? confirmedPositionSummary(w.positions) : null;
   const capital = confirmed ? [...confirmed.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones" : "—";
+  const statementCurrencySupported = (confirmed?.positions ?? []).every(p => p.currency === "USD") && (w?.tickets ?? []).every(t => t.currency === "USD");
   const pending = w?.tickets.filter(t => !["settled", "cancelled", "rejected"].includes(t.status)) ?? [];
   const clp = (n: number) =>
     usdClp ? `≈ CLP ${Math.round(n * usdClp).toLocaleString("es-CL")}` : undefined;
@@ -118,8 +118,8 @@ export function InvestorWallet() {
         <BrandButton variant="outline"
           type="button"
           onClick={() => void downloadStatement()}
-          disabled={!w || busy || loading || error}
-          title={!w ? "Consulta tus posiciones antes de descargar" : "Descargar cartola de inversiones"}
+          disabled={!w || busy || loading || error || !statementCurrencySupported}
+          title={!w ? "Consulta tus posiciones antes de descargar" : !statementCurrencySupported ? "La cartola PDF actual solo admite USD; consulta certificados individuales" : "Descargar cartola de inversiones"}
           className="ml-auto inline-flex items-center gap-1.5 border border-accent-brand px-3 min-h-11 py-1.5 text-xs text-accent-brand hover:bg-accent-brand hover:text-surface disabled:opacity-40"
         >
           <Download className="w-3.5 h-3.5" /> {busy ? "Generando…" : "Cartola PDF"}
@@ -242,6 +242,7 @@ export function InvestorWallet() {
 
         {!loading && !error && pending.length === 0 && <p className="mt-5 text-sm text-content-muted">Sin órdenes pendientes.</p>}
         <div className="mt-8 border-t border-hairline pt-5"><h3 className="font-serif text-xl">Documentos y cartola PDF</h3><p className="mt-2 text-sm text-content-muted">Certificados junto a cada posición; contratos firmados junto a cada orden. La cartola PDF reúne las posiciones consultadas.</p></div>
+        {!statementCurrencySupported && <p role="status" className="mt-3 text-xs text-content-muted">La cartola PDF actual solo admite USD. Consulta los certificados individuales para otras monedas.</p>}
         <p className="mt-5 text-[11px] text-content-muted">Inversión privada e ilíquida; riesgo de pérdida total. El capital aportado no es una valoración de mercado ni acredita rentabilidad. Sin recursos certificados NI 43-101/JORC.</p>
         {roundError && <div role="alert" className="mt-4">No pudimos cargar las rondas. <BrandButton variant="outline" onClick={() => void loadRounds()}>Reintentar</BrandButton></div>}
         {rounds.length > 0 && (

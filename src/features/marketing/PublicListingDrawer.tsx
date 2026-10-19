@@ -62,7 +62,7 @@ function Body({ listing }: { listing: PublicListing }) {
       <div className="p-5 md:p-7">
         <SheetHeader>
           <SheetTitle asChild>
-            <h2 className="font-display text-2xl text-content text-left">{listing.title}</h2>
+            <h2 className="font-serif text-2xl text-content text-left">{listing.title}</h2>
           </SheetTitle>
         </SheetHeader>
         <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
@@ -179,7 +179,7 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
       <div className="mt-7 rounded-lg border border-hairline bg-surface-2 p-5 flex items-start gap-3">
         <CheckCircle2 className="w-5 h-5 text-accent-brand shrink-0 mt-0.5" />
         <div>
-          <div className="font-display text-[15px] text-content">Solicitud enviada</div>
+          <div className="font-serif text-[15px] text-content">Solicitud enviada</div>
           <p className="text-sm text-content-muted mt-1">
             Te contactaremos en menos de 24 h para coordinar acceso al data room.
           </p>
@@ -198,7 +198,7 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
     >
       <div className="flex items-center gap-2">
         <Lock className="w-4 h-4 text-accent-brand" />
-        <div className="font-display text-[15px] text-content">Solicitar acceso al data room</div>
+        <div className="font-serif text-[15px] text-content">Solicitar acceso al data room</div>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <input

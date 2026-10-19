@@ -1,9 +1,11 @@
 # Roadmap
 
 ## Investment OS · Fase 2
-- [ ] Rediseñar tarjetas compartidas del catálogo y rondas con procedencia explícita, filtros y enlaces existentes.
-- [ ] Rediseñar posiciones, órdenes, documentos y KYC en la cartola sin modificar servicios ni economía.
-- [ ] Desglosar colocación externa declarada y compromisos del sistema; verificar pruebas y pantallas 320/390/1440 sin publicar.
+- [ ] Verificar contratos firmados y posiciones pobladas con registros reales — la cuenta autenticada actual no tiene posiciones ni tickets; no crear inversiones de prueba.
+- [ ] Verificar fallos internos de lectura — los servicios actuales convierten algunos errores en resultados vacíos; requiere autorización para modificar servicios, fuera de este patch frontend.
+- [x] Rediseñar tarjetas compartidas del catálogo y rondas con procedencia explícita, filtros y enlaces existentes.
+- [x] Rediseñar posiciones, órdenes, documentos y KYC en la cartola sin modificar servicios ni economía.
+- [x] Desglosar colocación externa declarada y compromisos del sistema; verificar pruebas y pantallas 320/390/1440 sin publicar.
 
 - [x] Colocar imagen satelital real georreferenciada sobre el relieve CAD de Cholqui, con atribución y controles topografía/satélite; verificada en perspectiva, planta y móvil, sin alterar cotas ni backend.
 
