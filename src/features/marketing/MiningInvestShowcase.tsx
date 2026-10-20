@@ -21,8 +21,8 @@ const PROJECTS = [
 const STEPS = [
   { n: "01", t: "Ficha del proyecto", d: "Relieve 3D, satélite y data room." },
   { n: "02", t: "Simulación", d: "Acciones y participación, sin registro." },
-  { n: "03", t: "KYC y firma", d: "Perfil en 3 pasos y contrato con QR." },
-  { n: "04", t: "Mis inversiones", d: "Estado del ticket hasta la posición SPV." },
+  { n: "03", t: "Verificación y contrato", d: "KYC, revisión y firma cuando se emita." },
+  { n: "04", t: "Seguimiento", d: "Solicitud en curso y posición solo al liquidarse." },
 ];
 
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
@@ -227,12 +227,12 @@ export function MiningInvestShowcase() {
               onClick={emit}
               className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-surface px-4 py-3 text-sm font-medium disabled:opacity-40"
             >
-              Emitir ticket <ArrowRight className="w-4 h-4" />
+              Guardar simulación y continuar <ArrowRight className="w-4 h-4" />
             </button>
             <p className="mt-3 text-[11px] text-content-muted leading-relaxed">
               Simulación referencial: escenario objetivo, no rentabilidad garantizada. No constituye
               oferta pública; la inversión minera conlleva riesgo de pérdida de capital. La emisión
-              requiere registro, KYC y firma del contrato.
+              requiere una solicitud posterior, revisión KYC, firma y verificación del pago.
             </p>
           </div>
         </div>
