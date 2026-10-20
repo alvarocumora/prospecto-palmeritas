@@ -54,3 +54,8 @@
 - [x] Fase 2: relieve CAD de Cholqui como fuente de terreno en GeoScene3D (máscara de cobertura, sin extrapolar).
 - [x] Fase 3 global: terminal y workspace usan una sola instancia GeoScene3D con cámara Planta/Perspectiva y capas persistentes para Cholqui, Los Verdes, Nahuelbuta, Palmeras y otros proyectos; conservar procedencia sin modificar backend.
 - [x] Verificar fase 3 global: cuatro terminales públicos, acceso Cholqui con sesión real, relieve CAD con imagen real, persistencia de cámara/capas y vista móvil sin desbordamiento. Ensayes, EMIT y radar conservados; capas espectrales densas disponibles a pedido.
+
+## Visor 3D · herramientas geológicas
+- [x] Apoyar catastro, anomalías y escenas procesadas sobre el relieve real (DEM Los Verdes / CAD Cholqui) en Perspectiva.
+- [x] Discos estructurales orientados por rumbo/manteo medidos (Cholqui), con pruebas.
+- [ ] Secciones transversales, sondajes por mínima curvatura y conector OMF — siguientes herramientas de la hoja de ruta.
