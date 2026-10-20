@@ -14,7 +14,7 @@ import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, typ
 import { SectionProfilePanel } from "../controls/SectionProfilePanel";
 import { FeatureInspector } from "../controls/FeatureInspector";
 import { AnalysisDock } from "../controls/AnalysisDock";
-import { filterSpectral, unitColor, type SpectralTop } from "../analysisTools";
+import { filterSpectral, unitColor, type SpectralTop, sectionGeology } from "../analysisTools";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
@@ -307,6 +307,12 @@ export function GeoSceneCanvas({
           ? terrainProfile(a, b, cadElevationSampler(cadTerrain.tile))
           : [],
       structures: structuresInSection(a, b, structures, corridor),
+      geology: sectionGeology(
+        a,
+        b,
+        resolvedProjectLayers.find((l) => l.id === "geology.official_map_units")?.data as FeatureCollection | undefined,
+        resolvedProjectLayers.find((l) => l.id === "geology.official_faults")?.data as FeatureCollection | undefined,
+      ),
     };
   }, [sectionPts, drape, cadTerrain, resolvedProjectLayers, corridor]);
   const sectionLayer = useMemo(() => {
@@ -814,19 +820,6 @@ export function GeoSceneCanvas({
           </div>
         </div>
       )}
-      <button
-        type="button"
-        aria-pressed={sectionOn}
-        onClick={() => {
-          setSectionOn((v) => !v);
-          setSectionPts([]);
-        }}
-        className={`absolute bottom-3 left-3 z-30 min-h-11 rounded border px-3 font-mono text-[11px] uppercase tracking-wider shadow-sm backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand ${
-          sectionOn ? "border-accent-brand bg-accent-brand text-primary-foreground" : "border-border bg-bg-secondary/90 text-foreground"
-        }`}
-      >
-        {sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
-      </button>
       <AnalysisDock
         spectralTop={spectralTop}
         onSpectralTop={setSpectralTop}
@@ -847,7 +840,35 @@ export function GeoSceneCanvas({
         stereoOpen={stereoOpen}
         onStereo={setStereoOpen}
         planes={planes}
+        sectionOn={sectionOn}
+        sectionLabel={sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
+        onSection={() => {
+          setSectionOn((v) => !v);
+          setSectionPts([]);
+          setMeasuring(false);
+        }}
       />
+      {(() => {
+        const on = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
+        if (!on.length) return null;
+        return (
+          <div data-theme="im-light" className="pointer-events-none absolute bottom-3 right-3 z-20 hidden max-w-[16rem] rounded border border-hairline bg-surface/95 p-2 font-mono text-[9px] text-content shadow md:block" aria-label="Leyenda de capas encendidas">
+            <p className="mb-1 uppercase tracking-wider text-muted-foreground">Leyenda · encendido</p>
+            {on.map((l) => {
+              const c = evidenceColor(l.definition.evidence);
+              const n = (l.data as FeatureCollection | undefined)?.features?.length;
+              return (
+                <p key={l.id} className="flex items-center gap-1.5 leading-tight">
+                  <span className="inline-block h-2 w-3 shrink-0 rounded-sm" style={{ background: `rgb(${c[0]},${c[1]},${c[2]})`, borderStyle: isDashedEvidence(l.definition.evidence) ? "dashed" : "solid", borderWidth: 1 }} />
+                  <span className="truncate">{l.definition.label ?? l.id}</span>
+                  {n != null && <span className="ml-auto text-muted-foreground">{n}</span>}
+                  <span className="text-muted-foreground">· {String(l.definition.evidence).toUpperCase()}</span>
+                </p>
+              );
+            })}
+          </div>
+        );
+      })()}
       {selected && (
         <FeatureInspector
           layer={selected.layer}
