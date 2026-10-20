@@ -7,6 +7,9 @@ on:
       - 'src/features/marketing/**'
       - 'src/features/terminal/**'
       - 'src/components/shell/AppShell.tsx'
+      - 'src/routes/auth.tsx'
+      - 'src/routes/catastro.index.tsx'
+      - 'src/routes/_authenticated.dashboard.investments.tsx'
       - 'public/manifest.webmanifest'
       - 'scripts/qa/customerJourneysChromium.mjs'
       - '.github/workflows/customer-journeys-chromium.yml'
@@ -36,6 +39,8 @@ jobs:
         run: |
           npm install --no-save --package-lock=false --ignore-scripts playwright@1.56.1
           npx playwright install --with-deps chromium
+      - name: Verify formatting of client journey files
+        run: npx prettier --check scripts/qa/customerJourneysChromium.mjs src/features/marketing/HeroGeospatial.tsx src/routes/auth.tsx
       - name: Start GeoCapitals server locally
         run: |
           npm run dev -- --host 127.0.0.1 --port 4173 > /tmp/geocapitals-browser-server.log 2>&1 &
