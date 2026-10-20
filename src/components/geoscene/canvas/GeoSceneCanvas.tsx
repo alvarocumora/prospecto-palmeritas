@@ -338,6 +338,7 @@ export function GeoSceneCanvas({
         const data = drape
           ? drapeFeatureCollection(layer.data as FeatureCollection, drape.sample, {
               fallback: drape.fallback,
+              offsetM: 8,
             })
           : layer.data;
         return new GeoJsonLayer({
@@ -359,16 +360,20 @@ export function GeoSceneCanvas({
           getLineWidth: dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",
-          getPointRadius: 6,
-          pointRadiusUnits: "pixels",
-          pointRadiusMinPixels: 4,
-          parameters: { depthTest: false } as never,
+          // Píxel satelital a escala real (EMIT ~60 m, ASTER ~90 m) en 3D;
+          // en Planta se mantiene legible en píxeles.
+          getPointRadius: spectral && view === "3d" ? (layer.id.includes("aster") ? 45 : 30) : 6,
+          pointRadiusUnits: spectral && view === "3d" ? "meters" : "pixels",
+          pointRadiusMinPixels: spectral && view === "3d" ? 1 : 4,
+          pointRadiusMaxPixels: 14,
+          // El relieve del primer plano oculta lo que está detrás.
+          parameters: { depthTest: view === "3d" } as never,
           updateTriggers: { getLineColor: layer.definition.evidence },
           // keep a reference for tooltips
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
+  }, [mode, view, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
 
   // Discos estructurales: rumbo/manteo de terreno como planos orientados.
   const structurePlaneLayer = useMemo(() => {
