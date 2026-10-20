@@ -1,12 +1,13 @@
 """FastAPI entrypoint para mining-engine."""
 from __future__ import annotations
 
-import os
 from typing import List, Optional
 
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
+from .security import require_engine_auth as _check_auth
+from .job_contracts import GeoJobSpec, GeoJobValidation
 from .desurvey import desurvey
 from .composite import composite_intervals
 from .section import project_trajectory, project_points
@@ -14,16 +15,6 @@ from .wireframe import rbf_wireframe
 from .swath import swath_compare
 
 app = FastAPI(title="mining-engine", version="0.2.0")
-
-AUTH_TOKEN = os.environ.get("MINING_ENGINE_TOKEN")
-
-
-def _check_auth(authorization: Optional[str]) -> None:
-    if not AUTH_TOKEN:
-        return  # sin token configurado: modo dev
-    if not authorization or authorization != f"Bearer {AUTH_TOKEN}":
-        raise HTTPException(status_code=401, detail="unauthorized")
-
 
 class Shot(BaseModel):
     depth: float = Field(ge=0)
@@ -54,6 +45,20 @@ class DesurveyResponse(BaseModel):
 @app.get("/health")
 def health() -> dict:
     return {"status": "ok", "service": "mining-engine", "version": app.version}
+
+
+@app.post("/jobs/validate", response_model=GeoJobValidation)
+def validate_geo_job(
+    spec: GeoJobSpec,
+    authorization: Optional[str] = Header(default=None),
+) -> GeoJobValidation:
+    """Validate an asset-referenced job request; never schedule or persist it."""
+    _check_auth(authorization)
+    return GeoJobValidation(
+        project_id=spec.project_id,
+        input_asset_id=spec.input_asset_id,
+        job_type=spec.job_type,
+    )
 
 
 @app.post("/desurvey", response_model=DesurveyResponse)

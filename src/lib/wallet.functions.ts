@@ -23,8 +23,17 @@ export type PublicRound = {
   open: boolean;
   committed: number;
   settled: number;
+  /** Colocación comprometida por la emisora (declarada, fuera de la plataforma). */
+  anchor: number;
   investors: number;
 };
+
+/** Avance de colocación declarado por Valle Escondido SpA (fracción de la ronda). */
+export const ANCHOR_PLACEMENT_PCT: Record<string, number> = {
+  CHOLQUI: 0.47,
+  "LV-TIL-001": 0.65,
+};
+
 
 export const getPublicRounds = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicRound[]> => {
@@ -39,15 +48,18 @@ export const getPublicRounds = createServerFn({ method: "GET" }).handler(
         .maybeSingle();
       const { data: st } = await supabaseAdmin.rpc("spv_round_status", { _project_code: p.code });
       const s = Array.isArray(st) ? st[0] : null;
+      const target = Number(spv?.round_size ?? 1_500_000);
+      const anchor = Math.round(target * (ANCHOR_PLACEMENT_PCT[p.code] ?? 0));
       out.push({
         ...p,
-        target: Number(spv?.round_size ?? 1_500_000),
+        target,
         shares: Number(spv?.round_shares ?? 15_000),
         sharePrice: Number(spv?.share_price ?? 100),
         minTicket: Number(spv?.min_ticket ?? 15_000),
         open: !!spv?.tickets_open,
-        committed: Number(s?.committed ?? 0),
+        committed: Number(s?.committed ?? 0) + anchor,
         settled: Number(s?.settled ?? 0),
+        anchor,
         investors: Number(s?.tickets_count ?? 0),
       });
     }
