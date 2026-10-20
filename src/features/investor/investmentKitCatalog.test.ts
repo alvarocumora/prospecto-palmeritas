@@ -15,7 +15,7 @@ describe("investment kit discovery", () => {
     const tabs = new Set(["mapa", "tesis", "simulador", "dataroom"]);
     for (const item of publicKitItems()) {
       expect(item.access).toBe("public_page");
-      expect(tabs.has(item.tab)).toBe(true);
+      expect(tabs.has(item.tab ?? "")).toBe(true);
     }
   });
 
