@@ -1,0 +1,48 @@
+import hero from '@/assets/hero-mining.jpg';
+import cholqui from '@/assets/sat-cholqui.jpg.asset.json';
+import losverdes from '@/assets/sat-losverdes.jpg.asset.json';
+import hualane from '@/assets/colateral/hualane-satelite.jpg';
+import type { InvestorVisualSlide, ProjectDoc } from '@/lib/pdf/model';
+import { publicUrl } from '@/lib/publicUrl';
+
+export const DECK_TERMS = { roundUsd: 1500000, shares: 15000, shareUsd: 100, minUsd: 15000, minShares: 150, cholquiPlacement: 47, tilamaPlacement: 65, collateralMinClp: 15000000, collateralRate: 12 } as const;
+export const DECK_RISKS = [
+  'Documento comercial · Octubre 2026 · No constituye oferta pública de valores',
+  'Las cifras operativas, leyes y valorizaciones son declaradas por la operadora o referenciales; no son proyecciones auditadas ni garantía de resultados',
+  'Sin recursos ni reservas certificados NI 43-101/JORC',
+  'Acciones no transables en bolsa. Salidas potenciales, no garantizadas. Colocación declarada no equivale a recaudo ni capital liquidado.',
+  'La garantía mitiga, pero no elimina, el riesgo de pérdida',
+];
+const satellite = 'Imagen satelital · recurso de la plataforma; no acredita mineralización';
+const source = 'Según dossier comercial octubre 2026. Datos declarados o referenciales, no auditados.';
+export const DECK_SLIDES: InvestorVisualSlide[] = [
+  { title: 'GeoCapitals', kicker: 'Ronda Serie A · 2026', lead: 'Dos proyectos mineros en explotación en Chile.', image: hero, imageLabel: 'Imagen ilustrativa / referencial', hero: true,
+    stats: [{ label: 'Por proyecto', value: 'USD 1,5 M' }, { label: 'Desde', value: 'USD 15.000' }],
+    items: [{ title: 'Cholqui', body: 'Cu–Au–Ag · Melipilla, Región Metropolitana' }, { title: 'Los Verdes – Tilama', body: 'Cu · Los Vilos, Choapa, Región Coquimbo' }], note: 'Operadora Valle Escondido SpA · RUT 78.524.757-4 · Las Condes, Santiago. A través de sociedades por proyecto. Explotación declarada por el titular, no auditada.' },
+  { title: 'Dos territorios. Una tesis minera.', kicker: '01 / Portafolio chileno', lead: 'Explotación de vetas y mantos oxidados, con validación técnica y comercial por etapas.', image: losverdes.url, imageLabel: satellite,
+    stats: [{ label: 'Capacidad por proyecto', value: '5.000–15.000', note: 't/mes · declarada, no auditada' }], items: [{ title: 'Cholqui / Región Metropolitana', body: 'Melipilla · Cu–Au–Ag. Vecina a Mina Las Minitas: operación de un tercero, no GeoCapitals.' }, { title: 'Los Verdes – Tilama / Coquimbo', body: 'Los Vilos, Provincia de Choapa. Cartera integrada multi-titular. Cobre-Molibdeno según ficha.' }], note: source },
+  { title: 'La ronda, por proyecto.', kicker: '02 / Inversión accionaria', lead: 'USD 1.500.000 por proyecto mediante sociedades por proyecto; no confundir con el mutuo inmobiliario.', image: cholqui.url, imageLabel: satellite,
+    stats: [{ label: 'Acciones por ronda', value: '15.000' }, { label: 'Precio por acción', value: 'USD 100' }, { label: 'Ticket mínimo', value: 'USD 15.000', note: '150 acciones' }], items: [{ title: '47% Cholqui · 65% Tilama', body: 'Colocación declarada por la operadora. No son ventas verificadas ni dinero efectivamente recaudado o liquidado.' }], note: 'Términos según dossier comercial octubre 2026; sujetos a documentación definitiva y KYC. No sustituyen estados de la plataforma.' },
+  { title: 'Cholqui', kicker: '03 / Cu–Au–Ag · Melipilla, RM', lead: 'Un activo territorial con muestreo superficial puntual y un programa de validación prioritario.', image: cholqui.url, imageLabel: satellite,
+    stats: [{ label: 'Superficie declarada', value: '~5.000 ha', note: '20 pedimentos + 15 pertenencias' }, { label: 'Horizonte de negocio', value: '4 años' }], items: [{ title: '7 análisis puntuales superficiales', body: '0,96–16,23% Cu total · Au hasta 1,00 g/t · Ag hasta 118 g/t. No representan leyes medias del yacimiento ni reservas.' }, { title: 'Valorización referencial USD 4–6 M', body: 'Comparables + tarifa ENAMI a 1,5–2,5% Cu soluble. No es tasación ni proyección auditada.' }], note: source },
+  { title: 'Los Verdes – Tilama', kicker: '04 / Cu–Mo según ficha · Coquimbo', lead: 'Distrito integrado multi-titular en Los Vilos, Provincia de Choapa.', image: losverdes.url, imageLabel: satellite,
+    stats: [{ label: 'Valorización referencial', value: 'USD 8–12 M' }, { label: 'Horizonte de negocio', value: '5 años' }], items: [{ title: 'Renta minera a titulares', body: 'Contrato marco: 10% del valor líquido pagado por ENAMI u otro comprador; no es rentabilidad prometida al accionista.' }, { title: 'Base de venta integral USD 8 M', body: 'Monto pactado contractualmente, no tasación. Valorización referencial basada en cubicación interna y comparables.' }], note: source },
+  { title: 'Del mineral al flujo comercial.', kicker: '05 / Modelo de negocio', lead: 'Cuatro etapas con controles de calidad y salidas sujetas a ejecución.', image: hero, imageLabel: 'Imagen ilustrativa / referencial', stats: [],
+    items: [{ title: '01 / Extracción', body: 'Vetas y mantos oxidados. Capacidad declarada: 5.000–15.000 t/mes por proyecto, no auditada.' }, { title: '02 / Calidad', body: 'Muestreo con laboratorio certificado y QA/QC; validar antes de escalar.' }, { title: '03 / Venta', body: 'ENAMI u otro poder de compra. Referencia CLP 89.571/tms a 1,5% Cu soluble.' }, { title: '04 / Escenarios de salida', body: 'Flujos a accionistas y/o consolidación, venta o asociación del distrito. No garantizados.' }], note: 'Referencia documental: Circular ENAMI N°27, julio 2026, citada en el dossier. No se ha verificado su vigencia comercial.' },
+  { title: 'Cholqui: primeros 90 días.', kicker: '06 / Hoja de trabajo', lead: 'Hitos propuestos y parcialmente simultáneos; no son compromisos de ejecución ni resultados garantizados.', image: cholqui.url, imageLabel: satellite, stats: [],
+    items: [{ title: '0–15 días', body: 'Matriz de pertenencias, patentes, contratos y saneamiento.' }, { title: '0–30 días', body: 'Topografía, mapeo, canales y QA/QC.' }, { title: '15–45 días', body: 'Sondajes prioritarios y metalurgia.' }, { title: '30–60 días', body: 'Empadronamiento ENAMI, carta comercial y lote piloto.' }, { title: '45–90 días', body: 'Plan minero, modelo financiero auditado y garantías.' }], note: 'Plan según dossier comercial octubre 2026; requiere validación técnica, legal, comercial y financiamiento.' },
+  { title: 'Valor referencial. Horizonte definido.', kicker: '07 / Escenarios, no promesas', lead: 'Los rangos no equivalen al precio de la ronda ni a una valoración certificada de las sociedades.', image: losverdes.url, imageLabel: satellite,
+    stats: [{ label: 'Cholqui / 4 años', value: 'USD 4–6 M', note: 'Comparables y tarifa ENAMI' }, { label: 'Tilama / 5 años', value: 'USD 8–12 M', note: 'Cubicación interna + comparables' }], items: [{ title: 'Liquidez limitada', body: 'Acciones no transables en bolsa. Salidas potenciales por flujos, venta o socio estratégico, sin promesa de plazo ni retorno.' }, { title: 'Due diligence antes de invertir', body: 'Revisar tenencia, contratos, supuestos comerciales, capacidad operativa y documentación societaria.' }], note: source },
+  { title: 'Colateral inmobiliario.', kicker: '08 / Alternativa contractual · no acciones', lead: 'Mutuo reajustable UF + 12% anual contractual, sujeto a términos y riesgo. Intereses mensuales.', image: hualane, imageLabel: 'Imagen satelital · Hualañé / deslindes comerciales, no plano inscrito',
+    stats: [{ label: 'Mínimo / 12 meses renovables', value: 'CLP 15 M' }, { label: 'Garantía individual', value: '5.000 m²–1 ha' }],
+    items: [{ title: '116 parcelas / 85,75 ha declaradas', body: 'Hualañé (Caone): 40 / 41,75 ha, lista CLP 12.990.000–25.980.000. Licantén: 76 / 44 ha, lista CLP 19.990.000–42.990.000. Propietario declarado: Forestal Valle Escondido SpA. Lista no tasación.' }, { title: 'Contrato y garantía', body: 'KYC → seleccionar parcela → mutuo notarial e inscripción CBR a favor del inversionista → transferir capital → intereses según cumplimiento. Rol y tasación individual en contrato.' }, { title: 'Ejemplo nominal', body: 'CLP 15.000.000 × 12% anual = CLP 150.000/mes, más reajuste UF, sin anticipar indexación.' }], note: 'La garantía mitiga, pero no elimina, el riesgo de pérdida. Instrumento diferente de la inversión accionaria.' },
+  { title: 'La evidencia primero.', kicker: '09 / Riesgos y próximo paso', lead: 'Revisa el expediente, define el instrumento y conversa con el equipo antes de comprometer capital.', image: hero, imageLabel: 'Imagen ilustrativa / referencial', stats: [],
+    items: [{ title: 'Información no auditada', body: DECK_RISKS[1] }, { title: 'Riesgo técnico y de liquidez', body: 'Sin recursos ni reservas certificados NI 43-101/JORC. Acciones no cotizadas; posibilidad de pérdida. Ninguna salida está garantizada.' }, { title: 'Geocapitals / contacto', body: 'contacto@geocapitals.com · +56 9 6218 4071. Validación KYC y documentación formal antes de invertir.' }], note: DECK_RISKS[0] },
+];
+export function deckSlideIndex(value: unknown): number {
+  const n = Number(value);
+  return Number.isInteger(n) && n >= 1 && n <= DECK_SLIDES.length ? n : 1;
+}
+export function buildMarketingDeck(): ProjectDoc {
+  return { code: 'INVESTOR_2026', name: 'GeoCapitals · Serie A 2026', subtitle: 'Portafolio minero y alternativa de colateral', reportProfile: 'investment', commodity: 'Cu–Au–Ag / Cu–Mo', stage: 'En explotación · declarada', location: 'Chile', liveUrl: publicUrl('/inversion/deck'), docVersion: '2026.10', tags: [], kpis: [], thesis: [], sections: [], disclaimers: DECK_RISKS, visualSlides: DECK_SLIDES, contact: { email: 'contacto@geocapitals.com' } };
+}

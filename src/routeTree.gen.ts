@@ -47,6 +47,7 @@ import { Route as FirmarTokenRouteImport } from './routes/firmar.$token'
 import { Route as HooksSyncBoletinMineroRouteImport } from './routes/hooks/sync-boletin-minero'
 import { Route as HooksSyncPjudRouteImport } from './routes/hooks/sync-pjud'
 import { Route as InscripcionGraciasRouteImport } from './routes/inscripcion.gracias'
+import { Route as InversionDeckRouteImport } from './routes/inversion.deck'
 import { Route as InvitationsTokenRouteImport } from './routes/invitations.$token'
 import { Route as LegalPrivacidadRouteImport } from './routes/legal.privacidad'
 import { Route as LegalTerminosRouteImport } from './routes/legal.terminos'
@@ -380,6 +381,11 @@ const InscripcionGraciasRoute = InscripcionGraciasRouteImport.update({
   id: '/gracias',
   path: '/gracias',
   getParentRoute: () => InscripcionRoute,
+} as any)
+const InversionDeckRoute = InversionDeckRouteImport.update({
+  id: '/inversion/deck',
+  path: '/inversion/deck',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InvitationsTokenRoute = InvitationsTokenRouteImport.update({
   id: '/invitations/$token',
@@ -1229,6 +1235,7 @@ export interface FileRoutesByFullPath {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/inscripcion/gracias': typeof InscripcionGraciasRoute
+  '/inversion/deck': typeof InversionDeckRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1410,6 +1417,7 @@ export interface FileRoutesByTo {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/inscripcion/gracias': typeof InscripcionGraciasRoute
+  '/inversion/deck': typeof InversionDeckRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1593,6 +1601,7 @@ export interface FileRoutesById {
   '/hooks/sync-boletin-minero': typeof HooksSyncBoletinMineroRoute
   '/hooks/sync-pjud': typeof HooksSyncPjudRoute
   '/inscripcion/gracias': typeof InscripcionGraciasRoute
+  '/inversion/deck': typeof InversionDeckRoute
   '/invitations/$token': typeof InvitationsTokenRoute
   '/legal/privacidad': typeof LegalPrivacidadRoute
   '/legal/terminos': typeof LegalTerminosRoute
@@ -1776,6 +1785,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/inscripcion/gracias'
+    | '/inversion/deck'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -1957,6 +1967,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/inscripcion/gracias'
+    | '/inversion/deck'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -2139,6 +2150,7 @@ export interface FileRouteTypes {
     | '/hooks/sync-boletin-minero'
     | '/hooks/sync-pjud'
     | '/inscripcion/gracias'
+    | '/inversion/deck'
     | '/invitations/$token'
     | '/legal/privacidad'
     | '/legal/terminos'
@@ -2320,6 +2332,7 @@ export interface RootRouteChildren {
   FirmarTokenRoute: typeof FirmarTokenRoute
   HooksSyncBoletinMineroRoute: typeof HooksSyncBoletinMineroRoute
   HooksSyncPjudRoute: typeof HooksSyncPjudRoute
+  InversionDeckRoute: typeof InversionDeckRoute
   InvitationsTokenRoute: typeof InvitationsTokenRoute
   LegalPrivacidadRoute: typeof LegalPrivacidadRoute
   LegalTerminosRoute: typeof LegalTerminosRoute
@@ -2640,6 +2653,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/inscripcion/gracias'
       preLoaderRoute: typeof InscripcionGraciasRouteImport
       parentRoute: typeof InscripcionRoute
+    }
+    '/inversion/deck': {
+      id: '/inversion/deck'
+      path: '/inversion/deck'
+      fullPath: '/inversion/deck'
+      preLoaderRoute: typeof InversionDeckRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/invitations/$token': {
       id: '/invitations/$token'
@@ -4018,6 +4038,7 @@ const rootRouteChildren: RootRouteChildren = {
   FirmarTokenRoute: FirmarTokenRoute,
   HooksSyncBoletinMineroRoute: HooksSyncBoletinMineroRoute,
   HooksSyncPjudRoute: HooksSyncPjudRoute,
+  InversionDeckRoute: InversionDeckRoute,
   InvitationsTokenRoute: InvitationsTokenRoute,
   LegalPrivacidadRoute: LegalPrivacidadRoute,
   LegalTerminosRoute: LegalTerminosRoute,

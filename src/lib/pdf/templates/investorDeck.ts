@@ -34,6 +34,11 @@ const { w: W, h: H, m: M } = GC_PAGE.deck;
 const CW = W - M * 2;
 
 export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise<void> {
+  if (model.visualSlides?.length) {
+    const { renderVisualInvestorSlides } = await import('./visualInvestorSlides');
+    await renderVisualInvestorSlides(doc, model);
+    return;
+  }
   const qr = await brandQr(model.liveUrl, 480);
   const issued = new Date().toLocaleDateString("es-CL", { dateStyle: "long" });
   let slide = 0;

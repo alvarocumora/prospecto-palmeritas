@@ -14,3 +14,5 @@
 - confirmedPositionSummary counts only active ledger positions and groups capital by currency; historical contributions must never be presented as market valuation.
 - Viewer property analysis (PropertyAnalysisPanel) derives its evidence summary deterministically from layers already loaded in GeoScene3D; the AI estimate only interprets that summary and the PDF reuses the brand kit — keeps AI from inventing data and avoids a parallel report generator.
 - Structured AI estimates (report assessment, property estimate) go through src/lib/ai-responses.server.ts (Responses API, strict schema, streamed) — free-form JSON from compatible chat mistranslated keys and failed validation.
+- Public investor presentations use a shared documentary slide model in the marketing module and the canonical ProjectDoc deck renderer; documentary values never mutate live investment terms — prevents economic drift and duplicate PDF systems.
+- Investor slides have a single centered 1920×1080 scaling component, URL-selected pages, and a mobile reading companion — preserves print proportions without making phone text unreadable.
