@@ -6,7 +6,7 @@ describe("assessmentSection", () => {
     const s = assessmentSection({
       prospectivity: "Media",
       confidence: "Baja",
-      synthesis: ["x"],
+      synthesis: ["x"], technicalSummary: [], investorSummary: [], workPlan: [],
       priorities: [
         { level: "P3", target: "c", rationale: "", evidence: "", action: "" },
         { level: "P1", target: "a", rationale: "", evidence: "", action: "" },

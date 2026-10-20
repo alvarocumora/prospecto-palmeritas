@@ -38,9 +38,17 @@ export function buildReportDigest(model: ProjectDoc): string {
   for (const q of model.dataQuality ?? []) parts.push(`Calidad [${q.status}] ${q.label}: ${q.detail}`);
   for (const s of model.sections) {
     const body = s.blocks.map(blockText).filter(Boolean).join("\n");
-    if (body) parts.push(`## ${s.title}\n${clip(body, 1800)}`);
+    if (body) parts.push(`## ${s.title}${s.lead ? ` — ${s.lead}` : ""}\n${clip(body, 3500)}`);
   }
-  return clip(parts.join("\n"), 18000);
+  const m = model.map;
+  if (m) {
+    parts.push(`Mapa: ${m.title}${m.source ? ` · fuente ${m.source}` : ""}${m.crs ? ` · ${m.crs}` : ""}`);
+    if (m.points?.length) parts.push(`Puntos mapeados (${m.points.length}): ${m.points.slice(0, 40).map((p) => JSON.stringify(p)).join("; ")}`);
+    if (m.snapshotManifest) parts.push(`Capas del visor: ${clip(JSON.stringify(m.snapshotManifest), 1500)}`);
+  }
+  if (model.milestones?.length) parts.push(`Hitos: ${model.milestones.map((h) => `${h.when}: ${h.what}`).join("; ")}`);
+  if (model.disclaimers.length) parts.push(`Avisos: ${model.disclaimers.join(" ")}`);
+  return clip(parts.join("\n"), 38000);
 }
 
 const PRIORITY: Record<"P1" | "P2" | "P3", "high" | "medium" | "low"> = {
@@ -48,6 +56,43 @@ const PRIORITY: Record<"P1" | "P2" | "P3", "high" | "medium" | "low"> = {
   P2: "medium",
   P3: "low",
 };
+
+const AI_NOTE =
+  "Síntesis asistida por IA sobre la evidencia del informe (INTERPRETADO). No constituye estimación de recursos ni reservas, ni opinión de una Persona Calificada/Competente, ni recomendación de inversión.";
+
+/** Resúmenes ejecutivos técnico y para inversionistas, y plan de trabajo. */
+export function assessmentSections(a: ReportAssessment): DocSection[] {
+  const out: DocSection[] = [];
+  if (a.technicalSummary.length || a.investorSummary.length)
+    out.push({
+      eyebrow: "RESUMEN EJECUTIVO",
+      title: "Resumen técnico y para inversionistas",
+      lead: `Prospectividad ${a.prospectivity.toLowerCase()} · confianza ${a.confidence.toLowerCase()}.`,
+      deck: true,
+      blocks: [
+        ...a.technicalSummary.map((body) => ({ kind: "finding" as const, title: "Lectura técnica", body, provenance: "INTERPRETED" as const })),
+        ...a.investorSummary.map((body) => ({ kind: "finding" as const, title: "Para inversionistas", body, provenance: "INTERPRETED" as const })),
+        { kind: "text", body: AI_NOTE },
+      ],
+    });
+  out.push(assessmentSection(a));
+  if (a.workPlan.length)
+    out.push({
+      eyebrow: "PLAN DE TRABAJO",
+      title: "Plan de verificación por fases",
+      lead: "Secuencia propuesta para reducir incertidumbre; duraciones orientativas, sin costos estimados.",
+      blocks: [
+        {
+          kind: "table",
+          head: ["Fase", "Actividades", "Duración", "Entregable", "Criterio para avanzar"],
+          rows: a.workPlan.map((w) => [w.phase, w.activities, w.duration, w.deliverable, w.decisionGate]),
+          widths: [0.14, 0.32, 0.1, 0.2, 0.24],
+        },
+        { kind: "text", body: AI_NOTE },
+      ],
+    });
+  return out;
+}
 
 /** Sección "Evaluación y prioridades" con procedencia INTERPRETADA. */
 export function assessmentSection(a: ReportAssessment): DocSection {

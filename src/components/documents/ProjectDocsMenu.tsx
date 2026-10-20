@@ -65,9 +65,14 @@ export function ProjectDocsMenu({
       const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
       // Capture the real live GIS when available. A capture failure is non-fatal:
       // the document renderer keeps its analytical fallback instead of blanking.
-      if (model.map?.captureSelector) {
-        const { captureElement } = await import("@/lib/pdf/captureMap");
-        const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
+      if (model.map) {
+        const { captureElement, captureGeoScene } = await import("@/lib/pdf/captureMap");
+        // Prefer the live 3D/2D GeoScene canvas (WebGL composite); fall back to DOM capture.
+        const snapshot =
+          (await captureGeoScene()) ??
+          (model.map.captureSelector
+            ? await captureElement(model.map.captureSelector, { scale: 2 })
+            : null);
         if (snapshot) model.map.imageDataUrl = snapshot;
         if (model.map.capturePresets?.length && (kind === "technical" || kind === "deck")) {
           const captures = await Promise.all(
@@ -132,7 +137,7 @@ export function ProjectDocsMenu({
       if (kind === "technical") {
         toast.loading("Evaluando evidencia y prioridades con IA…", { id });
         try {
-          const [{ assessProjectReport }, { buildReportDigest, assessmentSection }] =
+          const [{ assessProjectReport }, { buildReportDigest, assessmentSections }] =
             await Promise.all([
               import("@/lib/reports/reportAssessment.functions"),
               import("@/lib/reports/reportAssessment"),
@@ -144,7 +149,7 @@ export function ProjectDocsMenu({
               digest: buildReportDigest(model),
             },
           });
-          if (res.assessment) model.sections.unshift(assessmentSection(res.assessment));
+          if (res.assessment) model.sections.unshift(...assessmentSections(res.assessment));
           else if (res.error) toast.message(`Informe sin evaluación IA: ${res.error}`);
         } catch (err) {
           console.warn("[ProjectDocsMenu] evaluación IA omitida", err);
