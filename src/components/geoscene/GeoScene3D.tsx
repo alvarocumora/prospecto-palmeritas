@@ -127,6 +127,7 @@ export function GeoScene3D({
               type="button"
               size="sm"
               variant="outline"
+              data-theme="im-light"
               onClick={() => setLayerPanelOpen((value) => !value)}
               className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
               title="Capas 3D canónicas"
