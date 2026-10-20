@@ -5,11 +5,23 @@ import { useAsterS1Layers } from "@/lib/cholqui/asterS1Layers";
 import type { GeoSceneProjectLayer } from "@/components/geoscene/projectLayers";
 import { ProjectSceneFrame } from "../UnifiedProjectScene";
 import type { ProjectView } from "@/lib/projects/navigation";
+import { CHOLQUI_STRUCTURES_GEOJSON } from "@/features/franco/data/cholquiStructures";
+import { correlateVeins, correlationLayer } from "@/lib/cholqui/structuralCorrelation";
 
 export function CholquiScene({ view }: { view: ProjectView }) {
   const input = useMemo(buildCholquiSceneInput, []);
   const emit = useEmitMineralogyLayers("cholqui");
   const radar = useAsterS1Layers();
+  const correlated = useMemo(() => {
+    const s1 = radar.find((layer) => layer.id === "s1-lineamientos");
+    if (!s1) return null;
+    const emitAll = {
+      type: "FeatureCollection" as const,
+      features: emit.flatMap((layer) => layer.features.features),
+    };
+    const results = correlateVeins(CHOLQUI_STRUCTURES_GEOJSON, s1.features, emitAll);
+    return correlationLayer(results, s1.features);
+  }, [emit, radar]);
   const layers = useMemo<GeoSceneProjectLayer[]>(() => {
     const spectral = [...emit, ...radar.filter((layer) => layer.id === "aster-silice")];
     const lineaments = radar.find((layer) => layer.id === "s1-lineamientos");
@@ -49,7 +61,18 @@ export function CholquiScene({ view }: { view: ProjectView }) {
             },
           ]
         : []),
+      ...(correlated?.features.length
+        ? [
+            {
+              id: "geology.interpreted_structures" as const,
+              defaultVisible: true,
+              data: correlated,
+              source:
+                "Cruce vetas medidas (Arcos/Leman) × lineamientos Sentinel-1 RTC × halos NASA EMIT",
+            },
+          ]
+        : []),
     ];
-  }, [input, emit, radar]);
+  }, [input, emit, radar, correlated]);
   return <ProjectSceneFrame project={input.project} layers={layers} view={view} />;
 }
