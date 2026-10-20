@@ -11,6 +11,7 @@ import {
 import { lazy, Suspense } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { PUBLIC_INTELLIGENCE_PATHS } from "./landingNavigation";
+import featureCatastro from "@/assets/feature-catastro.jpg";
 
 const HeroTerrain3D = lazy(() => import("./HeroTerrain3D"));
 
@@ -46,6 +47,15 @@ export function HeroGeospatial() {
   return (
     <section className="relative overflow-hidden border-b border-border bg-background text-foreground min-h-[680px]">
       <div className="absolute inset-y-0 right-0 w-full md:w-[62%]">
+        {/* Bundled imagery remains visible when WebGL, remote DEM or SSR is unavailable.
+            This is decorative context, NOT a georeferenced analytical layer. */}
+        <img
+          src={featureCatastro}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover opacity-25 saturate-75"
+        />
         <ClientOnly fallback={null}>
           <Suspense fallback={null}>
             <HeroTerrain3D />
