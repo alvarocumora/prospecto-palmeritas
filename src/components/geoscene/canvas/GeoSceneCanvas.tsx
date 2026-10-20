@@ -211,6 +211,14 @@ export function GeoSceneCanvas({
     wireframesVisible,
   );
 
+  const [spectralTop, setSpectralTop] = useState<SpectralTop>("p90");
+  const [includeOxides, setIncludeOxides] = useState(false);
+  const [terrainOpacity, setTerrainOpacity] = useState(0.92);
+  const [measuring, setMeasuring] = useState(false);
+  const [measurePts, setMeasurePts] = useState<LngLat[]>([]);
+  const [stereoOpen, setStereoOpen] = useState(false);
+  const measureRef = useRef(measuring);
+  measureRef.current = measuring;
   const cadTerrain = project?.cadTerrain ?? null;
   const cadMesh = useMemo(
     () => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null),
@@ -276,14 +284,6 @@ export function GeoSceneCanvas({
 
   // Corte transversal A-A' (estándar global: cualquier proyecto con relieve).
   const [sectionOn, setSectionOn] = useState(false);
-  const [spectralTop, setSpectralTop] = useState<SpectralTop>("p90");
-  const [includeOxides, setIncludeOxides] = useState(false);
-  const [terrainOpacity, setTerrainOpacity] = useState(0.92);
-  const [measuring, setMeasuring] = useState(false);
-  const [measurePts, setMeasurePts] = useState<LngLat[]>([]);
-  const [stereoOpen, setStereoOpen] = useState(false);
-  const measureRef = useRef(measuring);
-  measureRef.current = measuring;
   const [selected, setSelected] = useState<{
     layer: ResolvedProjectLayer;
     properties: Record<string, unknown>;
