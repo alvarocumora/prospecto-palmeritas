@@ -20288,43 +20288,6 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      ticket_issue_contract: {
-        Args: { _ticket_id: string }
-        Returns: {
-          amount: number
-          cancel_reason: string | null
-          contract_hash: string | null
-          contract_pdf_url: string | null
-          created_at: string
-          currency: string
-          id: string
-          instrument_type: string
-          investor_signature_name: string | null
-          investor_user_id: string
-          listing_ref: string | null
-          notes: string | null
-          payment_proof_url: string | null
-          payment_submitted_at: string | null
-          payment_verified_at: string | null
-          payment_verified_by: string | null
-          risk_disclosure_accepted_at: string | null
-          share_price: number | null
-          shares_allocated: number | null
-          signature_ip: string | null
-          signed_at: string | null
-          spv_id: string | null
-          spv_position_id: string | null
-          status: string
-          ticket_code: string
-          updated_at: string
-        }
-        SetofOptions: {
-          from: "*"
-          to: "investment_tickets"
-          isOneToOne: true
-          isSetofReturn: false
-        }
-      }
       ticket_settle: {
         Args: { _ticket_id: string }
         Returns: {

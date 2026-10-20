@@ -99,7 +99,18 @@ export function projectLayerTooltip(
     `Fuente: ${layer.source ?? (properties?.fuente as string | undefined) ?? d.sourceSystem}`,
   ];
   if (d.caution) lines.push(d.caution);
-  for (const key of ["procedencia", "advertencia", "lab", "report_id", "cu_total_pct", "au_gpt"]) {
+  for (const key of [
+    "procedencia",
+    "advertencia",
+    "lab",
+    "report_id",
+    "cu_total_pct",
+    "au_gpt",
+    "veta",
+    "delta_angular_deg",
+    "distancia_m",
+    "halo_emit_300m",
+  ]) {
     const value = properties?.[key];
     if (value != null && value !== "") lines.push(`${key}: ${String(value)}`);
   }
