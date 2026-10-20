@@ -87,6 +87,20 @@ export function drapeFeatureCollection(
   };
 }
 
+/**
+ * Selects (never blends) the first sampler that knows the elevation: survey
+ * inside its coverage, regional DEM elsewhere. Keeps provenance per vertex clear.
+ */
+export function hybridElevationSampler(...samplers: ElevationSampler[]): ElevationSampler {
+  return (lng, lat) => {
+    for (const s of samplers) {
+      const h = s(lng, lat);
+      if (h !== null && Number.isFinite(h)) return h;
+    }
+    return null;
+  };
+}
+
 /** Bilinear sampler over the CAD tile; null outside surveyed coverage (no extrapolation). */
 export function cadElevationSampler(tile: CadTerrainTile): ElevationSampler {
   const grid = tile as unknown as TerrainGrid;
