@@ -80,7 +80,9 @@ for (const width of [390, 1440]) {
   });
 
   await scenario(page, prefix + "-investment-project-selection", async () => {
-    await startAt(page, "/#invertir");
+    // Follow the actual visitor CTA instead of reloading /#invertir and aborting active SSR requests.
+    await page.getByRole("link", { name: /Ver proyectos en explotación/i }).click();
+    await page.locator("section#invertir").scrollIntoViewIfNeeded();
     const selection = page.getByRole("button", { name: /Seleccionar Los Verdes/i });
     await selection.waitFor({ timeout: 15000 });
     await selection.click();
@@ -95,7 +97,8 @@ for (const width of [390, 1440]) {
     const card = page.locator('section#invertir article').filter({
       has: page.getByRole("button", { name: /Seleccionar Los Verdes/i }),
     });
-    await card.getByRole("link", { name: /Ver ficha y visor 3D/i }).click({ timeout: 15000 });
+    // SPA navigation can outlive Playwright click's internal load wait on geospatial pages.
+    await card.getByRole("link", { name: /Ver ficha y visor 3D/i }).click({ timeout: 15000, noWaitAfter: true });
     await page.waitForURL(/\/terminal\/losverdes/, { timeout: 20000 });
     await page.getByRole("heading", { level: 1, name: /Los Verdes/i }).waitFor({ timeout: 20000 });
     assert.ok(await page.getByRole("link", { name: "Inicio", exact: true }).isVisible(), "breadcrumb to landing");
@@ -111,7 +114,12 @@ for (const width of [390, 1440]) {
     await page.waitForURL(/tab=mapa/, { timeout: 20000 });
     const perspective = page.getByRole("button", { name: /Perspectiva/i }).first();
     await perspective.waitFor({ timeout: 20000 });
-    await perspective.click();
+    await perspective.click({ noWaitAfter: true });
+    await page.waitForURL(/view=3d/, { timeout: 20000 });
+    await page.waitForFunction(() =>
+      [...document.querySelectorAll("button")].some((button) =>
+        button.textContent?.includes("Perspectiva") && button.getAttribute("aria-pressed") === "true"
+      ), undefined, { timeout: 8000 });
     assert.equal(await perspective.getAttribute("aria-pressed"), "true");
     await snapshot(page, prefix + "-perspective");
   });
