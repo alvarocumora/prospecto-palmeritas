@@ -223,7 +223,7 @@ export function MiningInvestShowcase() {
             )}
             <button
               type="button"
-              disabled={!valid}
+              disabled={!valid || !hydrated}
               onClick={emit}
               className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-surface px-4 py-3 text-sm font-medium disabled:opacity-40"
             >
