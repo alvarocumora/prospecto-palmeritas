@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import {
   ArrowLeft,
-  Loader2,
   RefreshCw,
   CheckCircle2,
   Clock,
@@ -15,9 +14,25 @@ import { toast } from "sonner";
 import { getMyInvestmentHistory } from "@/lib/investors.functions";
 import { PendingTicketBanner } from "@/features/investor/PendingTicketBanner";
 import { InvestorWallet } from "@/features/investor/InvestorWallet";
+import { ContentState, PageHeader, PlatformPage } from "@/components/ui-system";
 
 export const Route = createFileRoute("/_authenticated/dashboard/investments")({
-  head: () => ({ meta: [{ title: "Portafolio y cartola — Geocapitals" }, { name: "description", content: "Posiciones confirmadas, órdenes, contratos y estado KYC de tu inversión privada." }, { property: "og:title", content: "Portafolio y cartola — Geocapitals" }, { property: "og:description", content: "Cartola institucional de posiciones SPV y documentos de inversión." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Portafolio y cartola — Geocapitals" },
+      {
+        name: "description",
+        content: "Posiciones confirmadas, órdenes, contratos y estado KYC de tu inversión privada.",
+      },
+      { property: "og:title", content: "Portafolio y cartola — Geocapitals" },
+      {
+        property: "og:description",
+        content: "Cartola institucional de posiciones SPV y documentos de inversión.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   validateSearch: (s: Record<string, unknown>): { vista?: string } =>
     typeof s.vista === "string" ? { vista: s.vista } : {},
   component: MyInvestmentsPage,
@@ -38,12 +53,14 @@ function MyInvestmentsPage() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    setLoading(true); setError(false);
+    setLoading(true);
+    setError(false);
     try {
       const d = await getMyInvestmentHistory();
       setData(d);
     } catch (e) {
-      setError(true); setData(null);
+      setError(true);
+      setData(null);
       toast.error(e instanceof Error ? e.message : "Error cargando historial");
     } finally {
       setLoading(false);
@@ -61,27 +78,32 @@ function MyInvestmentsPage() {
   }, [vista, loading]);
 
   return (
-    <div data-theme="im-light" className="min-h-full bg-surface text-content"><main className="mx-auto max-w-7xl p-4 pb-28 md:p-7">
-      <header className="flex flex-wrap items-center justify-between gap-3 mb-6 border-b border-hairline pb-6">
-        <div>
-          <Link
-            to="/dashboard"
-            className="inline-flex items-center gap-1 text-[11px] font-mono text-content-muted hover:text-content"
+    <PlatformPage>
+      <Link
+        to="/dashboard"
+        className="mb-3 inline-flex min-h-11 items-center gap-2 text-xs text-content-muted hover:text-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Volver al inicio
+      </Link>
+      <PageHeader
+        eyebrow="Capital · Inversiones"
+        title="Portafolio y cartola"
+        description="Posiciones confirmadas, órdenes y documentos de inversión privada. El capital aportado es histórico; no es un valor de mercado."
+        actions={
+          <BrandButton
+            variant="outline"
+            onClick={() => void load()}
+            className="inline-flex min-h-11 items-center gap-2 rounded-md border border-hairline px-4 py-2 text-sm font-medium focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
           >
-            <ArrowLeft className="w-3 h-3" /> Dashboard
-          </Link>
-          <h1 className="font-serif text-3xl md:text-4xl mt-2">Portafolio y cartola</h1>
-          <p className="text-xs text-content-muted mt-1">
-            Posiciones confirmadas, órdenes y documentos de inversión privada.
-          </p>
-        </div>
-        <BrandButton variant="outline"
-          onClick={() => void load()}
-          className="inline-flex items-center gap-1.5 rounded border border-hairline bg-surface-3 px-3 py-1.5 text-xs font-mono hover:border-accent-brand/60"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} /> Recargar
-        </BrandButton>
-      </header>
+            <RefreshCw
+              className={`h-4 w-4 ${loading ? "animate-spin motion-reduce:animate-none" : ""}`}
+              aria-hidden="true"
+            />
+            Recargar
+          </BrandButton>
+        }
+      />
 
       <PendingTicketBanner />
       <InvestorWallet />
@@ -100,10 +122,15 @@ function MyInvestmentsPage() {
       </Link>
 
       {loading && !data ? (
-        <div className="flex items-center gap-2 text-sm text-content-muted p-8 justify-center">
-          <Loader2 className="w-4 h-4 animate-spin" /> Cargando…
-        </div>
-      ) : error ? (<div role="alert" className="py-6 text-content-muted">No pudimos cargar KYC y solicitudes. <BrandButton variant="outline" onClick={() => void load()}>Reintentar</BrandButton></div>) : !data ? null : (
+        <ContentState kind="loading" title="Cargando historial de inversión…" />
+      ) : error ? (
+        <ContentState
+          kind="error"
+          title="No pudimos cargar KYC y solicitudes"
+          description="El historial no está disponible en este momento; esto no significa que no tengas operaciones."
+          action={{ label: "Reintentar", onClick: () => void load() }}
+        />
+      ) : !data ? null : (
         <>
           <KycCard data={data} />
 
@@ -111,7 +138,7 @@ function MyInvestmentsPage() {
           <InquiriesBlock items={data.inquiries} />
         </>
       )}
-    </main></div>
+    </PlatformPage>
   );
 }
 
@@ -123,7 +150,10 @@ function KycCard({ data }: { data: Data }) {
         <div className="flex items-center gap-2 text-sm">
           <CircleDashed className="w-4 h-4 text-content-muted" />
           <span>Aún no completas tu perfil de inversionista.</span>
-          <Link to="/dashboard" className="ml-auto text-xs font-mono text-accent-brand hover:underline">
+          <Link
+            to="/dashboard"
+            className="ml-auto text-xs font-mono text-accent-brand hover:underline"
+          >
             Completar →
           </Link>
         </div>
@@ -136,7 +166,11 @@ function KycCard({ data }: { data: Data }) {
       cls: "border-hairline/40 bg-surface-2/10 text-content-muted",
       Icon: Clock,
     },
-    approved: { label: "Aprobado", cls: "border-hairline/40 bg-surface-2/10 text-accent-brand", Icon: CheckCircle2 },
+    approved: {
+      label: "Aprobado",
+      cls: "border-hairline/40 bg-surface-2/10 text-accent-brand",
+      Icon: CheckCircle2,
+    },
     rejected: {
       label: "Rechazado",
       cls: "border-hairline/40 bg-surface-2/10 text-content",
@@ -286,7 +320,10 @@ function InquiriesBlock({ items }: { items: Data["inquiries"] }) {
       ) : (
         <ul className="divide-y divide-hairline">
           {items.map((i) => (
-            <li key={i.id} className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <li
+              key={i.id}
+              className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs"
+            >
               <div className="min-w-0">
                 <div className="font-medium text-content truncate">
                   <Link
