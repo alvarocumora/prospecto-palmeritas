@@ -288,22 +288,7 @@ export const staffTicketAction = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     if (!(await isStaff(supabase, userId))) throw new Error("No autorizado");
     if (data.action === "issue_contract") {
-      const { data: t } = await supabase
-        .from("investment_tickets")
-        .select("investor_user_id, status")
-        .eq("id", data.ticketId)
-        .single();
-      const { data: p } = await supabase
-        .from("investor_profiles")
-        .select("review_status")
-        .eq("user_id", t?.investor_user_id ?? "")
-        .maybeSingle();
-      if (p?.review_status !== "approved")
-        throw new Error("El KYC del inversionista no está aprobado.");
-      const { error } = await supabase
-        .from("investment_tickets")
-        .update({ status: "contract_pending" })
-        .eq("id", data.ticketId);
+      const { error } = await supabase.rpc("ticket_issue_contract", { _ticket_id: data.ticketId });
       if (error) throw new Error(error.message);
     } else if (data.action === "settle") {
       const { error } = await supabase.rpc("ticket_settle", { _ticket_id: data.ticketId });

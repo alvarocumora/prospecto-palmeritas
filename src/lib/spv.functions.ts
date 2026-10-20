@@ -5,6 +5,13 @@
  *  - El inversionista sólo ve su propia posición (RLS + filtro explícito).
  *  - El alta/edición/anulación de posiciones es sólo para staff GeoCapitals,
  *    verificado en el servidor con `is_geocapitals_staff`.
+ *
+ * saveSpvPosition es la vía MANUAL del cap table (posiciones heredadas o
+ * fundadores, sin ticket asociado): no pasa por la máquina de estados de
+ * investment_tickets ni por ticket_settle. Queda su propio audit trail en
+ * spv_position_events (ver getPositionEvents). No usarla para cargar una
+ * inversión que debería originarse como ticket — esa siempre se liquida
+ * con ticket_settle, que es quien emite la spv_position real.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -155,6 +162,53 @@ export const getSpvOverview = createServerFn({ method: "GET" })
       stages: (stages ?? []) as StageRow[],
       metrics: (metrics ?? []) as MetricRow[],
       certifications: (certs ?? []) as CertRow[],
+    };
+  });
+
+export type CapTableSpv = {
+  id: string;
+  project_code: string;
+  legal_name: string;
+  total_shares: number;
+  currency: string;
+};
+
+export type CapTablePosition = {
+  id: string;
+  spv_id: string;
+  investor_name: string;
+  investor_email: string | null;
+  shares: number;
+  amount_paid: number;
+  currency: string;
+  status: string;
+  subscribed_on: string;
+};
+
+/** Cap table consolidado de varios proyectos, para el panel admin (solo staff). */
+export const getCapTableAdmin = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ codes: z.array(z.string()).max(10) }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (!(await isStaff(supabase, userId))) throw new Error("No autorizado");
+    const { data: spvs } = await supabase
+      .from("spv_entities")
+      .select("id, project_code, legal_name, total_shares, currency")
+      .in("project_code", data.codes);
+    const ids = (spvs ?? []).map((s: { id: string }) => s.id);
+    const { data: positions } = ids.length
+      ? await supabase
+          .from("spv_positions")
+          .select(
+            "id, spv_id, investor_name, investor_email, shares, amount_paid, currency, status, subscribed_on",
+          )
+          .in("spv_id", ids)
+          .order("subscribed_on", { ascending: true })
+      : { data: [] };
+    return {
+      spvs: (spvs ?? []) as CapTableSpv[],
+      positions: (positions ?? []) as CapTablePosition[],
     };
   });
 
