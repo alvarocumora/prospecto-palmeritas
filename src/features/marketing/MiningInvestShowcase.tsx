@@ -62,7 +62,7 @@ export function MiningInvestShowcase() {
       <div className="max-w-6xl mx-auto px-5 py-16 sm:py-20">
         <Eyebrow className="mb-3">Proyectos en explotación</Eyebrow>
         <h2 className="font-serif text-3xl md:text-4xl leading-tight max-w-2xl">
-          Dos faenas activas, una ronda por proyecto.
+          Dos proyectos mineros, una ronda por proyecto.
         </h2>
         <p className="mt-3 text-content-muted max-w-2xl text-sm">
           Explotación declarada por el titular de 5.000 a 15.000 t/mes en cada proyecto. Ronda de{" "}
@@ -73,22 +73,26 @@ export function MiningInvestShowcase() {
         <div className="mt-10 grid lg:grid-cols-[1fr_1fr] gap-6">
           <div className="grid gap-4">
             {PROJECTS.map((p) => (
-              <button
+              <article
                 key={p.slug}
-                type="button"
-                onClick={() => setSlug(p.slug)}
                 className={`text-left border p-5 bg-surface transition-colors ${
                   slug === p.slug
                     ? "border-accent-brand"
                     : "border-hairline hover:border-content-muted"
                 }`}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="font-serif text-2xl">{p.name}</div>
+                <button
+                  type="button"
+                  onClick={() => setSlug(p.slug)}
+                  aria-pressed={slug === p.slug}
+                  aria-label={`Seleccionar ${p.name} para simular inversión`}
+                  className="flex min-h-11 w-full items-center justify-between gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
+                >
+                  <span className="font-serif text-2xl">{p.name}</span>
                   <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand border border-accent-brand px-2 py-0.5">
                     Ronda {usd(rounds.find((r) => r.slug === p.slug)?.target ?? ROUND.target)}
                   </span>
-                </div>
+                </button>
                 <div className="mt-1 text-xs text-content-muted">
                   {getTerminalProject(p.slug)?.ficha.region ?? "Ubicación por verificar"}
                 </div>
@@ -126,12 +130,11 @@ export function MiningInvestShowcase() {
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
                   search={{ tab: "mapa" }}
-                  onClick={(e) => e.stopPropagation()}
-                  className="mt-4 inline-flex items-center gap-1 text-sm text-accent-brand hover:underline"
+                  className="mt-4 inline-flex min-h-11 items-center gap-1 text-sm text-accent-brand hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
                 >
                   Ver ficha y visor 3D <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
-              </button>
+              </article>
             ))}
           </div>
 
