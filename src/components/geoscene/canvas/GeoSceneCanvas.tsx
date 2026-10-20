@@ -237,6 +237,30 @@ export function GeoSceneCanvas({
     });
   }, [cadTerrain, cadMesh, terrainVisible, mode]);
 
+  // Elevation used to drape 2D layers onto the relief actually rendered.
+  // CAD tile when present (absolute heights), MapLibre DEM otherwise; none in Planta.
+  const [terrainEpoch, setTerrainEpoch] = useState(0);
+  const demActive = terrainVisible && !cadTerrain && view === "3d";
+  const drape = useMemo((): { sample: ElevationSampler; fallback: number } | null => {
+    if (view !== "3d" || !terrainVisible) return null;
+    if (cadTerrain) {
+      const t = cadTerrain.tile;
+      return { sample: cadElevationSampler(t), fallback: t.referenceElevationM + t.minH };
+    }
+    const map = mapRef.current as unknown as {
+      terrain?: { getElevationForLngLatZoom?: (ll: maplibregl.LngLat, z: number) => number };
+    } | null;
+    const terrain = map?.terrain;
+    if (!terrain?.getElevationForLngLatZoom || terrainEpoch === 0) return null;
+    const zoom = Math.min(14, Math.max(8, Math.round(mapRef.current?.getZoom() ?? 12)));
+    const sample: ElevationSampler = (lng, lat) => {
+      const h = terrain.getElevationForLngLatZoom!(new maplibregl.LngLat(lng, lat), zoom);
+      return Number.isFinite(h) && h !== 0 ? h : null;
+    };
+    return { sample, fallback: sample(centerLng, centerLat) ?? 0 };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view, terrainVisible, cadTerrain, terrainEpoch, demActive]);
+
   const resolvedProjectLayers = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
@@ -247,9 +271,14 @@ export function GeoSceneCanvas({
         const dashed = isDashedEvidence(layer.definition.evidence);
         const spectral = SPECTRAL_LAYER_IDS.has(layer.id);
         const rgb: [number, number, number] = [color[0], color[1], color[2]];
+        const data = drape
+          ? drapeFeatureCollection(layer.data as FeatureCollection, drape.sample, {
+              fallback: drape.fallback,
+            })
+          : layer.data;
         return new GeoJsonLayer({
           id: `project:${layer.id}`,
-          data: layer.data as never,
+          data: data as never,
           pickable: true,
           stroked: true,
           filled: true,
@@ -275,7 +304,56 @@ export function GeoSceneCanvas({
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity]);
+  }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
+
+  // Discos estructurales: rumbo/manteo de terreno como planos orientados.
+  const structurePlaneLayer = useMemo(() => {
+    if (mode === "resource" || view !== "3d" || !visibleLayerIds.has("geology.structures")) return null;
+    const source = resolvedProjectLayers.find((l) => l.id === "geology.structures");
+    if (!source) return null;
+    const discs: { code: string; ring: [number, number, number][]; label: string }[] = [];
+    for (const f of (source.data as FeatureCollection).features) {
+      const plane = planeFromProperties(f.properties as Record<string, unknown>);
+      if (!plane || f.geometry?.type !== "LineString") continue;
+      const c = f.geometry.coordinates;
+      const lng = (c[0][0] + c[c.length - 1][0]) / 2;
+      const lat = (c[0][1] + c[c.length - 1][1]) / 2;
+      const z = (drape?.sample(lng, lat) ?? drape?.fallback ?? 0) + 4;
+      discs.push({
+        code: plane.code,
+        ring: discRing([lng, lat, z], plane, 38),
+        label: `${plane.code} · rumbo ${Math.round(plane.strikeDeg)}° · manteo ${plane.dipDeg}° → ${Math.round(plane.dipDirectionDeg)}°`,
+      });
+    }
+    if (!discs.length) return null;
+    const color = evidenceColor(source.definition.evidence);
+    return new PolygonLayer({
+      id: "geology.structure_planes",
+      data: discs,
+      getPolygon: (d: (typeof discs)[number]) => d.ring,
+      filled: true,
+      stroked: true,
+      getFillColor: [color[0], color[1], color[2], 110],
+      getLineColor: [color[0], color[1], color[2], 255],
+      getLineWidth: 2,
+      lineWidthUnits: "pixels",
+      pickable: true,
+      parameters: { depthTest: false } as never,
+    });
+  }, [mode, view, visibleLayerIds, resolvedProjectLayers, drape]);
+
+  // Anomalías extruidas: la base se apoya en el relieve, no en cota 0.
+  const drapedSatLayer = useMemo(() => {
+    if (!satAnomaliesLayer || !drape) return satAnomaliesLayer;
+    type P = { rings: number[][][]; centroidLng: number; centroidLat: number };
+    return (satAnomaliesLayer as Layer).clone({
+      getPolygon: (d: P) => {
+        const z = drape.sample(d.centroidLng, d.centroidLat) ?? drape.fallback;
+        return d.rings.map((r) => r.map((p) => [p[0], p[1], z]));
+      },
+      updateTriggers: { getPolygon: [drape] },
+    } as never);
+  }, [satAnomaliesLayer, drape]);
 
   // Escena Sentinel-2 procesada por el pipeline del proyecto (índices reales,
   // malla de visualización). Se drapea sobre DEM/CAD sin test de profundidad.
@@ -285,7 +363,9 @@ export function GeoSceneCanvas({
     const range = indexRange(data, index);
     return new GeoJsonLayer({
       id: "project:sentinel2-processed",
-      data: data as never,
+      data: (drape
+        ? drapeFeatureCollection(data, drape.sample, { fallback: drape.fallback, offsetM: 3 })
+        : data) as never,
       pickable: true,
       stroked: false,
       filled: true,
