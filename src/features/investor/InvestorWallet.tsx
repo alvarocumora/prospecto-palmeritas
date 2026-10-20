@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "@tanstack/react-router";
 import { BrandButton } from "@/components/brand";
+import { ContentState } from "@/components/ui-system";
 import { confirmedPositionSummary, money } from "./investmentPresentation";
 import { Landmark, Clock, FileText, Download } from "lucide-react";
 import { seriesForCode } from "@/features/investor/projectTerms";
@@ -110,7 +111,7 @@ export function InvestorWallet() {
     <section
       id="cartola"
       data-theme="im-light"
-      className="mb-8 scroll-mt-20 bg-surface text-content"
+      className="mb-8 scroll-mt-20 overflow-hidden rounded-xl border border-hairline bg-surface-3 text-content"
     >
       <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
         <Landmark className="w-4 h-4 text-accent-brand" />
@@ -147,15 +148,21 @@ export function InvestorWallet() {
         <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted mb-3">
           Mis posiciones confirmadas
         </h3>
-        {error ? (<div role="alert" className="py-5 text-sm text-content-muted">No pudimos consultar tus posiciones.<BrandButton onClick={() => void load()} variant="outline" className="mt-3">Reintentar</BrandButton></div>) : loading ? (
-          <p role="status" className="text-sm text-content-muted">
-            Consultando tus posiciones…
-          </p>
+        {error ? (
+          <ContentState
+            kind="error"
+            title="No pudimos consultar tus posiciones"
+            description="Un error de consulta no equivale a no tener inversiones."
+            action={{ label: "Reintentar", onClick: () => void load() }}
+          />
+        ) : loading ? (
+          <ContentState kind="loading" title="Consultando tus posiciones…" />
         ) : !confirmed || confirmed.positions.length === 0 ? (
-          <p className="text-sm text-content-muted">
-            Aún no tienes participaciones confirmadas. Aparecerán aquí cuando el equipo liquide tu
-            ticket.
-          </p>
+          <ContentState
+            kind="empty"
+            title="Sin posiciones confirmadas"
+            description="Las participaciones se mostrarán cuando el equipo liquide y confirme tu ticket."
+          />
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {confirmed.positions.map((p) => (
