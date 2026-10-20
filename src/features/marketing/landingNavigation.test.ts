@@ -9,7 +9,11 @@ describe("GeoCapitals public intelligence navigation", () => {
       dataAnalysis: "/terminal",
       projectEvaluation: "/proyectos",
     });
-    expect(Object.values(PUBLIC_INTELLIGENCE_PATHS).every((path) => !path.includes("cholqui") && !path.includes("losverdes"))).toBe(true);
+    expect(
+      Object.values(PUBLIC_INTELLIGENCE_PATHS).every(
+        (path) => !path.includes("cholqui") && !path.includes("losverdes"),
+      ),
+    ).toBe(true);
   });
 
   it("keeps unique destinations for the four intelligence promises", () => {

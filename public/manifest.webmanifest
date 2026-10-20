@@ -7,11 +7,7 @@
   "display": "standalone",
   "background_color": "#0b0a09",
   "theme_color": "#0b0a09",
-  "categories": [
-    "productivity",
-    "utilities",
-    "business"
-  ],
+  "categories": ["productivity", "utilities", "business"],
   "icons": [
     {
       "src": "/icon-192.png",

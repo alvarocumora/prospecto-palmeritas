@@ -133,14 +133,19 @@ export function ProjectTerminalShell({
       <header className="sticky top-0 z-30 bg-surface-inverse text-white border-b border-white/10">
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
-            <nav aria-label="Volver a la plataforma" className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
+            <nav
+              aria-label="Volver a la plataforma"
+              className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]"
+            >
               <Link
                 to="/"
                 className="inline-flex min-h-11 items-center text-white/60 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
               >
                 Inicio
               </Link>
-              <span aria-hidden="true" className="text-white/30">/</span>
+              <span aria-hidden="true" className="text-white/30">
+                /
+              </span>
               <Link
                 to="/terminal"
                 className="inline-flex min-h-11 items-center text-white hover:text-white/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
@@ -149,8 +154,10 @@ export function ProjectTerminalShell({
               </Link>
             </nav>
 
-            <nav aria-label="Seleccionar proyecto"
-              className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0">
+            <nav
+              aria-label="Seleccionar proyecto"
+              className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0"
+            >
               {projects.map((p) => (
                 <Link
                   key={p.slug}
@@ -272,7 +279,11 @@ function MapaTab({
 function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
     <div className="flex justify-end mb-4">
-      <div role="group" aria-label="Vista del proyecto" className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded">
+      <div
+        role="group"
+        aria-label="Vista del proyecto"
+        className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded"
+      >
         {(["2d", "3d"] as const).map((key) => {
           const Icon = key === "2d" ? MapIcon : Box;
           return (

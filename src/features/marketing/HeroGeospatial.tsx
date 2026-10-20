@@ -22,9 +22,17 @@ const VALUES = [
 
 const INTEL = [
   { icon: Layers, label: "Capas geológicas", to: PUBLIC_INTELLIGENCE_PATHS.geologicalLayers },
-  { icon: Satellite, label: "Imágenes satelitales", to: PUBLIC_INTELLIGENCE_PATHS.satelliteImagery },
+  {
+    icon: Satellite,
+    label: "Imágenes satelitales",
+    to: PUBLIC_INTELLIGENCE_PATHS.satelliteImagery,
+  },
   { icon: BarChart3, label: "Análisis de datos", to: PUBLIC_INTELLIGENCE_PATHS.dataAnalysis },
-  { icon: ClipboardCheck, label: "Evaluación de proyectos", to: PUBLIC_INTELLIGENCE_PATHS.projectEvaluation },
+  {
+    icon: ClipboardCheck,
+    label: "Evaluación de proyectos",
+    to: PUBLIC_INTELLIGENCE_PATHS.projectEvaluation,
+  },
 ];
 
 const LEGEND = [

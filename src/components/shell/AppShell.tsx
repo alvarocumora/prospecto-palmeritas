@@ -194,7 +194,10 @@ export function MarketingHeader() {
       </div>
       {menuOpen && (
         <div className="xl:hidden border-t border-hairline bg-white max-h-[80vh] overflow-y-auto">
-          <nav aria-label="Navegación móvil" className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm">
+          <nav
+            aria-label="Navegación móvil"
+            className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm"
+          >
             {PILLARS.map((p) => (
               <div key={p.label} className="py-2 border-b border-hairline last:border-0">
                 <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-subtle py-1">
