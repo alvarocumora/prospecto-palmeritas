@@ -29,7 +29,7 @@ export function AnalysisDock({
   const z0 = elevations[0];
   const z1 = elevations[elevations.length - 1];
   return (
-    <div data-theme="im-light" className="absolute bottom-3 left-1/2 z-30 flex max-w-[calc(100%-1.5rem)] -translate-x-1/2 flex-col items-center gap-2">
+    <div data-theme="im-light" className="pointer-events-none absolute bottom-3 left-1/2 z-30 flex bg-transparent [&>*]:pointer-events-auto max-w-[calc(100%-1.5rem)] -translate-x-1/2 flex-col items-center gap-2">
       {measuring && measurePts.length > 0 && (
         <div className="rounded border border-hairline bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-content shadow">
           {measurePts.length} pto · {fmtM(len)}
