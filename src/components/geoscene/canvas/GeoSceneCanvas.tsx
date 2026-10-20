@@ -36,6 +36,11 @@ import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useProjects } from "@/hooks/useProjects";
+import { useDrillHoles } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { buildSectionLine, projectHolesToSection } from "@/lib/section/projection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { GeoSnapshotViewState } from "@/lib/geospatial/snapshotManifest";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
@@ -346,6 +351,63 @@ export function GeoSceneCanvas({
       ),
     };
   }, [sectionPts, drape, cadTerrain, resolvedProjectLayers, corridor]);
+
+  // Sondajes proyectados sobre el corte, para interpretación IA (geólogo senior
+  // razonando continuidad de mineralización a partir de intercepts reales).
+  const { data: sectionHoles } = useDrillHoles(privateProjectId);
+  const { byHole: sectionLogsByHole } = useProjectCoreLogs(privateProjectId);
+  const sectionProjectedHoles = useMemo(() => {
+    if (sectionPts.length < 2 || !sectionHoles.length) return [];
+    const [a, b] = sectionPts;
+    const line = buildSectionLine([a[1], a[0]], [b[1], b[0]]);
+    return projectHolesToSection(sectionHoles, sectionLogsByHole, line, corridor);
+  }, [sectionPts, sectionHoles, sectionLogsByHole, corridor]);
+  const [sectionInterpretation, setSectionInterpretation] = useState<string | null>(null);
+  const [sectionInterpreting, setSectionInterpreting] = useState(false);
+  useEffect(() => {
+    setSectionInterpretation(null);
+  }, [sectionPts]);
+  const interpretSection = async () => {
+    if (sectionInterpreting || !section || sectionPts.length < 2) return;
+    setSectionInterpreting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("section-interpret", {
+        body: {
+          line: {
+            lengthM: section.length,
+            bearingDeg: section.azimuth,
+            start: sectionPts[0],
+            end: sectionPts[1],
+          },
+          maxOffsetM: corridor,
+          projectName: project?.name,
+          holes: sectionProjectedHoles.map((ph) => ({
+            hole_id: ph.hole.hole_id,
+            alongM: ph.alongM,
+            signedOffsetM: ph.signedOffsetM,
+            azimuth: ph.hole.azimuth,
+            dip: ph.hole.dip,
+            depth: ph.hole.actual_depth ?? ph.hole.planned_depth,
+            intercepts: ph.logs.map((l) => ({
+              from: l.depth_from,
+              to: l.depth_to,
+              au: l.au_gpt,
+              cu: l.cu_pct,
+              lithology: l.lithology,
+              alteration: l.alteration,
+            })),
+          })),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setSectionInterpretation(data.interpretation as string);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error generando interpretación");
+    } finally {
+      setSectionInterpreting(false);
+    }
+  };
   const sectionLayer = useMemo(() => {
     if (!sectionOn || !sectionPts.length) return null;
     const z = (p: LngLat) => (drape?.sample(p[0], p[1]) ?? drape?.fallback ?? 0) + 6;
@@ -970,6 +1032,10 @@ export function GeoSceneCanvas({
           {...section}
           corridor={corridor}
           onCorridor={setCorridor}
+          holeCount={sectionProjectedHoles.length}
+          onInterpret={interpretSection}
+          interpreting={sectionInterpreting}
+          interpretation={sectionInterpretation}
           onClose={() => {
             setSectionOn(false);
             setSectionPts([]);

@@ -1,5 +1,6 @@
 // Panel de perfil del corte A-A'. Escala vertical = horizontal (sin exageración)
 // para que los manteos aparentes se lean con su ángulo real.
+import { Loader2, Sparkles } from "lucide-react";
 import type { SectionFault, SectionUnit } from "../analysisTools";
 import { unitColor } from "../analysisTools";
 import type { ProfileSample, SectionStructure } from "../sectionProfile";
@@ -12,6 +13,10 @@ export function SectionProfilePanel({
   geology,
   corridor,
   onCorridor,
+  holeCount,
+  onInterpret,
+  interpreting,
+  interpretation,
   onClose,
 }: {
   length: number;
@@ -21,6 +26,11 @@ export function SectionProfilePanel({
   geology?: { units: SectionUnit[]; faults: SectionFault[] };
   corridor: number;
   onCorridor: (m: number) => void;
+  /** Sondajes propios del proyecto proyectados sobre la franja del corte. */
+  holeCount?: number;
+  onInterpret?: () => void;
+  interpreting?: boolean;
+  interpretation?: string | null;
   onClose: () => void;
 }) {
   const known = profile.filter((p) => p.z != null) as { d: number; z: number }[];
@@ -73,6 +83,22 @@ export function SectionProfilePanel({
               ))}
             </select>
           </label>
+          {onInterpret && (
+            <button
+              type="button"
+              onClick={onInterpret}
+              disabled={interpreting || !holeCount}
+              title={holeCount ? undefined : "Sin sondajes propios dentro de la franja del corte"}
+              className="inline-flex min-h-[32px] items-center gap-1 rounded border border-accent-brand/60 px-2 text-accent-brand hover:bg-accent-brand/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {interpreting ? (
+                <Loader2 className="h-3 w-3 animate-spin" />
+              ) : (
+                <Sparkles className="h-3 w-3" />
+              )}
+              Interpretar IA{holeCount ? ` (${holeCount})` : ""}
+            </button>
+          )}
           <button
             type="button"
             onClick={onClose}
@@ -207,6 +233,19 @@ export function SectionProfilePanel({
             )
             .join(" · ")}
         </p>
+      )}
+      {interpretation && (
+        <div className="mt-2 max-h-48 overflow-y-auto border-t border-border pt-2">
+          <div className="mb-1 flex items-center gap-1.5 font-semibold text-foreground">
+            <Sparkles className="h-3 w-3 text-accent-brand" />
+            Interpretación geológica IA
+          </div>
+          <p className="whitespace-pre-wrap leading-relaxed">{interpretation}</p>
+          <p className="mt-1.5 italic">
+            Generado por IA a partir de sondajes propios proyectados en la franja. Verifica contra
+            datos de campo — no reemplaza el juicio del QP (NI 43-101).
+          </p>
+        </div>
       )}
     </div>
   );
