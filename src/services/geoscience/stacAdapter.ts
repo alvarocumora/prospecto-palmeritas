@@ -2,10 +2,12 @@ import type { StacItem } from "@/types/stac";
 import type { GeoscienceDatasetDraft } from "./registryAdapter";
 
 /**
- * Mapper puro STAC Item -> GeoscienceDatasetDraft. Sin HTTP, sin auth, sin
- * paginación: eso es GEO-02 (ingestión real desde Copernicus Data Space /
- * Planetary Computer). Acá solo se fija el contrato de traducción para que
- * GEO-02 no tenga que rediseñar el shape del dataset.
+ * Mapper puro STAC Item -> GeoscienceDatasetDraft. Sin HTTP ni auth propios
+ * (eso lo hace `searchStac` en satelliteIntel.functions.ts, que ya pagina vía
+ * `fetchStacFeatures` contra Planetary Computer / NASA CMR-STAC y usa este
+ * mapper para cruzar cada escena al registro unificado `geoscience_datasets`).
+ * Esta función se mantiene pura y sin red para seguir siendo testeable sin
+ * mocks de HTTP.
  */
 export function stacItemToDatasetDraft(item: StacItem, projectId: string): GeoscienceDatasetDraft {
   return {

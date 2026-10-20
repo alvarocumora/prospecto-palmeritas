@@ -1,9 +1,9 @@
 import { ProjectMasterViewer } from "@/components/geo/ProjectMasterViewer";
 import { satelliteEvidence } from "@/lib/satellite/evidence";
 import { geoColors } from "@/lib/geospatial/visualTokens";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { LucideIcon } from "lucide-react";
-import type { FeatureCollection, Geometry } from "geojson";
+import type { FeatureCollection } from "geojson";
 import {
   Layers,
   Loader2,
@@ -17,63 +17,18 @@ import {
   useTargetSatelliteSummaries,
   type TargetSatelliteSummary,
 } from "@/hooks/useTargetSatelliteSummaries";
-import { supabase } from "@/integrations/supabase/client";
+import {
+  useSatelliteContextLayers,
+  type SatelliteLayerKey,
+} from "@/hooks/useSatelliteContextLayers";
 import { cn } from "@/lib/utils";
-
-type HyperRow = {
-  metadata?: unknown;
-  id: string;
-  source: string | null;
-  mineral: string | null;
-  assemblage: string | null;
-  bbox_geojson: Geometry | null;
-  mean_score: number | null;
-  max_score: number | null;
-  acquisition_date: string | null;
-};
-
-type InsarRow = {
-  metadata?: unknown;
-  id: string;
-  asset_name: string | null;
-  asset_type: string | null;
-  point_geojson: Geometry | null;
-  velocity_mm_year: number | null;
-  cumulative_displacement_mm: number | null;
-  coherence: number | null;
-  alert_severity: string | null;
-  end_date: string | null;
-};
-
-type StockRow = {
-  notes?: string | null;
-  id: string;
-  name: string;
-  material: string | null;
-  polygon_geojson: Geometry | null;
-  volume_m3: number | null;
-  area_m2: number | null;
-  mean_height_m: number | null;
-};
-
-type HotspotRow = {
-  id: string;
-  index_code: string | null;
-  geometry: Geometry | null;
-  severity: string | null;
-  score: number | null;
-  area_ha: number | null;
-  detected_at: string | null;
-  notes: string | null;
-};
 
 type Props = {
   projectId: string;
   center: [number, number] | null; // [lat, lng]
 };
 
-type LayerKey =
-  "aoi" | "hyper_emit" | "hyper_aster" | "insar" | "demdiff" | "targets" | "hotspots_high";
+type LayerKey = SatelliteLayerKey | "targets";
 
 const LAYER_META: Record<
   LayerKey,
@@ -115,17 +70,6 @@ const LAYER_META: Record<
 
 const CRITICAL_PRIORITIES = new Set(["critical", "Critical", "CRITICAL", "high", "High", "HIGH"]);
 
-// Industrial color ramp for InSAR velocity (mm/year)
-function velocityColor(v: number | null): string {
-  if (v == null) return geoColors.declared;
-  const a = Math.abs(v);
-  if (a >= 25) return geoColors.deposit; // red
-  if (a >= 15) return geoColors.tenureOwn; // amber
-  if (a >= 8) return geoColors.structure; // yellow
-  if (a >= 3) return geoColors.signal; // cyan
-  return geoColors.sample; // green
-}
-
 function statusColor(s: TargetSatelliteSummary["overallStatus"]): string {
   return s === "alert"
     ? geoColors.neighbourDeposit
@@ -146,11 +90,6 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
   });
   const [statusFilter, setStatusFilter] = useState<"all" | "alert" | "monitor" | "ok">("all");
   const [criticalOnly, setCriticalOnly] = useState(false);
-  const [hyperData, setHyperData] = useState<HyperRow[]>([]);
-  const [insarData, setInsarData] = useState<InsarRow[]>([]);
-  const [stockData, setStockData] = useState<StockRow[]>([]);
-  const [hotspots, setHotspots] = useState<HotspotRow[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const { data: summariesRes } = useTargetSatelliteSummaries(projectId);
   const summaries = useMemo<TargetSatelliteSummary[]>(
@@ -158,44 +97,7 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
     [summariesRes],
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      const [h, i, s, hs] = await Promise.all([
-        supabase
-          .from("hyperspectral_products")
-          .select(
-            "id,source,mineral,assemblage,bbox_geojson,mean_score,max_score,acquisition_date,metadata",
-          )
-          .eq("project_id", projectId),
-        supabase
-          .from("insar_displacement")
-          .select(
-            "id,asset_name,asset_type,point_geojson,velocity_mm_year,cumulative_displacement_mm,coherence,alert_severity,end_date,metadata",
-          )
-          .eq("project_id", projectId),
-        supabase
-          .from("stockpile_volumes")
-          .select("id,name,material,polygon_geojson,volume_m3,area_m2,mean_height_m,notes")
-          .eq("project_id", projectId),
-        supabase
-          .from("satellite_anomalies")
-          .select("id,index_code,geometry,severity,score,area_ha,detected_at,notes")
-          .eq("project_id", projectId)
-          .in("severity", ["high", "HIGH", "High", "critical", "Critical", "CRITICAL"]),
-      ]);
-      if (cancelled) return;
-      setHyperData((h.data ?? []) as unknown as HyperRow[]);
-      setInsarData((i.data ?? []) as unknown as InsarRow[]);
-      setStockData((s.data ?? []) as unknown as StockRow[]);
-      setHotspots((hs.data ?? []) as unknown as HotspotRow[]);
-      setLoading(false);
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
+  const { layers: satelliteLayers, loading, counts } = useSatelliteContextLayers(projectId);
 
   const contextLayers = useMemo(() => {
     const result: Array<{
@@ -206,105 +108,43 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       features: FeatureCollection;
       color?: string | ((properties: Record<string, unknown>) => string);
     }> = [];
-    const add = (
-      key: LayerKey,
-      features: FeatureCollection["features"],
-      color?: string | ((properties: Record<string, unknown>) => string),
-    ) => {
-      if (enabled[key])
-        result.push({
-          id: key,
-          label: LAYER_META[key].label,
-          evidence: key === "targets" ? "DECLARADO" : "DERIVADO",
-          evidenceForFeature: (properties) =>
-            satelliteEvidence(
-              properties.metadata,
-              typeof properties.notes === "string" ? properties.notes : null,
-            ),
-          features: { type: "FeatureCollection", features },
-          color: color ?? LAYER_META[key].color,
-        });
-    };
-    const footprint = hyperData
-      .map((p) => p.bbox_geojson)
-      .filter((g): g is Geometry => !!g)
-      .sort((a, b) => bboxArea(b) - bboxArea(a))[0];
-    add(
-      "aoi",
-      footprint
-        ? [
-            {
-              type: "Feature",
-              geometry: footprint,
-              properties: { source: "Mayor huella hiperespectral; no delimita tenencia" },
-            },
-          ]
-        : [],
-    );
-    for (const [key, source] of [
-      ["hyper_emit", "EMIT"],
-      ["hyper_aster", "ASTER"],
-    ] as const)
-      add(
-        key,
-        hyperData
-          .filter((p) => (source === "EMIT" ? p.source === "EMIT" : p.source !== "EMIT"))
-          .flatMap((p) =>
-            p.bbox_geojson
-              ? [{ type: "Feature", id: p.id, geometry: p.bbox_geojson, properties: { ...p } }]
-              : [],
+    for (const layer of satelliteLayers) if (enabled[layer.id]) result.push(layer);
+    if (enabled.targets)
+      result.push({
+        id: "targets",
+        label: LAYER_META.targets.label,
+        evidence: "DECLARADO",
+        evidenceForFeature: (properties) =>
+          satelliteEvidence(
+            properties.metadata,
+            typeof properties.notes === "string" ? properties.notes : null,
           ),
-      );
-    add(
-      "insar",
-      insarData.flatMap((p) =>
-        p.point_geojson
-          ? [{ type: "Feature", id: p.id, geometry: p.point_geojson, properties: { ...p } }]
-          : [],
-      ),
-      (p) => velocityColor(typeof p.velocity_mm_year === "number" ? p.velocity_mm_year : null),
-    );
-    add(
-      "demdiff",
-      stockData.flatMap((p) =>
-        p.polygon_geojson
-          ? [{ type: "Feature", id: p.id, geometry: p.polygon_geojson, properties: { ...p } }]
-          : [],
-      ),
-    );
-    add(
-      "hotspots_high",
-      hotspots.flatMap((p) =>
-        p.geometry
-          ? [{ type: "Feature", id: p.id, geometry: p.geometry, properties: { ...p } }]
-          : [],
-      ),
-    );
-    add(
-      "targets",
-      summaries
-        .filter((t) => statusFilter === "all" || t.overallStatus === statusFilter)
-        .filter((t) => !criticalOnly || CRITICAL_PRIORITIES.has(String(t.priority ?? "")))
-        .flatMap((t) =>
-          t.lng == null || t.lat == null
-            ? []
-            : [
-                {
-                  type: "Feature",
-                  geometry: { type: "Point", coordinates: [t.lng, t.lat] },
-                  properties: {
-                    ...t,
-                    insar_velocity_mm_year: t.insar.velocityMmYear,
-                    hyperspectral_max_score: t.hyperspectral.maxScore,
-                    dem_diff_volume_m3: t.demDiff.volumeM3,
-                  },
-                },
-              ],
-        ),
-      (p) => statusColor(p.overallStatus as TargetSatelliteSummary["overallStatus"]),
-    );
+        features: {
+          type: "FeatureCollection",
+          features: summaries
+            .filter((t) => statusFilter === "all" || t.overallStatus === statusFilter)
+            .filter((t) => !criticalOnly || CRITICAL_PRIORITIES.has(String(t.priority ?? "")))
+            .flatMap((t) =>
+              t.lng == null || t.lat == null
+                ? []
+                : [
+                    {
+                      type: "Feature" as const,
+                      geometry: { type: "Point" as const, coordinates: [t.lng, t.lat] },
+                      properties: {
+                        ...t,
+                        insar_velocity_mm_year: t.insar.velocityMmYear,
+                        hyperspectral_max_score: t.hyperspectral.maxScore,
+                        dem_diff_volume_m3: t.demDiff.volumeM3,
+                      },
+                    },
+                  ],
+            ),
+        },
+        color: (p) => statusColor(p.overallStatus as TargetSatelliteSummary["overallStatus"]),
+      });
     return result;
-  }, [enabled, hyperData, insarData, stockData, hotspots, summaries, statusFilter, criticalOnly]);
+  }, [enabled, satelliteLayers, summaries, statusFilter, criticalOnly]);
 
   function toggle(k: LayerKey) {
     setEnabled((prev) => ({ ...prev, [k]: !prev[k] }));
@@ -319,9 +159,9 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
             Visor Geoespacial
           </h2>
           <span className="text-xs text-content-subtle font-mono">
-            ({hyperData.length} hiper · {insarData.length} InSAR · {stockData.length} stockpiles ·{" "}
+            ({counts.hyper} hiper · {counts.insar} InSAR · {counts.stock} stockpiles ·{" "}
             {summaries.length} targets ·{" "}
-            <span className="text-brand-danger">{hotspots.length} hotspots HIGH</span>)
+            <span className="text-brand-danger">{counts.hotspots} hotspots HIGH</span>)
           </span>
         </div>
         {loading && <Loader2 className="w-4 h-4 animate-spin text-content-subtle" />}
@@ -470,16 +310,4 @@ export function SatelliteMapViewer({ projectId, center }: Props) {
       </div>
     </div>
   );
-}
-
-function bboxArea(g: Geometry | null | undefined): number {
-  try {
-    const c = g && "coordinates" in g ? (g.coordinates as unknown[])[0] : undefined;
-    if (!Array.isArray(c)) return 0;
-    const xs = c.map((p: number[]) => p[0]);
-    const ys = c.map((p: number[]) => p[1]);
-    return (Math.max(...xs) - Math.min(...xs)) * (Math.max(...ys) - Math.min(...ys));
-  } catch {
-    return 0;
-  }
 }
