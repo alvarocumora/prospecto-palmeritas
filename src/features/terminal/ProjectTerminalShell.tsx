@@ -280,7 +280,7 @@ function MapaTab({
 
 function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
-    <div className="pointer-events-none absolute bottom-3 left-1/2 z-30 -translate-x-1/2">
+    <div className="pointer-events-none absolute right-3 top-3 z-30">
       <div
         role="group"
         aria-label="Vista del proyecto"
