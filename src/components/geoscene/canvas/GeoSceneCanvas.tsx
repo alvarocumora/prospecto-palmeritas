@@ -740,7 +740,7 @@ export function GeoSceneCanvas({
           setSectionOn((v) => !v);
           setSectionPts([]);
         }}
-        className={`absolute top-3 right-14 z-10 min-h-[36px] rounded border px-2 font-mono text-[10px] backdrop-blur ${
+        className={`absolute top-14 right-3 z-10 min-h-[36px] rounded border px-2 font-mono text-[10px] backdrop-blur ${
           sectionOn ? "border-accent-brand bg-accent-brand text-primary-foreground" : "border-border bg-bg-secondary/90 text-foreground"
         }`}
       >
