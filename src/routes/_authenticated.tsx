@@ -166,7 +166,11 @@ function AuthenticatedLayout() {
       </main>
 
       <StatusBar />
-      <MobileBottomNav onMoreClick={() => setDrawerOpen(true)} catastroAlerts={catastroAlerts} />
+      <MobileBottomNav
+        onMoreClick={() => setDrawerOpen(true)}
+        catastroAlerts={catastroAlerts}
+        variant={profile?.account_type === "investor" ? "investor" : "default"}
+      />
     </div>
   );
 }

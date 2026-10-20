@@ -8,3 +8,7 @@
 
 - Investment tickets: state machine enforced by trigger on investment_tickets; investors mutate only via SECURITY DEFINER RPCs (ticket_sign_contract/submit_payment/cancel), staff settles via ticket_settle which issues the spv_position — keeps ledger tamper-proof.
 - 3D viewing uses one engine: GeoScene3D (MapLibre + deck.gl) plus ProjectTerrain3D for CAD/DEM terrain; legacy three.js viewers are retired — never reintroduce parallel renderers, add canonical layers instead.
+- The national cadastre map (/catastro/mapa) runs on MapLibre GL querying SERNAGEOMIN ArcGIS REST as GeoJSON per visible extent; processed Sentinel-2 runs reach GeoScene3D via useSentinelRasterPreview — one map engine, no Leaflet in new viewers.
+
+- InvestmentCard is the shared presentation for public listings and investor rounds; canonical terminal fichas supply location, while roundBreakdown separates issuer-declared placement from system commitments without changing services.
+- confirmedPositionSummary counts only active ledger positions and groups capital by currency; historical contributions must never be presented as market valuation.

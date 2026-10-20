@@ -79,7 +79,7 @@ export const CHOLQUI = {
   formerName: "Distrito Franco / Gianfranco",
   commodity: "Cu-Au-Ag",
   stage: "Explotación · 5.000 a 15.000 t/mes",
-  operator: "Volcania Minerals SpA",
+  operator: "Valle Escondido SpA",
   location: "Cholqui, Cajón de Panamá, Melipilla, Región Metropolitana, Chile",
   region: "Melipilla · Región Metropolitana",
   country: "Chile",
@@ -618,7 +618,7 @@ export const CHOLQUI_FACTS: Array<{
   {
     section: "Legal",
     label: "Titular",
-    value: "Volcania Minerals SpA",
+    value: "Valle Escondido SpA (RUT 78.524.757-4)",
     provenance: "A verificar",
     source: "Acreditación de dominio",
   },

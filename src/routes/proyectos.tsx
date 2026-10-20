@@ -5,6 +5,11 @@ import { ArrowRight, Mountain, Activity, Satellite, FileText, Box as BoxIcon } f
 import { PublicRouteEntry } from "@/components/navigation/PublicRouteEntry";
 import { MarketingPage } from "@/features/marketing/MarketingShell";
 import { BrandButton, Eyebrow } from "@/components/brand";
+import { InvestmentCard } from "@/features/investor/InvestmentCard";
+import { RoundProgress } from "@/features/investor/RoundProgress";
+import { getPublicRounds } from "@/lib/wallet.functions";
+import { getTerminalProject } from "@/features/terminal/terminalProjects";
+import { DealFlow } from "@/features/marketing/DealFlow";
 import { getPublicListings } from "@/lib/publicListings.functions";
 import { ListingsMap } from "@/features/proyectos/ListingsMap";
 import { QueryError } from "@/components/ui/QueryError";
@@ -132,6 +137,8 @@ const SHOWCASE: Array<{
 ];
 
 function ProyectosPage() {
+  const fetchRounds = useServerFn(getPublicRounds);
+  const rounds = useQuery({ queryKey: ["public-rounds"], queryFn: () => fetchRounds(), staleTime: 60_000 });
   const fetchListings = useServerFn(getPublicListings);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["public-listings"],
@@ -146,107 +153,43 @@ function ProyectosPage() {
       title="Activos reales operando sobre Geocapitals"
       intro="Una muestra de los proyectos mineros que usan la plataforma para integrar catastro, exploración, monitoreo satelital y documentación técnica."
     >
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="publicar">
-        {SHOWCASE.map((p) => (
-          <article
-            key={p.code}
-            className="group rounded-2xl border border-hairline bg-white overflow-hidden flex flex-col hover:border-accent-brand hover:shadow-[0_24px_48px_-28px_rgba(11,42,91,0.4)] transition"
-          >
-            <Link
-              to="/terminal/$slug"
-              params={{ slug: p.slug }}
-              search={{ tab: "mapa" as const }}
-              className="relative block aspect-[16/10] overflow-hidden bg-surface"
-            >
-              <img
-                src={p.image}
-                alt={p.name}
-                loading="lazy"
-                className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
-              <div className="absolute top-3 left-3 right-3 flex flex-wrap items-start gap-2">
-                <span className="px-2 py-0.5 rounded-full bg-white/90 text-[10px] font-mono uppercase tracking-wider text-content">
-                  {p.commodity}
-                </span>
-                <span className="px-2 py-0.5 rounded-full bg-accent-brand text-[10px] font-mono uppercase tracking-wider text-white">
-                  {p.stage}
-                </span>
-                <span className="ml-auto px-1.5 py-0.5 rounded bg-black/50 text-[9px] font-mono uppercase tracking-wider text-white/80">
-                  {p.imageSource ?? "Imagen referencial"}
-                </span>
-              </div>
-              <div className="absolute bottom-3 left-4 right-4 text-white">
-                <div className="text-[10px] font-mono uppercase tracking-[0.18em] opacity-80">
-                  {p.region}
-                </div>
-                <div className="font-display text-2xl leading-tight mt-0.5">{p.name}</div>
-                {p.coords && (
-                  <div className="text-[10px] font-mono tracking-wider opacity-75 mt-1">
-                    {p.coords} · WGS84
-                  </div>
-                )}
-              </div>
-            </Link>
-            <div className="grid grid-cols-3 border-b border-hairline">
-              {p.stats.map(([v, l], i) => (
-                <div key={l} className={`px-4 py-3 ${i ? "border-l border-hairline" : ""}`}>
-                  <div className="font-display text-xl text-content">{v}</div>
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-content-subtle">
-                    {l}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <ul className="px-5 pt-4 space-y-1.5 text-[13px] text-content flex-1">
-              {p.bullets.map((b) => (
-                <li key={b} className="flex items-start gap-2">
-                  <span className="mt-2 w-1 h-1 rounded-full bg-accent-brand shrink-0" /> {b}
-                </li>
-              ))}
-            </ul>
-            <div className="px-5 pt-4 flex flex-wrap gap-1.5">
-              {[
-                ["mapa", "Mapa 2D"],
-                ["satelital", "Satélite"],
-                ["dataroom", "Data room"],
-              ].map(([tab, label]) => (
-                <Link
-                  key={tab}
-                  to="/terminal/$slug"
-                  params={{ slug: p.slug }}
-                  search={{ tab: tab as "mapa" }}
-                  className="px-2 py-1 rounded border border-hairline text-[11px] font-mono uppercase tracking-wider text-content-subtle hover:border-accent-brand hover:text-accent-brand"
-                >
-                  {label}
-                </Link>
-              ))}
-            </div>
-            <div className="p-5 pt-4 grid grid-cols-2 gap-2">
-              <Link
-                to="/terminal/$slug"
-                params={{ slug: p.slug }}
-                search={{ tab: "mapa" as const }}
-                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-accent-brand text-white text-sm py-2.5 hover:opacity-90"
-              >
-                Abrir terminal <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              <Link
-                to="/terminal/$slug"
-                params={{ slug: p.slug }}
-                search={{ tab: "simulador" as const }}
-                className="inline-flex items-center justify-center rounded-md border border-hairline text-sm py-2.5 text-content hover:border-accent-brand hover:text-accent-brand"
-              >
-                Simular inversión
-              </Link>
-            </div>
-          </article>
-        ))}
+      {[
+        {
+          key: "explotacion",
+          eyebrow: "Rondas mineras · términos referenciales",
+          title: "Proyectos en explotación",
+          items: SHOWCASE.filter((p) => p.stage.startsWith("Explotación")),
+        },
+        {
+          key: "exploracion",
+          eyebrow: "Sin ronda abierta",
+          title: "Prospectos en exploración",
+          items: SHOWCASE.filter((p) => !p.stage.startsWith("Explotación")),
+        },
+      ].map((g) => (
+      <section key={g.key} className="mb-12">
+        <Eyebrow className="mb-2">{g.eyebrow}</Eyebrow>
+        <h2 className="font-serif text-2xl text-content mb-5">{g.title}</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id={g.key === "explotacion" ? "publicar" : undefined}>
+        {g.items.map((p) => {
+          const ficha = getTerminalProject(p.slug)?.ficha;
+          const round = rounds.data?.find(r => r.slug === p.slug);
+          return <InvestmentCard key={p.code} title={p.name} region={ficha?.region ?? p.region} commodity={ficha?.commodity ?? p.commodity} stage={p.stage} image={p.image} imageLabel="Imagen de archivo · procedencia por verificar" slug={p.slug}>
+            <p className="font-mono text-[10px] text-content-muted">DECLARADO · antecedentes del titular</p>
+            <dl className="grid grid-cols-3 gap-3 border-t border-hairline pt-3">{p.stats.map(([v,l]) => <div key={l} className="min-w-0"><dt className="text-[10px] text-content-muted">{l}</dt><dd className="font-serif text-xl">{v}</dd></div>)}</dl>
+            <ul className="space-y-1 text-xs text-content-muted">{p.bullets.map(b => <li key={b}>{b}</li>)}</ul>
+            {p.stage.startsWith("Explotación") && (round ? <RoundProgress round={round} compact /> : rounds.isError ? <BrandButton variant="outline" onClick={() => void rounds.refetch()}>Reintentar ronda</BrandButton> : <p role="status" className="text-xs text-content-muted">{rounds.isLoading ? "Consultando ronda…" : "Ronda no disponible"}</p>)}
+            <div className="flex flex-wrap gap-2">{[{tab:"simulador" as const,label:"Simular inversión"},{tab:"satelital" as const,label:"Satélite"},{tab:"dataroom" as const,label:"Data room"}].map(({tab,label}) => <BrandButton key={tab} asChild variant="ghost" size="md"><Link to="/terminal/$slug" params={{slug:p.slug}} search={{tab}}>{label}</Link></BrandButton>)}</div>
+            <p className="text-[10px] text-content-muted">Términos referenciales. Inversión ilíquida y riesgo de pérdida. Sin recursos certificados NI 43-101/JORC.</p>
+          </InvestmentCard>;
+        })}
       </div>
+      </section>
+      ))}
 
       <Link
         to="/inversion-colateral"
-        className="group mt-6 grid md:grid-cols-[280px_1fr_auto] items-center gap-6 rounded-2xl border border-hairline bg-white overflow-hidden hover:border-accent-brand transition"
+        className="group mt-6 grid md:grid-cols-[280px_1fr_auto] items-center gap-6 rounded-lg border border-hairline bg-surface-3 overflow-hidden hover:border-accent-brand transition"
       >
         <img
           src={colateralImg}
@@ -272,7 +215,7 @@ function ProyectosPage() {
       <section className="mt-14 grid sm:grid-cols-2 gap-4">
         <Link
           to="/satelital"
-          className="group rounded-xl border border-hairline bg-white p-5 flex items-center gap-4 hover:border-accent-brand transition"
+          className="group rounded-lg border border-hairline bg-surface-3 p-5 flex items-center gap-4 hover:border-accent-brand transition"
         >
           <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0">
             <Satellite className="w-5 h-5" strokeWidth={1.75} />
@@ -287,7 +230,7 @@ function ProyectosPage() {
         </Link>
         <Link
           to="/visor-3d"
-          className="group rounded-xl border border-hairline bg-white p-5 flex items-center gap-4 hover:border-accent-brand transition"
+          className="group rounded-lg border border-hairline bg-surface-3 p-5 flex items-center gap-4 hover:border-accent-brand transition"
         >
           <span className="grid place-items-center w-11 h-11 rounded-lg bg-accent-brand-subtle text-accent-brand shrink-0">
             <BoxIcon className="w-5 h-5" strokeWidth={1.75} />
@@ -319,7 +262,7 @@ function ProyectosPage() {
         {isError ? (
           <QueryError message="No pudimos cargar los proyectos." onRetry={() => void refetch()} />
         ) : isLoading ? (
-          <div className="h-[460px] rounded-2xl border border-hairline bg-slate-100 animate-pulse" />
+          <div className="h-[460px] rounded-lg border border-hairline bg-surface-2 animate-pulse" />
         ) : listings.filter((l) => l.centroid).length === 0 ? (
           <p className="text-sm text-content-subtle italic">
             Aún no hay proyectos georreferenciados publicados.
@@ -329,8 +272,9 @@ function ProyectosPage() {
         )}
       </section>
 
+      <section className="mt-12"><h2 className="mb-5 font-serif text-2xl">Explorar oportunidades publicadas</h2><DealFlow /></section>
       {/* El deal flow vive en /inversionistas — aquí solo el puente, sin duplicar */}
-      <section className="mt-20 rounded-2xl border border-hairline bg-accent-brand-subtle p-8 flex flex-wrap items-center justify-between gap-5">
+      <section className="mt-20 rounded-lg border border-hairline bg-accent-brand-subtle p-8 flex flex-wrap items-center justify-between gap-5">
         <div>
           <Eyebrow className="mb-2">¿Buscas invertir?</Eyebrow>
           <h2 className="brand-display text-2xl text-content">
@@ -348,17 +292,17 @@ function ProyectosPage() {
         </BrandButton>
       </section>
 
-      <section className="mt-20 rounded-2xl bg-surface-inverse text-white p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
+      <section className="mt-20 rounded-lg bg-surface-inverse text-surface p-8 md:p-12 grid md:grid-cols-[1fr_auto] gap-6 items-center">
         <div>
-          <Eyebrow className="mb-2 text-white/60">Publica tu proyecto</Eyebrow>
+          <Eyebrow className="mb-2 text-surface/60">Publica tu proyecto</Eyebrow>
           <h2 className="brand-display text-2xl md:text-3xl">
             Eleva tu activo al estándar institucional
           </h2>
-          <p className="mt-3 text-white/70 max-w-xl">
+          <p className="mt-3 text-surface/70 max-w-xl">
             Crea un perfil profesional, conecta tu catastro, sube tu data room y recibe interés de
             inversionistas calificados. Onboarding asistido por nuestro equipo.
           </p>
-          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono uppercase tracking-wider text-white/60">
+          <div className="mt-5 flex flex-wrap gap-x-6 gap-y-2 text-[11px] font-mono uppercase tracking-wider text-surface/60">
             <span className="flex items-center gap-2">
               <Mountain className="w-3.5 h-3.5 text-accent-brand-subtle" /> Catastro
             </span>
@@ -381,7 +325,7 @@ function ProyectosPage() {
           </BrandButton>
           <Link
             to="/contacto"
-            className="inline-flex items-center justify-center gap-2 border border-white/30 text-white px-5 py-3 rounded-md text-sm hover:bg-white/10"
+            className="inline-flex items-center justify-center gap-2 border border-surface/30 text-surface px-5 py-3 rounded-md text-sm hover:bg-surface-3/10"
           >
             Habla con nosotros
           </Link>

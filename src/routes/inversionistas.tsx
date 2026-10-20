@@ -96,8 +96,8 @@ function InvPage() {
             {
               i: FileSignature,
               n: "3",
-              t: "Firma el NDA",
-              d: "Firma electrónica en minutos y acceso al data room completo.",
+              t: "KYC y firma",
+              d: "Perfil en 3 pasos y contrato de suscripción firmado con QR.",
             },
             {
               i: Wallet,
@@ -224,9 +224,9 @@ function InvPage() {
             <Eyebrow className="mb-3">Tickets institucionales</Eyebrow>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
-                { v: "USD 250K+", l: "Equity en juniors" },
-                { v: "USD 1M+", l: "Royalties / streams" },
-                { v: "USD 5M+", l: "Pre-feasibility / feasibility" },
+                { v: "USD 15.000", l: "Ticket mínimo · 150 acciones" },
+                { v: "USD 1,5 M", l: "Ronda por proyecto · 10 % SPV" },
+                { v: "USD 15 M", l: "Valuación de referencia" },
               ].map((s) => (
                 <div key={s.l}>
                   <div className="font-mono text-2xl text-content">{s.v}</div>

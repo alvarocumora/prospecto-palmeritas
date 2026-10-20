@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { SPECTRAL_LAYER_IDS, legendClasses } from "./spectralStyle";
 import { BrandButton } from "@/components/brand";
 import { Loader2, Sparkles, Crosshair, X, Layers3 } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
@@ -8,6 +9,9 @@ import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchor
 import { SceneLayerPanel } from "./controls/SceneLayerPanel";
 import { initialGeoSceneLayerIds } from "./layerPolicy";
 import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
+import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
+import { useProjects } from "@/hooks/useProjects";
+import { PROCESSED_INDICES, RAMP_CSS, indexRange, type ProcessedIndex } from "./processedSceneStyle";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -61,6 +65,30 @@ export function GeoScene3D({
         ]),
     );
   }, [projectLayers]);
+
+  const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
+  const { active: activeProject } = useProjects();
+  const processedQuery = useSentinelRasterPreview(project?.id ?? activeProject?.id);
+  const processedData = processedQuery.data ?? null;
+  const [processedOn, setProcessedOn] = useState(true);
+  const [processedIndex, setProcessedIndex] = useState<ProcessedIndex>("ironOxideRatio");
+  const [processedOpacity, setProcessedOpacity] = useState(0.7);
+  const processedRange = useMemo(
+    () => indexRange(processedData, processedIndex),
+    [processedData, processedIndex],
+  );
+  const processedScene =
+    processedData && processedOn && processedData.features.length
+      ? { data: processedData, index: processedIndex, opacity: processedOpacity }
+      : null;
+  const spectralLegend = useMemo(() => {
+    const seen = new Map<string, [number, number, number]>();
+    for (const layer of projectLayers ?? []) {
+      if (!SPECTRAL_LAYER_IDS.has(layer.id) || !enabledLayerIds.has(layer.id)) continue;
+      for (const item of legendClasses(layer.data)) seen.set(item.label, item.color);
+    }
+    return [...seen].map(([label, color]) => ({ label, color }));
+  }, [projectLayers, enabledLayerIds]);
 
   const toggleCanonicalLayer = (id: CanonicalGeoLayerId) => {
     setEnabledLayerIds((current) => {
@@ -118,6 +146,8 @@ export function GeoScene3D({
               filters={filters}
               project={project}
               projectLayers={projectLayers}
+              layerOpacity={layerOpacity}
+              processedScene={processedScene}
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
@@ -132,8 +162,90 @@ export function GeoScene3D({
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
           extraLayerIds={projectLayers?.map((layer) => layer.id)}
+          opacity={layerOpacity}
+          onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
         />
       }
+
+      {spectralLegend.length > 0 && (
+        <div
+          className="absolute bottom-10 right-3 z-20 max-w-[16rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          aria-label="Leyenda espectral"
+        >
+          <div className="mb-1.5 uppercase tracking-wider text-muted-foreground">
+            Firmas espectrales · modeladas
+          </div>
+          <ul className="space-y-1">
+            {spectralLegend.map((item) => (
+              <li key={item.label} className="flex items-center gap-2 text-foreground">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: `rgb(${item.color.join(",")})` }}
+                />
+                {item.label}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+            Intensidad = opacidad del polígono. Hipótesis de priorización, no ensayes ni recursos.
+          </p>
+        </div>
+      )}
+
+      {processedData && processedData.features.length > 0 && mode !== "resource" && (
+        <div
+          className="absolute bottom-10 left-14 z-20 w-[15rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          aria-label="Escena Sentinel-2 procesada"
+        >
+          <label className="flex items-center gap-2 uppercase tracking-wider text-foreground">
+            <input
+              type="checkbox"
+              checked={processedOn}
+              onChange={(e) => setProcessedOn(e.target.checked)}
+            />
+            Sentinel-2 L2A procesada
+          </label>
+          {processedOn && (
+            <div className="mt-2 space-y-2">
+              <select
+                value={processedIndex}
+                onChange={(e) => setProcessedIndex(e.target.value as ProcessedIndex)}
+                className="w-full rounded border border-border bg-background px-1.5 py-1 text-[10px] text-foreground"
+                aria-label="Índice espectral"
+              >
+                {PROCESSED_INDICES.map((i) => (
+                  <option key={i.key} value={i.key}>
+                    {i.label}
+                  </option>
+                ))}
+              </select>
+              <div>
+                <div className="h-2 w-full rounded-sm" style={{ background: RAMP_CSS }} />
+                <div className="mt-0.5 flex justify-between text-muted-foreground">
+                  <span>{processedRange[0].toFixed(3)}</span>
+                  <span>{processedRange[1].toFixed(3)}</span>
+                </div>
+              </div>
+              <label className="flex items-center gap-2 text-muted-foreground">
+                Opacidad
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.05}
+                  value={processedOpacity}
+                  onChange={(e) => setProcessedOpacity(Number(e.target.value))}
+                  className="flex-1"
+                />
+              </label>
+            </div>
+          )}
+          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+            MODELADO · índice derivado de reflectancia real. No identifica minerales ni reemplaza
+            ensayes.
+          </p>
+        </div>
+      )}
 
       {/* Focus banner: chip clicado en el copilot */}
       {focus && (
