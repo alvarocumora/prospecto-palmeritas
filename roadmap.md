@@ -1,8 +1,8 @@
 # Roadmap
 
 ## Investor Deck 2026 · preview
-- [ ] Integrar presentación pública visual de diez láminas y CTA desde marketing, sin cambiar términos persistidos.
-- [ ] Reutilizar el motor PDF institucional, verificar navegación, descarga e imágenes a 1440/390/320 px y documentar resultados.
+- [x] Integrar presentación pública visual de diez láminas y CTA desde marketing, sin cambiar términos persistidos.
+- [x] Reutilizar el motor PDF institucional, verificar navegación, descarga e imágenes a 1440/390/320 px y documentar resultados.
 
 ## Investment OS · Fase 2
 - [ ] Verificar contratos firmados y posiciones pobladas con registros reales — la cuenta autenticada actual no tiene posiciones ni tickets; no crear inversiones de prueba.
