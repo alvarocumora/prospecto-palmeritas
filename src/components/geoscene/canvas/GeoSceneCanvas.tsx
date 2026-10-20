@@ -10,6 +10,8 @@ import { COORDINATE_SYSTEM, type Layer } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
 import { cadElevationSampler, drapeFeatureCollection, hybridElevationSampler, type ElevationSampler } from "../terrainDrape";
 import { discRing, planeFromProperties } from "../structuralPlanes";
+import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, type LngLat } from "../sectionProfile";
+import { SectionProfilePanel } from "../controls/SectionProfilePanel";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
@@ -268,6 +270,58 @@ export function GeoSceneCanvas({
   }, [view, terrainVisible, cadTerrain, terrainEpoch, demActive]);
 
   const resolvedProjectLayers = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
+
+  // Corte transversal A-A' (estándar global: cualquier proyecto con relieve).
+  const [sectionOn, setSectionOn] = useState(false);
+  const [sectionPts, setSectionPts] = useState<LngLat[]>([]);
+  const [corridor, setCorridor] = useState(50);
+  const sectionRef = useRef(sectionOn);
+  sectionRef.current = sectionOn;
+  const section = useMemo(() => {
+    if (sectionPts.length < 2) return null;
+    const [a, b] = sectionPts;
+    const structures = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data as
+      | FeatureCollection
+      | undefined;
+    return {
+      length: sectionLength(a, b),
+      azimuth: sectionAzimuth(a, b),
+      profile: drape ? terrainProfile(a, b, drape.sample) : [],
+      structures: structuresInSection(a, b, structures, corridor),
+    };
+  }, [sectionPts, drape, resolvedProjectLayers, corridor]);
+  const sectionLayer = useMemo(() => {
+    if (!sectionOn || !sectionPts.length) return null;
+    const z = (p: LngLat) => (drape?.sample(p[0], p[1]) ?? drape?.fallback ?? 0) + 6;
+    return new GeoJsonLayer({
+      id: "tool.section",
+      data: {
+        type: "FeatureCollection",
+        features: [
+          ...sectionPts.map((p, i) => ({
+            type: "Feature" as const,
+            properties: { label: i ? "A′" : "A" },
+            geometry: { type: "Point" as const, coordinates: [p[0], p[1], z(p)] },
+          })),
+          ...(sectionPts.length === 2
+            ? [{
+                type: "Feature" as const,
+                properties: {},
+                geometry: { type: "LineString" as const, coordinates: sectionPts.map((p) => [p[0], p[1], z(p)]) },
+              }]
+            : []),
+        ],
+      } as never,
+      getLineColor: [43, 74, 203, 255],
+      getFillColor: [247, 245, 240, 255],
+      getLineWidth: 3,
+      lineWidthUnits: "pixels",
+      pointRadiusUnits: "pixels",
+      getPointRadius: 6,
+      stroked: true,
+      parameters: { depthTest: false } as never,
+    });
+  }, [sectionOn, sectionPts, drape]);
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
     return resolvedProjectLayers
@@ -437,6 +491,11 @@ export function GeoSceneCanvas({
       setReady(true);
     });
     map.on("moveend", syncSnapshotViewState);
+    map.on("click", (e) => {
+      if (!sectionRef.current) return;
+      const p: LngLat = [e.lngLat.lng, e.lngLat.lat];
+      setSectionPts((prev) => (prev.length >= 2 ? [p] : [...prev, p]));
+    });
     // Re-drape once DEM tiles for the current view have loaded.
     let lastDrapeKey = "";
     map.on("idle", () => {
@@ -544,6 +603,7 @@ export function GeoSceneCanvas({
       ...trajectoryLayers,
       ...wireframeLayers,
       anomaliesLayer,
+      sectionLayer,
     ].filter(Boolean);
     overlayRef.current.setProps({ layers });
   }, [
@@ -558,6 +618,7 @@ export function GeoSceneCanvas({
     trajectoryLayers,
     wireframeLayers,
     anomaliesLayer,
+    sectionLayer,
   ]);
 
   useEffect(() => {
@@ -671,6 +732,30 @@ export function GeoSceneCanvas({
             Inicializando canvas 3D…
           </div>
         </div>
+      )}
+      <button
+        type="button"
+        aria-pressed={sectionOn}
+        onClick={() => {
+          setSectionOn((v) => !v);
+          setSectionPts([]);
+        }}
+        className={`absolute top-3 right-14 z-10 min-h-[36px] rounded border px-2 font-mono text-[10px] backdrop-blur ${
+          sectionOn ? "border-accent-brand bg-accent-brand text-primary-foreground" : "border-border bg-bg-secondary/90 text-foreground"
+        }`}
+      >
+        {sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
+      </button>
+      {sectionOn && section && (
+        <SectionProfilePanel
+          {...section}
+          corridor={corridor}
+          onCorridor={setCorridor}
+          onClose={() => {
+            setSectionOn(false);
+            setSectionPts([]);
+          }}
+        />
       )}
       {cadTerrainLayer && cadTerrain && (
         <details className="absolute bottom-12 right-3 z-10 max-w-[min(24rem,calc(100%-1.5rem))] max-h-[35%] overflow-auto rounded border border-border bg-bg-secondary/90 px-2 py-1.5 font-mono text-[9px] leading-snug text-muted-foreground backdrop-blur">
