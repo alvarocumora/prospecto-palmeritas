@@ -24,19 +24,39 @@ export function InvestorWallet() {
   const [busy, setBusy] = useState(false);
   const { usdClp } = useCurrency();
   const load = useCallback(async () => {
-    setLoading(true); setError(false);
-    try { setW(await getMyWallet()); } catch { setW(null); setError(true); }
-    finally { setLoading(false); }
+    setLoading(true);
+    setError(false);
+    try {
+      setW(await getMyWallet());
+    } catch {
+      setW(null);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
   const loadRounds = useCallback(async () => {
     setRoundError(false);
-    try { setRounds(await getPublicRounds()); } catch { setRounds([]); setRoundError(true); }
+    try {
+      setRounds(await getPublicRounds());
+    } catch {
+      setRounds([]);
+      setRoundError(true);
+    }
   }, []);
-  useEffect(() => { void load(); void loadRounds(); }, [load, loadRounds]);
+  useEffect(() => {
+    void load();
+    void loadRounds();
+  }, [load, loadRounds]);
   const confirmed = w ? confirmedPositionSummary(w.positions) : null;
-  const capital = confirmed ? [...confirmed.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones" : "—";
-  const statementCurrencySupported = (confirmed?.positions ?? []).every(p => p.currency === "USD") && (w?.tickets ?? []).every(t => t.currency === "USD");
-  const pending = w?.tickets.filter(t => !["settled", "cancelled", "rejected"].includes(t.status)) ?? [];
+  const capital = confirmed
+    ? [...confirmed.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones"
+    : "—";
+  const statementCurrencySupported =
+    (confirmed?.positions ?? []).every((p) => p.currency === "USD") &&
+    (w?.tickets ?? []).every((t) => t.currency === "USD");
+  const pending =
+    w?.tickets.filter((t) => !["settled", "cancelled", "rejected"].includes(t.status)) ?? [];
   const clp = (n: number) =>
     usdClp ? `≈ CLP ${Math.round(n * usdClp).toLocaleString("es-CL")}` : undefined;
 
@@ -57,7 +77,8 @@ export function InvestorWallet() {
         usdClp,
       });
     } catch {
-      const { toast } = await import("sonner"); toast.error("No pudimos generar la cartola. Reintenta.");
+      const { toast } = await import("sonner");
+      toast.error("No pudimos generar la cartola. Reintenta.");
     } finally {
       setBusy(false);
     }
@@ -104,7 +125,9 @@ export function InvestorWallet() {
     } catch (e) {
       const { toast } = await import("sonner");
       toast.error(e instanceof Error ? e.message : "Error al generar el contrato");
-    } finally { setContractBusy(null); }
+    } finally {
+      setContractBusy(null);
+    }
   };
 
   return (
@@ -116,11 +139,18 @@ export function InvestorWallet() {
       <header className="p-5 border-b border-hairline flex flex-wrap items-center gap-2">
         <Landmark className="w-4 h-4 text-accent-brand" />
         <h2 className="font-serif text-xl">Cartola de posiciones</h2>
-        <BrandButton variant="outline"
+        <BrandButton
+          variant="outline"
           type="button"
           onClick={() => void downloadStatement()}
           disabled={!w || busy || loading || error || !statementCurrencySupported}
-          title={!w ? "Consulta tus posiciones antes de descargar" : !statementCurrencySupported ? "La cartola PDF actual solo admite USD; consulta certificados individuales" : "Descargar cartola de inversiones"}
+          title={
+            !w
+              ? "Consulta tus posiciones antes de descargar"
+              : !statementCurrencySupported
+                ? "La cartola PDF actual solo admite USD; consulta certificados individuales"
+                : "Descargar cartola de inversiones"
+          }
           className="ml-auto inline-flex items-center gap-1.5 border border-accent-brand px-3 min-h-11 py-1.5 text-xs text-accent-brand hover:bg-accent-brand hover:text-surface disabled:opacity-40"
         >
           <Download className="w-3.5 h-3.5" /> {busy ? "Generando…" : "Cartola PDF"}
@@ -131,11 +161,17 @@ export function InvestorWallet() {
         <Kpi
           label="Capital aportado · confirmado"
           value={error ? "No disponible" : capital}
-          note={confirmed?.capital.size === 1 && confirmed.capital.has("USD") ? clp(confirmed.capital.get("USD") ?? 0) : loading ? "Consultando…" : "Capital histórico, no valor de mercado"}
+          note={
+            confirmed?.capital.size === 1 && confirmed.capital.has("USD")
+              ? clp(confirmed.capital.get("USD") ?? 0)
+              : loading
+                ? "Consultando…"
+                : "Capital histórico, no valor de mercado"
+          }
         />
         <Kpi
           label="Acciones serie preferente"
-          value={w ? confirmed?.shares.toLocaleString("es-CL") ?? "—" : "—"}
+          value={w ? (confirmed?.shares.toLocaleString("es-CL") ?? "—") : "—"}
         />
         <Kpi
           label="Órdenes en curso"
@@ -166,10 +202,18 @@ export function InvestorWallet() {
         ) : (
           <div className="grid sm:grid-cols-2 gap-3">
             {confirmed.positions.map((p) => (
-              <article key={p.id} className="min-w-0 rounded-lg border border-hairline p-5 bg-surface-3">
+              <article
+                key={p.id}
+                className="min-w-0 rounded-lg border border-hairline p-5 bg-surface-3"
+              >
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-accent-brand flex items-center gap-1">
-                    <Landmark className="w-3.5 h-3.5" /> {p.slug === "cholqui" ? seriesForCode("CHOLQUI") : p.slug === "losverdes" ? seriesForCode("LV") : "Serie SPV · por verificar"}
+                    <Landmark className="w-3.5 h-3.5" />{" "}
+                    {p.slug === "cholqui"
+                      ? seriesForCode("CHOLQUI")
+                      : p.slug === "losverdes"
+                        ? seriesForCode("LV")
+                        : "Serie SPV · por verificar"}
                   </span>
                   <span className="text-[11px] text-content-muted">Explotación</span>
                 </div>
@@ -219,13 +263,15 @@ export function InvestorWallet() {
                       </span>
                       <span className="text-xs inline-flex items-center gap-3 text-accent-brand">
                         {["signed", "payment_pending", "settled"].includes(t.status) && (
-                          <BrandButton variant="outline"
+                          <BrandButton
+                            variant="outline"
                             type="button"
                             onClick={() => void downloadContract(t.id, t.project)}
                             disabled={contractBusy === t.id}
                             className="inline-flex min-h-11 items-center gap-1 hover:underline"
                           >
-                            <FileText className="w-3 h-3" /> {contractBusy === t.id ? "Generando…" : "Contrato firmado"}
+                            <FileText className="w-3 h-3" />{" "}
+                            {contractBusy === t.id ? "Generando…" : "Contrato firmado"}
                           </BrandButton>
                         )}
                         <span className="inline-flex items-center gap-1">
@@ -234,9 +280,17 @@ export function InvestorWallet() {
                       </span>
                     </div>
                     {t.status !== "cancelled" && idx >= 0 && (
-                      <ol aria-label="Avance del ticket" className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2">
+                      <ol
+                        aria-label="Avance del ticket"
+                        className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-2"
+                      >
                         {TICKET_STEPS.map((s, i) => (
-                          <li key={s} className="min-w-0 text-[10px] text-content-muted"><div className={`mb-1 h-1 ${i <= idx ? "bg-accent-brand" : "bg-hairline"}`} />{TICKET_STATUS_LABEL[s] ?? s}</li>
+                          <li key={s} className="min-w-0 text-[10px] text-content-muted">
+                            <div
+                              className={`mb-1 h-1 ${i <= idx ? "bg-accent-brand" : "bg-hairline"}`}
+                            />
+                            {TICKET_STATUS_LABEL[s] ?? s}
+                          </li>
                         ))}
                       </ol>
                     )}
@@ -247,11 +301,34 @@ export function InvestorWallet() {
           </>
         )}
 
-        {!loading && !error && pending.length === 0 && <p className="mt-5 text-sm text-content-muted">Sin órdenes pendientes.</p>}
-        <div className="mt-8 border-t border-hairline pt-5"><h3 className="font-serif text-xl">Documentos y cartola PDF</h3><p className="mt-2 text-sm text-content-muted">Certificados junto a cada posición; contratos firmados junto a cada orden. La cartola PDF reúne las posiciones consultadas.</p></div>
-        {!statementCurrencySupported && <p role="status" className="mt-3 text-xs text-content-muted">La cartola PDF actual solo admite USD. Consulta los certificados individuales para otras monedas.</p>}
-        <p className="mt-5 text-[11px] text-content-muted">Inversión privada e ilíquida; riesgo de pérdida total. El capital aportado no es una valoración de mercado ni acredita rentabilidad. Sin recursos certificados NI 43-101/JORC.</p>
-        {roundError && <div role="alert" className="mt-4">No pudimos cargar las rondas. <BrandButton variant="outline" onClick={() => void loadRounds()}>Reintentar</BrandButton></div>}
+        {!loading && !error && pending.length === 0 && (
+          <p className="mt-5 text-sm text-content-muted">Sin órdenes pendientes.</p>
+        )}
+        <div className="mt-8 border-t border-hairline pt-5">
+          <h3 className="font-serif text-xl">Documentos y cartola PDF</h3>
+          <p className="mt-2 text-sm text-content-muted">
+            Certificados junto a cada posición; contratos firmados junto a cada orden. La cartola
+            PDF reúne las posiciones consultadas.
+          </p>
+        </div>
+        {!statementCurrencySupported && (
+          <p role="status" className="mt-3 text-xs text-content-muted">
+            La cartola PDF actual solo admite USD. Consulta los certificados individuales para otras
+            monedas.
+          </p>
+        )}
+        <p className="mt-5 text-[11px] text-content-muted">
+          Inversión privada e ilíquida; riesgo de pérdida total. El capital aportado no es una
+          valoración de mercado ni acredita rentabilidad. Sin recursos certificados NI 43-101/JORC.
+        </p>
+        {roundError && (
+          <div role="alert" className="mt-4">
+            No pudimos cargar las rondas.{" "}
+            <BrandButton variant="outline" onClick={() => void loadRounds()}>
+              Reintentar
+            </BrandButton>
+          </div>
+        )}
         {rounds.length > 0 && (
           <>
             <h3 className="font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted mt-6 mb-3">

@@ -17,7 +17,22 @@ import { InvestorWallet } from "@/features/investor/InvestorWallet";
 import { ContentState, PageHeader, PlatformPage } from "@/components/ui-system";
 
 export const Route = createFileRoute("/_authenticated/dashboard/investments")({
-  head: () => ({ meta: [{ title: "Portafolio y cartola — Geocapitals" }, { name: "description", content: "Posiciones confirmadas, órdenes, contratos y estado KYC de tu inversión privada." }, { property: "og:title", content: "Portafolio y cartola — Geocapitals" }, { property: "og:description", content: "Cartola institucional de posiciones SPV y documentos de inversión." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({
+    meta: [
+      { title: "Portafolio y cartola — Geocapitals" },
+      {
+        name: "description",
+        content: "Posiciones confirmadas, órdenes, contratos y estado KYC de tu inversión privada.",
+      },
+      { property: "og:title", content: "Portafolio y cartola — Geocapitals" },
+      {
+        property: "og:description",
+        content: "Cartola institucional de posiciones SPV y documentos de inversión.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   validateSearch: (s: Record<string, unknown>): { vista?: string } =>
     typeof s.vista === "string" ? { vista: s.vista } : {},
   component: MyInvestmentsPage,
@@ -38,12 +53,14 @@ function MyInvestmentsPage() {
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
-    setLoading(true); setError(false);
+    setLoading(true);
+    setError(false);
     try {
       const d = await getMyInvestmentHistory();
       setData(d);
     } catch (e) {
-      setError(true); setData(null);
+      setError(true);
+      setData(null);
       toast.error(e instanceof Error ? e.message : "Error cargando historial");
     } finally {
       setLoading(false);
@@ -133,7 +150,10 @@ function KycCard({ data }: { data: Data }) {
         <div className="flex items-center gap-2 text-sm">
           <CircleDashed className="w-4 h-4 text-content-muted" />
           <span>Aún no completas tu perfil de inversionista.</span>
-          <Link to="/dashboard" className="ml-auto text-xs font-mono text-accent-brand hover:underline">
+          <Link
+            to="/dashboard"
+            className="ml-auto text-xs font-mono text-accent-brand hover:underline"
+          >
             Completar →
           </Link>
         </div>
@@ -146,7 +166,11 @@ function KycCard({ data }: { data: Data }) {
       cls: "border-hairline/40 bg-surface-2/10 text-content-muted",
       Icon: Clock,
     },
-    approved: { label: "Aprobado", cls: "border-hairline/40 bg-surface-2/10 text-accent-brand", Icon: CheckCircle2 },
+    approved: {
+      label: "Aprobado",
+      cls: "border-hairline/40 bg-surface-2/10 text-accent-brand",
+      Icon: CheckCircle2,
+    },
     rejected: {
       label: "Rechazado",
       cls: "border-hairline/40 bg-surface-2/10 text-content",
@@ -296,7 +320,10 @@ function InquiriesBlock({ items }: { items: Data["inquiries"] }) {
       ) : (
         <ul className="divide-y divide-hairline">
           {items.map((i) => (
-            <li key={i.id} className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+            <li
+              key={i.id}
+              className="px-4 py-3 flex flex-wrap items-center justify-between gap-3 text-xs"
+            >
               <div className="min-w-0">
                 <div className="font-medium text-content truncate">
                   <Link
