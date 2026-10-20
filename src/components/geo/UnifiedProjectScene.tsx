@@ -13,6 +13,7 @@ import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
+import { useOfficialGeology } from "@/lib/geology/officialGeologicalMap";
 
 const CholquiScene = lazy(() =>
   import("./scenes/CholquiScene").then((m) => ({ default: m.CholquiScene })),
@@ -30,12 +31,27 @@ export function ProjectSceneFrame({
   layers: GeoSceneProjectLayer[];
   view: ProjectView;
 }) {
+  const official = useOfficialGeology(project.center, project.bbox);
+  const allLayers = useMemo<GeoSceneProjectLayer[]>(() => {
+    const d = official.data;
+    if (!d) return layers;
+    const src = `SERNAGEOMIN · ${d.sheets.map((s) => s.label).join(", ")} (Geoportal CIGeo)`;
+    return [
+      ...layers,
+      ...(d.units.features.length
+        ? [{ id: "geology.official_map_units" as const, data: d.units, source: src, defaultVisible: false }]
+        : []),
+      ...(d.faults.features.length
+        ? [{ id: "geology.official_faults" as const, data: d.faults, source: src, defaultVisible: false }]
+        : []),
+    ];
+  }, [layers, official.data]);
   return (
     <div data-surface="canvas" className="relative h-[620px] w-full overflow-hidden">
       <GeoScene3D
         key={project.id}
         project={project}
-        projectLayers={layers}
+        projectLayers={allLayers}
         view={view}
         showModeTabs={false}
         showCopilot={false}
