@@ -61,15 +61,21 @@ export function useTargetsLayer(
             pickable: true,
             stroked: true,
             filled: true,
-            radiusUnits: "meters",
+            // Mira técnica: radio en píxeles, relleno casi transparente, anillo nítido.
+            radiusUnits: "pixels",
+            radiusMinPixels: 5,
+            radiusMaxPixels: 14,
             getPosition: (d: (typeof points)[number]) => [d.lng, d.lat],
-            getRadius: (d: (typeof points)[number]) => 80 + (d.score ?? 0) * 4,
+            getRadius: (d: (typeof points)[number]) => 6 + Math.min(8, (d.score ?? 0) / 12),
             getFillColor: (d: (typeof points)[number]) => [
               ...(PRIORITY_COLOR[d.priority] ?? PRIORITY_COLOR.medium),
-              180,
+              40,
             ],
-            getLineColor: [255, 215, 0, 220],
-            getLineWidth: 2,
+            getLineColor: (d: (typeof points)[number]) => [
+              ...(PRIORITY_COLOR[d.priority] ?? PRIORITY_COLOR.medium),
+              255,
+            ],
+            getLineWidth: 1.75,
             lineWidthUnits: "pixels",
           })
         : null,
