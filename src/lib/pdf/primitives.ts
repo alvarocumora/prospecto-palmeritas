@@ -90,7 +90,11 @@ export function drawFooter(s: PdfState, totalPages?: number) {
   setRGB(doc, "text", COLORS.muted);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
-  doc.text("GEOCAPITALS · geocapitals.com · Preliminar, pendiente de revisión QP/CP", PAGE.margin, 290);
+  doc.text(
+    "GEOCAPITALS · geocapitals.com · Preliminar, pendiente de revisión QP/CP",
+    PAGE.margin,
+    290,
+  );
   const pageTxt = totalPages ? `Pág. ${s.pageNum} de ${totalPages}` : `Pág. ${s.pageNum}`;
   doc.text(pageTxt, PAGE.width - PAGE.margin, 290, { align: "right" });
   doc.text(new Date().toLocaleDateString("es-CL"), PAGE.width / 2, 290, { align: "center" });

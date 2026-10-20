@@ -330,15 +330,21 @@ export function GeoSceneCanvas({
     const map = mapRef.current;
     const root = mapDiv.current;
     if (!map || !root) return null;
-    await new Promise<void>((r) => { map.once("idle", () => r()); map.triggerRepaint(); setTimeout(r, 2500); });
+    await new Promise<void>((r) => {
+      map.once("idle", () => r());
+      map.triggerRepaint();
+      setTimeout(r, 2500);
+    });
     const canvases = Array.from(root.querySelectorAll("canvas"));
     const base = map.getCanvas();
     const out = document.createElement("canvas");
-    out.width = base.width; out.height = base.height;
+    out.width = base.width;
+    out.height = base.height;
     const ctx = out.getContext("2d");
     if (!ctx) return null;
     try {
-      for (const c of canvases) if (c.width && c.height) ctx.drawImage(c, 0, 0, out.width, out.height);
+      for (const c of canvases)
+        if (c.width && c.height) ctx.drawImage(c, 0, 0, out.width, out.height);
       return out.toDataURL("image/jpeg", 0.88);
     } catch {
       return null;
@@ -1013,9 +1019,22 @@ export function GeoSceneCanvas({
         <PropertyAnalysisPanel
           projectName={project?.name ?? "Proyecto"}
           layers={resolvedProjectLayers}
-          onFocus={([w, so, e, n]) => mapRef.current?.fitBounds([[w, so], [e, n]], { padding: 80, duration: 900, maxZoom: 14.5 })}
+          onFocus={([w, so, e, n]) =>
+            mapRef.current?.fitBounds(
+              [
+                [w, so],
+                [e, n],
+              ],
+              { padding: 80, duration: 900, maxZoom: 14.5 },
+            )
+          }
           captureView={captureView}
-          viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.definition.label ?? l.id).join(", ") || "ninguna"}. Imagen base: Esri World Imagery.`}
+          viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${
+            resolvedProjectLayers
+              .filter((l) => visibleLayerIds.has(l.id))
+              .map((l) => l.definition.label ?? l.id)
+              .join(", ") || "ninguna"
+          }. Imagen base: Esri World Imagery.`}
           onClose={() => setPropertyOpen(false)}
         />
       )}
