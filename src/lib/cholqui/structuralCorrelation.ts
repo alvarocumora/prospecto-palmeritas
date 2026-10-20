@@ -113,6 +113,14 @@ export function correlateVeins(
   return out;
 }
 
+export function haloSummary(halo: Record<HaloFamily, number>): string {
+  return (
+    HALO_FAMILIES.filter((f) => halo[f] > 0)
+      .map((f) => `${HALO_LABEL[f]} ${halo[f]} px EMIT`)
+      .join(" · ") || "sin detecciones EMIT en 300 m"
+  );
+}
+
 /** Coincident lineaments as an INTERPRETED layer, annotated with the vein they align with. */
 export function correlationLayer(
   results: VeinCorrelation[],
@@ -120,10 +128,7 @@ export function correlationLayer(
 ): FeatureCollection {
   const features: Feature[] = [];
   for (const r of results) {
-    const haloText =
-      HALO_FAMILIES.filter((f) => r.halo[f] > 0)
-        .map((f) => `${HALO_LABEL[f]} ${r.halo[f]} px`)
-        .join(" · ") || "sin detecciones EMIT en el radio";
+    const haloText = haloSummary(r.halo);
     for (const m of r.lineaments) {
       const src = lineaments.features[m.index];
       features.push({
