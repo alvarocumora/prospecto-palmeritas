@@ -338,6 +338,7 @@ export function GeoSceneCanvas({
         const data = drape
           ? drapeFeatureCollection(layer.data as FeatureCollection, drape.sample, {
               fallback: drape.fallback,
+              offsetM: 8,
             })
           : layer.data;
         return new GeoJsonLayer({
