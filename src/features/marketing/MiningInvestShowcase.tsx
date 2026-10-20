@@ -103,7 +103,7 @@ export function MiningInvestShowcase() {
                 <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.15em]">
                   Explotación · 5.000–15.000 t/mes
                 </div>
-                <dl className="mt-3 grid grid-cols-3 gap-px bg-hairline border border-hairline text-left">
+                <dl className="mt-3 grid grid-cols-2 gap-px border border-hairline bg-hairline text-left sm:grid-cols-3">
                   <div className="bg-surface p-2">
                     <dt className="text-[10px] text-content-muted">Hectáreas directas</dt>
                     <dd className="font-mono text-sm">
@@ -114,8 +114,8 @@ export function MiningInvestShowcase() {
                     <dt className="text-[10px] text-content-muted">Valuación ref.</dt>
                     <dd className="font-mono text-sm">{usd(REFERENCE_VALUATION_USD)}</dd>
                   </div>
-                  <div className="bg-surface p-2">
-                    <dt className="text-[10px] text-content-muted">Entrega</dt>
+                  <div className="col-span-2 bg-surface p-2 sm:col-span-1">
+                    <dt className="text-[11px] text-content-muted">Entrega</dt>
                     <dd className="text-[11px] leading-tight">
                       {PROJECT_TERMS[p.slug].delivery[0]}
                     </dd>
