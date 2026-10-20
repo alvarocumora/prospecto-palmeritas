@@ -250,8 +250,10 @@ function MapaTab({
 }) {
   return (
     <>
-      <ViewToggle view={view} onChange={setView} />
-      <UnifiedProjectScene slug={project.slug} view={view} />
+      <div className="relative">
+        <UnifiedProjectScene slug={project.slug} view={view} />
+        <ViewToggle view={view} onChange={setView} />
+      </div>
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando programa" />}>
           <div className="mt-6 space-y-6">
@@ -278,11 +280,11 @@ function MapaTab({
 
 function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
-    <div className="flex justify-end mb-4">
+    <div className="pointer-events-none absolute bottom-3 left-1/2 z-30 -translate-x-1/2">
       <div
         role="group"
         aria-label="Vista del proyecto"
-        className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded"
+        className="pointer-events-auto inline-flex gap-1 rounded border border-hairline bg-surface/95 p-1 shadow-lg backdrop-blur"
       >
         {(["2d", "3d"] as const).map((key) => {
           const Icon = key === "2d" ? MapIcon : Box;

@@ -146,7 +146,7 @@ export function useSatAnomaliesLayer(projectId: string | null, visible = true) {
             data: polys,
             pickable: true,
             extruded: true,
-            wireframe: true,
+            wireframe: false,
             filled: true,
             stroked: true,
             getPolygon: (d: Poly) => d.rings,
@@ -159,11 +159,11 @@ export function useSatAnomaliesLayer(projectId: string | null, visible = true) {
                 Math.round(sev[0] * 0.6 + tint[0] * 0.4),
                 Math.round(sev[1] * 0.6 + tint[1] * 0.4),
                 Math.round(sev[2] * 0.6 + tint[2] * 0.4),
-                170,
+                70,
               ];
             },
-            getLineColor: [255, 215, 0, 220],
-            getLineWidth: 2,
+            getLineColor: [247, 245, 240, 200],
+            getLineWidth: 1,
             lineWidthUnits: "pixels",
             elevationScale: 1,
           })

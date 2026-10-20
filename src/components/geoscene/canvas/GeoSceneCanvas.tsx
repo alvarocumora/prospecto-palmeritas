@@ -349,14 +349,14 @@ export function GeoSceneCanvas({
           opacity: layerOpacity?.[layer.id] ?? 1,
           getFillColor: spectral
             ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-            : [color[0], color[1], color[2], dashed ? 20 : 45],
+            : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: spectral
             ? (f: { properties?: Record<string, unknown> }) => {
                 const c = spectralFill(f.properties, rgb);
                 return [c[0], c[1], c[2], 230];
               }
             : color,
-          getLineWidth: dashed ? 1.5 : 2.5,
+          getLineWidth: dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",
           getPointRadius: 6,
@@ -397,7 +397,7 @@ export function GeoSceneCanvas({
       getPolygon: (d: (typeof discs)[number]) => d.ring,
       filled: true,
       stroked: true,
-      getFillColor: [color[0], color[1], color[2], 110],
+      getFillColor: [color[0], color[1], color[2], 60],
       getLineColor: [color[0], color[1], color[2], 255],
       getLineWidth: 2,
       lineWidthUnits: "pixels",
@@ -744,7 +744,7 @@ export function GeoSceneCanvas({
           setSectionOn((v) => !v);
           setSectionPts([]);
         }}
-        className={`absolute top-3 left-3 z-30 min-h-[36px] rounded border px-2 font-mono text-[10px] backdrop-blur ${
+        className={`absolute bottom-3 left-3 z-30 min-h-11 rounded border px-3 font-mono text-[11px] uppercase tracking-wider shadow-sm backdrop-blur focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand ${
           sectionOn ? "border-accent-brand bg-accent-brand text-primary-foreground" : "border-border bg-bg-secondary/90 text-foreground"
         }`}
       >

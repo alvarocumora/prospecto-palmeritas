@@ -11,10 +11,10 @@ import type { GeoSceneMode } from "../types";
 import { BrandButton } from "@/components/brand";
 
 const DOMAIN_LABEL: Partial<Record<GeoLayerDomain, string>> = {
-  territory: "Territorio",
-  remote_sensing: "Satélite",
-  geology: "Geología",
-  geophysics: "Geofísica",
+  territory: "Tenencia minera",
+  remote_sensing: "Relieve y teledetección",
+  geology: "Geología estructural",
+  geophysics: "Geofísica y espectral",
   sampling: "Muestreo",
   targets: "Targets",
   drilling: "Sondajes",
@@ -53,12 +53,12 @@ export function SceneLayerPanel({
   const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
 
   return (
-    <div className="absolute left-3 top-14 z-30 max-h-[70%] w-[min(21rem,calc(100%-1.5rem))] overflow-y-auto rounded border border-border bg-bg-secondary/95 p-3 font-mono text-xs shadow-xl backdrop-blur">
-      <div className="mb-3 flex items-start justify-between gap-2 border-b border-border pb-2">
+    <div data-theme="im-light" className="absolute left-3 top-3 z-30 flex max-h-[calc(100%-5rem)] w-[min(20rem,calc(100%-1.5rem))] flex-col overflow-hidden rounded border border-hairline bg-surface/95 text-xs text-content shadow-lg backdrop-blur">
+      <div className="flex shrink-0 items-start justify-between gap-2 border-b border-hairline px-3 py-2.5">
         <div>
-          <div className="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wide text-foreground">
+          <div className="inline-flex items-center gap-1.5 font-serif text-sm text-content">
             <Layers3 className="h-3.5 w-3.5" />
-            Capas 3D canónicas
+            Capas
           </div>
           <div className="mt-0.5 text-[9px] uppercase tracking-wider text-muted-foreground">
             GeoScene3D · {mode}
@@ -76,11 +76,13 @@ export function SceneLayerPanel({
         </BrandButton>
       </div>
 
+      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
       {domains.map((domain) => (
-        <div key={domain} className="mb-4">
-          <div className="mb-1.5 text-[9px] uppercase tracking-wider text-muted-foreground">
+        <details key={domain} open className="group mb-2 border-b border-hairline pb-2 last:border-0">
+          <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
             {DOMAIN_LABEL[domain] ?? domain}
-          </div>
+            <span className="transition-transform group-open:rotate-90">›</span>
+          </summary>
           <div className="space-y-2">
             {definitions
               .filter((definition) => definition.domain === domain)
@@ -96,8 +98,8 @@ export function SceneLayerPanel({
                       aria-pressed={active}
                       className={`h-auto w-full block whitespace-normal rounded border p-2 text-left transition-colors ${
                         active
-                          ? "border-gold/60 bg-gold/5"
-                          : "border-border bg-background/30 hover:border-foreground/30"
+                          ? "border-accent-brand/50 bg-accent-brand-subtle"
+                          : "border-hairline bg-transparent hover:border-content/30"
                       }`}
                     >
                       <div className="flex items-start justify-between gap-2">
@@ -106,7 +108,7 @@ export function SceneLayerPanel({
                         </span>
                         <span
                           className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
-                            active ? "bg-gold" : "bg-muted-foreground/30"
+                            active ? "bg-accent-brand" : "bg-muted-foreground/30"
                           }`}
                         />
                       </div>
@@ -148,8 +150,9 @@ export function SceneLayerPanel({
                 );
               })}
           </div>
-        </div>
+        </details>
       ))}
+      </div>
     </div>
   );
 }
