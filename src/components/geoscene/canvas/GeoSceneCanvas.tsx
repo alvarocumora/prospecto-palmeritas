@@ -240,7 +240,7 @@ export function GeoSceneCanvas({
       opacity: terrainOpacity,
       material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
     });
-  }, [cadTerrain, cadMesh, terrainVisible, mode]);
+  }, [cadTerrain, cadMesh, terrainVisible, mode, terrainOpacity]);
 
   // Elevation used to drape 2D layers onto the relief actually rendered.
   // CAD tile when present (absolute heights), MapLibre DEM otherwise; none in Planta.
@@ -699,6 +699,7 @@ export function GeoSceneCanvas({
     wireframeLayers,
     anomaliesLayer,
     sectionLayer,
+    measureLayer,
   ]);
 
   useEffect(() => {
