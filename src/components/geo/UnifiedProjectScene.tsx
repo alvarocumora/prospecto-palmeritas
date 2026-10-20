@@ -39,10 +39,24 @@ export function ProjectSceneFrame({
     return [
       ...layers,
       ...(d.units.features.length
-        ? [{ id: "geology.official_map_units" as const, data: d.units, source: src, defaultVisible: false }]
+        ? [
+            {
+              id: "geology.official_map_units" as const,
+              data: d.units,
+              source: src,
+              defaultVisible: false,
+            },
+          ]
         : []),
       ...(d.faults.features.length
-        ? [{ id: "geology.official_faults" as const, data: d.faults, source: src, defaultVisible: false }]
+        ? [
+            {
+              id: "geology.official_faults" as const,
+              data: d.faults,
+              source: src,
+              defaultVisible: false,
+            },
+          ]
         : []),
     ];
   }, [layers, official.data]);

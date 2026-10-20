@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import type { FeatureCollection } from "geojson";
-import { apparentDip, sectionAzimuth, sectionLength, structuresInSection, terrainProfile } from "./sectionProfile";
+import {
+  apparentDip,
+  sectionAzimuth,
+  sectionLength,
+  structuresInSection,
+  terrainProfile,
+} from "./sectionProfile";
 
 const A: [number, number] = [-71.0, -33.6];
 const B: [number, number] = [-70.99, -33.6]; // ~926 m al este
@@ -28,12 +34,39 @@ describe("section profile", () => {
     const fc: FeatureCollection = {
       type: "FeatureCollection",
       features: [
-        { type: "Feature", properties: { code: "V1", strikeDeg: 0, dipText: "60° E" },
-          geometry: { type: "LineString", coordinates: [[-70.995, -33.605], [-70.995, -33.595]] } },
-        { type: "Feature", properties: { code: "V2" },
-          geometry: { type: "LineString", coordinates: [[-70.992, -33.605], [-70.992, -33.595]] } },
-        { type: "Feature", properties: { code: "far" },
-          geometry: { type: "LineString", coordinates: [[-70.995, -33.65], [-70.994, -33.64]] } },
+        {
+          type: "Feature",
+          properties: { code: "V1", strikeDeg: 0, dipText: "60° E" },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [-70.995, -33.605],
+              [-70.995, -33.595],
+            ],
+          },
+        },
+        {
+          type: "Feature",
+          properties: { code: "V2" },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [-70.992, -33.605],
+              [-70.992, -33.595],
+            ],
+          },
+        },
+        {
+          type: "Feature",
+          properties: { code: "far" },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [-70.995, -33.65],
+              [-70.994, -33.64],
+            ],
+          },
+        },
       ],
     };
     const s = structuresInSection(A, B, fc, 50);

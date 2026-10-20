@@ -29,7 +29,12 @@ export function sectionLength(a: LngLat, b: LngLat): number {
 export type ProfileSample = { d: number; z: number | null };
 
 /** Samples terrain every `step` metres; null where no source knows the height. */
-export function terrainProfile(a: LngLat, b: LngLat, sample: ElevationSampler, maxSamples = 160): ProfileSample[] {
+export function terrainProfile(
+  a: LngLat,
+  b: LngLat,
+  sample: ElevationSampler,
+  maxSamples = 160,
+): ProfileSample[] {
   const len = sectionLength(a, b);
   const n = Math.max(2, Math.min(maxSamples, Math.ceil(len / 10) + 1));
   return Array.from({ length: n }, (_, i) => {
@@ -41,7 +46,9 @@ export function terrainProfile(a: LngLat, b: LngLat, sample: ElevationSampler, m
 
 /** True dip seen in a vertical section: tan(α) = tan(δ)·|cos(azSection − dipDir)|. */
 export function apparentDip(dipDeg: number, dipDirectionDeg: number, sectionAzDeg: number): number {
-  return deg(Math.atan(Math.tan(rad(dipDeg)) * Math.abs(Math.cos(rad(sectionAzDeg - dipDirectionDeg)))));
+  return deg(
+    Math.atan(Math.tan(rad(dipDeg)) * Math.abs(Math.cos(rad(sectionAzDeg - dipDirectionDeg)))),
+  );
 }
 
 export type SectionStructure = {
@@ -54,7 +61,12 @@ export type SectionStructure = {
   towardB: 1 | -1 | null;
 };
 
-function segIntersect(p: [number, number], p2: [number, number], q: [number, number], q2: [number, number]) {
+function segIntersect(
+  p: [number, number],
+  p2: [number, number],
+  q: [number, number],
+  q2: [number, number],
+) {
   const r = [p2[0] - p[0], p2[1] - p[1]];
   const s = [q2[0] - q[0], q2[1] - q[1]];
   const den = r[0] * s[1] - r[1] * s[0];

@@ -46,7 +46,8 @@ export const OFFICIAL_GEOLOGY_SHEETS: readonly OfficialGeologySheet[] = [
   },
 ];
 
-const intersects = (a: BBox, b: BBox) => a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
+const intersects = (a: BBox, b: BBox) =>
+  a[0] <= b[2] && a[2] >= b[0] && a[1] <= b[3] && a[3] >= b[1];
 
 export function sheetsForBBox(bbox: BBox): OfficialGeologySheet[] {
   return OFFICIAL_GEOLOGY_SHEETS.filter((s) => intersects(s.extent, bbox));
@@ -78,7 +79,11 @@ async function query(url: string, bbox: BBox): Promise<FeatureCollection> {
 
 const label = (v: unknown) => (v == null || v === "" ? undefined : String(v));
 
-export type OfficialGeology = { sheets: OfficialGeologySheet[]; units: FeatureCollection; faults: FeatureCollection };
+export type OfficialGeology = {
+  sheets: OfficialGeologySheet[];
+  units: FeatureCollection;
+  faults: FeatureCollection;
+};
 
 export async function fetchOfficialGeology(bbox: BBox): Promise<OfficialGeology> {
   const sheets = sheetsForBBox(bbox);

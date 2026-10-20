@@ -8,30 +8,60 @@ const fmtM = (m: number) => (m >= 1000 ? `${(m / 1000).toFixed(2)} km` : `${m.to
 
 const btn = (on: boolean) =>
   `min-h-9 rounded border px-2.5 font-mono text-[10px] uppercase tracking-wider focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand ${
-    on ? "border-accent-brand bg-accent-brand text-primary-foreground" : "border-hairline bg-surface text-content hover:border-content/30"
+    on
+      ? "border-accent-brand bg-accent-brand text-primary-foreground"
+      : "border-hairline bg-surface text-content hover:border-content/30"
   }`;
 
 /** Barra de análisis: filtro espectral, terreno, medición y red estereográfica. */
 export function AnalysisDock({
-  spectralTop, onSpectralTop, includeOxides, onIncludeOxides, hasSpectral,
-  terrainOpacity, onTerrainOpacity, hasTerrain,
-  measuring, onMeasuring, measurePts, elevations,
-  stereoOpen, onStereo, planes,
-  sectionOn, sectionLabel, onSection,
+  spectralTop,
+  onSpectralTop,
+  includeOxides,
+  onIncludeOxides,
+  hasSpectral,
+  terrainOpacity,
+  onTerrainOpacity,
+  hasTerrain,
+  measuring,
+  onMeasuring,
+  measurePts,
+  elevations,
+  stereoOpen,
+  onStereo,
+  planes,
+  sectionOn,
+  sectionLabel,
+  onSection,
 }: {
-  spectralTop: SpectralTop; onSpectralTop: (v: SpectralTop) => void;
-  includeOxides: boolean; onIncludeOxides: (v: boolean) => void; hasSpectral: boolean;
-  terrainOpacity: number; onTerrainOpacity: (v: number) => void; hasTerrain: boolean;
-  measuring: boolean; onMeasuring: (v: boolean) => void; measurePts: LngLat[]; elevations: (number | null)[];
-  stereoOpen: boolean; onStereo: (v: boolean) => void; planes: StructurePlane[];
-  sectionOn: boolean; sectionLabel: string; onSection: () => void;
+  spectralTop: SpectralTop;
+  onSpectralTop: (v: SpectralTop) => void;
+  includeOxides: boolean;
+  onIncludeOxides: (v: boolean) => void;
+  hasSpectral: boolean;
+  terrainOpacity: number;
+  onTerrainOpacity: (v: number) => void;
+  hasTerrain: boolean;
+  measuring: boolean;
+  onMeasuring: (v: boolean) => void;
+  measurePts: LngLat[];
+  elevations: (number | null)[];
+  stereoOpen: boolean;
+  onStereo: (v: boolean) => void;
+  planes: StructurePlane[];
+  sectionOn: boolean;
+  sectionLabel: string;
+  onSection: () => void;
 }) {
   const len = pathLength(measurePts);
   const area = polygonArea(measurePts);
   const z0 = elevations[0];
   const z1 = elevations[elevations.length - 1];
   return (
-    <div data-theme="im-light" className="pointer-events-none absolute bottom-3 left-1/2 z-30 flex bg-transparent [&>*]:pointer-events-auto max-w-[calc(100%-1.5rem)] -translate-x-1/2 flex-col items-center gap-2">
+    <div
+      data-theme="im-light"
+      className="pointer-events-none absolute bottom-3 left-1/2 z-30 flex bg-transparent [&>*]:pointer-events-auto max-w-[calc(100%-1.5rem)] -translate-x-1/2 flex-col items-center gap-2"
+    >
       {measuring && measurePts.length > 0 && (
         <div className="rounded border border-hairline bg-surface/95 px-3 py-1.5 font-mono text-[11px] text-content shadow">
           {measurePts.length} pto · {fmtM(len)}
@@ -40,18 +70,47 @@ export function AnalysisDock({
         </div>
       )}
       {stereoOpen && (
-        <figure className="rounded border border-hairline bg-surface/95 p-2 shadow" aria-label="Red estereográfica">
+        <figure
+          className="rounded border border-hairline bg-surface/95 p-2 shadow"
+          aria-label="Red estereográfica"
+        >
           <svg viewBox="-1.15 -1.15 2.3 2.3" className="h-44 w-44">
-            <circle r={1} fill="none" stroke="currentColor" strokeWidth={0.01} className="text-content" />
-            <line x1={-1} y1={0} x2={1} y2={0} stroke="currentColor" strokeWidth={0.004} className="text-muted-foreground" />
-            <line x1={0} y1={-1} x2={0} y2={1} stroke="currentColor" strokeWidth={0.004} className="text-muted-foreground" />
-            <text x={0} y={-1.05} fontSize={0.1} textAnchor="middle" className="fill-current">N</text>
+            <circle
+              r={1}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={0.01}
+              className="text-content"
+            />
+            <line
+              x1={-1}
+              y1={0}
+              x2={1}
+              y2={0}
+              stroke="currentColor"
+              strokeWidth={0.004}
+              className="text-muted-foreground"
+            />
+            <line
+              x1={0}
+              y1={-1}
+              x2={0}
+              y2={1}
+              stroke="currentColor"
+              strokeWidth={0.004}
+              className="text-muted-foreground"
+            />
+            <text x={0} y={-1.05} fontSize={0.1} textAnchor="middle" className="fill-current">
+              N
+            </text>
             {planes.map((p) => {
               const { x, y } = schmidtPole(p);
               return (
                 <g key={p.code}>
                   <circle cx={x} cy={-y} r={0.035} className="fill-accent-brand" />
-                  <text x={x + 0.05} y={-y + 0.03} fontSize={0.07} className="fill-current">{p.code}</text>
+                  <text x={x + 0.05} y={-y + 0.03} fontSize={0.07} className="fill-current">
+                    {p.code}
+                  </text>
                 </g>
               );
             })}
@@ -62,10 +121,20 @@ export function AnalysisDock({
         </figure>
       )}
       <div className="flex flex-wrap items-center justify-center gap-1.5 rounded border border-hairline bg-surface/95 p-1.5 shadow-lg backdrop-blur">
-        <button type="button" aria-pressed={sectionOn} onClick={onSection} className={btn(sectionOn)}>
+        <button
+          type="button"
+          aria-pressed={sectionOn}
+          onClick={onSection}
+          className={btn(sectionOn)}
+        >
           {sectionLabel}
         </button>
-        <button type="button" aria-pressed={measuring} onClick={() => onMeasuring(!measuring)} className={btn(measuring)}>
+        <button
+          type="button"
+          aria-pressed={measuring}
+          onClick={() => onMeasuring(!measuring)}
+          className={btn(measuring)}
+        >
           Medir
         </button>
         <button
@@ -91,7 +160,11 @@ export function AnalysisDock({
               <option value="all">Todas</option>
             </select>
             <label className="flex min-h-9 items-center gap-1 px-1 font-mono text-[10px] text-content">
-              <input type="checkbox" checked={includeOxides} onChange={(e) => onIncludeOxides(e.target.checked)} />
+              <input
+                type="checkbox"
+                checked={includeOxides}
+                onChange={(e) => onIncludeOxides(e.target.checked)}
+              />
               Óxidos
             </label>
           </>
@@ -100,7 +173,10 @@ export function AnalysisDock({
           <label className="flex min-h-9 items-center gap-1.5 px-1 font-mono text-[10px] text-content">
             Terreno
             <input
-              type="range" min={15} max={100} step={5}
+              type="range"
+              min={15}
+              max={100}
+              step={5}
               value={Math.round(terrainOpacity * 100)}
               onChange={(e) => onTerrainOpacity(Number(e.target.value) / 100)}
               aria-label="Opacidad del terreno"

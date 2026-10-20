@@ -61,7 +61,9 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
   });
 
   const positions = wallet.data ? confirmedPositionSummary(wallet.data.positions) : null;
-  const capitalLabel = positions ? [...positions.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones" : null;
+  const capitalLabel = positions
+    ? [...positions.capital].map(([c, n]) => money(n, c)).join(" · ") || "Sin posiciones"
+    : null;
   const data = history.data;
   const inquiries = data?.inquiries ?? [];
   const confirmed = (holdings.data ?? []).filter((holding) => holding.status === "confirmed");
@@ -101,14 +103,14 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           <div className="grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-hairline bg-hairline sm:grid-cols-3">
             <PatrimonioCell
               label="Capital aportado · posiciones confirmadas"
-              value={wallet.data ? capitalLabel ?? "—" : wallet.isError ? "No disponible" : "—"}
+              value={wallet.data ? (capitalLabel ?? "—") : wallet.isError ? "No disponible" : "—"}
               note="Solo posiciones liquidadas y confirmadas por el equipo."
             />
             <PatrimonioCell
               label="Acciones confirmadas"
               value={
                 wallet.data
-                  ? positions?.shares.toLocaleString("es-CL") ?? "—"
+                  ? (positions?.shares.toLocaleString("es-CL") ?? "—")
                   : wallet.isError
                     ? "No disponible"
                     : "—"
@@ -157,13 +159,23 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           {rounds.isLoading ? (
             <div className="grid gap-4 sm:grid-cols-2">
               {[0, 1].map((i) => (
-                <div key={i} className="h-44 animate-pulse rounded-lg border border-hairline bg-surface-2" />
+                <div
+                  key={i}
+                  className="h-44 animate-pulse rounded-lg border border-hairline bg-surface-2"
+                />
               ))}
             </div>
           ) : rounds.isError ? (
-            <p role="status" className="rounded-lg border border-hairline p-5 text-sm text-content-subtle">
+            <p
+              role="status"
+              className="rounded-lg border border-hairline p-5 text-sm text-content-subtle"
+            >
               No pudimos cargar las rondas.{" "}
-              <BrandButton variant="ghost" className="text-accent-brand underline" onClick={() => void rounds.refetch()}>
+              <BrandButton
+                variant="ghost"
+                className="text-accent-brand underline"
+                onClick={() => void rounds.refetch()}
+              >
                 Reintentar
               </BrandButton>
             </p>
@@ -223,14 +235,21 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
           <section className="rounded-lg border border-hairline bg-surface-3">
             <header className="flex justify-between gap-3 border-b border-hairline p-5">
               <h2 className="font-serif text-xl">Tu seguimiento</h2>
-              <Link to="/dashboard/investments" className="text-sm text-accent-brand hover:underline">
+              <Link
+                to="/dashboard/investments"
+                className="text-sm text-accent-brand hover:underline"
+              >
                 Ver portafolio
               </Link>
             </header>
             {history.isError ? (
               <div role="status" className="p-5 text-sm text-content-subtle">
                 No pudimos cargar tu historial.{" "}
-                <BrandButton variant="ghost" className="text-accent-brand underline" onClick={() => void history.refetch()}>
+                <BrandButton
+                  variant="ghost"
+                  className="text-accent-brand underline"
+                  onClick={() => void history.refetch()}
+                >
                   Reintentar
                 </BrandButton>
               </div>
@@ -322,7 +341,11 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
             {holdings.isError && (
               <p role="status" className="text-xs text-content-subtle">
                 No pudimos consultar las participaciones.{" "}
-                <BrandButton variant="ghost" onClick={() => void holdings.refetch()} className="text-accent-brand underline">
+                <BrandButton
+                  variant="ghost"
+                  onClick={() => void holdings.refetch()}
+                  className="text-accent-brand underline"
+                >
                   Reintentar
                 </BrandButton>
               </p>
@@ -340,15 +363,7 @@ export function InvestorHome({ name, children }: { name: string; children?: Reac
   );
 }
 
-function PatrimonioCell({
-  label,
-  value,
-  note,
-}: {
-  label: string;
-  value: string;
-  note: string;
-}) {
+function PatrimonioCell({ label, value, note }: { label: string; value: string; note: string }) {
   return (
     <div className="bg-surface-3 p-4 md:p-5">
       <p className="text-[11px] text-content-subtle">{label}</p>
@@ -361,12 +376,35 @@ function PatrimonioCell({
 function RoundCard({ round }: { round: PublicRound }) {
   const terms = PROJECT_TERMS[round.slug];
   const ficha = getTerminalProject(round.slug)?.ficha;
-  return <InvestmentCard title={round.name} region={ficha?.region ?? "Ubicación por verificar"} commodity={ficha?.commodity ?? ""} stage={round.open ? "Ronda abierta · explotación declarada" : "Ronda cerrada · explotación declarada"}
-    image={round.slug === "cholqui" ? cholquiCover.url : verdesCover.url} imageLabel="Imagen de archivo · procedencia por verificar" slug={round.slug}>
-    <p className="text-xs text-content-muted"><span className="font-mono">{terms.hectares.direct.toLocaleString("es-CL")} ha directas · {terms.hectares.district.toLocaleString("es-CL")} ha distrito</span><br />DECLARADO · titular · tenencia sujeta a verificación</p>
-    <RoundProgress round={round} compact />
-    <p className="text-[10px] text-content-muted">Inversión privada, riesgo de pérdida y liquidez limitada. Sin recursos certificados NI 43-101/JORC.</p>
-  </InvestmentCard>;
+  return (
+    <InvestmentCard
+      title={round.name}
+      region={ficha?.region ?? "Ubicación por verificar"}
+      commodity={ficha?.commodity ?? ""}
+      stage={
+        round.open
+          ? "Ronda abierta · explotación declarada"
+          : "Ronda cerrada · explotación declarada"
+      }
+      image={round.slug === "cholqui" ? cholquiCover.url : verdesCover.url}
+      imageLabel="Imagen de archivo · procedencia por verificar"
+      slug={round.slug}
+    >
+      <p className="text-xs text-content-muted">
+        <span className="font-mono">
+          {terms.hectares.direct.toLocaleString("es-CL")} ha directas ·{" "}
+          {terms.hectares.district.toLocaleString("es-CL")} ha distrito
+        </span>
+        <br />
+        DECLARADO · titular · tenencia sujeta a verificación
+      </p>
+      <RoundProgress round={round} compact />
+      <p className="text-[10px] text-content-muted">
+        Inversión privada, riesgo de pérdida y liquidez limitada. Sin recursos certificados NI
+        43-101/JORC.
+      </p>
+    </InvestmentCard>
+  );
 }
 
 function InvestorMetric({

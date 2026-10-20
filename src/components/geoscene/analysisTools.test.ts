@@ -28,7 +28,12 @@ describe("herramientas de análisis", () => {
     expect(haversine([0, 0], [0, 1]) / 1000).toBeCloseTo(111.2, 0);
   });
   it("cuadrado de 0,01° en el ecuador ≈ 1,24 km²", () => {
-    const a = polygonArea([[0, 0], [0.01, 0], [0.01, 0.01], [0, 0.01]]);
+    const a = polygonArea([
+      [0, 0],
+      [0.01, 0],
+      [0.01, 0.01],
+      [0, 0.01],
+    ]);
     expect(a / 1e6).toBeCloseTo(1.24, 1);
   });
   it("plano horizontal → polo al centro; vertical → polo en el borde", () => {
@@ -42,8 +47,43 @@ describe("herramientas de análisis", () => {
 import { sectionGeology } from "./analysisTools";
 describe("corte con carta geológica", () => {
   it("detecta la unidad bajo la traza y la falla que la cruza", () => {
-    const units: FeatureCollection = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codigo: "Ki", nombre: "Lo Prado" }, geometry: { type: "Polygon", coordinates: [[[0, -1], [0.5, -1], [0.5, 1], [0, 1], [0, -1]]] } }] };
-    const faults: FeatureCollection = { type: "FeatureCollection", features: [{ type: "Feature", properties: { nombre: "F1" }, geometry: { type: "LineString", coordinates: [[0.25, -1], [0.25, 1]] } }] };
+    const units: FeatureCollection = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { codigo: "Ki", nombre: "Lo Prado" },
+          geometry: {
+            type: "Polygon",
+            coordinates: [
+              [
+                [0, -1],
+                [0.5, -1],
+                [0.5, 1],
+                [0, 1],
+                [0, -1],
+              ],
+            ],
+          },
+        },
+      ],
+    };
+    const faults: FeatureCollection = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: { nombre: "F1" },
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              [0.25, -1],
+              [0.25, 1],
+            ],
+          },
+        },
+      ],
+    };
     const r = sectionGeology([0, 0], [1, 0], units, faults);
     expect(r.units.map((u) => u.code)).toEqual(["Ki"]);
     expect(r.units[0].d1 / 1000).toBeCloseTo(55.6, 0);

@@ -67,11 +67,17 @@ export function SectionProfilePanel({
               className="min-h-[32px] rounded border border-border bg-bg-panel px-1 text-foreground"
             >
               {[10, 25, 50, 100].map((m) => (
-                <option key={m} value={m}>{m} m</option>
+                <option key={m} value={m}>
+                  {m} m
+                </option>
               ))}
             </select>
           </label>
-          <button type="button" onClick={onClose} className="min-h-[32px] rounded border border-border px-2 text-foreground hover:bg-bg-panel">
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-[32px] rounded border border-border px-2 text-foreground hover:bg-bg-panel"
+          >
             Cerrar
           </button>
         </div>
@@ -81,7 +87,12 @@ export function SectionProfilePanel({
           Sin relieve disponible para este corte. Usa Perspectiva con el relieve activo.
         </p>
       ) : (
-        <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label="Perfil topográfico del corte">
+        <svg
+          viewBox={`0 0 ${W} ${H}`}
+          className="w-full"
+          role="img"
+          aria-label="Perfil topográfico del corte"
+        >
           <line x1={pad} x2={W - pad} y1={H - pad} y2={H - pad} className="stroke-border" />
           {segments.map((d, i) => (
             <path key={i} d={d} fill="none" className="stroke-foreground" strokeWidth={1.5} />
@@ -97,18 +108,42 @@ export function SectionProfilePanel({
             return (
               <g key={s.code + s.d} className="text-accent-brand">
                 {a != null ? (
-                  <line x1={x} y1={y} x2={x + (dir * L) / Math.hypot(1, Math.tan(a) * vex)} y2={y + (L * Math.tan(a) * vex) / Math.hypot(1, Math.tan(a) * vex)} stroke="currentColor" strokeWidth={2} />
+                  <line
+                    x1={x}
+                    y1={y}
+                    x2={x + (dir * L) / Math.hypot(1, Math.tan(a) * vex)}
+                    y2={y + (L * Math.tan(a) * vex) / Math.hypot(1, Math.tan(a) * vex)}
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  />
                 ) : (
-                  <line x1={x} y1={y} x2={x} y2={y + 14} stroke="currentColor" strokeWidth={1} strokeDasharray="2 2" />
+                  <line
+                    x1={x}
+                    y1={y}
+                    x2={x}
+                    y2={y + 14}
+                    stroke="currentColor"
+                    strokeWidth={1}
+                    strokeDasharray="2 2"
+                  />
                 )}
-                <text x={x + 3} y={y - 4} fill="currentColor" fontSize={9}>{s.code}</text>
+                <text x={x + 3} y={y - 4} fill="currentColor" fontSize={9}>
+                  {s.code}
+                </text>
               </g>
             );
           })}
           {geology?.units.map((u) => {
             const c = unitColor(u.code);
             return (
-              <rect key={u.code + u.d0} x={X(u.d0)} y={H - pad + 2} width={Math.max(1, X(u.d1) - X(u.d0))} height={6} fill={`rgb(${c[0]},${c[1]},${c[2]})`}>
+              <rect
+                key={u.code + u.d0}
+                x={X(u.d0)}
+                y={H - pad + 2}
+                width={Math.max(1, X(u.d1) - X(u.d0))}
+                height={6}
+                fill={`rgb(${c[0]},${c[1]},${c[2]})`}
+              >
                 <title>{`${u.code} · ${u.nombre}`}</title>
               </rect>
             );
@@ -117,34 +152,60 @@ export function SectionProfilePanel({
             const z = zAt(f.d);
             return z == null ? null : (
               <g key={i} className="text-destructive">
-                <line x1={X(f.d)} x2={X(f.d)} y1={Y(z) - 6} y2={H - pad + 8} stroke="currentColor" strokeWidth={1} strokeDasharray="3 2" />
-                <text x={X(f.d) + 2} y={Y(z) - 8} fill="currentColor" fontSize={8}>F</text>
+                <line
+                  x1={X(f.d)}
+                  x2={X(f.d)}
+                  y1={Y(z) - 6}
+                  y2={H - pad + 8}
+                  stroke="currentColor"
+                  strokeWidth={1}
+                  strokeDasharray="3 2"
+                />
+                <text x={X(f.d) + 2} y={Y(z) - 8} fill="currentColor" fontSize={8}>
+                  F
+                </text>
               </g>
             );
           })}
-          <text x={pad} y={pad - 10} fill="currentColor" fontSize={9}>A</text>
-          <text x={W - pad - 6} y={pad - 10} fill="currentColor" fontSize={9}>A′</text>
+          <text x={pad} y={pad - 10} fill="currentColor" fontSize={9}>
+            A
+          </text>
+          <text x={W - pad - 6} y={pad - 10} fill="currentColor" fontSize={9}>
+            A′
+          </text>
           <text x={pad} y={H - 8} fill="currentColor" fontSize={9}>
-            {Math.round(zMin)}–{Math.round(zMax)} m s.n.m. · {Math.abs(vex - 1) < 0.05 ? "escala 1:1" : `exageración vertical ×${vex.toFixed(1)} (manteos dibujados con la misma exageración)`}
+            {Math.round(zMin)}–{Math.round(zMax)} m s.n.m. ·{" "}
+            {Math.abs(vex - 1) < 0.05
+              ? "escala 1:1"
+              : `exageración vertical ×${vex.toFixed(1)} (manteos dibujados con la misma exageración)`}
           </text>
         </svg>
       )}
       <p className="mt-1 leading-snug">
-        Relieve muestreado del terreno mostrado (CAD del titular dentro de su cobertura, DEM regional fuera).
-        Trazos: manteo aparente de vetas con manteo MEDIDO; punteado = sin manteo medido, no se proyecta en profundidad.
-        Es una proyección geométrica, no una interpretación de continuidad.
+        Relieve muestreado del terreno mostrado (CAD del titular dentro de su cobertura, DEM
+        regional fuera). Trazos: manteo aparente de vetas con manteo MEDIDO; punteado = sin manteo
+        medido, no se proyecta en profundidad. Es una proyección geométrica, no una interpretación
+        de continuidad.
       </p>
       {geology && (geology.units.length > 0 || geology.faults.length > 0) && (
         <p className="mt-1">
           Carta geológica OFICIAL (SERNAGEOMIN) en superficie:{" "}
-          {geology.units.map((u) => `${u.code} ${Math.round(u.d0)}–${Math.round(u.d1)} m`).join(" · ")}
-          {geology.faults.length > 0 && ` · ${geology.faults.length} falla(s) cruzada(s) @ ${geology.faults.map((f) => Math.round(f.d)).join(", ")} m`}
+          {geology.units
+            .map((u) => `${u.code} ${Math.round(u.d0)}–${Math.round(u.d1)} m`)
+            .join(" · ")}
+          {geology.faults.length > 0 &&
+            ` · ${geology.faults.length} falla(s) cruzada(s) @ ${geology.faults.map((f) => Math.round(f.d)).join(", ")} m`}
           . No se proyecta en profundidad.
         </p>
       )}
       {structures.length > 0 && (
         <p className="mt-1">
-          {structures.map((s) => `${s.code} @${Math.round(s.d)} m${s.apparentDipDeg != null ? ` (aparente ${Math.round(s.apparentDipDeg)}°)` : ""}`).join(" · ")}
+          {structures
+            .map(
+              (s) =>
+                `${s.code} @${Math.round(s.d)} m${s.apparentDipDeg != null ? ` (aparente ${Math.round(s.apparentDipDeg)}°)` : ""}`,
+            )
+            .join(" · ")}
         </p>
       )}
     </div>

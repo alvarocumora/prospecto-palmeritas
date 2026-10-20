@@ -168,7 +168,9 @@ export function GeoScene3D({
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
           extraLayerIds={projectLayers?.map((layer) => layer.id)}
-          counts={Object.fromEntries((projectLayers ?? []).map((l) => [l.id, l.data.features.length]))}
+          counts={Object.fromEntries(
+            (projectLayers ?? []).map((l) => [l.id, l.data.features.length]),
+          )}
           opacity={layerOpacity}
           onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
         />

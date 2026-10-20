@@ -47,7 +47,9 @@ const LABELS: Record<string, string> = {
 
 const SKIP = new Set(["nombre", "name", "NOMBRE", "procedencia", "advertencia", "OBJECTID", "FID"]);
 
-export function featureFacts(properties: Record<string, unknown> | null | undefined): FeatureFact[] {
+export function featureFacts(
+  properties: Record<string, unknown> | null | undefined,
+): FeatureFact[] {
   if (!properties) return [];
   const facts: FeatureFact[] = [];
   const seen = new Set<string>();
@@ -57,8 +59,10 @@ export function featureFacts(properties: Record<string, unknown> | null | undefi
     if (!label || seen.has(label)) continue;
     seen.add(label);
     let value = String(raw);
-    if (key === "FECHA_VENCIMIENTO" && typeof raw === "number") value = new Date(raw).toISOString().slice(0, 10);
-    else if (typeof raw === "number") value = raw.toLocaleString("es-CL", { maximumFractionDigits: 3 });
+    if (key === "FECHA_VENCIMIENTO" && typeof raw === "number")
+      value = new Date(raw).toISOString().slice(0, 10);
+    else if (typeof raw === "number")
+      value = raw.toLocaleString("es-CL", { maximumFractionDigits: 3 });
     facts.push({ label, value });
   }
   return facts;

@@ -25,7 +25,9 @@ export function FeatureInspector({
     >
       <div className="flex items-start justify-between gap-2 border-b border-hairline px-3 py-2.5">
         <div className="min-w-0">
-          <div className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">{d.label}</div>
+          <div className="font-mono text-[9px] uppercase tracking-wider text-muted-foreground">
+            {d.label}
+          </div>
           <h3 className="mt-0.5 font-serif text-base leading-tight">{featureLabel(properties)}</h3>
         </div>
         <button
@@ -48,7 +50,9 @@ export function FeatureInspector({
             ))}
           </dl>
         ) : (
-          <p className="py-2 text-muted-foreground">El elemento no trae atributos adicionales en su fuente.</p>
+          <p className="py-2 text-muted-foreground">
+            El elemento no trae atributos adicionales en su fuente.
+          </p>
         )}
       </div>
       <div className="space-y-1.5 border-t border-hairline px-3 py-2 text-[10px]">
@@ -59,7 +63,9 @@ export function FeatureInspector({
           )}
         </div>
         <div className="text-muted-foreground">Fuente: {layer.source ?? d.sourceSystem}</div>
-        {(warning ?? d.caution) && <div className="leading-snug text-amber-700">{warning ?? d.caution}</div>}
+        {(warning ?? d.caution) && (
+          <div className="leading-snug text-amber-700">{warning ?? d.caution}</div>
+        )}
       </div>
     </aside>
   );

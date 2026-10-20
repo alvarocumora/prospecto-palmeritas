@@ -18,7 +18,9 @@ const QUAD: Record<string, [number, number]> = {
 };
 
 /** Parses "30° SE" / "60-70° NW" / "80°". Range dips use the mean. */
-export function parseDip(text: string | null | undefined): { dip: number; quadrant: string } | null {
+export function parseDip(
+  text: string | null | undefined,
+): { dip: number; quadrant: string } | null {
   if (!text) return null;
   const m = /(\d{1,2})(?:\s*-\s*(\d{1,2}))?\s*°?\s*([NSEWO]{0,2})/i.exec(text);
   if (!m) return null;
@@ -48,7 +50,9 @@ export function dipDirection(strikeDeg: number, quadrant: string): number {
   return dot(right) >= dot(left) ? right : left;
 }
 
-export function planeFromProperties(p: Record<string, unknown> | null | undefined): StructurePlane | null {
+export function planeFromProperties(
+  p: Record<string, unknown> | null | undefined,
+): StructurePlane | null {
   if (!p) return null;
   const strike = Number(p.strikeDeg);
   const dip = parseDip(p.dipText as string | null);

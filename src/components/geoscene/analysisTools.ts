@@ -8,7 +8,11 @@ import type { StructurePlane } from "./structuralPlanes";
 export type SpectralTop = "all" | "p90" | "p95";
 
 /** Mantiene solo el percentil superior de intensidad por mineral; óxidos opcionales. */
-export function filterSpectral(fc: FeatureCollection, top: SpectralTop, includeOxides: boolean): FeatureCollection {
+export function filterSpectral(
+  fc: FeatureCollection,
+  top: SpectralTop,
+  includeOxides: boolean,
+): FeatureCollection {
   const groups = new Map<string, typeof fc.features>();
   for (const f of fc.features) {
     const p = f.properties ?? {};
@@ -22,9 +26,15 @@ export function filterSpectral(fc: FeatureCollection, top: SpectralTop, includeO
   const q = top === "p95" ? 0.95 : 0.9;
   const out: typeof fc.features = [];
   for (const list of groups.values()) {
-    const values = list.map((f) => featureIntensity(f.properties)).filter((v): v is number => v != null).sort((a, b) => a - b);
+    const values = list
+      .map((f) => featureIntensity(f.properties))
+      .filter((v): v is number => v != null)
+      .sort((a, b) => a - b);
     // Sin intensidad no hay percentil que calcular: se conserva tal cual.
-    if (!values.length) { out.push(...list); continue; }
+    if (!values.length) {
+      out.push(...list);
+      continue;
+    }
     const cut = values[Math.min(values.length - 1, Math.floor(q * values.length))];
     for (const f of list) {
       const v = featureIntensity(f.properties);
@@ -36,8 +46,16 @@ export function filterSpectral(fc: FeatureCollection, top: SpectralTop, includeO
 
 /** Color determinístico por código de unidad (paleta de visualización, no la oficial impresa). */
 const UNIT_PALETTE: [number, number, number][] = [
-  [196, 160, 110], [150, 178, 120], [190, 120, 120], [130, 150, 190], [200, 180, 90],
-  [160, 130, 180], [120, 170, 160], [210, 140, 90], [150, 150, 150], [180, 200, 140],
+  [196, 160, 110],
+  [150, 178, 120],
+  [190, 120, 120],
+  [130, 150, 190],
+  [200, 180, 90],
+  [160, 130, 180],
+  [120, 170, 160],
+  [210, 140, 90],
+  [150, 150, 150],
+  [180, 200, 140],
 ];
 export function unitColor(code: unknown): [number, number, number] {
   const s = String(code ?? "");
@@ -53,7 +71,8 @@ const rad = (d: number) => (d * Math.PI) / 180;
 export function haversine(a: LngLat, b: LngLat): number {
   const dLat = rad(b[1] - a[1]);
   const dLng = rad(b[0] - a[0]);
-  const h = Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[1])) * Math.cos(rad(b[1])) * Math.sin(dLng / 2) ** 2;
+  const h =
+    Math.sin(dLat / 2) ** 2 + Math.cos(rad(a[1])) * Math.cos(rad(b[1])) * Math.sin(dLng / 2) ** 2;
   return 2 * R * Math.asin(Math.sqrt(h));
 }
 
@@ -91,7 +110,8 @@ function inRing(pt: LngLat, ring: Ring): boolean {
   for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
     const [xi, yi] = ring[i];
     const [xj, yj] = ring[j];
-    if (yi > pt[1] !== yj > pt[1] && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) inside = !inside;
+    if (yi > pt[1] !== yj > pt[1] && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi)
+      inside = !inside;
   }
   return inside;
 }
@@ -135,7 +155,9 @@ export function sectionGeology(
       const t = (i + 0.5) / samples;
       const p: LngLat = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
       const f = units.features.find((u) =>
-        polygons(u.geometry).some((poly) => inRing(p, poly[0]) && !poly.slice(1).some((h) => inRing(p, h))),
+        polygons(u.geometry).some(
+          (poly) => inRing(p, poly[0]) && !poly.slice(1).some((h) => inRing(p, h)),
+        ),
       );
       if (!f) continue;
       const code = String(f.properties?.codigo ?? f.properties?.nombre ?? "?");
