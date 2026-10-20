@@ -4,10 +4,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import maplibregl, { Map as MapLibreMap } from "maplibre-gl";
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import { GeoJsonLayer } from "@deck.gl/layers";
+import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
-import { COORDINATE_SYSTEM } from "@deck.gl/core";
+import { COORDINATE_SYSTEM, type Layer } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
+import { cadElevationSampler, drapeFeatureCollection, type ElevationSampler } from "../terrainDrape";
+import { discRing, planeFromProperties } from "../structuralPlanes";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
