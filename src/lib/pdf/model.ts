@@ -9,6 +9,19 @@ import type { DisclosureStandard } from "@/lib/reports/internationalStandards";
 
 export type DocKpi = { label: string; value: string; note?: string };
 
+/** Visual marketing pages share their content with the public presentation. */
+export type InvestorVisualSlide = {
+  title: string;
+  kicker: string;
+  lead: string;
+  image: string;
+  imageLabel: string;
+  hero?: boolean;
+  stats: DocKpi[];
+  items: Array<{ title: string; body: string }>;
+  note: string;
+};
+
 export type EvidenceStatus =
   "VERIFIED" | "OBSERVED" | "DECLARED" | "DERIVED" | "CONCEPTUAL" | "PENDING_DD";
 
@@ -134,6 +147,7 @@ export type ProjectDoc = {
   dataQuality?: DataQualityFlag[];
   milestones?: Array<{ when: string; what: string }>;
   sections: DocSection[];
+  visualSlides?: InvestorVisualSlide[];
   disclaimers: string[];
   contact?: { name?: string; email?: string; phone?: string };
 };

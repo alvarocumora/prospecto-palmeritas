@@ -21,6 +21,11 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
     label: "Inversión & Capital",
     items: [
       {
+        to: "/inversion/deck",
+        label: "Investor Deck 2026",
+        desc: "Cholqui y Los Verdes · dossier comercial de inversión",
+      },
+      {
         to: "/proyectos",
         label: "Proyectos en explotación",
         desc: "Cholqui y Los Verdes · ronda SPV desde USD 15.000",

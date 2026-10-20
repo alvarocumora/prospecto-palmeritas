@@ -13,6 +13,7 @@ import { HeroGeospatial } from "@/features/marketing/HeroGeospatial";
 import { MiningInvestShowcase } from "@/features/marketing/MiningInvestShowcase";
 import featureCatastro from "@/assets/feature-catastro.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
+import { InvestorDeckEntry } from "@/features/marketing/deck/InvestorDeckEntry";
 
 /**
  * Portada = embudo de captura con dos puertas:
@@ -44,6 +45,7 @@ export function MarketingLanding() {
       </section>
 
       <MiningInvestShowcase />
+      <InvestorDeckEntry />
 
       {/* 2. INVERSIONISTAS */}
       <section id="colateral" className="border-b border-hairline">
