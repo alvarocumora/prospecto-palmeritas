@@ -153,7 +153,9 @@ function ProjectsPage() {
             className="w-full max-w-md space-y-4 rounded-xl border border-hairline bg-surface-3 p-5 text-content shadow-2xl"
           >
             <div className="flex items-center justify-between">
-              <h2 id="new-project-title" className="font-display text-2xl">Nuevo proyecto</h2>
+              <h2 id="new-project-title" className="font-display text-2xl">
+                Nuevo proyecto
+              </h2>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
@@ -165,7 +167,10 @@ function ProjectsPage() {
             </div>
             {(["code", "name", "commodity", "region"] as const).map((f) => (
               <div key={f}>
-                <label htmlFor={`new-project-${f}`} className="font-mono text-[10px] uppercase text-content-muted">
+                <label
+                  htmlFor={`new-project-${f}`}
+                  className="font-mono text-[10px] uppercase text-content-muted"
+                >
                   {f === "code" ? "Código (único)" : f}
                 </label>
                 <input
@@ -180,7 +185,10 @@ function ProjectsPage() {
               </div>
             ))}
             <div>
-              <label htmlFor="new-project-description" className="font-mono text-[10px] uppercase text-content-muted">
+              <label
+                htmlFor="new-project-description"
+                className="font-mono text-[10px] uppercase text-content-muted"
+              >
                 Descripción
               </label>
               <textarea
