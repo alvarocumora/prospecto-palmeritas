@@ -379,7 +379,7 @@ export function GeoSceneCanvas({
       parameters: { depthTest: false } as never,
       updateTriggers: { getFillColor: [index, range[0], range[1]] },
     });
-  }, [processedScene, mode]);
+  }, [processedScene, mode, drape]);
 
   useEffect(() => {
     if (!mapDiv.current || mapRef.current) return;
@@ -431,6 +431,10 @@ export function GeoSceneCanvas({
       setReady(true);
     });
     map.on("moveend", syncSnapshotViewState);
+    // Re-drape once DEM tiles for the current view have loaded.
+    map.on("idle", () => {
+      if (map.getTerrain()) setTerrainEpoch((n) => n + 1);
+    });
 
     map.on("error", (event: { error?: { message?: string } }) => {
       const message = event?.error?.message ?? "";
@@ -521,8 +525,9 @@ export function GeoSceneCanvas({
       cadTerrainLayer,
       processedLayer,
       ...projectGeoLayers,
+      structurePlaneLayer,
       targetsLayer,
-      satAnomaliesLayer,
+      drapedSatLayer,
       ...holeColumnLayers,
       ...trajectoryLayers,
       ...wireframeLayers,
@@ -534,8 +539,9 @@ export function GeoSceneCanvas({
     cadTerrainLayer,
     processedLayer,
     projectGeoLayers,
+    structurePlaneLayer,
     targetsLayer,
-    satAnomaliesLayer,
+    drapedSatLayer,
     holeColumnLayers,
     trajectoryLayers,
     wireframeLayers,
