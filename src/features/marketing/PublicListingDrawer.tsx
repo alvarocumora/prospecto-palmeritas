@@ -52,7 +52,11 @@ function Body({ listing }: { listing: PublicListing }) {
             <Mountain className="w-14 h-14 text-accent-brand/30" />
           </div>
         )}
-        <p className="absolute bottom-3 left-3 right-3 w-fit bg-surface/95 px-2 py-1 text-[10px]">{listing.cover_image_url ? "Imagen referencial · procedencia por verificar" : "Ilustración referencial"}</p>
+        <p className="absolute bottom-3 left-3 right-3 w-fit bg-surface/95 px-2 py-1 text-[10px]">
+          {listing.cover_image_url
+            ? "Imagen referencial · procedencia por verificar"
+            : "Ilustración referencial"}
+        </p>
         <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-3/95 text-content text-[10px] font-mono uppercase tracking-wider border border-hairline">
           {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality} ·{" "}
           {STAGE_LABEL[listing.stage ?? ""] ?? listing.stage}
@@ -90,7 +94,10 @@ function Body({ listing }: { listing: PublicListing }) {
           />
           <Kpi
             label="Ubicación"
-            v={ficha?.region ?? ([listing.region, listing.country].filter(Boolean).join(", ") || "Por verificar")}
+            v={
+              ficha?.region ??
+              ([listing.region, listing.country].filter(Boolean).join(", ") || "Por verificar")
+            }
             icon={<MapPin className="w-3.5 h-3.5" />}
           />
         </div>
@@ -136,7 +143,10 @@ function Body({ listing }: { listing: PublicListing }) {
           )}
         </div>
 
-        <p className="mt-5 text-xs text-content-muted">DECLARADO · listado publicado. No constituye oferta pública, precio bursátil ni rendimiento garantizado; inversión privada e ilíquida.</p>
+        <p className="mt-5 text-xs text-content-muted">
+          DECLARADO · listado publicado. No constituye oferta pública, precio bursátil ni
+          rendimiento garantizado; inversión privada e ilíquida.
+        </p>
         <RequestAccess listing={listing} />
       </div>
     </div>

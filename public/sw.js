@@ -13,7 +13,13 @@ const HTML_TIMEOUT_MS = 3000;
 /* Explicit allowlist of public pages that may be cached for offline viewing.
    Everything else (any /dashboard route, auth, onboarding, unknown paths) is
    treated as private and is never stored. */
-const PUBLIC_HTML_PATHS = ["/", "/proyectos", "/inversionistas", "/inversion-colateral", "/catastro/mapa"];
+const PUBLIC_HTML_PATHS = [
+  "/",
+  "/proyectos",
+  "/inversionistas",
+  "/inversion-colateral",
+  "/catastro/mapa",
+];
 
 function isPublicHtmlPath(pathname) {
   const p = pathname.replace(/\/+$/, "") || "/";
