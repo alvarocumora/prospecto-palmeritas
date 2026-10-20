@@ -33,7 +33,11 @@ describe("GeoCapitals institutional page primitives", () => {
 
   it("shows intentional empty data with a separate action", () => {
     const html = renderToStaticMarkup(
-      <ContentState kind="empty" title="Sin proyectos" action={{ label: "Crear proyecto", onClick: () => {} }} />,
+      <ContentState
+        kind="empty"
+        title="Sin proyectos"
+        action={{ label: "Crear proyecto", onClick: () => {} }}
+      />,
     );
     expect(html).toContain("Sin proyectos");
     expect(html).toContain("Crear proyecto");
