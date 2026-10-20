@@ -1,0 +1,31 @@
+name: Format UX review (temporary)
+on:
+  push:
+    branches: [feat/global-ux-landing-terminal-navigation]
+    paths: [.github/workflows/format-global-ux-pr343.yml]
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/global-ux-landing-terminal-navigation
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Format touched UI source only
+        run: npx prettier --write src/components/shell/AppShell.tsx src/features/marketing/HeroGeospatial.tsx src/features/marketing/MarketingLanding.tsx src/features/marketing/MiningInvestShowcase.tsx src/features/marketing/landingNavigation.ts src/features/marketing/landingNavigation.test.ts src/features/terminal/ProjectTerminalShell.tsx public/manifest.webmanifest
+      - name: Commit formatting only
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/shell/AppShell.tsx src/features/marketing/HeroGeospatial.tsx src/features/marketing/MarketingLanding.tsx src/features/marketing/MiningInvestShowcase.tsx src/features/marketing/landingNavigation.ts src/features/marketing/landingNavigation.test.ts src/features/terminal/ProjectTerminalShell.tsx public/manifest.webmanifest
+          if ! git diff --cached --quiet; then
+            git commit -m "style(ux): format landing and terminal changes"
+            git push origin HEAD:feat/global-ux-landing-terminal-navigation
+          fi
