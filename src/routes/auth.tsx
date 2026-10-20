@@ -27,11 +27,11 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s) => authSearch.parse(s),
   head: () => ({
     meta: [
-      { title: "Acceso a la mina — Geocapitals" },
+      { title: "Acceso a GeoCapitals · Inversiones y geointeligencia" },
       {
         name: "description",
         content:
-          "Portal de acceso a la plataforma minera Geocapitals. Autorización, catastro y sala de operaciones.",
+          "Accede a tu espacio GeoCapitals para evaluar proyectos mineros, gestionar inversiones y usar herramientas profesionales.",
       },
     ],
   }),
@@ -293,6 +293,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const search = Route.useSearch();
+  const isInvestor = search.intent === "investor";
   const [mode, setMode] = useState<Mode>(search.mode ?? (search.intent ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -308,6 +309,11 @@ function AuthPage() {
     form?: string;
   }>({});
   const pwStrength = evaluatePassword(password);
+
+  // Re-entering /auth from a different client journey must use its intended mode.
+  useEffect(() => {
+    setMode(search.mode ?? (search.intent ? "signup" : "login"));
+  }, [search.mode, search.intent]);
   const authSteps = useRef([
     "Validando credenciales…",
     "Firmando token QP…",
@@ -464,21 +470,31 @@ function AuthPage() {
 
           <div className="text-center space-y-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#e0a742]">
-              Autorización de operador
+              {isInvestor ? "Espacio del inversionista" : "Acceso seguro a GeoCapitals"}
             </p>
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              {mode === "login" ? "Ingreso a la mina" : "Registro de operador"}
+              {isInvestor
+                ? mode === "login"
+                  ? "Ingresa a tus inversiones"
+                  : "Crea tu cuenta de inversión"
+                : mode === "login"
+                  ? "Ingresa a tu espacio"
+                  : "Crea tu cuenta"}
             </h2>
             <p className="text-xs text-[#8a97ab]">
-              {mode === "login"
-                ? "Presenta tus credenciales para descender a la sala de operaciones."
-                : "Alta de credenciales para acceso al portal Geocapitals."}
+              {isInvestor
+                ? mode === "login"
+                  ? "Revisa tus solicitudes, documentos y posiciones confirmadas."
+                  : "Explora oportunidades y completa la verificación de identidad antes de invertir."
+                : mode === "login"
+                  ? "Accede a tus proyectos, catastro y herramientas profesionales."
+                  : "Crea tus credenciales para acceder a GeoCapitals."}
             </p>
           </div>
 
           {search.intent === "investor" && (
             <div className="rounded border border-[#e0a742]/40 bg-[#e0a742]/5 px-3 py-2 text-[11px] text-[#e0a742] font-mono text-center">
-              ✦ Acceso institucional · KYC/AML post registro
+              Verificación de identidad requerida antes de formalizar una inversión.
             </div>
           )}
 
@@ -540,7 +556,7 @@ function AuthPage() {
                   required
                   aria-invalid={!!errors.email}
                   className={inputCls(!!errors.email)}
-                  placeholder="geologo@empresa.com"
+                  placeholder={isInvestor ? "tu@correo.com" : "correo@empresa.com"}
                   maxLength={255}
                   autoComplete="email"
                   inputMode="email"
@@ -598,7 +614,7 @@ function AuthPage() {
                   <Fingerprint className="w-4 h-4" />
                 )}
                 <span className="relative">
-                  {mode === "login" ? "Autorizar acceso" : "Registrar operador"}
+                  {mode === "login" ? "Ingresar a mi cuenta" : "Crear cuenta"}
                 </span>
               </button>
             </form>
@@ -627,7 +643,9 @@ function AuthPage() {
           </div>
 
           <p className="text-center text-[10px] font-mono uppercase tracking-[0.35em] text-[#5f6b7d]">
-            Catastro · Geofísica · Sondajes · QA/QC
+            {isInvestor
+              ? "Proyectos · Verificación · Portafolio · Wallet"
+              : "Catastro · Geofísica · Sondajes · QA/QC"}
           </p>
         </div>
       </main>
