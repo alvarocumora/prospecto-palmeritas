@@ -42,16 +42,15 @@ describe("geophysical anomaly presentation", () => {
   });
 
   it("filters missing and invalid coordinates instead of relocating anomalies", () => {
-    expect(
-      normalizeGeophysicalAnomalies([
-        anomaly({ lat: null }),
-        anomaly({ lng: 181 }),
-        anomaly({ lat: -91 }),
-        anomaly({ code: "" }),
-        anomaly({ lat: Number.NaN }),
-        anomaly({ code: "VALID" }),
-      ]),
-    ).map((item) => item.code)).toEqual(["VALID"]);
+    const markers = normalizeGeophysicalAnomalies([
+      anomaly({ lat: null }),
+      anomaly({ lng: 181 }),
+      anomaly({ lat: -91 }),
+      anomaly({ code: "" }),
+      anomaly({ lat: Number.NaN }),
+      anomaly({ code: "VALID" }),
+    ]);
+    expect(markers.map((item) => item.code)).toEqual(["VALID"]);
   });
 
   it("does not turn missing severity into a fabricated medium classification", () => {
