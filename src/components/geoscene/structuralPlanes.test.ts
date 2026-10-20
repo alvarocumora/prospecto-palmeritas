@@ -46,3 +46,15 @@ describe("terrain drape", () => {
     expect((fc.features[0].geometry as { coordinates: number[] }).coordinates[2]).toBe(800);
   });
 });
+
+import { hybridElevationSampler } from "./terrainDrape";
+describe("hybrid elevation sampler", () => {
+  it("uses survey inside coverage and regional DEM outside, never zero", () => {
+    const cad = (lng: number) => (lng < 0 ? 900 : null);
+    const dem = () => 750;
+    const s = hybridElevationSampler(cad, dem);
+    expect(s(-1, 0)).toBe(900);
+    expect(s(1, 0)).toBe(750);
+    expect(hybridElevationSampler(cad, () => null)(1, 0)).toBeNull();
+  });
+});

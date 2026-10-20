@@ -8,7 +8,7 @@ import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM, type Layer } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
-import { cadElevationSampler, drapeFeatureCollection, type ElevationSampler } from "../terrainDrape";
+import { cadElevationSampler, drapeFeatureCollection, hybridElevationSampler, type ElevationSampler } from "../terrainDrape";
 import { discRing, planeFromProperties } from "../structuralPlanes";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
@@ -240,25 +240,30 @@ export function GeoSceneCanvas({
   // Elevation used to drape 2D layers onto the relief actually rendered.
   // CAD tile when present (absolute heights), MapLibre DEM otherwise; none in Planta.
   const [terrainEpoch, setTerrainEpoch] = useState(0);
-  const demActive = terrainVisible && !cadTerrain && view === "3d";
+  // Regional DEM stays on around CAD surveys so concessions beyond the survey
+  // never drop to sea level. CAD wins inside its coverage (selection, not blend).
+  const demActive = terrainVisible && view === "3d";
   const drape = useMemo((): { sample: ElevationSampler; fallback: number } | null => {
     if (view !== "3d" || !terrainVisible) return null;
-    if (cadTerrain) {
-      const t = cadTerrain.tile;
-      // Outside CAD coverage the basemap is flat (no DEM fusion), so features stay at 0.
-      return { sample: cadElevationSampler(t), fallback: 0 };
-    }
     const map = mapRef.current as unknown as {
       terrain?: { getElevationForLngLatZoom?: (ll: maplibregl.LngLat, z: number) => number };
     } | null;
     const terrain = map?.terrain;
-    if (!terrain?.getElevationForLngLatZoom || terrainEpoch === 0) return null;
     const zoom = Math.min(14, Math.max(8, Math.round(mapRef.current?.getZoom() ?? 12)));
-    const sample: ElevationSampler = (lng, lat) => {
-      const h = terrain.getElevationForLngLatZoom!(new maplibregl.LngLat(lng, lat), zoom);
-      return Number.isFinite(h) && h !== 0 ? h : null;
-    };
-    return { sample, fallback: sample(centerLng, centerLat) ?? 0 };
+    const dem: ElevationSampler | null =
+      terrain?.getElevationForLngLatZoom && terrainEpoch > 0
+        ? (lng, lat) => {
+            const h = terrain.getElevationForLngLatZoom!(new maplibregl.LngLat(lng, lat), zoom);
+            return Number.isFinite(h) && h !== 0 ? h : null;
+          }
+        : null;
+    if (cadTerrain) {
+      const cad = cadElevationSampler(cadTerrain.tile);
+      const sample = dem ? hybridElevationSampler(cad, dem) : cad;
+      return { sample, fallback: sample(centerLng, centerLat) ?? cadTerrain.tile.referenceElevationM };
+    }
+    if (!dem) return null;
+    return { sample: dem, fallback: dem(centerLng, centerLat) ?? 0 };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, terrainVisible, cadTerrain, terrainEpoch, demActive]);
 
@@ -500,10 +505,10 @@ export function GeoSceneCanvas({
     if (!ready || !mapRef.current) return;
     try {
       mapRef.current.setTerrain(
-        // CAD terrain replaces the global DEM; the two are never fused.
-        // In Planta the DEM is not rendered (layer selection is preserved).
-        terrainVisible && !cadTerrain && view === "3d"
-          ? { source: "terrainDEM", exaggeration: 1.5 }
+        // Regional DEM is the continuous base in Perspectiva. With a CAD survey it
+        // runs at true scale so the CAD mesh (absolute heights) sits on it.
+        terrainVisible && view === "3d"
+          ? { source: "terrainDEM", exaggeration: cadTerrain ? 1 : 1.5 }
           : null,
       );
     } catch {
@@ -653,7 +658,7 @@ export function GeoSceneCanvas({
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
       data-geo-terrain-source={
-        cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"
+        cadTerrain && terrainVisible ? "cad_contours+aws_terrarium" : terrainVisible ? "aws_terrarium" : "none"
       }
     >
       <div className="absolute inset-0">
