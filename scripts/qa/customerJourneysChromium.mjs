@@ -165,7 +165,7 @@ for (const width of [390, 1440]) {
 
     await page.getByRole("link", { name: /Simular participación/i }).click({ noWaitAfter: true });
     await page.waitForURL(/tab=simulador/, { timeout: 20000 });
-    await page.getByRole("heading", { name: /Simulador de inversión/i }).waitFor({
+    await page.getByText("Simulador de inversión", { exact: true }).waitFor({
       timeout: 15000,
     });
     await snapshot(page, prefix + "-investment-simulator");
