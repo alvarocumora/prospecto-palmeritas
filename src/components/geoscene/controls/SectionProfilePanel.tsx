@@ -27,9 +27,8 @@ export function SectionProfilePanel({
   const zMax = known.length ? Math.max(...known.map((p) => p.z)) : 1;
   // Same scale both axes when it fits; otherwise flag the vertical exaggeration.
   const sx = (W - pad * 2) / Math.max(1, length);
-  const sz = Math.min(sx * 1, (H - pad * 2) / Math.max(1, zMax - zMin)) || sx;
-  const vex = sz / sx;
-  const scaleZ = vex < 1 ? sx : sz;
+  const scaleZ = Math.min(sx * 10, (H - pad * 2) / Math.max(1, zMax - zMin));
+  const vex = scaleZ / sx;
   const X = (d: number) => pad + d * sx;
   const Y = (z: number) => H - pad - (z - zMin) * scaleZ;
   const segments: string[] = [];
@@ -94,7 +93,7 @@ export function SectionProfilePanel({
             return (
               <g key={s.code + s.d} className="text-accent-brand">
                 {a != null ? (
-                  <line x1={x} y1={y} x2={x + dir * Math.cos(a) * L} y2={y + Math.sin(a) * L} stroke="currentColor" strokeWidth={2} />
+                  <line x1={x} y1={y} x2={x + (dir * L) / Math.hypot(1, Math.tan(a) * vex)} y2={y + (L * Math.tan(a) * vex) / Math.hypot(1, Math.tan(a) * vex)} stroke="currentColor" strokeWidth={2} />
                 ) : (
                   <line x1={x} y1={y} x2={x} y2={y + 14} stroke="currentColor" strokeWidth={1} strokeDasharray="2 2" />
                 )}
@@ -105,7 +104,7 @@ export function SectionProfilePanel({
           <text x={pad} y={pad - 10} fill="currentColor" fontSize={9}>A</text>
           <text x={W - pad - 6} y={pad - 10} fill="currentColor" fontSize={9}>A′</text>
           <text x={pad} y={H - 8} fill="currentColor" fontSize={9}>
-            {Math.round(zMin)}–{Math.round(zMax)} m s.n.m. · {vex < 1 ? "escala 1:1" : `exageración vertical ×${vex.toFixed(1)}`}
+            {Math.round(zMin)}–{Math.round(zMax)} m s.n.m. · {Math.abs(vex - 1) < 0.05 ? "escala 1:1" : `exageración vertical ×${vex.toFixed(1)} (manteos dibujados con la misma exageración)`}
           </text>
         </svg>
       )}
