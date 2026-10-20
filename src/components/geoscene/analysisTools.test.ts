@@ -38,3 +38,16 @@ describe("herramientas de análisis", () => {
     expect(Math.hypot(v.x, v.y)).toBeCloseTo(1, 5);
   });
 });
+
+import { sectionGeology } from "./analysisTools";
+describe("corte con carta geológica", () => {
+  it("detecta la unidad bajo la traza y la falla que la cruza", () => {
+    const units: FeatureCollection = { type: "FeatureCollection", features: [{ type: "Feature", properties: { codigo: "Ki", nombre: "Lo Prado" }, geometry: { type: "Polygon", coordinates: [[[0, -1], [0.5, -1], [0.5, 1], [0, 1], [0, -1]]] } }] };
+    const faults: FeatureCollection = { type: "FeatureCollection", features: [{ type: "Feature", properties: { nombre: "F1" }, geometry: { type: "LineString", coordinates: [[0.25, -1], [0.25, 1]] } }] };
+    const r = sectionGeology([0, 0], [1, 0], units, faults);
+    expect(r.units.map((u) => u.code)).toEqual(["Ki"]);
+    expect(r.units[0].d1 / 1000).toBeCloseTo(55.6, 0);
+    expect(r.faults).toHaveLength(1);
+    expect(r.faults[0].d / 1000).toBeCloseTo(27.8, 0);
+  });
+});

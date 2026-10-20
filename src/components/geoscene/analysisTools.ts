@@ -84,3 +84,76 @@ export function schmidtPole(plane: StructurePlane): { x: number; y: number } {
   const r = Math.SQRT2 * Math.sin((Math.PI / 2 - plunge) / 2);
   return { x: r * Math.sin(trend), y: r * Math.cos(trend) };
 }
+
+type Ring = number[][];
+function inRing(pt: LngLat, ring: Ring): boolean {
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const [xi, yi] = ring[i];
+    const [xj, yj] = ring[j];
+    if (yi > pt[1] !== yj > pt[1] && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function polygons(g: GeoJSON.Geometry | null): Ring[][] {
+  if (!g) return [];
+  if (g.type === "Polygon") return [g.coordinates];
+  if (g.type === "MultiPolygon") return g.coordinates;
+  return [];
+}
+function lines(g: GeoJSON.Geometry | null): number[][][] {
+  if (!g) return [];
+  if (g.type === "LineString") return [g.coordinates];
+  if (g.type === "MultiLineString") return g.coordinates;
+  return [];
+}
+function segT(a: LngLat, b: LngLat, c: number[], d: number[]): number | null {
+  const r = [b[0] - a[0], b[1] - a[1]];
+  const s = [d[0] - c[0], d[1] - c[1]];
+  const den = r[0] * s[1] - r[1] * s[0];
+  if (Math.abs(den) < 1e-15) return null;
+  const t = ((c[0] - a[0]) * s[1] - (c[1] - a[1]) * s[0]) / den;
+  const u = ((c[0] - a[0]) * r[1] - (c[1] - a[1]) * r[0]) / den;
+  return t >= 0 && t <= 1 && u >= 0 && u <= 1 ? t : null;
+}
+
+export type SectionUnit = { d0: number; d1: number; code: string; nombre: string };
+export type SectionFault = { d: number; nombre: string };
+
+/** Unidades oficiales bajo la traza A–A′ (superficie) y fallas oficiales que la cruzan. */
+export function sectionGeology(
+  a: LngLat,
+  b: LngLat,
+  units: FeatureCollection | undefined,
+  faults: FeatureCollection | undefined,
+  samples = 120,
+): { units: SectionUnit[]; faults: SectionFault[] } {
+  const len = haversine(a, b);
+  const out: SectionUnit[] = [];
+  if (units?.features.length) {
+    for (let i = 0; i < samples; i++) {
+      const t = (i + 0.5) / samples;
+      const p: LngLat = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+      const f = units.features.find((u) =>
+        polygons(u.geometry).some((poly) => inRing(p, poly[0]) && !poly.slice(1).some((h) => inRing(p, h))),
+      );
+      if (!f) continue;
+      const code = String(f.properties?.codigo ?? f.properties?.nombre ?? "?");
+      const d0 = (len * i) / samples;
+      const d1 = (len * (i + 1)) / samples;
+      const last = out[out.length - 1];
+      if (last && last.code === code && Math.abs(last.d1 - d0) < 1e-6) last.d1 = d1;
+      else out.push({ d0, d1, code, nombre: String(f.properties?.nombre ?? code) });
+    }
+  }
+  const fx: SectionFault[] = [];
+  for (const f of faults?.features ?? []) {
+    for (const line of lines(f.geometry)) {
+      for (let i = 1; i < line.length; i++) {
+        const t = segT(a, b, line[i - 1], line[i]);
+        if (t != null) fx.push({ d: t * len, nombre: String(f.properties?.nombre ?? "Falla") });
+      }
+    }
+  }
+  return { units: out, faults: fx.sort((x, y) => x.d - y.d) };
+}
