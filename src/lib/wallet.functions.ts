@@ -34,7 +34,6 @@ export const ANCHOR_PLACEMENT_PCT: Record<string, number> = {
   "LV-TIL-001": 0.65,
 };
 
-
 export const getPublicRounds = createServerFn({ method: "GET" }).handler(
   async (): Promise<PublicRound[]> => {
     // Solo agregados: montos totales y número de tickets, nunca identidades.
