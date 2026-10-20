@@ -1,6 +1,6 @@
 /**
- * Menú global de documentos de proyecto. Ofrece las tres plantillas de marca
- * (deck 16:9, resumen de una página y dossier técnico) desde un único botón.
+ * Menú global de documentos de proyecto: un único informe técnico institucional
+ * (marco NI 43-101 o JORC) con evaluación y prioridades por IA.
  * Se usa en cualquier vista que disponga de un `ProjectDoc`.
  */
 import { useRef, useState } from "react";
@@ -19,17 +19,16 @@ import {
 import type { DisclosureStandard } from "@/lib/reports/internationalStandards";
 import type { ProjectDoc, ProjectDocKind } from "@/lib/pdf/model";
 
-const OPTIONS: Array<{ kind: ProjectDocKind; title: string; hint: string }> = [
+const FRAMEWORKS: Array<{ standard: DisclosureStandard; title: string; hint: string }> = [
   {
-    kind: "deck",
-    title: "Deck de inversión (16:9)",
-    hint: "Presentación para comités y family offices",
+    standard: "NI_43_101",
+    title: "Informe técnico del proyecto · marco NI 43-101",
+    hint: "Formato global · evaluación y prioridades IA · revisión QP pendiente",
   },
-  { kind: "onepager", title: "Resumen de una página", hint: "Para enviar por correo o WhatsApp" },
   {
-    kind: "technical",
-    title: "Informe técnico · NI 43-101",
-    hint: "Preliminar · revisión QP pendiente",
+    standard: "JORC_2012",
+    title: "Informe técnico del proyecto · marco JORC 2012",
+    hint: "Mismo formato global · revisión CP pendiente",
   },
 ];
 
@@ -66,9 +65,14 @@ export function ProjectDocsMenu({
       const { downloadProjectDoc } = await import("@/lib/pdf/generateProjectDoc");
       // Capture the real live GIS when available. A capture failure is non-fatal:
       // the document renderer keeps its analytical fallback instead of blanking.
-      if (model.map?.captureSelector) {
-        const { captureElement } = await import("@/lib/pdf/captureMap");
-        const snapshot = await captureElement(model.map.captureSelector, { scale: 2 });
+      if (model.map) {
+        const { captureElement, captureGeoScene } = await import("@/lib/pdf/captureMap");
+        // Prefer the live 3D/2D GeoScene canvas (WebGL composite); fall back to DOM capture.
+        const snapshot =
+          (await captureGeoScene()) ??
+          (model.map.captureSelector
+            ? await captureElement(model.map.captureSelector, { scale: 2 })
+            : null);
         if (snapshot) model.map.imageDataUrl = snapshot;
         if (model.map.capturePresets?.length && (kind === "technical" || kind === "deck")) {
           const captures = await Promise.all(
@@ -130,6 +134,28 @@ export function ProjectDocsMenu({
           });
         }
       }
+      if (kind === "technical") {
+        toast.loading("Evaluando evidencia y prioridades con IA…", { id });
+        try {
+          const [{ assessProjectReport }, { buildReportDigest, assessmentSections }] =
+            await Promise.all([
+              import("@/lib/reports/reportAssessment.functions"),
+              import("@/lib/reports/reportAssessment"),
+            ]);
+          const res = await assessProjectReport({
+            data: {
+              projectName: model.name,
+              standard: model.disclosureStandard,
+              digest: buildReportDigest(model),
+            },
+          });
+          if (res.assessment) model.sections.unshift(...assessmentSections(res.assessment));
+          else if (res.error) toast.message(`Informe sin evaluación IA: ${res.error}`);
+        } catch (err) {
+          console.warn("[ProjectDocsMenu] evaluación IA omitida", err);
+        }
+        toast.loading("Generando documento…", { id });
+      }
       await downloadProjectDoc(model, kind);
       toast.success("Documento generado", { id });
     } catch (e) {
@@ -166,22 +192,13 @@ export function ProjectDocsMenu({
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuLabel className="text-[10px] uppercase tracking-wider text-muted-foreground">
-          Exportación rápida · compatibilidad
+          Informe único del proyecto
         </DropdownMenuLabel>
-        <DropdownMenuItem
-          onSelect={() => {
-            void run("technical", "JORC_2012");
-          }}
-          className="flex-col items-start gap-0.5 py-2.5"
-        >
-          <span className="text-sm font-medium">Informe técnico · JORC 2012</span>
-          <span className="text-xs text-muted-foreground">Preliminar · revisión CP pendiente</span>
-        </DropdownMenuItem>
-        {OPTIONS.map((opt) => (
+        {FRAMEWORKS.map((opt) => (
           <DropdownMenuItem
-            key={opt.kind}
+            key={opt.standard}
             onSelect={() => {
-              void run(opt.kind, opt.kind === "technical" ? "NI_43_101" : undefined);
+              void run("technical", opt.standard);
             }}
             className="flex-col items-start gap-0.5 py-2.5"
           >

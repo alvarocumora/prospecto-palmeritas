@@ -12,3 +12,5 @@
 
 - InvestmentCard is the shared presentation for public listings and investor rounds; canonical terminal fichas supply location, while roundBreakdown separates issuer-declared placement from system commitments without changing services.
 - confirmedPositionSummary counts only active ledger positions and groups capital by currency; historical contributions must never be presented as market valuation.
+- Viewer property analysis (PropertyAnalysisPanel) derives its evidence summary deterministically from layers already loaded in GeoScene3D; the AI estimate only interprets that summary and the PDF reuses the brand kit — keeps AI from inventing data and avoids a parallel report generator.
+- Structured AI estimates (report assessment, property estimate) go through src/lib/ai-responses.server.ts (Responses API, strict schema, streamed) — free-form JSON from compatible chat mistranslated keys and failed validation.

@@ -33,6 +33,8 @@ export function AnalysisDock({
   sectionOn,
   sectionLabel,
   onSection,
+  propertyOn = false,
+  onProperty,
 }: {
   spectralTop: SpectralTop;
   onSpectralTop: (v: SpectralTop) => void;
@@ -52,6 +54,8 @@ export function AnalysisDock({
   sectionOn: boolean;
   sectionLabel: string;
   onSection: () => void;
+  propertyOn?: boolean;
+  onProperty?: () => void;
 }) {
   const len = pathLength(measurePts);
   const area = polygonArea(measurePts);
@@ -129,6 +133,16 @@ export function AnalysisDock({
         >
           {sectionLabel}
         </button>
+        {onProperty && (
+          <button
+            type="button"
+            aria-pressed={propertyOn}
+            onClick={onProperty}
+            className={btn(propertyOn)}
+          >
+            Pertenencia
+          </button>
+        )}
         <button
           type="button"
           aria-pressed={measuring}

@@ -135,6 +135,16 @@ export async function renderTechnicalBrief(doc: jsPDF, model: ProjectDoc): Promi
     ],
     [CW * 0.34, CW * 0.66],
   );
+  y += 16;
+  pagedTable(
+    ["RESPONSABILIDAD TÉCNICA", "NOMBRE / ESTADO", "FIRMA"],
+    [
+      ["Preparado por", "Geocapitals · equipo técnico", "Compilación"],
+      ["Revisado por", `${framework.reviewerRole} · no designado`, "Pendiente"],
+      ["Aprobado para emisión", "No acreditado en esta exportación", "Pendiente"],
+    ],
+    [CW * 0.3, CW * 0.48, CW * 0.22],
+  );
   y += 22;
   write(framework.positioning, 9);
   write(

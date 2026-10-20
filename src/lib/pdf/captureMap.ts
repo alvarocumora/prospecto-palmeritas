@@ -26,3 +26,34 @@ export async function captureElement(
     return null;
   }
 }
+
+/**
+ * Captures the mounted GeoScene viewer by compositing its WebGL canvases
+ * (MapLibre + deck.gl, rendered with preserveDrawingBuffer). html2canvas
+ * cannot read WebGL reliably, so this is the preferred path for the 3D viewer.
+ */
+export async function captureGeoScene(): Promise<string | null> {
+  const root = document.querySelector<HTMLElement>("[data-geo-engine]");
+  if (!root) return null;
+  await new Promise((r) => setTimeout(r, 900));
+  const canvases = Array.from(root.querySelectorAll("canvas")).filter((c) => c.width && c.height);
+  if (!canvases.length) return null;
+  const base = canvases.reduce((a, b) => (b.width * b.height > a.width * a.height ? b : a));
+  const out = document.createElement("canvas");
+  out.width = base.width;
+  out.height = base.height;
+  const ctx = out.getContext("2d");
+  if (!ctx) return null;
+  try {
+    ctx.fillStyle = "#F7F5F0";
+    ctx.fillRect(0, 0, out.width, out.height);
+    for (const c of canvases) ctx.drawImage(c, 0, 0, out.width, out.height);
+    const url = out.toDataURL("image/jpeg", 0.9);
+    // Reject a blank buffer (all one colour) so the renderer keeps its fallback.
+    const px = ctx.getImageData(out.width / 2, out.height / 2, 1, 1).data;
+    return px[0] === 247 && px[1] === 245 && px[2] === 240 ? null : url;
+  } catch (err) {
+    console.warn("[pdf] geoscene capture failed:", err);
+    return null;
+  }
+}
