@@ -26,16 +26,16 @@ export const Route = createFileRoute("/inversionistas")({
   validateSearch: (s) => searchSchema.parse(s),
   head: () => ({
     meta: [
-      { title: "Inversionistas — Geocapitals" },
+      { title: "Inversionistas — GeoCapitals" },
       {
         name: "description",
         content:
-          "Deal-flow minero verificado: oportunidades activas, due diligence acelerado y data rooms cifrados.",
+          "Evalúa proyectos mineros, revisa fuentes, escenarios y requisitos de inversión antes de enviar una solicitud.",
       },
       { property: "og:title", content: "Inversionistas — Geocapitals" },
       {
         property: "og:description",
-        content: "Acceso institucional a proyectos mineros con trazabilidad NI 43-101.",
+        content: "Proyectos con fuentes identificadas, información referencial y documentación según permisos.",
       },
     ],
   }),
@@ -45,18 +45,18 @@ export const Route = createFileRoute("/inversionistas")({
 const BENEFITS = [
   {
     i: CheckCircle2,
-    t: "Proyectos calificados",
+    t: "Proyectos documentados",
     d: "Evidencias, fuentes y estado de revisión técnica por activo.",
   },
   {
     i: LineChart,
     t: "Modelo económico",
-    d: "Sensibilidad de precios, NPV, IRR y escenarios listos para comité.",
+    d: "Escenarios referenciales con supuestos y limitaciones visibles.",
   },
   {
     i: Database,
     t: "Data room cifrado",
-    d: "Permisos granulares, audit-trail por documento y firmas electrónicas.",
+    d: "Documentos públicos y antecedentes de acceso controlado por proyecto.",
   },
   {
     i: ShieldCheck,
@@ -70,8 +70,8 @@ function InvPage() {
   return (
     <MarketingPage
       eyebrow="Inversionistas"
-      title="Deal-flow minero verificado, en una sola pantalla"
-      intro="Accede a oportunidades activas en venta, joint venture y royalty con due diligence acelerado y trazabilidad NI 43-101 sobre una capa de datos georreferenciada."
+      title="Inversión minera con la evidencia a la vista"
+      intro="Explora oportunidades mineras, analiza antecedentes geoespaciales y revisa riesgos y documentación antes de iniciar una solicitud. Distingue datos declarados de información verificada."
     >
       {/* Cómo invertir — el flujo en 4 pasos, sin ambigüedad */}
       <div className="mb-16">
@@ -97,13 +97,13 @@ function InvPage() {
               i: FileSignature,
               n: "3",
               t: "KYC y firma",
-              d: "Perfil en 3 pasos y contrato de suscripción firmado con QR.",
+              d: "Envía la solicitud, completa KYC y firma solo cuando se emita el contrato.",
             },
             {
               i: Wallet,
               n: "4",
               t: "Invierte y sigue tu posición",
-              d: "Cierre acompañado por el equipo y seguimiento en el dashboard.",
+              d: "Sigue el ticket; tu wallet refleja posiciones tras su confirmación.",
             },
           ].map(({ i: Icon, n, t, d }) => (
             <li key={n} className="rounded-xl border border-hairline bg-white p-5 relative">
@@ -224,9 +224,9 @@ function InvPage() {
             <Eyebrow className="mb-3">Tickets institucionales</Eyebrow>
             <div className="grid sm:grid-cols-3 gap-4">
               {[
-                { v: "USD 15.000", l: "Ticket mínimo · 150 acciones" },
-                { v: "USD 1,5 M", l: "Ronda por proyecto · 10 % SPV" },
-                { v: "USD 15 M", l: "Valuación de referencia" },
+                { v: "01", l: "Evalúa proyecto y riesgos" },
+                { v: "02", l: "Simula y solicita participación" },
+                { v: "03", l: "Verifica, firma y sigue tu posición" },
               ].map((s) => (
                 <div key={s.l}>
                   <div className="font-mono text-2xl text-content">{s.v}</div>
@@ -245,7 +245,7 @@ function InvPage() {
               </Link>
             </BrandButton>
             <span className="inline-flex items-center gap-2 text-[11px] font-mono text-content-subtle">
-              <Lock className="w-3.5 h-3.5" /> Cifrado AES-256 · KYC / AML
+              <Lock className="w-3.5 h-3.5" /> Acceso personal · Verificación KYC
             </span>
           </div>
         </div>
