@@ -36,11 +36,7 @@ export function normalizeGeophysicalAnomalies(
   rows: readonly GeophysicsAnomalyRow[],
 ): GeophysicsAnomalyMarker[] {
   return rows.flatMap((row) => {
-    if (
-      !row.code?.trim() ||
-      !isValidLatitude(row.lat) ||
-      !isValidLongitude(row.lng)
-    ) {
+    if (!row.code?.trim() || !isValidLatitude(row.lat) || !isValidLongitude(row.lng)) {
       return [];
     }
     const severity = row.severity?.toLowerCase().trim();
@@ -52,9 +48,7 @@ export function normalizeGeophysicalAnomalies(
         ? row.estimated_depth_m
         : null;
     const peakValue =
-      row.peak_value != null && Number.isFinite(row.peak_value)
-        ? row.peak_value
-        : null;
+      row.peak_value != null && Number.isFinite(row.peak_value) ? row.peak_value : null;
     return [
       {
         code: row.code.trim().slice(0, 120),
