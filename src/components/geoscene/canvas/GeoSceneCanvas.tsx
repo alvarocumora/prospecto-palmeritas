@@ -273,6 +273,10 @@ export function GeoSceneCanvas({
 
   // Corte transversal A-A' (estándar global: cualquier proyecto con relieve).
   const [sectionOn, setSectionOn] = useState(false);
+  const [selected, setSelected] = useState<{
+    layer: ResolvedProjectLayer;
+    properties: Record<string, unknown>;
+  } | null>(null);
   const [sectionPts, setSectionPts] = useState<LngLat[]>([]);
   const [corridor, setCorridor] = useState(50);
   const sectionRef = useRef(sectionOn);
@@ -348,7 +352,9 @@ export function GeoSceneCanvas({
           stroked: true,
           filled: true,
           opacity: layerOpacity?.[layer.id] ?? 1,
-          getFillColor: spectral
+          getFillColor: layer.id === "territory.cadastre"
+            ? [color[0], color[1], color[2], 0]
+            : spectral
             ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
             : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: spectral
@@ -356,8 +362,10 @@ export function GeoSceneCanvas({
                 const c = spectralFill(f.properties, rgb);
                 return [c[0], c[1], c[2], 230];
               }
-            : color,
-          getLineWidth: dashed ? 1.25 : 1.75,
+            : layer.id === "territory.cadastre"
+              ? [color[0], color[1], color[2], 150]
+              : color,
+          getLineWidth: layer.id === "territory.cadastre" ? 1 : dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",
           // Píxel satelital a escala real (EMIT ~60 m, ASTER ~90 m) en 3D;
@@ -481,7 +489,18 @@ export function GeoSceneCanvas({
           const projectLayer = info.layer?.props?.geoProjectLayer as
             ResolvedProjectLayer | undefined;
           if (!projectLayer || !info.object) return null;
-          return projectLayerTooltip(projectLayer, info.object.properties);
+          return featureLabel(info.object.properties) + " · clic para ficha";
+        },
+        onClick: (info: {
+          layer?: { props?: Record<string, unknown> } | null;
+          object?: { properties?: Record<string, unknown> } | null;
+        }) => {
+          if (sectionRef.current) return false;
+          const projectLayer = info.layer?.props?.geoProjectLayer as
+            ResolvedProjectLayer | undefined;
+          if (!projectLayer || !info.object) return false;
+          setSelected({ layer: projectLayer, properties: info.object.properties ?? {} });
+          return true;
         },
       } as never);
       map.addControl(overlay as unknown as maplibregl.IControl);
@@ -755,6 +774,13 @@ export function GeoSceneCanvas({
       >
         {sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
       </button>
+      {selected && (
+        <FeatureInspector
+          layer={selected.layer}
+          properties={selected.properties}
+          onClose={() => setSelected(null)}
+        />
+      )}
       {sectionOn && section && (
         <SectionProfilePanel
           {...section}
