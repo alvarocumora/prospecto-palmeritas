@@ -50,6 +50,7 @@ export function letterhead(
     total: number;
     issued: string;
     deferFooter?: boolean;
+    classification?: string;
   },
 ) {
   fill(doc, GC_COLOR.white);
@@ -62,7 +63,7 @@ export function letterhead(
   font(doc, "body", "normal", 7);
   ink(doc, GC_COLOR.slate);
   doc.text(o.unit, f.m + mw + 7, 47);
-  doc.text("ESTRICTAMENTE PRIVADO Y CONFIDENCIAL", f.w - f.m, 38, {
+  doc.text(o.classification ?? "ESTRICTAMENTE PRIVADO Y CONFIDENCIAL", f.w - f.m, 38, {
     align: "right",
     charSpace: 0.4,
   });
