@@ -21,11 +21,11 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
   for (let i=0;i<slides.length;i++) {
     if (i>0) doc.addPage([f.w, f.h], 'landscape');
     const s = slides[i];
-    letterhead(doc, f, { unit: 'INVESTOR DECK / SERIE A', ref: 'GC-2026', version: model.docVersion, page: i+1, total: slides.length, issued: 'Octubre 2026' });
+    letterhead(doc, f, { unit: 'INVESTOR DECK / SERIE A', ref: 'GC-2026', version: model.docVersion, page: i+1, total: slides.length, issued: 'Octubre 2026', classification: 'DOCUMENTO COMERCIAL / NO OFERTA PÚBLICA' });
     const image = images.get(s.image); if (!image) throw new Error('Image missing');
-    doc.addImage(image,'JPEG', 540,65,376,376,undefined,'FAST');
+    doc.addImage(image,'JPEG', 530,100,386,352,undefined,'FAST');
     font(doc,'body','normal',6.3); ink(doc,GC_COLOR.slate);
-    doc.text(doc.splitTextToSize(s.imageLabel,376),540,453);
+    doc.text(doc.splitTextToSize(s.imageLabel,386),530,462);
     section(doc,f,84,String(i+1).padStart(2,'0'), s.kicker);
     font(doc,'display','bold',30); ink(doc,GC_COLOR.ink);
     const titleLines = doc.splitTextToSize(s.title,475) as string[];
@@ -37,7 +37,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       font(doc,'body','normal',7); ink(doc,GC_COLOR.slate); doc.text(doc.splitTextToSize([stat.label,stat.note].filter(Boolean).join(' / '), statW-10),x,y+27);
     });
     if (s.stats.length) y+=64;
-    const bodySize = s.items.length>3 ? 8.2 : s.items.some(it=>it.body.length>200) ? 8 : 9;
+    const bodySize = s.items.length>3 ? 11 : s.items.some(it=>it.body.length>200) ? 10 : 12;
     for (const item of s.items) {
       font(doc,'body','bold',bodySize+1); ink(doc,GC_COLOR.ink);
       const heading = doc.splitTextToSize(item.title,470) as string[]; doc.text(heading,44,y); y+=heading.length*(bodySize+3);
