@@ -280,7 +280,7 @@ function MapaTab({
 
 function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
-    <div className="pointer-events-none absolute right-3 top-3 z-30">
+    <div className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2">
       <div
         role="group"
         aria-label="Vista del proyecto"
@@ -296,7 +296,7 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
               variant={view === key ? "primary" : "ghost"}
               aria-pressed={view === key}
               onClick={() => onChange(key)}
-              className="inline-flex min-h-11 items-center justify-center gap-2 px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
             >
               <Icon />
               {key === "2d" ? "Planta" : "Perspectiva"}

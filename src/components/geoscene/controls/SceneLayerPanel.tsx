@@ -30,6 +30,7 @@ export function SceneLayerPanel({
   extraLayerIds,
   opacity,
   onOpacity,
+  counts,
 }: {
   mode: GeoSceneMode;
   enabled: ReadonlySet<string>;
@@ -39,6 +40,7 @@ export function SceneLayerPanel({
   extraLayerIds?: readonly CanonicalGeoLayerId[];
   opacity?: Readonly<Record<string, number>>;
   onOpacity?: (id: string, value: number) => void;
+  counts?: Readonly<Record<string, number>>;
 }) {
   if (!open) return null;
 
@@ -105,6 +107,11 @@ export function SceneLayerPanel({
                       <div className="flex items-start justify-between gap-2">
                         <span className="text-[11px] font-medium leading-tight text-foreground">
                           {definition.label}
+                          {counts?.[definition.id] != null && (
+                            <span className="ml-1 font-mono text-[10px] text-muted-foreground">
+                              {counts[definition.id].toLocaleString("es-CL")}
+                            </span>
+                          )}
                         </span>
                         <span
                           className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
@@ -128,7 +135,7 @@ export function SceneLayerPanel({
                         </div>
                       )}
                     </BrandButton>
-                    {active && onOpacity && definition.domain === "remote_sensing" && (
+                    {active && onOpacity && counts?.[definition.id] != null && (
                       <label className="flex items-center gap-2 px-2 text-[9px] uppercase tracking-wider text-muted-foreground">
                         Opacidad
                         <input

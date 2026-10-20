@@ -128,12 +128,12 @@ export function GeoScene3D({
               size="sm"
               variant="outline"
               onClick={() => setLayerPanelOpen((value) => !value)}
-              className="inline-flex items-center gap-1 rounded border border-border bg-bg-secondary/95 px-2 py-1 font-mono text-[10px] uppercase text-foreground backdrop-blur hover:bg-accent"
+              className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
               title="Capas 3D canónicas"
               aria-label="Capas del proyecto"
               aria-expanded={layerPanelOpen}
             >
-              <Layers3 className="h-3 w-3" /> capas
+              <Layers3 className="h-3.5 w-3.5" /> Capas · {enabledLayerIds.size}
             </BrandButton>
           }
           {showModeTabs && <ModeTabs mode={mode} onChange={setInternalMode} />}
@@ -167,6 +167,7 @@ export function GeoScene3D({
           onClose={() => setLayerPanelOpen(false)}
           onToggle={toggleCanonicalLayer}
           extraLayerIds={projectLayers?.map((layer) => layer.id)}
+          counts={Object.fromEntries((projectLayers ?? []).map((l) => [l.id, l.data.features.length]))}
           opacity={layerOpacity}
           onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
         />
