@@ -18,6 +18,8 @@ import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { ProjectOpportunities } from "./ProjectOpportunities";
+import { ProjectInvestorEntry } from "./ProjectInvestorEntry";
+import { InvestmentKitIndex } from "./InvestmentKitIndex";
 import { TicketPanel } from "./TicketPanel";
 import { spvCodeForSlug } from "@/lib/investor/rounds";
 const TerminalSatellitePanel = lazy(() =>
@@ -215,6 +217,7 @@ export function ProjectTerminalShell({
       </header>
 
       <main className="max-w-[1320px] mx-auto px-4 md:px-6 py-6 space-y-6">
+        <ProjectInvestorEntry project={project} currentTab={tab} />
         {mapVisited && (
           <div hidden={tab !== "mapa"}>
             <MapaTab project={project} view={view} setView={setView} />
@@ -404,6 +407,7 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
   const { ficha } = project;
   return (
     <>
+      <InvestmentKitIndex project={project} />
       <ProjectOpportunities projectId={project.projectId} />
       <section className="rounded-2xl border border-hairline bg-white p-6">
         <div className="flex items-center gap-2 mb-4">
@@ -411,8 +415,8 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
           <Eyebrow>Documentos públicos del activo</Eyebrow>
         </div>
         <p className="text-sm text-content-subtle max-w-2xl">
-          Descarga el expediente con la marca de Geocapitals: presentación para comité, resumen de
-          una página y brief técnico con trazabilidad de fuentes.
+          Los reportes públicos que estén disponibles pueden generarse con la información registrada.
+          Son documentos de análisis preliminar y no equivalen a una certificación de reservas.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           {project.slug === "cholqui" && (
