@@ -245,7 +245,8 @@ export function GeoSceneCanvas({
     if (view !== "3d" || !terrainVisible) return null;
     if (cadTerrain) {
       const t = cadTerrain.tile;
-      return { sample: cadElevationSampler(t), fallback: t.referenceElevationM + t.minH };
+      // Outside CAD coverage the basemap is flat (no DEM fusion), so features stay at 0.
+      return { sample: cadElevationSampler(t), fallback: 0 };
     }
     const map = mapRef.current as unknown as {
       terrain?: { getElevationForLngLatZoom?: (ll: maplibregl.LngLat, z: number) => number };
