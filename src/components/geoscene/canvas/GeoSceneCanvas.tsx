@@ -877,7 +877,7 @@ export function GeoSceneCanvas({
         <PropertyAnalysisPanel
           projectName={project?.name ?? "Proyecto"}
           layers={resolvedProjectLayers}
-          onFocus={([w, so, e, n]) => mapRef.current?.fitBounds([[w, so], [e, n]], { padding: 80, duration: 900, maxZoom: 16 })}
+          onFocus={([w, so, e, n]) => mapRef.current?.fitBounds([[w, so], [e, n]], { padding: 80, duration: 900, maxZoom: 14.5 })}
           captureView={captureView}
           viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.definition.label ?? l.id).join(", ") || "ninguna"}. Imagen base: Esri World Imagery.`}
           onClose={() => setPropertyOpen(false)}
