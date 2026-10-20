@@ -53,7 +53,7 @@ export function ProjectSceneFrame({
         project={project}
         projectLayers={allLayers}
         view={view}
-        showModeTabs={false}
+        showModeTabs
         showCopilot={false}
       />
       <MiningEvidenceInspector layers={layers} projectName={project.name} />
