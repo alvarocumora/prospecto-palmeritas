@@ -14,6 +14,11 @@ on:
 permissions:
   contents: read
 
+# A PR can receive frequent UX changes: keep only its latest Chromium run.
+concurrency:
+  group: chromium-clients-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   browser-smoke:
     name: Chromium 390px + 1440px
