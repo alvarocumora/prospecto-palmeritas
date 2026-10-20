@@ -1,5 +1,7 @@
 // Panel de perfil del corte A-A'. Escala vertical = horizontal (sin exageración)
 // para que los manteos aparentes se lean con su ángulo real.
+import type { SectionFault, SectionUnit } from "../analysisTools";
+import { unitColor } from "../analysisTools";
 import type { ProfileSample, SectionStructure } from "../sectionProfile";
 
 export function SectionProfilePanel({
@@ -7,6 +9,7 @@ export function SectionProfilePanel({
   azimuth,
   profile,
   structures,
+  geology,
   corridor,
   onCorridor,
   onClose,
@@ -15,6 +18,7 @@ export function SectionProfilePanel({
   azimuth: number;
   profile: ProfileSample[];
   structures: SectionStructure[];
+  geology?: { units: SectionUnit[]; faults: SectionFault[] };
   corridor: number;
   onCorridor: (m: number) => void;
   onClose: () => void;
@@ -101,6 +105,23 @@ export function SectionProfilePanel({
               </g>
             );
           })}
+          {geology?.units.map((u) => {
+            const c = unitColor(u.code);
+            return (
+              <rect key={u.code + u.d0} x={X(u.d0)} y={H - pad + 2} width={Math.max(1, X(u.d1) - X(u.d0))} height={6} fill={`rgb(${c[0]},${c[1]},${c[2]})`}>
+                <title>{`${u.code} · ${u.nombre}`}</title>
+              </rect>
+            );
+          })}
+          {geology?.faults.map((f, i) => {
+            const z = zAt(f.d);
+            return z == null ? null : (
+              <g key={i} className="text-destructive">
+                <line x1={X(f.d)} x2={X(f.d)} y1={Y(z) - 6} y2={H - pad + 8} stroke="currentColor" strokeWidth={1} strokeDasharray="3 2" />
+                <text x={X(f.d) + 2} y={Y(z) - 8} fill="currentColor" fontSize={8}>F</text>
+              </g>
+            );
+          })}
           <text x={pad} y={pad - 10} fill="currentColor" fontSize={9}>A</text>
           <text x={W - pad - 6} y={pad - 10} fill="currentColor" fontSize={9}>A′</text>
           <text x={pad} y={H - 8} fill="currentColor" fontSize={9}>
@@ -113,6 +134,14 @@ export function SectionProfilePanel({
         Trazos: manteo aparente de vetas con manteo MEDIDO; punteado = sin manteo medido, no se proyecta en profundidad.
         Es una proyección geométrica, no una interpretación de continuidad.
       </p>
+      {geology && (geology.units.length > 0 || geology.faults.length > 0) && (
+        <p className="mt-1">
+          Carta geológica OFICIAL (SERNAGEOMIN) en superficie:{" "}
+          {geology.units.map((u) => `${u.code} ${Math.round(u.d0)}–${Math.round(u.d1)} m`).join(" · ")}
+          {geology.faults.length > 0 && ` · ${geology.faults.length} falla(s) cruzada(s) @ ${geology.faults.map((f) => Math.round(f.d)).join(", ")} m`}
+          . No se proyecta en profundidad.
+        </p>
+      )}
       {structures.length > 0 && (
         <p className="mt-1">
           {structures.map((s) => `${s.code} @${Math.round(s.d)} m${s.apparentDipDeg != null ? ` (aparente ${Math.round(s.apparentDipDeg)}°)` : ""}`).join(" · ")}

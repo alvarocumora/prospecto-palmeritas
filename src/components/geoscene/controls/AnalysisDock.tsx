@@ -17,12 +17,14 @@ export function AnalysisDock({
   terrainOpacity, onTerrainOpacity, hasTerrain,
   measuring, onMeasuring, measurePts, elevations,
   stereoOpen, onStereo, planes,
+  sectionOn, sectionLabel, onSection,
 }: {
   spectralTop: SpectralTop; onSpectralTop: (v: SpectralTop) => void;
   includeOxides: boolean; onIncludeOxides: (v: boolean) => void; hasSpectral: boolean;
   terrainOpacity: number; onTerrainOpacity: (v: number) => void; hasTerrain: boolean;
   measuring: boolean; onMeasuring: (v: boolean) => void; measurePts: LngLat[]; elevations: (number | null)[];
   stereoOpen: boolean; onStereo: (v: boolean) => void; planes: StructurePlane[];
+  sectionOn: boolean; sectionLabel: string; onSection: () => void;
 }) {
   const len = pathLength(measurePts);
   const area = polygonArea(measurePts);
@@ -60,6 +62,9 @@ export function AnalysisDock({
         </figure>
       )}
       <div className="flex flex-wrap items-center justify-center gap-1.5 rounded border border-hairline bg-surface/95 p-1.5 shadow-lg backdrop-blur">
+        <button type="button" aria-pressed={sectionOn} onClick={onSection} className={btn(sectionOn)}>
+          {sectionLabel}
+        </button>
         <button type="button" aria-pressed={measuring} onClick={() => onMeasuring(!measuring)} className={btn(measuring)}>
           Medir
         </button>
