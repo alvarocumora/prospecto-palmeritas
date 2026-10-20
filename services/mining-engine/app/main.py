@@ -8,6 +8,7 @@ from pydantic import BaseModel, Field
 
 from .security import require_engine_auth as _check_auth
 from .job_contracts import GeoJobSpec, GeoJobValidation
+from .ingest.router import router as ingest_preview_router
 from .desurvey import desurvey
 from .composite import composite_intervals
 from .section import project_trajectory, project_points
@@ -15,6 +16,7 @@ from .wireframe import rbf_wireframe
 from .swath import swath_compare
 
 app = FastAPI(title="mining-engine", version="0.2.0")
+app.include_router(ingest_preview_router)
 
 class Shot(BaseModel):
     depth: float = Field(ge=0)
