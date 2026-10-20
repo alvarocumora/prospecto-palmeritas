@@ -14,6 +14,7 @@ import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, typ
 import { SectionProfilePanel } from "../controls/SectionProfilePanel";
 import { FeatureInspector } from "../controls/FeatureInspector";
 import { AnalysisDock } from "../controls/AnalysisDock";
+import { PropertyAnalysisPanel } from "../controls/PropertyAnalysisPanel";
 import { filterSpectral, unitColor, type SpectralTop, sectionGeology } from "../analysisTools";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
@@ -289,6 +290,25 @@ export function GeoSceneCanvas({
     properties: Record<string, unknown>;
   } | null>(null);
   const [sectionPts, setSectionPts] = useState<LngLat[]>([]);
+  const [propertyOpen, setPropertyOpen] = useState(false);
+  const captureView = async (): Promise<string | null> => {
+    const map = mapRef.current;
+    const root = mapDiv.current;
+    if (!map || !root) return null;
+    await new Promise<void>((r) => { map.once("idle", () => r()); map.triggerRepaint(); setTimeout(r, 2500); });
+    const canvases = Array.from(root.querySelectorAll("canvas"));
+    const base = map.getCanvas();
+    const out = document.createElement("canvas");
+    out.width = base.width; out.height = base.height;
+    const ctx = out.getContext("2d");
+    if (!ctx) return null;
+    try {
+      for (const c of canvases) if (c.width && c.height) ctx.drawImage(c, 0, 0, out.width, out.height);
+      return out.toDataURL("image/jpeg", 0.88);
+    } catch {
+      return null;
+    }
+  };
   const [corridor, setCorridor] = useState(50);
   const sectionRef = useRef(sectionOn);
   sectionRef.current = sectionOn;
@@ -526,7 +546,9 @@ export function GeoSceneCanvas({
       ...projectCamera(view),
       maxPitch: 80,
       attributionControl: { compact: true },
-    });
+      // Permite capturar la vista exacta para la ficha PDF.
+      canvasContextAttributes: { preserveDrawingBuffer: true },
+    } as maplibregl.MapOptions);
 
     const syncSnapshotViewState = () => setSnapshotViewState(mapSnapshotViewState(map));
 
@@ -535,6 +557,7 @@ export function GeoSceneCanvas({
       const overlay = new MapboxOverlay({
         interleaved: false,
         layers: [],
+        deviceProps: { webgl: { preserveDrawingBuffer: true } },
         getTooltip: (info: {
           layer?: { props?: Record<string, unknown> } | null;
           object?: { properties?: Record<string, unknown> } | null;
@@ -847,7 +870,19 @@ export function GeoSceneCanvas({
           setSectionPts([]);
           setMeasuring(false);
         }}
+        propertyOn={propertyOpen}
+        onProperty={() => setPropertyOpen((v) => !v)}
       />
+      {propertyOpen && (
+        <PropertyAnalysisPanel
+          projectName={project?.name ?? "Proyecto"}
+          layers={resolvedProjectLayers}
+          onFocus={([w, so, e, n]) => mapRef.current?.fitBounds([[w, so], [e, n]], { padding: 80, duration: 900, maxZoom: 16 })}
+          captureView={captureView}
+          viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.definition.label ?? l.id).join(", ") || "ninguna"}. Imagen base: Esri World Imagery.`}
+          onClose={() => setPropertyOpen(false)}
+        />
+      )}
       {(() => {
         const on = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
         if (!on.length) return null;
