@@ -58,4 +58,7 @@
 ## Visor 3D · herramientas geológicas
 - [x] Apoyar catastro, anomalías y escenas procesadas sobre el relieve real (DEM Los Verdes / CAD Cholqui) en Perspectiva.
 - [x] Discos estructurales orientados por rumbo/manteo medidos (Cholqui), con pruebas.
-- [ ] Secciones transversales, sondajes por mínima curvatura y conector OMF — siguientes herramientas de la hoja de ruta.
+- [x] Corte A–A′ con perfil y manteo aparente, estándar en el visor de todos los proyectos.
+- [x] Sondajes por mínima curvatura (sin datos cargados aún para verlos).
+- [ ] Red estereográfica de rumbos y manteos.
+- [ ] Conector OMF — espera archivo real de software minero.
