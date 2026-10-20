@@ -372,7 +372,7 @@ export function GeoSceneCanvas({
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
+  }, [mode, view, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
 
   // Discos estructurales: rumbo/manteo de terreno como planos orientados.
   const structurePlaneLayer = useMemo(() => {
