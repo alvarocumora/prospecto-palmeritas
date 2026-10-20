@@ -58,7 +58,11 @@ export function MiningEvidenceInspector({
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
           </header>
-          <div className="flex gap-1 overflow-x-auto border-b border-hairline px-3 py-2" role="group" aria-label="Filtrar dominio de evidencia">
+          <div
+            className="flex gap-1 overflow-x-auto border-b border-hairline px-3 py-2"
+            role="group"
+            aria-label="Filtrar dominio de evidencia"
+          >
             {MINING_EVIDENCE_DOMAINS.map((option) => (
               <button
                 key={option.value}
@@ -80,8 +84,12 @@ export function MiningEvidenceInspector({
           </div>
           <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-2">
             {filtered.length === 0 ? (
-              <p role="status" className="rounded-md border border-dashed border-hairline p-4 text-xs text-content-muted">
-                No hay capas GeoJSON cargadas en esta categoría. Esto no confirma ausencia de datos externos ni de mineralización.
+              <p
+                role="status"
+                className="rounded-md border border-dashed border-hairline p-4 text-xs text-content-muted"
+              >
+                No hay capas GeoJSON cargadas en esta categoría. Esto no confirma ausencia de datos
+                externos ni de mineralización.
               </p>
             ) : (
               <ul className="space-y-2">
@@ -90,7 +98,9 @@ export function MiningEvidenceInspector({
                     <button
                       type="button"
                       aria-expanded={expandedId === row.id}
-                      onClick={() => setExpandedId((current) => (current === row.id ? null : row.id))}
+                      onClick={() =>
+                        setExpandedId((current) => (current === row.id ? null : row.id))
+                      }
                       className="flex min-h-11 w-full items-center justify-between gap-2 p-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
                     >
                       <span className="min-w-0">
@@ -107,8 +117,13 @@ export function MiningEvidenceInspector({
                     </button>
                     {expandedId === row.id && (
                       <div className="space-y-2 border-t border-hairline px-3 py-3 text-xs">
-                        <p><strong>Fuente:</strong> {row.source}</p>
-                        <p><strong>Escala:</strong> {row.scale}{row.units ? ` · ${row.units}` : ""}</p>
+                        <p>
+                          <strong>Fuente:</strong> {row.source}
+                        </p>
+                        <p>
+                          <strong>Escala:</strong> {row.scale}
+                          {row.units ? ` · ${row.units}` : ""}
+                        </p>
                         {row.caution && (
                           <p className="rounded-md bg-surface-2 p-2 text-content-muted">
                             <strong>Limitación:</strong> {row.caution}
@@ -127,7 +142,9 @@ export function MiningEvidenceInspector({
             )}
           </div>
           <footer className="border-t border-hairline bg-surface-2 px-3 py-2 text-[10px] leading-relaxed text-content-muted">
-            Inventario de capas GeoJSON entregadas a esta escena. No incluye todas las fuentes remotas ni implica recurso mineral, profundidad medida o reserva certificada. Para activar capas utiliza «Capas».
+            Inventario de capas GeoJSON entregadas a esta escena. No incluye todas las fuentes
+            remotas ni implica recurso mineral, profundidad medida o reserva certificada. Para
+            activar capas utiliza «Capas».
           </footer>
         </section>
       )}
