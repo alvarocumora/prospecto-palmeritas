@@ -5,3 +5,5 @@ export { EvidenceBadge, type Evidence } from "./EvidenceBadge";
 export { KpiTile, KpiRow } from "./KpiTile";
 export { SectionHeader } from "./SectionHeader";
 export { Panel } from "./Panel";
+export { PlatformPage, PageHeader } from "./PlatformPage";
+export { ContentState } from "./ContentState";
