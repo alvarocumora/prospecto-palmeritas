@@ -13,6 +13,8 @@ import { discRing, planeFromProperties } from "../structuralPlanes";
 import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, type LngLat } from "../sectionProfile";
 import { SectionProfilePanel } from "../controls/SectionProfilePanel";
 import { FeatureInspector } from "../controls/FeatureInspector";
+import { AnalysisDock } from "../controls/AnalysisDock";
+import { filterSpectral, unitColor, type SpectralTop } from "../analysisTools";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
@@ -235,7 +237,7 @@ export function GeoSceneCanvas({
       getPosition: (d: { position: [number, number, number] }) => d.position,
       texture: cadTerrain.imagery?.url,
       getColor: [255, 255, 255, 235],
-      opacity: 0.92,
+      opacity: terrainOpacity,
       material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
     });
   }, [cadTerrain, cadMesh, terrainVisible, mode]);
@@ -274,6 +276,14 @@ export function GeoSceneCanvas({
 
   // Corte transversal A-A' (estándar global: cualquier proyecto con relieve).
   const [sectionOn, setSectionOn] = useState(false);
+  const [spectralTop, setSpectralTop] = useState<SpectralTop>("p90");
+  const [includeOxides, setIncludeOxides] = useState(false);
+  const [terrainOpacity, setTerrainOpacity] = useState(0.92);
+  const [measuring, setMeasuring] = useState(false);
+  const [measurePts, setMeasurePts] = useState<LngLat[]>([]);
+  const [stereoOpen, setStereoOpen] = useState(false);
+  const measureRef = useRef(measuring);
+  measureRef.current = measuring;
   const [selected, setSelected] = useState<{
     layer: ResolvedProjectLayer;
     properties: Record<string, unknown>;
@@ -340,12 +350,17 @@ export function GeoSceneCanvas({
         const dashed = isDashedEvidence(layer.definition.evidence);
         const spectral = SPECTRAL_LAYER_IDS.has(layer.id);
         const rgb: [number, number, number] = [color[0], color[1], color[2]];
+        const source =
+          layer.id === "remote_sensing.hyperspectral"
+            ? filterSpectral(layer.data as FeatureCollection, spectralTop, includeOxides)
+            : (layer.data as FeatureCollection);
+        const units = layer.id === "geology.official_map_units";
         const data = drape
-          ? drapeFeatureCollection(layer.data as FeatureCollection, drape.sample, {
+          ? drapeFeatureCollection(source, drape.sample, {
               fallback: drape.fallback,
               offsetM: 8,
             })
-          : layer.data;
+          : source;
         return new GeoJsonLayer({
           id: `project:${layer.id}`,
           data: data as never,
@@ -353,7 +368,9 @@ export function GeoSceneCanvas({
           stroked: true,
           filled: true,
           opacity: layerOpacity?.[layer.id] ?? 1,
-          getFillColor: layer.id === "territory.cadastre"
+          getFillColor: units
+            ? (f: { properties?: Record<string, unknown> }) => [...unitColor(f.properties?.codigo ?? f.properties?.nombre), 110]
+            : layer.id === "territory.cadastre"
             ? [color[0], color[1], color[2], 0]
             : spectral
             ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
@@ -382,7 +399,36 @@ export function GeoSceneCanvas({
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, view, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape]);
+  }, [mode, view, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape, spectralTop, includeOxides]);
+  const planes = useMemo(() => {
+    const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;
+    return (fc?.features ?? [])
+      .map((f) => planeFromProperties(f.properties as Record<string, unknown>))
+      .filter((p): p is NonNullable<typeof p> => p != null);
+  }, [resolvedProjectLayers]);
+  const measureLayer = useMemo(() => {
+    if (!measuring || !measurePts.length) return null;
+    const z = (p: LngLat) => (drape?.sample(p[0], p[1]) ?? drape?.fallback ?? 0) + 6;
+    const pts = measurePts.map((p) => [p[0], p[1], z(p)]);
+    return new GeoJsonLayer({
+      id: "tool:measure",
+      data: {
+        type: "FeatureCollection",
+        features: [
+          ...(pts.length > 1 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: pts } }] : []),
+          ...pts.map((c) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: c } })),
+        ],
+      } as never,
+      stroked: true,
+      getLineColor: [230, 120, 30, 255],
+      getFillColor: [230, 120, 30, 255],
+      getLineWidth: 2,
+      lineWidthUnits: "pixels",
+      pointRadiusUnits: "pixels",
+      getPointRadius: 4,
+      parameters: { depthTest: false } as never,
+    });
+  }, [measuring, measurePts, drape]);
 
   // Discos estructurales: rumbo/manteo de terreno como planos orientados.
   const structurePlaneLayer = useMemo(() => {
@@ -496,7 +542,7 @@ export function GeoSceneCanvas({
           layer?: { props?: Record<string, unknown> } | null;
           object?: { properties?: Record<string, unknown> } | null;
         }) => {
-          if (sectionRef.current) return false;
+          if (sectionRef.current || measureRef.current) return false;
           const projectLayer = info.layer?.props?.geoProjectLayer as
             ResolvedProjectLayer | undefined;
           if (!projectLayer || !info.object) return false;
@@ -521,6 +567,10 @@ export function GeoSceneCanvas({
     });
     map.on("moveend", syncSnapshotViewState);
     map.on("click", (e) => {
+      if (measureRef.current) {
+        setMeasurePts((prev) => [...prev, [e.lngLat.lng, e.lngLat.lat]]);
+        return;
+      }
       if (!sectionRef.current) return;
       const p: LngLat = [e.lngLat.lng, e.lngLat.lat];
       setSectionPts((prev) => (prev.length >= 2 ? [p] : [...prev, p]));
@@ -633,6 +683,7 @@ export function GeoSceneCanvas({
       ...wireframeLayers,
       anomaliesLayer,
       sectionLayer,
+      measureLayer,
     ].filter(Boolean);
     overlayRef.current.setProps({ layers });
   }, [
@@ -775,6 +826,27 @@ export function GeoSceneCanvas({
       >
         {sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
       </button>
+      <AnalysisDock
+        spectralTop={spectralTop}
+        onSpectralTop={setSpectralTop}
+        includeOxides={includeOxides}
+        onIncludeOxides={setIncludeOxides}
+        hasSpectral={visibleLayerIds.has("remote_sensing.hyperspectral") && resolvedProjectLayers.some((l) => l.id === "remote_sensing.hyperspectral")}
+        terrainOpacity={terrainOpacity}
+        onTerrainOpacity={setTerrainOpacity}
+        hasTerrain={Boolean(cadTerrainLayer)}
+        measuring={measuring}
+        onMeasuring={(v) => {
+          setMeasuring(v);
+          setMeasurePts([]);
+          if (v) setSectionOn(false);
+        }}
+        measurePts={measurePts}
+        elevations={measurePts.map((p) => drape?.sample(p[0], p[1]) ?? null)}
+        stereoOpen={stereoOpen}
+        onStereo={setStereoOpen}
+        planes={planes}
+      />
       {selected && (
         <FeatureInspector
           layer={selected.layer}
