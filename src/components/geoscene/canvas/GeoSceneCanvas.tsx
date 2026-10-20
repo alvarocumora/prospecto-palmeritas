@@ -432,8 +432,14 @@ export function GeoSceneCanvas({
     });
     map.on("moveend", syncSnapshotViewState);
     // Re-drape once DEM tiles for the current view have loaded.
+    let lastDrapeKey = "";
     map.on("idle", () => {
-      if (map.getTerrain()) setTerrainEpoch((n) => n + 1);
+      if (!map.getTerrain()) return;
+      const c = map.getCenter();
+      const key = `${c.lng.toFixed(4)},${c.lat.toFixed(4)},${Math.round(map.getZoom())}`;
+      if (key === lastDrapeKey) return; // avoid idle → re-render → idle loops
+      lastDrapeKey = key;
+      setTerrainEpoch((n) => n + 1);
     });
 
     map.on("error", (event: { error?: { message?: string } }) => {
