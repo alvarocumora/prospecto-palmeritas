@@ -12,6 +12,7 @@ import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicG
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
+import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
 
 const CholquiScene = lazy(() =>
   import("./scenes/CholquiScene").then((m) => ({ default: m.CholquiScene })),
@@ -39,6 +40,7 @@ export function ProjectSceneFrame({
         showModeTabs={false}
         showCopilot={false}
       />
+      <MiningEvidenceInspector layers={layers} projectName={project.name} />
     </div>
   );
 }

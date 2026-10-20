@@ -16,6 +16,7 @@ import {
 import { FilterSelect } from "@/modules/deals/ui/FilterSelect";
 import { ListingCard } from "@/modules/deals/ui/ListingCard";
 import { ListingDetailDrawer } from "@/modules/deals/ui/ListingDetailDrawer";
+import { ContentState, PageHeader, PlatformPage } from "@/components/ui-system";
 
 export const Route = createFileRoute("/_authenticated/dashboard/deals")({
   head: () => ({
@@ -72,26 +73,19 @@ function DealsPage() {
     (commodity ? 1 : 0) + (stage ? 1 : 0) + (modality ? 1 : 0) + (search ? 1 : 0);
 
   return (
-    <div className="mx-auto w-full max-w-6xl bg-surface p-4 text-content md:p-6">
-      <header className="mb-4">
-        <div className="flex items-center gap-2 mb-1">
-          <Briefcase className="w-5 h-5 text-accent-brand" />
-          <h1 className="font-serif text-3xl font-normal text-content">
-            Marketplace de Propiedades
-          </h1>
-        </div>
-        <p className="text-xs font-mono text-content-subtle">
-          Pertenencias, JVs, royalties y opciones de propiedades mineras. Firma NDA para acceder al
-          data room.
-        </p>
-      </header>
+    <PlatformPage>
+      <PageHeader
+        eyebrow="Capital · Marketplace"
+        title="Marketplace de propiedades"
+        description="Pertenencias, joint ventures, royalties y opciones mineras. Accede a sus antecedentes y solicita el data room según disponibilidad y permisos."
+      />
 
       {/* Scope tabs */}
       <div className="flex items-center gap-1 mb-3 border-b border-hairline">
         <button
           onClick={() => setScope("project")}
           disabled={!active}
-          className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors disabled:opacity-40 ${
+          className={`min-h-11 px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors disabled:opacity-40 ${
             scope === "project"
               ? "border-accent-brand text-accent-brand"
               : "border-transparent text-content-subtle hover:text-content"
@@ -101,7 +95,7 @@ function DealsPage() {
         </button>
         <button
           onClick={() => setScope("all")}
-          className={`px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
+          className={`min-h-11 px-3 py-2 text-xs font-mono border-b-2 -mb-px transition-colors ${
             scope === "all"
               ? "border-accent-brand text-accent-brand"
               : "border-transparent text-content-subtle hover:text-content"
@@ -120,7 +114,7 @@ function DealsPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Buscar por título, código, región…"
-            className="w-full pl-7 pr-2 py-1.5 text-xs font-mono rounded border border-hairline bg-surface outline-none focus:border-accent-brand"
+            className="min-h-11 w-full rounded-md border border-hairline bg-surface-3 py-2 pl-8 pr-3 text-sm text-content outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
           />
         </div>
         <FilterSelect
@@ -149,7 +143,7 @@ function DealsPage() {
         {activeFilters > 0 && (
           <button
             onClick={clearFilters}
-            className="inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono text-content-subtle hover:text-content"
+            className="inline-flex min-h-11 items-center gap-1 rounded-md px-3 py-2 text-xs font-medium text-content-muted hover:bg-surface-2 hover:text-content focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
           >
             <X className="w-3 h-3" /> Limpiar ({activeFilters})
           </button>
@@ -160,25 +154,30 @@ function DealsPage() {
         </span>
       </div>
 
-      {/* Grid */}
+      {/* Grid: distintos estados del servicio sin fabricar datos. */}
       {loading ? (
-        <div className="text-center py-16 text-xs font-mono text-content-subtle">
-          Cargando ofertas…
-        </div>
+        <ContentState kind="loading" title="Cargando ofertas…" />
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-hairline rounded-lg">
-          <Briefcase className="w-8 h-8 text-content-subtle/50 mx-auto mb-2" />
-          <div className="text-sm font-mono text-content mb-1">Sin resultados</div>
-          <div className="text-xs font-mono text-content-subtle">
-            {activeFilters > 0
-              ? "Ajusta los filtros o cambia el scope."
+        <ContentState
+          kind="empty"
+          title="Sin resultados"
+          description={
+            activeFilters > 0
+              ? "Ajusta los filtros para ampliar la búsqueda."
               : scope === "project"
-                ? "Este proyecto aún no tiene listings públicos."
-                : "No hay propiedades publicadas."}
-          </div>
-        </div>
+                ? "El proyecto seleccionado aún no tiene ofertas publicadas."
+                : "No hay propiedades publicadas."
+          }
+          action={
+            activeFilters > 0
+              ? { label: "Limpiar filtros", onClick: clearFilters }
+              : scope === "project"
+                ? { label: "Ver todo el marketplace", onClick: () => setScope("all") }
+                : undefined
+          }
+        />
       ) : (
-        <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((l) => (
             <ListingCard key={l.id} listing={l} onOpen={() => setSelectedId(l.id)} />
           ))}
@@ -190,6 +189,6 @@ function DealsPage() {
         onClose={() => setSelectedId(null)}
         onMutated={refresh}
       />
-    </div>
+    </PlatformPage>
   );
 }

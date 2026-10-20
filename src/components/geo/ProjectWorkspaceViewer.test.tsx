@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { ProjectWorkspaceViewer } from "./ProjectWorkspaceViewer";
 
 const context = vi.hoisted(() => ({
@@ -60,5 +60,31 @@ describe("project workspace isolation", () => {
     expect(screen.queryByRole("heading", { name: "Proyecto B" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Planta" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Perspectiva" })).not.toBeInTheDocument();
+  });
+  it("keeps one canvas while changing Planta/Perspectiva using accessible controls", () => {
+    const onModeChange = vi.fn();
+    render(
+      <ProjectWorkspaceViewer
+        projectId="first"
+        defaultMode="2d"
+        heightClassName="min-h-[480px]"
+        onModeChange={onModeChange}
+      />,
+    );
+    expect(screen.getByRole("group", { name: "Vista del proyecto" })).toBeInTheDocument();
+    expect(screen.getByTestId("map").closest('[data-surface="canvas"]')).toHaveClass(
+      "min-h-[480px]",
+    );
+    expect(screen.getByRole("button", { name: "Planta" })).toHaveAttribute("aria-pressed", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Perspectiva" }));
+
+    expect(onModeChange).toHaveBeenCalledWith("3d");
+    expect(screen.queryByTestId("map")).not.toBeInTheDocument();
+    expect(screen.getByTestId("scene")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Perspectiva" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
   });
 });

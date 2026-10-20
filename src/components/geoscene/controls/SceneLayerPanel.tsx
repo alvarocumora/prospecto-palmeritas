@@ -88,62 +88,62 @@ export function SceneLayerPanel({
                 const active = enabled.has(definition.id);
                 return (
                   <div key={definition.id} className="space-y-1">
-                  <BrandButton
-                    variant="ghost"
-                    size="sm"
-                    type="button"
-                    onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
-                    aria-pressed={active}
-                    className={`h-auto w-full block whitespace-normal rounded border p-2 text-left transition-colors ${
-                      active
-                        ? "border-gold/60 bg-gold/5"
-                        : "border-border bg-background/30 hover:border-foreground/30"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <span className="text-[11px] font-medium leading-tight text-foreground">
-                        {definition.label}
-                      </span>
-                      <span
-                        className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
-                          active ? "bg-gold" : "bg-muted-foreground/30"
-                        }`}
-                      />
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                      <EvidenceBadge
-                        kind={definition.evidence}
-                        scale={definition.scaleLabel}
-                        size="xs"
-                      />
-                      <span className="text-[9px] text-muted-foreground">
-                        {definition.sourceSystem}
-                      </span>
-                    </div>
-                    {definition.caution && active && (
-                      <div className="mt-1.5 text-[9px] leading-snug text-amber-600">
-                        {definition.caution}
+                    <BrandButton
+                      variant="ghost"
+                      size="sm"
+                      type="button"
+                      onClick={() => onToggle(definition.id as CanonicalGeoLayerId)}
+                      aria-pressed={active}
+                      className={`h-auto w-full block whitespace-normal rounded border p-2 text-left transition-colors ${
+                        active
+                          ? "border-gold/60 bg-gold/5"
+                          : "border-border bg-background/30 hover:border-foreground/30"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <span className="text-[11px] font-medium leading-tight text-foreground">
+                          {definition.label}
+                        </span>
+                        <span
+                          className={`mt-0.5 h-2 w-2 shrink-0 rounded-full ${
+                            active ? "bg-gold" : "bg-muted-foreground/30"
+                          }`}
+                        />
                       </div>
+                      <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                        <EvidenceBadge
+                          kind={definition.evidence}
+                          scale={definition.scaleLabel}
+                          size="xs"
+                        />
+                        <span className="text-[9px] text-muted-foreground">
+                          {definition.sourceSystem}
+                        </span>
+                      </div>
+                      {definition.caution && active && (
+                        <div className="mt-1.5 text-[9px] leading-snug text-amber-600">
+                          {definition.caution}
+                        </div>
+                      )}
+                    </BrandButton>
+                    {active && onOpacity && definition.domain === "remote_sensing" && (
+                      <label className="flex items-center gap-2 px-2 text-[9px] uppercase tracking-wider text-muted-foreground">
+                        Opacidad
+                        <input
+                          type="range"
+                          min={10}
+                          max={100}
+                          step={5}
+                          value={Math.round((opacity?.[definition.id] ?? 1) * 100)}
+                          onChange={(e) => onOpacity(definition.id, Number(e.target.value) / 100)}
+                          aria-label={`Opacidad ${definition.label}`}
+                          className="flex-1 accent-[hsl(var(--primary))]"
+                        />
+                        <span className="w-8 text-right font-mono">
+                          {Math.round((opacity?.[definition.id] ?? 1) * 100)}%
+                        </span>
+                      </label>
                     )}
-                  </BrandButton>
-                  {active && onOpacity && definition.domain === "remote_sensing" && (
-                    <label className="flex items-center gap-2 px-2 text-[9px] uppercase tracking-wider text-muted-foreground">
-                      Opacidad
-                      <input
-                        type="range"
-                        min={10}
-                        max={100}
-                        step={5}
-                        value={Math.round((opacity?.[definition.id] ?? 1) * 100)}
-                        onChange={(e) => onOpacity(definition.id, Number(e.target.value) / 100)}
-                        aria-label={`Opacidad ${definition.label}`}
-                        className="flex-1 accent-[hsl(var(--primary))]"
-                      />
-                      <span className="w-8 text-right font-mono">
-                        {Math.round((opacity?.[definition.id] ?? 1) * 100)}%
-                      </span>
-                    </label>
-                  )}
                   </div>
                 );
               })}

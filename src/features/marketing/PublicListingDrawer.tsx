@@ -1,4 +1,5 @@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { BrandButton } from "@/components/brand";
 import { VerificationBadge } from "@/components/brand";
 import { projectVerification } from "@/lib/verification";
 import type { PublicListing } from "@/lib/publicListings.functions";
@@ -10,7 +11,7 @@ import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { submitContactMessage } from "@/lib/contactMessages.functions";
-import { terminalSlugForListing } from "@/features/terminal/terminalProjects";
+import { terminalSlugForListing, getTerminalProject } from "@/features/terminal/terminalProjects";
 
 export function PublicListingDrawer({
   listing,
@@ -25,7 +26,8 @@ export function PublicListingDrawer({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="bg-white text-content sm:max-w-xl w-full overflow-y-auto p-0 border-l border-hairline"
+        data-theme="im-light"
+        className="bg-surface text-content sm:max-w-xl w-full overflow-y-auto p-0 border-l border-hairline"
       >
         {listing && <Body listing={listing} />}
       </SheetContent>
@@ -35,6 +37,7 @@ export function PublicListingDrawer({
 
 function Body({ listing }: { listing: PublicListing }) {
   const terminalSlug = terminalSlugForListing(listing);
+  const ficha = terminalSlug ? getTerminalProject(terminalSlug)?.ficha : null;
   return (
     <div className="flex flex-col">
       <div className="relative aspect-[16/9] bg-accent-brand-subtle overflow-hidden">
@@ -49,7 +52,8 @@ function Body({ listing }: { listing: PublicListing }) {
             <Mountain className="w-14 h-14 text-accent-brand/30" />
           </div>
         )}
-        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/95 text-content text-[10px] font-mono uppercase tracking-wider border border-hairline">
+        <p className="absolute bottom-3 left-3 right-3 w-fit bg-surface/95 px-2 py-1 text-[10px]">{listing.cover_image_url ? "Imagen referencial · procedencia por verificar" : "Ilustración referencial"}</p>
+        <div className="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-3/95 text-content text-[10px] font-mono uppercase tracking-wider border border-hairline">
           {MODALITY_LABEL[listing.modality ?? ""] ?? listing.modality} ·{" "}
           {STAGE_LABEL[listing.stage ?? ""] ?? listing.stage}
         </div>
@@ -58,7 +62,7 @@ function Body({ listing }: { listing: PublicListing }) {
       <div className="p-5 md:p-7">
         <SheetHeader>
           <SheetTitle asChild>
-            <h2 className="font-display text-2xl text-content text-left">{listing.title}</h2>
+            <h2 className="font-serif text-2xl text-content text-left">{listing.title}</h2>
           </SheetTitle>
         </SheetHeader>
         <div className="mt-1.5 flex items-center gap-2.5 flex-wrap">
@@ -72,7 +76,7 @@ function Body({ listing }: { listing: PublicListing }) {
 
         <div className="mt-5 grid grid-cols-2 gap-3">
           <Kpi
-            label="Precio / Términos"
+            label="Términos referenciales"
             v={
               listing.modality === "royalty" && listing.royalty_pct != null
                 ? `${listing.royalty_pct}% NSR`
@@ -81,12 +85,12 @@ function Body({ listing }: { listing: PublicListing }) {
           />
           <Kpi label="Commodity" v={listing.commodity ?? "—"} />
           <Kpi
-            label="Superficie"
+            label="Superficie declarada"
             v={listing.area_ha != null ? `${listing.area_ha.toLocaleString("es-CL")} ha` : "—"}
           />
           <Kpi
             label="Ubicación"
-            v={[listing.region, listing.country].filter(Boolean).join(", ") || "—"}
+            v={ficha?.region ?? ([listing.region, listing.country].filter(Boolean).join(", ") || "Por verificar")}
             icon={<MapPin className="w-3.5 h-3.5" />}
           />
         </div>
@@ -132,6 +136,7 @@ function Body({ listing }: { listing: PublicListing }) {
           )}
         </div>
 
+        <p className="mt-5 text-xs text-content-muted">DECLARADO · listado publicado. No constituye oferta pública, precio bursátil ni rendimiento garantizado; inversión privada e ilíquida.</p>
         <RequestAccess listing={listing} />
       </div>
     </div>
@@ -145,7 +150,7 @@ function Kpi({ label, v, icon }: { label: string; v: string; icon?: React.ReactN
         {icon}
         {label}
       </div>
-      <div className="mt-1 font-mono text-[14px] text-content font-semibold truncate">{v}</div>
+      <div className="mt-1 font-mono text-[14px] text-content font-semibold break-words">{v}</div>
     </div>
   );
 }
@@ -171,11 +176,11 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
 
   if (mut.isSuccess) {
     return (
-      <div className="mt-7 rounded-xl border border-emerald-200 bg-emerald-50 p-5 flex items-start gap-3">
-        <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+      <div className="mt-7 rounded-lg border border-hairline bg-surface-2 p-5 flex items-start gap-3">
+        <CheckCircle2 className="w-5 h-5 text-accent-brand shrink-0 mt-0.5" />
         <div>
-          <div className="font-display text-[15px] text-emerald-900">Solicitud enviada</div>
-          <p className="text-sm text-emerald-800/80 mt-1">
+          <div className="font-serif text-[15px] text-content">Solicitud enviada</div>
+          <p className="text-sm text-content-muted mt-1">
             Te contactaremos en menos de 24 h para coordinar acceso al data room.
           </p>
         </div>
@@ -189,11 +194,11 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
         e.preventDefault();
         mut.mutate();
       }}
-      className="mt-7 rounded-xl border border-hairline bg-white p-5 space-y-3"
+      className="mt-7 rounded-lg border border-hairline bg-surface-3 p-5 space-y-3"
     >
       <div className="flex items-center gap-2">
         <Lock className="w-4 h-4 text-accent-brand" />
-        <div className="font-display text-[15px] text-content">Solicitar acceso al data room</div>
+        <div className="font-serif text-[15px] text-content">Solicitar acceso al data room</div>
       </div>
       <div className="grid sm:grid-cols-2 gap-3">
         <input
@@ -223,14 +228,14 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
         onChange={(e) => setOrg(e.target.value)}
       />
       {mut.isError && (
-        <div className="text-sm text-red-600">
+        <div className="text-sm text-content">
           {(mut.error as Error)?.message ?? "Error al enviar."}
         </div>
       )}
-      <button
+      <BrandButton
         type="submit"
         disabled={mut.isPending}
-        className="w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-white px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
+        className="w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-accent-brand-contrast px-5 py-2.5 rounded-md text-sm font-medium hover:opacity-95 disabled:opacity-60"
       >
         {mut.isPending ? (
           "Enviando…"
@@ -239,7 +244,7 @@ function RequestAccess({ listing }: { listing: PublicListing }) {
             Solicitar acceso <ArrowRight className="w-4 h-4" />
           </>
         )}
-      </button>
+      </BrandButton>
       <p className="text-[11px] font-mono text-content-subtle text-center">
         Bajo NDA ·{" "}
         <Link to="/metodologia" className="text-accent-brand hover:underline">

@@ -29,7 +29,7 @@ export function PendingTicketBanner() {
           <Link
             to="/terminal/$slug"
             params={{ slug: t.slug }}
-            search={{ tab: "mapa" }}
+            search={{ tab: "simulador" }}
             className="rounded border border-gold/60 px-3 py-1.5 hover:border-gold"
           >
             2 · Emitir ticket

@@ -11,7 +11,12 @@ import { initialGeoSceneLayerIds } from "./layerPolicy";
 import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
 import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
-import { PROCESSED_INDICES, RAMP_CSS, indexRange, type ProcessedIndex } from "./processedSceneStyle";
+import {
+  PROCESSED_INDICES,
+  RAMP_CSS,
+  indexRange,
+  type ProcessedIndex,
+} from "./processedSceneStyle";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
