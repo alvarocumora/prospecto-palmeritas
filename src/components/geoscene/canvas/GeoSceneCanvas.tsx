@@ -12,6 +12,7 @@ import { cadElevationSampler, drapeFeatureCollection, hybridElevationSampler, ty
 import { discRing, planeFromProperties } from "../structuralPlanes";
 import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, type LngLat } from "../sectionProfile";
 import { SectionProfilePanel } from "../controls/SectionProfilePanel";
+import { FeatureInspector } from "../controls/FeatureInspector";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
@@ -37,7 +38,7 @@ import { sceneFilterManifest } from "../filterPolicy";
 import {
   evidenceColor,
   isDashedEvidence,
-  projectLayerTooltip,
+  featureLabel,
   resolveProjectLayers,
   type GeoSceneProject,
   type GeoSceneProjectLayer,
