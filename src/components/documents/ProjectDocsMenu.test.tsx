@@ -5,7 +5,7 @@ import { ProjectDocsMenu } from "./ProjectDocsMenu";
 const mocks = vi.hoisted(() => ({ download: vi.fn(), error: vi.fn(), success: vi.fn() }));
 vi.mock("@tanstack/react-router", () => ({ useNavigate: () => vi.fn() }));
 vi.mock("sonner", () => ({
-  toast: { loading: () => "job", error: mocks.error, success: mocks.success },
+  toast: { loading: () => "job", error: mocks.error, success: mocks.success, message: vi.fn() },
 }));
 vi.mock("@/lib/pdf/generateProjectDoc", () => ({ downloadProjectDoc: mocks.download }));
 vi.mock("@/components/ui/dropdown-menu", () => {
@@ -30,7 +30,7 @@ describe("ProjectDocsMenu asynchronous exports", () => {
   it("reports builder failures and releases the export button for retry", async () => {
     const build = vi.fn().mockRejectedValue(new Error("Fuente no disponible"));
     render(<ProjectDocsMenu build={build} />);
-    fireEvent.click(screen.getByText("Resumen de una página"));
+    fireEvent.click(screen.getByText(/marco NI 43-101/));
     await waitFor(() =>
       expect(mocks.error).toHaveBeenCalledWith("Fuente no disponible", { id: "job" }),
     );
@@ -47,8 +47,8 @@ describe("ProjectDocsMenu asynchronous exports", () => {
         }),
     );
     render(<ProjectDocsMenu build={build} />);
-    fireEvent.click(screen.getByText("Resumen de una página"));
-    fireEvent.click(screen.getByText("Informe técnico · JORC 2012"));
+    fireEvent.click(screen.getByText(/marco NI 43-101/));
+    fireEvent.click(screen.getByText(/marco JORC 2012/));
     expect(build).toHaveBeenCalledTimes(1);
     expect(screen.getByRole("button", { name: /Generando documento/ })).toBeDisabled();
     resolve(null);

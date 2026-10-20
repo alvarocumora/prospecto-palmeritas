@@ -62,7 +62,7 @@ export function assessmentSection(a: ReportAssessment): DocSection {
         ["Procedencia", "INTERPRETADO · síntesis asistida por IA sobre evidencia del informe"],
       ],
     },
-    ...a.synthesis.map((body) => ({ kind: "narrative" as const, body, provenance: "INTERPRETED" as never })),
+    ...a.synthesis.map((body) => ({ kind: "narrative" as const, body, provenance: "INTERPRETED" as const })),
   ];
   if (priorities.length) {
     blocks.push({
