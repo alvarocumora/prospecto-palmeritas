@@ -286,10 +286,14 @@ export function GeoSceneCanvas({
     return {
       length: sectionLength(a, b),
       azimuth: sectionAzimuth(a, b),
-      profile: drape ? terrainProfile(a, b, drape.sample) : [],
+      profile: drape
+        ? terrainProfile(a, b, drape.sample)
+        : cadTerrain
+          ? terrainProfile(a, b, cadElevationSampler(cadTerrain.tile))
+          : [],
       structures: structuresInSection(a, b, structures, corridor),
     };
-  }, [sectionPts, drape, resolvedProjectLayers, corridor]);
+  }, [sectionPts, drape, cadTerrain, resolvedProjectLayers, corridor]);
   const sectionLayer = useMemo(() => {
     if (!sectionOn || !sectionPts.length) return null;
     const z = (p: LngLat) => (drape?.sample(p[0], p[1]) ?? drape?.fallback ?? 0) + 6;
