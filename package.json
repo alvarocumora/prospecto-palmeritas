@@ -17,6 +17,7 @@
     "routes:generate": "node scripts/generate-routes.mjs"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3",
     "@ai-sdk/openai-compatible": "^2.0.48",
     "@cloudflare/vite-plugin": "^1.25.5",
     "@deck.gl/core": "^9",
