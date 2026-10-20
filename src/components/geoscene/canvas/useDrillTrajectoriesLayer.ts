@@ -217,7 +217,11 @@ export function useDrillTrajectoriesLayer(
       if (measured && measured.length >= 2) return measured;
       const total = Number(hole.actual_depth ?? hole.planned_depth ?? 100);
       return desurvey(
-        { x: Number(hole.easting ?? 0), y: Number(hole.northing ?? 0), z: Number(hole.elevation ?? 0) },
+        {
+          x: Number(hole.easting ?? 0),
+          y: Number(hole.northing ?? 0),
+          z: Number(hole.elevation ?? 0),
+        },
         [{ md: 0, azimuth: hole.azimuth ?? 0, dip: hole.dip ?? -90 }],
         total,
       );
@@ -234,7 +238,11 @@ export function useDrillTrajectoriesLayer(
       .map((log, index) => {
         const hole = byHole.get(log.hole_id)!;
         if (!paths.has(hole.hole_id)) paths.set(hole.hole_id, localPath(hole));
-        const seg = sliceByDepth(paths.get(hole.hole_id)!, Number(log.depth_from), Number(log.depth_to));
+        const seg = sliceByDepth(
+          paths.get(hole.hole_id)!,
+          Number(log.depth_from),
+          Number(log.depth_to),
+        );
         return {
           id: `${log.hole_id}-${index}`,
           path: seg.map(

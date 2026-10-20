@@ -8,9 +8,20 @@ import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM, type Layer } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
-import { cadElevationSampler, drapeFeatureCollection, hybridElevationSampler, type ElevationSampler } from "../terrainDrape";
+import {
+  cadElevationSampler,
+  drapeFeatureCollection,
+  hybridElevationSampler,
+  type ElevationSampler,
+} from "../terrainDrape";
 import { discRing, planeFromProperties } from "../structuralPlanes";
-import { sectionAzimuth, sectionLength, structuresInSection, terrainProfile, type LngLat } from "../sectionProfile";
+import {
+  sectionAzimuth,
+  sectionLength,
+  structuresInSection,
+  terrainProfile,
+  type LngLat,
+} from "../sectionProfile";
 import { SectionProfilePanel } from "../controls/SectionProfilePanel";
 import { FeatureInspector } from "../controls/FeatureInspector";
 import { AnalysisDock } from "../controls/AnalysisDock";
@@ -26,6 +37,11 @@ import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useProjects } from "@/hooks/useProjects";
+import { useDrillHoles } from "@/hooks/useDrilling";
+import { useProjectCoreLogs } from "@/hooks/useProjectCoreLogs";
+import { buildSectionLine, projectHolesToSection } from "@/lib/section/projection";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import type { GeoSnapshotViewState } from "@/lib/geospatial/snapshotManifest";
 import { useTargetsLayer } from "./useTargetsLayer";
 import { useDrillHolesLayer } from "./useDrillHolesLayer";
@@ -214,7 +230,7 @@ export function GeoSceneCanvas({
 
   const [spectralTop, setSpectralTop] = useState<SpectralTop>("p90");
   const [includeOxides, setIncludeOxides] = useState(false);
-  const [terrainOpacity, setTerrainOpacity] = useState(0.92);
+  const [terrainOpacity, setTerrainOpacity] = useState(() => (mode === "subsurface" ? 0.35 : 0.92));
   const [measuring, setMeasuring] = useState(false);
   const [measurePts, setMeasurePts] = useState<LngLat[]>([]);
   const [stereoOpen, setStereoOpen] = useState(false);
@@ -225,6 +241,18 @@ export function GeoSceneCanvas({
     () => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null),
     [cadTerrain],
   );
+  // Subsurface: el relieve CAD se aclara para dejar ver sondajes y modelos
+  // implícitos por debajo, como el corte de referencia. El usuario puede
+  // seguir ajustando la opacidad manualmente desde el dock.
+  const lastModeForOpacity = useRef(mode);
+  useEffect(() => {
+    if (!cadMesh || mode === lastModeForOpacity.current) return;
+    if (mode === "subsurface") setTerrainOpacity(0.35);
+    else if (lastModeForOpacity.current === "subsurface" && mode === "surface") {
+      setTerrainOpacity(0.92);
+    }
+    lastModeForOpacity.current = mode;
+  }, [mode, cadMesh]);
   const cadTerrainLayer = useMemo(() => {
     if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
     const { tile } = cadTerrain;
@@ -248,6 +276,10 @@ export function GeoSceneCanvas({
       getColor: [255, 255, 255, 235],
       opacity: terrainOpacity,
       material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
+      // Subsurface: el terreno no escribe profundidad, así las capas de
+      // subsuelo (sondajes, wireframes) dibujadas después no quedan
+      // ocluidas por él aunque geométricamente estén "detrás".
+      parameters: { depthMask: mode !== "subsurface" } as never,
     });
   }, [cadTerrain, cadMesh, terrainVisible, mode, terrainOpacity]);
 
@@ -274,7 +306,10 @@ export function GeoSceneCanvas({
     if (cadTerrain) {
       const cad = cadElevationSampler(cadTerrain.tile);
       const sample = dem ? hybridElevationSampler(cad, dem) : cad;
-      return { sample, fallback: sample(centerLng, centerLat) ?? cadTerrain.tile.referenceElevationM };
+      return {
+        sample,
+        fallback: sample(centerLng, centerLat) ?? cadTerrain.tile.referenceElevationM,
+      };
     }
     if (!dem) return null;
     return { sample: dem, fallback: dem(centerLng, centerLat) ?? 0 };
@@ -295,15 +330,21 @@ export function GeoSceneCanvas({
     const map = mapRef.current;
     const root = mapDiv.current;
     if (!map || !root) return null;
-    await new Promise<void>((r) => { map.once("idle", () => r()); map.triggerRepaint(); setTimeout(r, 2500); });
+    await new Promise<void>((r) => {
+      map.once("idle", () => r());
+      map.triggerRepaint();
+      setTimeout(r, 2500);
+    });
     const canvases = Array.from(root.querySelectorAll("canvas"));
     const base = map.getCanvas();
     const out = document.createElement("canvas");
-    out.width = base.width; out.height = base.height;
+    out.width = base.width;
+    out.height = base.height;
     const ctx = out.getContext("2d");
     if (!ctx) return null;
     try {
-      for (const c of canvases) if (c.width && c.height) ctx.drawImage(c, 0, 0, out.width, out.height);
+      for (const c of canvases)
+        if (c.width && c.height) ctx.drawImage(c, 0, 0, out.width, out.height);
       return out.toDataURL("image/jpeg", 0.88);
     } catch {
       return null;
@@ -316,8 +357,7 @@ export function GeoSceneCanvas({
     if (sectionPts.length < 2) return null;
     const [a, b] = sectionPts;
     const structures = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data as
-      | FeatureCollection
-      | undefined;
+      FeatureCollection | undefined;
     return {
       length: sectionLength(a, b),
       azimuth: sectionAzimuth(a, b),
@@ -330,11 +370,70 @@ export function GeoSceneCanvas({
       geology: sectionGeology(
         a,
         b,
-        resolvedProjectLayers.find((l) => l.id === "geology.official_map_units")?.data as FeatureCollection | undefined,
-        resolvedProjectLayers.find((l) => l.id === "geology.official_faults")?.data as FeatureCollection | undefined,
+        resolvedProjectLayers.find((l) => l.id === "geology.official_map_units")?.data as
+          FeatureCollection | undefined,
+        resolvedProjectLayers.find((l) => l.id === "geology.official_faults")?.data as
+          FeatureCollection | undefined,
       ),
     };
   }, [sectionPts, drape, cadTerrain, resolvedProjectLayers, corridor]);
+
+  // Sondajes proyectados sobre el corte, para interpretación IA (geólogo senior
+  // razonando continuidad de mineralización a partir de intercepts reales).
+  const { data: sectionHoles } = useDrillHoles(privateProjectId);
+  const { byHole: sectionLogsByHole } = useProjectCoreLogs(privateProjectId);
+  const sectionProjectedHoles = useMemo(() => {
+    if (sectionPts.length < 2 || !sectionHoles.length) return [];
+    const [a, b] = sectionPts;
+    const line = buildSectionLine([a[1], a[0]], [b[1], b[0]]);
+    return projectHolesToSection(sectionHoles, sectionLogsByHole, line, corridor);
+  }, [sectionPts, sectionHoles, sectionLogsByHole, corridor]);
+  const [sectionInterpretation, setSectionInterpretation] = useState<string | null>(null);
+  const [sectionInterpreting, setSectionInterpreting] = useState(false);
+  useEffect(() => {
+    setSectionInterpretation(null);
+  }, [sectionPts]);
+  const interpretSection = async () => {
+    if (sectionInterpreting || !section || sectionPts.length < 2) return;
+    setSectionInterpreting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("section-interpret", {
+        body: {
+          line: {
+            lengthM: section.length,
+            bearingDeg: section.azimuth,
+            start: sectionPts[0],
+            end: sectionPts[1],
+          },
+          maxOffsetM: corridor,
+          projectName: project?.name,
+          holes: sectionProjectedHoles.map((ph) => ({
+            hole_id: ph.hole.hole_id,
+            alongM: ph.alongM,
+            signedOffsetM: ph.signedOffsetM,
+            azimuth: ph.hole.azimuth,
+            dip: ph.hole.dip,
+            depth: ph.hole.actual_depth ?? ph.hole.planned_depth,
+            intercepts: ph.logs.map((l) => ({
+              from: l.depth_from,
+              to: l.depth_to,
+              au: l.au_gpt,
+              cu: l.cu_pct,
+              lithology: l.lithology,
+              alteration: l.alteration,
+            })),
+          })),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setSectionInterpretation(data.interpretation as string);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Error generando interpretación");
+    } finally {
+      setSectionInterpreting(false);
+    }
+  };
   const sectionLayer = useMemo(() => {
     if (!sectionOn || !sectionPts.length) return null;
     const z = (p: LngLat) => (drape?.sample(p[0], p[1]) ?? drape?.fallback ?? 0) + 6;
@@ -349,11 +448,16 @@ export function GeoSceneCanvas({
             geometry: { type: "Point" as const, coordinates: [p[0], p[1], z(p)] },
           })),
           ...(sectionPts.length === 2
-            ? [{
-                type: "Feature" as const,
-                properties: {},
-                geometry: { type: "LineString" as const, coordinates: sectionPts.map((p) => [p[0], p[1], z(p)]) },
-              }]
+            ? [
+                {
+                  type: "Feature" as const,
+                  properties: {},
+                  geometry: {
+                    type: "LineString" as const,
+                    coordinates: sectionPts.map((p) => [p[0], p[1], z(p)]),
+                  },
+                },
+              ]
             : []),
         ],
       } as never,
@@ -395,12 +499,15 @@ export function GeoSceneCanvas({
           filled: true,
           opacity: layerOpacity?.[layer.id] ?? 1,
           getFillColor: units
-            ? (f: { properties?: Record<string, unknown> }) => [...unitColor(f.properties?.codigo ?? f.properties?.nombre), 110]
+            ? (f: { properties?: Record<string, unknown> }) => [
+                ...unitColor(f.properties?.codigo ?? f.properties?.nombre),
+                110,
+              ]
             : layer.id === "territory.cadastre"
-            ? [color[0], color[1], color[2], 0]
-            : spectral
-            ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-            : [color[0], color[1], color[2], dashed ? 6 : 12],
+              ? [color[0], color[1], color[2], 0]
+              : spectral
+                ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
+                : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: spectral
             ? (f: { properties?: Record<string, unknown> }) => {
                 const c = spectralFill(f.properties, rgb);
@@ -425,7 +532,16 @@ export function GeoSceneCanvas({
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
       });
-  }, [mode, view, resolvedProjectLayers, visibleLayerIds, layerOpacity, drape, spectralTop, includeOxides]);
+  }, [
+    mode,
+    view,
+    resolvedProjectLayers,
+    visibleLayerIds,
+    layerOpacity,
+    drape,
+    spectralTop,
+    includeOxides,
+  ]);
   const planes = useMemo(() => {
     const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;
     return (fc?.features ?? [])
@@ -441,8 +557,20 @@ export function GeoSceneCanvas({
       data: {
         type: "FeatureCollection",
         features: [
-          ...(pts.length > 1 ? [{ type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: pts } }] : []),
-          ...pts.map((c) => ({ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: c } })),
+          ...(pts.length > 1
+            ? [
+                {
+                  type: "Feature",
+                  properties: {},
+                  geometry: { type: "LineString", coordinates: pts },
+                },
+              ]
+            : []),
+          ...pts.map((c) => ({
+            type: "Feature",
+            properties: {},
+            geometry: { type: "Point", coordinates: c },
+          })),
         ],
       } as never,
       stroked: true,
@@ -458,7 +586,8 @@ export function GeoSceneCanvas({
 
   // Discos estructurales: rumbo/manteo de terreno como planos orientados.
   const structurePlaneLayer = useMemo(() => {
-    if (mode === "resource" || view !== "3d" || !visibleLayerIds.has("geology.structures")) return null;
+    if (mode === "resource" || view !== "3d" || !visibleLayerIds.has("geology.structures"))
+      return null;
     const source = resolvedProjectLayers.find((l) => l.id === "geology.structures");
     if (!source) return null;
     const discs: { code: string; ring: [number, number, number][]; label: string }[] = [];
@@ -829,7 +958,11 @@ export function GeoSceneCanvas({
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
       data-geo-terrain-source={
-        cadTerrain && terrainVisible ? "cad_contours+aws_terrarium" : terrainVisible ? "aws_terrarium" : "none"
+        cadTerrain && terrainVisible
+          ? "cad_contours+aws_terrarium"
+          : terrainVisible
+            ? "aws_terrarium"
+            : "none"
       }
     >
       <div className="absolute inset-0">
@@ -848,7 +981,10 @@ export function GeoSceneCanvas({
         onSpectralTop={setSpectralTop}
         includeOxides={includeOxides}
         onIncludeOxides={setIncludeOxides}
-        hasSpectral={visibleLayerIds.has("remote_sensing.hyperspectral") && resolvedProjectLayers.some((l) => l.id === "remote_sensing.hyperspectral")}
+        hasSpectral={
+          visibleLayerIds.has("remote_sensing.hyperspectral") &&
+          resolvedProjectLayers.some((l) => l.id === "remote_sensing.hyperspectral")
+        }
         terrainOpacity={terrainOpacity}
         onTerrainOpacity={setTerrainOpacity}
         hasTerrain={Boolean(cadTerrainLayer)}
@@ -864,7 +1000,13 @@ export function GeoSceneCanvas({
         onStereo={setStereoOpen}
         planes={planes}
         sectionOn={sectionOn}
-        sectionLabel={sectionOn ? (sectionPts.length < 2 ? `Corte: toca ${sectionPts.length ? "A′" : "A"}` : "Corte activo") : "Corte A–A′"}
+        sectionLabel={
+          sectionOn
+            ? sectionPts.length < 2
+              ? `Corte: toca ${sectionPts.length ? "A′" : "A"}`
+              : "Corte activo"
+            : "Corte A–A′"
+        }
         onSection={() => {
           setSectionOn((v) => !v);
           setSectionPts([]);
@@ -877,9 +1019,22 @@ export function GeoSceneCanvas({
         <PropertyAnalysisPanel
           projectName={project?.name ?? "Proyecto"}
           layers={resolvedProjectLayers}
-          onFocus={([w, so, e, n]) => mapRef.current?.fitBounds([[w, so], [e, n]], { padding: 80, duration: 900, maxZoom: 14.5 })}
+          onFocus={([w, so, e, n]) =>
+            mapRef.current?.fitBounds(
+              [
+                [w, so],
+                [e, n],
+              ],
+              { padding: 80, duration: 900, maxZoom: 14.5 },
+            )
+          }
           captureView={captureView}
-          viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id)).map((l) => l.definition.label ?? l.id).join(", ") || "ninguna"}. Imagen base: Esri World Imagery.`}
+          viewNote={`Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Capas encendidas: ${
+            resolvedProjectLayers
+              .filter((l) => visibleLayerIds.has(l.id))
+              .map((l) => l.definition.label ?? l.id)
+              .join(", ") || "ninguna"
+          }. Imagen base: Esri World Imagery.`}
           onClose={() => setPropertyOpen(false)}
         />
       )}
@@ -887,17 +1042,32 @@ export function GeoSceneCanvas({
         const on = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
         if (!on.length) return null;
         return (
-          <div data-theme="im-light" className="pointer-events-none absolute bottom-3 right-3 z-20 hidden max-w-[16rem] rounded border border-hairline bg-surface/95 p-2 font-mono text-[9px] text-content shadow md:block" aria-label="Leyenda de capas encendidas">
-            <p className="mb-1 uppercase tracking-wider text-muted-foreground">Leyenda · encendido</p>
+          <div
+            data-theme="im-light"
+            className="pointer-events-none absolute bottom-3 right-3 z-20 hidden max-w-[16rem] rounded border border-hairline bg-surface/95 p-2 font-mono text-[9px] text-content shadow md:block"
+            aria-label="Leyenda de capas encendidas"
+          >
+            <p className="mb-1 uppercase tracking-wider text-muted-foreground">
+              Leyenda · encendido
+            </p>
             {on.map((l) => {
               const c = evidenceColor(l.definition.evidence);
               const n = (l.data as FeatureCollection | undefined)?.features?.length;
               return (
                 <p key={l.id} className="flex items-center gap-1.5 leading-tight">
-                  <span className="inline-block h-2 w-3 shrink-0 rounded-sm" style={{ background: `rgb(${c[0]},${c[1]},${c[2]})`, borderStyle: isDashedEvidence(l.definition.evidence) ? "dashed" : "solid", borderWidth: 1 }} />
+                  <span
+                    className="inline-block h-2 w-3 shrink-0 rounded-sm"
+                    style={{
+                      background: `rgb(${c[0]},${c[1]},${c[2]})`,
+                      borderStyle: isDashedEvidence(l.definition.evidence) ? "dashed" : "solid",
+                      borderWidth: 1,
+                    }}
+                  />
                   <span className="truncate">{l.definition.label ?? l.id}</span>
                   {n != null && <span className="ml-auto text-muted-foreground">{n}</span>}
-                  <span className="text-muted-foreground">· {String(l.definition.evidence).toUpperCase()}</span>
+                  <span className="text-muted-foreground">
+                    · {String(l.definition.evidence).toUpperCase()}
+                  </span>
                 </p>
               );
             })}
@@ -916,6 +1086,10 @@ export function GeoSceneCanvas({
           {...section}
           corridor={corridor}
           onCorridor={setCorridor}
+          holeCount={sectionProjectedHoles.length}
+          onInterpret={interpretSection}
+          interpreting={sectionInterpreting}
+          interpretation={sectionInterpretation}
           onClose={() => {
             setSectionOn(false);
             setSectionPts([]);

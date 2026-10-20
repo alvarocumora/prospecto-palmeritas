@@ -66,7 +66,9 @@ function drapeGeometry(
     case "GeometryCollection":
       return {
         ...g,
-        geometries: g.geometries.map((x) => drapeGeometry(x, sample, fallback, offsetM, maxSegmentM)),
+        geometries: g.geometries.map((x) =>
+          drapeGeometry(x, sample, fallback, offsetM, maxSegmentM),
+        ),
       };
   }
 }
@@ -78,11 +80,10 @@ export function drapeFeatureCollection(
 ): FeatureCollection {
   return {
     ...fc,
-    features: fc.features.map(
-      (f): Feature =>
-        f.geometry
-          ? { ...f, geometry: drapeGeometry(f.geometry, sample, fallback, offsetM, maxSegmentM) }
-          : f,
+    features: fc.features.map((f): Feature =>
+      f.geometry
+        ? { ...f, geometry: drapeGeometry(f.geometry, sample, fallback, offsetM, maxSegmentM) }
+        : f,
     ),
   };
 }

@@ -163,7 +163,13 @@ describe("service worker (public/sw.js)", () => {
 
   it("no intercepta /api/* ni archivos de control", async () => {
     const sw = makeSw(async () => new Response("net", { status: 200 }));
-    for (const path of ["/api/public/x", "/_server/foo", "/sw.js", "/version.json", "/manifest.webmanifest"]) {
+    for (const path of [
+      "/api/public/x",
+      "/_server/foo",
+      "/sw.js",
+      "/version.json",
+      "/manifest.webmanifest",
+    ]) {
       const res = await sw.dispatchFetch(ORIGIN + path);
       expect(res).toBeUndefined();
     }

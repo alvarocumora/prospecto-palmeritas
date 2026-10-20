@@ -6,7 +6,10 @@ describe("assessmentSection", () => {
     const s = assessmentSection({
       prospectivity: "Media",
       confidence: "Baja",
-      synthesis: ["x"], technicalSummary: [], investorSummary: [], workPlan: [],
+      synthesis: ["x"],
+      technicalSummary: [],
+      investorSummary: [],
+      workPlan: [],
       priorities: [
         { level: "P3", target: "c", rationale: "", evidence: "", action: "" },
         { level: "P1", target: "a", rationale: "", evidence: "", action: "" },
@@ -16,6 +19,10 @@ describe("assessmentSection", () => {
       nextSteps: [],
     });
     const table = s.blocks.find((b) => b.kind === "table");
-    expect(table && table.kind === "table" ? table.rows.map((r) => r[0]) : []).toEqual(["P1", "P2", "P3"]);
+    expect(table && table.kind === "table" ? table.rows.map((r) => r[0]) : []).toEqual([
+      "P1",
+      "P2",
+      "P3",
+    ]);
   });
 });

@@ -9,7 +9,8 @@ type Bbox = [number, number, number, number];
 const str = (v: unknown) => (v == null || v === "" ? null : String(v));
 
 export function propertyLabel(p: Record<string, unknown> | null | undefined): string {
-  const name = str(p?.nombre) ?? str(p?.NOMBRE) ?? str(p?.name) ?? str(p?.NOMBRE_CONCESION) ?? "Sin nombre";
+  const name =
+    str(p?.nombre) ?? str(p?.NOMBRE) ?? str(p?.name) ?? str(p?.NOMBRE_CONCESION) ?? "Sin nombre";
   const rol = str(p?.rol) ?? str(p?.ROL) ?? str(p?.rol_nacional) ?? str(p?.ROL_NACIONAL);
   return rol ? `${name} · ${rol}` : name;
 }
@@ -37,17 +38,26 @@ function rings(g: Geometry): Position[][][] {
 
 export function featureBbox(f: Feature): Bbox | null {
   if (!f.geometry) return null;
-  let w = Infinity, s = Infinity, e = -Infinity, n = -Infinity;
-  for (const poly of rings(f.geometry)) for (const r of poly) for (const [x, y] of r) {
-    w = Math.min(w, x); s = Math.min(s, y); e = Math.max(e, x); n = Math.max(n, y);
-  }
+  let w = Infinity,
+    s = Infinity,
+    e = -Infinity,
+    n = -Infinity;
+  for (const poly of rings(f.geometry))
+    for (const r of poly)
+      for (const [x, y] of r) {
+        w = Math.min(w, x);
+        s = Math.min(s, y);
+        e = Math.max(e, x);
+        n = Math.max(n, y);
+      }
   return Number.isFinite(w) ? [w, s, e, n] : null;
 }
 
 function inRing(x: number, y: number, r: Position[]): boolean {
   let inside = false;
   for (let i = 0, j = r.length - 1; i < r.length; j = i++) {
-    const [xi, yi] = r[i], [xj, yj] = r[j];
+    const [xi, yi] = r[i],
+      [xj, yj] = r[j];
     if (yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
   }
   return inside;
@@ -55,20 +65,28 @@ function inRing(x: number, y: number, r: Position[]): boolean {
 
 export function pointInFeature(x: number, y: number, f: Feature): boolean {
   if (!f.geometry) return false;
-  return rings(f.geometry).some((poly) => poly.length > 0 && inRing(x, y, poly[0]) && !poly.slice(1).some((h) => inRing(x, y, h)));
+  return rings(f.geometry).some(
+    (poly) =>
+      poly.length > 0 && inRing(x, y, poly[0]) && !poly.slice(1).some((h) => inRing(x, y, h)),
+  );
 }
 
 /** Vértices representativos de una geometría (para cruzar líneas y polígonos). */
 function samplePoints(g: Geometry | null): Position[] {
   if (!g) return [];
   switch (g.type) {
-    case "Point": return [g.coordinates];
+    case "Point":
+      return [g.coordinates];
     case "MultiPoint":
-    case "LineString": return g.coordinates;
+    case "LineString":
+      return g.coordinates;
     case "MultiLineString":
-    case "Polygon": return g.coordinates.flat();
-    case "MultiPolygon": return g.coordinates.flat(2);
-    default: return [];
+    case "Polygon":
+      return g.coordinates.flat();
+    case "MultiPolygon":
+      return g.coordinates.flat(2);
+    default:
+      return [];
   }
 }
 
@@ -85,8 +103,16 @@ const areaHa = (p: Record<string, unknown>) => {
 };
 
 export type PropertySummary = {
-  property: { label: string; titular: string | null; situacion: string | null; hectareas: number | null };
-  spectral: { total: number; byMineral: Array<{ label: string; count: number; maxIntensity: number | null }> };
+  property: {
+    label: string;
+    titular: string | null;
+    situacion: string | null;
+    hectareas: number | null;
+  };
+  spectral: {
+    total: number;
+    byMineral: Array<{ label: string; count: number; maxIntensity: number | null }>;
+  };
   structures: { measured: number; withDip: number; codes: string[] };
   lineaments: number;
   officialUnits: Array<{ code: string; nombre: string }>;
@@ -110,7 +136,9 @@ export function summarizeProperty(
   const spectral = inside("remote_sensing.hyperspectral");
   for (const f of spectral) {
     const fp = (f.properties ?? {}) as Record<string, unknown>;
-    const cls = mineralClass(fp.nombre ?? fp.mineral ?? fp.label ?? fp.index)?.label ?? String(fp.nombre ?? fp.mineral ?? "Firma");
+    const cls =
+      mineralClass(fp.nombre ?? fp.mineral ?? fp.label ?? fp.index)?.label ??
+      String(fp.nombre ?? fp.mineral ?? "Firma");
     const cur = spectralMap.get(cls) ?? { count: 0, max: null };
     const it = featureIntensity(fp);
     cur.count += 1;
@@ -133,12 +161,23 @@ export function summarizeProperty(
     },
     spectral: {
       total: spectral.length,
-      byMineral: [...spectralMap].map(([label, v]) => ({ label, count: v.count, maxIntensity: v.max })).sort((a, b) => b.count - a.count),
+      byMineral: [...spectralMap]
+        .map(([label, v]) => ({ label, count: v.count, maxIntensity: v.max }))
+        .sort((a, b) => b.count - a.count),
     },
     structures: {
       measured: structures.length,
-      withDip: structures.filter((f) => Number.isFinite(Number((f.properties as Record<string, unknown> | null)?.manteo ?? NaN))).length,
-      codes: structures.map((f) => str((f.properties as Record<string, unknown> | null)?.codigo) ?? str((f.properties as Record<string, unknown> | null)?.nombre) ?? "").filter(Boolean),
+      withDip: structures.filter((f) =>
+        Number.isFinite(Number((f.properties as Record<string, unknown> | null)?.manteo ?? NaN)),
+      ).length,
+      codes: structures
+        .map(
+          (f) =>
+            str((f.properties as Record<string, unknown> | null)?.codigo) ??
+            str((f.properties as Record<string, unknown> | null)?.nombre) ??
+            "",
+        )
+        .filter(Boolean),
     },
     lineaments: inside("remote_sensing.lineaments").length,
     officialUnits: [...units].map(([code, nombre]) => ({ code, nombre })),

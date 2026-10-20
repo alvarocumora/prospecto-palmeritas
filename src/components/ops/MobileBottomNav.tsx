@@ -1,5 +1,13 @@
 import { Link, useLocation } from "@tanstack/react-router";
-import { LayoutDashboard, Briefcase, Handshake, FileSignature, Menu, Compass, Wallet } from "lucide-react";
+import {
+  LayoutDashboard,
+  Briefcase,
+  Handshake,
+  FileSignature,
+  Menu,
+  Compass,
+  Wallet,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type Slot = {
@@ -70,7 +78,9 @@ export function MobileBottomNav({
                   active ? "bg-accent-brand" : "bg-transparent",
                 )}
               />
-              <Icon className={cn("w-5 h-5", active ? "text-accent-brand" : "text-content-subtle")} />
+              <Icon
+                className={cn("w-5 h-5", active ? "text-accent-brand" : "text-content-subtle")}
+              />
               <span
                 className={cn(
                   "text-[10px] font-mono mt-0.5",

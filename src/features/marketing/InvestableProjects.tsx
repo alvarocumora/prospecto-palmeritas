@@ -40,7 +40,7 @@ export function InvestableProjects() {
     staleTime: 60_000,
   });
 
-  const listings = useMemo(() => (data?.listings ?? []), [data?.listings]);
+  const listings = useMemo(() => data?.listings ?? [], [data?.listings]);
   const filtered = useMemo(
     () => listings.filter((p) => matchFilter(p, activeFilter)).slice(0, MAX_ON_LANDING),
     [listings, activeFilter],
@@ -112,7 +112,14 @@ export function InvestableProjects() {
             </div>
           ))}
         </div>
-      ) : isError ? (<div role="alert" className="py-8 text-content-muted">No pudimos cargar los proyectos. <BrandButton variant="outline" onClick={() => void refetch()}>Reintentar</BrandButton></div>) : filtered.length === 0 ? (
+      ) : isError ? (
+        <div role="alert" className="py-8 text-content-muted">
+          No pudimos cargar los proyectos.{" "}
+          <BrandButton variant="outline" onClick={() => void refetch()}>
+            Reintentar
+          </BrandButton>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="py-20 text-center space-y-4">
           <Mountain className="w-10 h-10 text-content-subtle mx-auto opacity-40" />
           <p className="text-sm text-content-subtle">
@@ -128,7 +135,11 @@ export function InvestableProjects() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map((p, idx) => (
             <Reveal key={p.id} delay={Math.min(idx, 5) * 70}>
-              <PublicListingCard listing={p} onOpen={() => openDrawer(p)} updatedAt={data?.updatedAt} />
+              <PublicListingCard
+                listing={p}
+                onOpen={() => openDrawer(p)}
+                updatedAt={data?.updatedAt}
+              />
             </Reveal>
           ))}
         </div>

@@ -3,7 +3,12 @@ import { featureFacts, provenanceLabel } from "./featureFacts";
 
 describe("ficha del elemento", () => {
   it("muestra los atributos reales de una pertenencia SERNAGEOMIN", () => {
-    const facts = featureFacts({ NOMBRE: "X", NUMERO_ROL: "13202-0001", HECTAREAS: 200, OBJECTID: 9 });
+    const facts = featureFacts({
+      NOMBRE: "X",
+      NUMERO_ROL: "13202-0001",
+      HECTAREAS: 200,
+      OBJECTID: 9,
+    });
     expect(facts).toEqual([
       { label: "Rol", value: "13202-0001" },
       { label: "Hectáreas", value: "200" },

@@ -62,10 +62,20 @@ export async function generateStructured<T>(opts: {
     console.error("[ai-responses]", e);
     const msg = String((e as Error)?.message ?? e);
     const status = (e as { statusCode?: number })?.statusCode;
-    if (NoObjectGeneratedError.isInstance(err)) return { value: null, error: "La IA devolvió un formato inválido." };
-    if (status === 429 || /429/.test(msg)) return { value: null, error: "Límite de uso de IA alcanzado; intenta en unos minutos." };
-    if (status === 402 || /402/.test(msg)) return { value: null, error: "Sin créditos de IA disponibles (Ajustes → Planes y créditos)." };
-    if (status === 403) return { value: null, error: "Acceso a IA bloqueado por la configuración del espacio de trabajo." };
+    if (NoObjectGeneratedError.isInstance(err))
+      return { value: null, error: "La IA devolvió un formato inválido." };
+    if (status === 429 || /429/.test(msg))
+      return { value: null, error: "Límite de uso de IA alcanzado; intenta en unos minutos." };
+    if (status === 402 || /402/.test(msg))
+      return {
+        value: null,
+        error: "Sin créditos de IA disponibles (Ajustes → Planes y créditos).",
+      };
+    if (status === 403)
+      return {
+        value: null,
+        error: "Acceso a IA bloqueado por la configuración del espacio de trabajo.",
+      };
     return { value: null, error: "La IA no respondió." };
   }
 }

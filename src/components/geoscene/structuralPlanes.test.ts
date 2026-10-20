@@ -15,7 +15,11 @@ describe("structural planes", () => {
     expect(planeFromProperties({ strikeDeg: 20, dipText: null })).toBeNull();
   });
   it("disc drops radius·sin(dip) below centre on the down-dip side", () => {
-    const ring = discRing([-71, -33, 1000], { code: "", strikeDeg: 0, dipDeg: 30, dipDirectionDeg: 90 }, 40);
+    const ring = discRing(
+      [-71, -33, 1000],
+      { code: "", strikeDeg: 0, dipDeg: 30, dipDirectionDeg: 90 },
+      40,
+    );
     const minZ = Math.min(...ring.map((p) => p[2]));
     expect(minZ).toBeCloseTo(1000 - 40 * Math.sin(Math.PI / 6), 3);
   });
@@ -27,7 +31,17 @@ describe("terrain drape", () => {
       {
         type: "FeatureCollection",
         features: [
-          { type: "Feature", properties: {}, geometry: { type: "LineString", coordinates: [[-71, -33], [-70.99, -33]] } },
+          {
+            type: "Feature",
+            properties: {},
+            geometry: {
+              type: "LineString",
+              coordinates: [
+                [-71, -33],
+                [-70.99, -33],
+              ],
+            },
+          },
         ],
       },
       () => 1500,
@@ -39,7 +53,12 @@ describe("terrain drape", () => {
   });
   it("uses the fallback when elevation is unknown, never zero", () => {
     const fc = drapeFeatureCollection(
-      { type: "FeatureCollection", features: [{ type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [-71, -33] } }] },
+      {
+        type: "FeatureCollection",
+        features: [
+          { type: "Feature", properties: {}, geometry: { type: "Point", coordinates: [-71, -33] } },
+        ],
+      },
       () => null,
       { fallback: 800, offsetM: 0 },
     );
