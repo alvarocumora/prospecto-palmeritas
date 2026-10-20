@@ -150,8 +150,9 @@ export function SceneLayerPanel({
                 );
               })}
           </div>
-        </div>
+        </details>
       ))}
+      </div>
     </div>
   );
 }
