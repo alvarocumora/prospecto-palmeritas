@@ -29,6 +29,9 @@ const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDig
 
 export function MiningInvestShowcase() {
   const navigate = useNavigate();
+  // SSR markup is visible before handlers hydrate: prevent clicks that would be lost.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const [slug, setSlug] = useState<(typeof PROJECTS)[number]["slug"]>("cholqui");
   const [amount, setAmount] = useState<number>(ROUND.minTicket);
   const [rounds, setRounds] = useState<PublicRound[]>([]);
@@ -84,6 +87,7 @@ export function MiningInvestShowcase() {
                 <button
                   type="button"
                   onClick={() => setSlug(p.slug)}
+                  disabled={!hydrated}
                   aria-pressed={slug === p.slug}
                   aria-label={`Seleccionar ${p.name} para simular inversión`}
                   className="flex min-h-11 w-full items-center justify-between gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
