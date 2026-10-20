@@ -35,7 +35,8 @@ export const Route = createFileRoute("/inversionistas")({
       { property: "og:title", content: "Inversionistas — Geocapitals" },
       {
         property: "og:description",
-        content: "Proyectos con fuentes identificadas, información referencial y documentación según permisos.",
+        content:
+          "Proyectos con fuentes identificadas, información referencial y documentación según permisos.",
       },
     ],
   }),

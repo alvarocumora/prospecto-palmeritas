@@ -23,7 +23,8 @@ describe("investment kit discovery", () => {
     const privateItems = INVESTOR_KIT_CATALOGUE.filter((item) => item.access !== "public_page");
     expect(privateItems).toHaveLength(4);
     expect(privateItems.every((item) => !item.tab)).toBe(true);
-    expect(INVESTOR_KIT_CATALOGUE.find((item) => item.id === "statement")?.access)
-      .toBe("ticket_owner_only");
+    expect(INVESTOR_KIT_CATALOGUE.find((item) => item.id === "statement")?.access).toBe(
+      "ticket_owner_only",
+    );
   });
 });

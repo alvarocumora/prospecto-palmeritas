@@ -415,8 +415,9 @@ function DataRoomTab({ project }: { project: TerminalProject }) {
           <Eyebrow>Documentos públicos del activo</Eyebrow>
         </div>
         <p className="text-sm text-content-subtle max-w-2xl">
-          Los reportes públicos que estén disponibles pueden generarse con la información registrada.
-          Son documentos de análisis preliminar y no equivalen a una certificación de reservas.
+          Los reportes públicos que estén disponibles pueden generarse con la información
+          registrada. Son documentos de análisis preliminar y no equivalen a una certificación de
+          reservas.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           {project.slug === "cholqui" && (

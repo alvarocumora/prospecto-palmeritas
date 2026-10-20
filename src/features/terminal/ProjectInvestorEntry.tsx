@@ -28,8 +28,8 @@ export function ProjectInvestorEntry({
         </p>
         <p className="mt-1 flex items-start gap-1.5 text-xs leading-relaxed text-content-subtle">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-          Ticket desde {fmtUsd0(project.ficha.minTicketUsd)} (referencial).
-          Simular no reserva acciones ni confirma inversión.
+          Ticket desde {fmtUsd0(project.ficha.minTicketUsd)} (referencial). Simular no reserva
+          acciones ni confirma inversión.
         </p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
