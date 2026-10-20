@@ -40,7 +40,11 @@ async function scenario(page, label, fn) {
     const message = String(error?.stack || error).slice(0, 2500);
     results.push({ label, result: "failed", error: message, url: page.url() });
     console.error("FAIL", label, message);
-    try { await snapshot(page, "failure-" + label); } catch { /* record failure even if screenshot fails */ }
+    try {
+      await snapshot(page, "failure-" + label);
+    } catch {
+      /* record failure even if screenshot fails */
+    }
   }
 }
 function contextFor(width) {
@@ -63,13 +67,19 @@ for (const width of [390, 1440]) {
   const context = await contextFor(width);
   const page = await context.newPage();
   const events = [];
-  page.on("pageerror", (err) => events.push({ type: "pageerror", message: err.message.slice(0, 400) }));
-  page.on("console", (msg) => { if (msg.type() === "error") events.push({ type: "console", message: msg.text().slice(0, 400) }); });
+  page.on("pageerror", (err) =>
+    events.push({ type: "pageerror", message: err.message.slice(0, 400) }),
+  );
+  page.on("console", (msg) => {
+    if (msg.type() === "error") events.push({ type: "console", message: msg.text().slice(0, 400) });
+  });
   const prefix = width === 390 ? "mobile" : "desktop";
 
   await scenario(page, prefix + "-landing-shows-entry-points", async () => {
     await startAt(page, "/");
-    await page.getByRole("heading", { level: 1, name: /De la geología/i }).waitFor({ timeout: 15000 });
+    await page
+      .getByRole("heading", { level: 1, name: /De la geología/i })
+      .waitFor({ timeout: 15000 });
     const hero = page.getByRole("link", { name: /Ver proyectos en explotación/i });
     assert.ok(await hero.count(), "investment CTA must be discoverable");
     const sat = page.getByRole("link", { name: /Imágenes satelitales/i }).first();
@@ -87,21 +97,30 @@ for (const width of [390, 1440]) {
     await selection.waitFor({ timeout: 15000 });
     await selection.click();
     assert.equal(await selection.getAttribute("aria-pressed"), "true");
-    const card = page.locator('section#invertir article').filter({ has: selection });
-    assert.equal(await card.locator("button a, a button").count(), 0, "no nested interactive controls");
+    const card = page.locator("section#invertir article").filter({ has: selection });
+    assert.equal(
+      await card.locator("button a, a button").count(),
+      0,
+      "no nested interactive controls",
+    );
     assert.ok(await card.getByRole("link", { name: /Ver ficha y visor 3D/i }).isVisible());
     await snapshot(page, prefix + "-investment-choice");
   });
 
   await scenario(page, prefix + "-public-project-terminal", async () => {
-    const card = page.locator('section#invertir article').filter({
+    const card = page.locator("section#invertir article").filter({
       has: page.getByRole("button", { name: /Seleccionar Los Verdes/i }),
     });
     // SPA navigation can outlive Playwright click's internal load wait on geospatial pages.
-    await card.getByRole("link", { name: /Ver ficha y visor 3D/i }).click({ timeout: 15000, noWaitAfter: true });
+    await card
+      .getByRole("link", { name: /Ver ficha y visor 3D/i })
+      .click({ timeout: 15000, noWaitAfter: true });
     await page.waitForURL(/\/terminal\/losverdes/, { timeout: 20000 });
     await page.getByRole("heading", { level: 1, name: /Los Verdes/i }).waitFor({ timeout: 20000 });
-    assert.ok(await page.getByRole("link", { name: "Inicio", exact: true }).isVisible(), "breadcrumb to landing");
+    assert.ok(
+      await page.getByRole("link", { name: "Inicio", exact: true }).isVisible(),
+      "breadcrumb to landing",
+    );
     const tabs = page.getByRole("navigation", { name: "Secciones del proyecto" });
     await tabs.getByRole("link", { name: /Satelital|Análisis satelital/i }).click();
     await page.waitForURL(/tab=satelital/, { timeout: 20000 });
@@ -116,10 +135,16 @@ for (const width of [390, 1440]) {
     await perspective.waitFor({ timeout: 20000 });
     await perspective.click({ noWaitAfter: true });
     await page.waitForURL(/view=3d/, { timeout: 20000 });
-    await page.waitForFunction(() =>
-      [...document.querySelectorAll("button")].some((button) =>
-        button.textContent?.includes("Perspectiva") && button.getAttribute("aria-pressed") === "true"
-      ), undefined, { timeout: 8000 });
+    await page.waitForFunction(
+      () =>
+        [...document.querySelectorAll("button")].some(
+          (button) =>
+            button.textContent?.includes("Perspectiva") &&
+            button.getAttribute("aria-pressed") === "true",
+        ),
+      undefined,
+      { timeout: 8000 },
+    );
     assert.equal(await perspective.getAttribute("aria-pressed"), "true");
     await snapshot(page, prefix + "-perspective");
   });
@@ -127,13 +152,18 @@ for (const width of [390, 1440]) {
   await scenario(page, prefix + "-guest-cannot-access-portfolio", async () => {
     await startAt(page, "/dashboard/investments");
     await page.waitForURL(/\/auth(?:\?|$)/, { timeout: 12000 });
-    assert.ok(!page.url().includes("/dashboard/investments"), "private portfolio must redirect unauthenticated visitors");
+    assert.ok(
+      !page.url().includes("/dashboard/investments"),
+      "private portfolio must redirect unauthenticated visitors",
+    );
     await snapshot(page, prefix + "-auth-gate");
   });
 
   await scenario(page, prefix + "-investor-registration-context", async () => {
     await startAt(page, "/auth?intent=investor&mode=signup&next=%2Fdashboard%2Finvestments");
-    await page.getByRole("heading", { name: /Crea tu cuenta de inversión/i }).waitFor({ timeout: 15000 });
+    await page
+      .getByRole("heading", { name: /Crea tu cuenta de inversión/i })
+      .waitFor({ timeout: 15000 });
     assert.ok(await page.getByText(/Verificación de identidad requerida/i).isVisible());
     assert.ok(await page.getByRole("button", { name: "Crear cuenta" }).isVisible());
     await snapshot(page, prefix + "-investor-registration");
@@ -141,7 +171,9 @@ for (const width of [390, 1440]) {
 
   await scenario(page, prefix + "-prospecting-customer-entry", async () => {
     await startAt(page, "/catastro");
-    await page.getByRole("heading", { level: 1, name: /Catastro minero de Chile/i }).waitFor({ timeout: 15000 });
+    await page
+      .getByRole("heading", { level: 1, name: /Catastro minero de Chile/i })
+      .waitFor({ timeout: 15000 });
     const search = page.getByPlaceholder(/Codelco/i);
     assert.ok(await search.isVisible(), "professionals must find concession search without login");
     await search.fill("Codelco");
@@ -163,7 +195,9 @@ for (const width of [390, 1440]) {
 
   await scenario(page, prefix + "-no-horizontal-overflow", async () => {
     await startAt(page, "/");
-    await page.getByRole("heading", { level: 1, name: /De la geología/i }).waitFor({ timeout: 15000 });
+    await page
+      .getByRole("heading", { level: 1, name: /De la geología/i })
+      .waitFor({ timeout: 15000 });
     const info = await page.evaluate(() => ({
       scrollWidth: document.documentElement.scrollWidth,
       clientWidth: document.documentElement.clientWidth,
@@ -171,10 +205,16 @@ for (const width of [390, 1440]) {
     assert.ok(info.scrollWidth <= info.clientWidth + 2, JSON.stringify(info));
   });
 
-  await fs.writeFile(path.join(output, prefix + "-console-events.json"), JSON.stringify(events, null, 2));
+  await fs.writeFile(
+    path.join(output, prefix + "-console-events.json"),
+    JSON.stringify(events, null, 2),
+  );
   await context.close();
 }
 await browser.close();
-await fs.writeFile(path.join(output, "results.json"), JSON.stringify({ baseUrl: root, failures, results }, null, 2));
+await fs.writeFile(
+  path.join(output, "results.json"),
+  JSON.stringify({ baseUrl: root, failures, results }, null, 2),
+);
 console.log(JSON.stringify({ failures, passed: results.length - failures, total: results.length }));
 if (failures) process.exitCode = 1;

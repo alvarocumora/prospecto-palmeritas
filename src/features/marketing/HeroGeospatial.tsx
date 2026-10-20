@@ -49,7 +49,9 @@ export function HeroGeospatial() {
   // The bundled thematic image remains a deterministic fallback.
   const [enableDesktopTerrain, setEnableDesktopTerrain] = useState(false);
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const media = window.matchMedia(
+      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+    );
     const update = () => setEnableDesktopTerrain(media.matches);
     update();
     media.addEventListener("change", update);

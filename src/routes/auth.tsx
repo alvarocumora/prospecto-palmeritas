@@ -297,7 +297,10 @@ function InvestorIntroPanel() {
   ];
   return (
     <aside className="relative hidden overflow-hidden border-r border-white/10 bg-[#111626] text-white lg:flex lg:flex-col">
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(50,80,170,0.20),transparent_50%)]" />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(50,80,170,0.20),transparent_50%)]"
+      />
       <div className="relative flex flex-1 flex-col justify-center px-12 py-20 xl:px-20">
         <p className="font-mono text-[11px] uppercase tracking-[0.27em] text-[#aebce9]">
           Geocapitals · Espacio del inversionista
@@ -321,8 +324,8 @@ function InvestorIntroPanel() {
           ))}
         </ol>
         <p className="mt-10 max-w-md text-xs leading-relaxed text-white/50">
-          Las simulaciones son referenciales. Las solicitudes no representan posiciones
-          confirmadas ni garantías de rentabilidad.
+          Las simulaciones son referenciales. Las solicitudes no representan posiciones confirmadas
+          ni garantías de rentabilidad.
         </p>
       </div>
     </aside>
