@@ -2,6 +2,10 @@ import { describe, it, expect, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { GeoScene3D } from "./GeoScene3D";
 
+vi.mock("@/hooks/useProjects", () => ({ useProjects: () => ({ active: null }) }));
+vi.mock("@/hooks/useSentinelRasterPreview", () => ({
+  useSentinelRasterPreview: () => ({ data: null }),
+}));
 vi.mock("./SceneCopilot", () => ({
   SceneCopilot: () => <div data-testid="scene-copilot" />,
 }));
