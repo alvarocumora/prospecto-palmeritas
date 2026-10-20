@@ -110,7 +110,7 @@ export function summarizeProperty(
   const spectral = inside("remote_sensing.hyperspectral");
   for (const f of spectral) {
     const fp = (f.properties ?? {}) as Record<string, unknown>;
-    const cls = mineralClass(fp.mineral ?? fp.clase ?? fp.class)?.label ?? String(fp.mineral ?? "Firma");
+    const cls = mineralClass(fp.nombre ?? fp.mineral ?? fp.label ?? fp.index)?.label ?? String(fp.nombre ?? fp.mineral ?? "Firma");
     const cur = spectralMap.get(cls) ?? { count: 0, max: null };
     const it = featureIntensity(fp);
     cur.count += 1;
