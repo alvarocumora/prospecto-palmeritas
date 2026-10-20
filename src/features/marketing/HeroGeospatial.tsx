@@ -8,7 +8,7 @@ import {
   BarChart3,
   ClipboardCheck,
 } from "lucide-react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
 import { PUBLIC_INTELLIGENCE_PATHS } from "./landingNavigation";
 import featureCatastro from "@/assets/feature-catastro.jpg";
@@ -44,6 +44,18 @@ const LEGEND = [
 ];
 
 export function HeroGeospatial() {
+  // Marketing is a customer entry point: avoid loading heavyweight WebGL / DEM
+  // during mobile hydration and respect reduced-motion preferences everywhere.
+  // The bundled thematic image remains a deterministic fallback.
+  const [enableDesktopTerrain, setEnableDesktopTerrain] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia("(min-width: 768px) and (prefers-reduced-motion: no-preference)");
+    const update = () => setEnableDesktopTerrain(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
   return (
     <section className="relative overflow-hidden border-b border-border bg-background text-foreground min-h-[680px]">
       <div className="absolute inset-y-0 right-0 w-full md:w-[62%]">
@@ -56,11 +68,13 @@ export function HeroGeospatial() {
           decoding="async"
           className="absolute inset-0 h-full w-full object-cover opacity-25 saturate-75"
         />
-        <ClientOnly fallback={null}>
-          <Suspense fallback={null}>
-            <HeroTerrain3D />
-          </Suspense>
-        </ClientOnly>
+        {enableDesktopTerrain && (
+          <ClientOnly fallback={null}>
+            <Suspense fallback={null}>
+              <HeroTerrain3D />
+            </Suspense>
+          </ClientOnly>
+        )}
       </div>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:via-background/40" />
 
