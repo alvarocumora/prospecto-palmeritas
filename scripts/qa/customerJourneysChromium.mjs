@@ -131,6 +131,25 @@ for (const width of [390, 1440]) {
     await snapshot(page, prefix + "-auth-gate");
   });
 
+  await scenario(page, prefix + "-investor-registration-context", async () => {
+    await startAt(page, "/auth?intent=investor&mode=signup&next=%2Fdashboard%2Finvestments");
+    await page.getByRole("heading", { name: /Crea tu cuenta de inversión/i }).waitFor({ timeout: 15000 });
+    assert.ok(await page.getByText(/Verificación de identidad requerida/i).isVisible());
+    assert.ok(await page.getByRole("button", { name: "Crear cuenta" }).isVisible());
+    await snapshot(page, prefix + "-investor-registration");
+  });
+
+  await scenario(page, prefix + "-prospecting-customer-entry", async () => {
+    await startAt(page, "/catastro");
+    await page.getByRole("heading", { level: 1, name: /Catastro minero de Chile/i }).waitFor({ timeout: 15000 });
+    const search = page.getByPlaceholder(/Codelco/i);
+    assert.ok(await search.isVisible(), "professionals must find concession search without login");
+    await search.fill("Codelco");
+    assert.ok(await page.getByRole("button", { name: /^Buscar$/i }).isEnabled());
+    // Avoid executing live search or modifying customer data in smoke checks.
+    await snapshot(page, prefix + "-prospecting");
+  });
+
   await scenario(page, prefix + "-pwa-identity-multi-role", async () => {
     const response = await page.request.get(root + "/manifest.webmanifest");
     assert.equal(response.status(), 200);
