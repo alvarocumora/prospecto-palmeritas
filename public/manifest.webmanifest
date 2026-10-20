@@ -1,14 +1,17 @@
 {
-  "name": "Geocapitals Field",
-  "short_name": "Geocapitals",
-  "description": "Exploración minera en terreno: targets, catastro y captura geolocalizada.",
-  "start_url": "/dashboard/field-map",
+  "name": "GeoCapitals · Inteligencia Minera e Inversión",
+  "short_name": "GeoCapitals",
+  "description": "Plataforma profesional de proyectos mineros, inversión, catastro y análisis geoespacial 2D/3D.",
+  "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#0b0a09",
   "theme_color": "#0b0a09",
-  "categories": ["productivity", "utilities", "business"],
+  "categories": [
+    "productivity",
+    "utilities",
+    "business"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -37,18 +40,40 @@
   ],
   "shortcuts": [
     {
+      "name": "Mi portafolio",
+      "short_name": "Portafolio",
+      "description": "Inversiones, órdenes y cartola",
+      "url": "/dashboard/investments"
+    },
+    {
+      "name": "Explorar proyectos",
+      "short_name": "Proyectos",
+      "description": "Catálogo y terminales mineros",
+      "url": "/proyectos"
+    },
+    {
       "name": "Targets",
       "short_name": "Targets",
       "description": "Mapa de targets de exploración con GPS",
       "url": "/dashboard/targets",
-      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180" }]
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180"
+        }
+      ]
     },
     {
       "name": "Mapa de campo",
       "short_name": "Campo",
       "description": "Captura geolocalizada en terreno",
       "url": "/dashboard/field-map",
-      "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180" }]
+      "icons": [
+        {
+          "src": "/apple-touch-icon.png",
+          "sizes": "180x180"
+        }
+      ]
     }
   ]
 }
