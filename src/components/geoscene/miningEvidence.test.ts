@@ -43,7 +43,7 @@ describe("mining evidence inventory", () => {
   });
 
   it("never invents features when no layers have been supplied", () => {
-    expect(projectMiningEvidence()).toEqual([]);
+    expect(projectMiningEvidence(undefined)).toEqual([]);
     expect(projectMiningEvidence([])).toEqual([]);
   });
 
@@ -57,9 +57,7 @@ describe("mining evidence inventory", () => {
     expect(filterMiningEvidence(rows, "geophysics").map((r) => r.id)).toEqual([
       "geophysics.anomalies",
     ]);
-    expect(filterMiningEvidence(rows, "sampling").map((r) => r.id)).toEqual([
-      "sampling.results",
-    ]);
+    expect(filterMiningEvidence(rows, "sampling").map((r) => r.id)).toEqual(["sampling.results"]);
     expect(filterMiningEvidence(rows, "all")).toHaveLength(4);
   });
 
