@@ -1,0 +1,31 @@
+name: Format UX-I1 (temporary)
+on:
+  push:
+    branches: [feat/investment-ux-i1-project-kit-entry]
+    paths: [.github/workflows/format-investor-ux-i1-temporary.yml]
+permissions:
+  contents: write
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/investment-ux-i1-project-kit-entry
+          persist-credentials: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Format touched investment entry files
+        run: npx prettier --write src/features/investor/investmentKitCatalog.ts src/features/investor/investmentKitCatalog.test.ts src/features/terminal/ProjectInvestorEntry.tsx src/features/terminal/InvestmentKitIndex.tsx src/features/terminal/ProjectTerminalShell.tsx src/features/marketing/MiningInvestShowcase.tsx src/routes/inversionistas.tsx scripts/qa/customerJourneysChromium.mjs
+      - name: Commit only formatting
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/features/investor/investmentKitCatalog.ts src/features/investor/investmentKitCatalog.test.ts src/features/terminal/ProjectInvestorEntry.tsx src/features/terminal/InvestmentKitIndex.tsx src/features/terminal/ProjectTerminalShell.tsx src/features/marketing/MiningInvestShowcase.tsx src/routes/inversionistas.tsx scripts/qa/customerJourneysChromium.mjs
+          if ! git diff --cached --quiet; then
+            git commit -m "style(investor-ux): format investment kit and entry components"
+            git push origin HEAD:feat/investment-ux-i1-project-kit-entry
+          fi
