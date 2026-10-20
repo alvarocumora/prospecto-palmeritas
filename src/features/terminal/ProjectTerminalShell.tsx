@@ -133,14 +133,24 @@ export function ProjectTerminalShell({
       <header className="sticky top-0 z-30 bg-surface-inverse text-white border-b border-white/10">
         <div className="max-w-[1320px] mx-auto px-4 md:px-6">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3 py-3">
-            <Link
-              to="/terminal"
-              className="text-[11px] font-mono uppercase tracking-[0.25em] text-white/60 hover:text-white"
-            >
-              Geocapitals · Terminal
-            </Link>
+            <nav aria-label="Volver a la plataforma" className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.14em]">
+              <Link
+                to="/"
+                className="inline-flex min-h-11 items-center text-white/60 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              >
+                Inicio
+              </Link>
+              <span aria-hidden="true" className="text-white/30">/</span>
+              <Link
+                to="/terminal"
+                className="inline-flex min-h-11 items-center text-white hover:text-white/75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+              >
+                GeoTerminal
+              </Link>
+            </nav>
 
-            <nav className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0">
+            <nav aria-label="Seleccionar proyecto"
+              className="order-last sm:order-none w-full sm:w-auto flex items-center gap-1.5 overflow-x-auto -mx-1 px-1 pb-1 sm:pb-0">
               {projects.map((p) => (
                 <Link
                   key={p.slug}
@@ -148,7 +158,7 @@ export function ProjectTerminalShell({
                   params={{ slug: p.slug }}
                   search={{ tab, view }}
                   aria-current={p.slug === project.slug ? "page" : undefined}
-                  className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors ${
+                  className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
                     p.slug === project.slug
                       ? "bg-white text-content border-white"
                       : "border-white/25 text-white/70 hover:text-white hover:border-white/60"
@@ -175,7 +185,7 @@ export function ProjectTerminalShell({
           </div>
 
           {/* Pestañas ejecutivas: misma pantalla, sin recarga */}
-          <nav className="flex gap-1 overflow-x-auto -mb-px">
+          <nav aria-label="Secciones del proyecto" className="flex gap-1 overflow-x-auto -mb-px">
             {TERMINAL_TABS.map((t) => (
               <Link
                 key={t.key}
@@ -183,7 +193,7 @@ export function ProjectTerminalShell({
                 params={{ slug: project.slug }}
                 search={{ tab: t.key, view }}
                 aria-current={t.key === tab ? "page" : undefined}
-                className={`whitespace-nowrap px-4 py-2.5 text-[12px] font-mono uppercase tracking-wider border-b-2 transition-colors ${
+                className={`inline-flex min-h-11 items-center whitespace-nowrap px-4 py-2.5 text-[12px] font-mono uppercase tracking-wider border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
                   t.key === tab
                     ? "border-white text-white"
                     : "border-transparent text-white/55 hover:text-white"
@@ -262,7 +272,7 @@ function MapaTab({
 function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
   return (
     <div className="flex justify-end mb-4">
-      <div className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded">
+      <div role="group" aria-label="Vista del proyecto" className="inline-flex gap-1 border border-hairline bg-surface p-1 rounded">
         {(["2d", "3d"] as const).map((key) => {
           const Icon = key === "2d" ? MapIcon : Box;
           return (
@@ -273,6 +283,7 @@ function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: Proje
               variant={view === key ? "primary" : "ghost"}
               aria-pressed={view === key}
               onClick={() => onChange(key)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 px-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
             >
               <Icon />
               {key === "2d" ? "Planta" : "Perspectiva"}
