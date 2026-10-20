@@ -288,7 +288,14 @@ export const staffTicketAction = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     if (!(await isStaff(supabase, userId))) throw new Error("No autorizado");
     if (data.action === "issue_contract") {
-      const { error } = await supabase.rpc("ticket_issue_contract", { _ticket_id: data.ticketId });
+      // RPC defined in migration 20261019180000; generated types not yet refreshed.
+      const rpc = supabase.rpc as unknown as (
+        fn: string,
+        args: Record<string, unknown>,
+      ) => Promise<{ error: { message: string } | null }>;
+      const { error } = await rpc.call(supabase, "ticket_issue_contract", {
+        _ticket_id: data.ticketId,
+      });
       if (error) throw new Error(error.message);
     } else if (data.action === "settle") {
       const { error } = await supabase.rpc("ticket_settle", { _ticket_id: data.ticketId });
