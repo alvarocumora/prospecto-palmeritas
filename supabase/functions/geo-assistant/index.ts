@@ -46,6 +46,7 @@ Deno.serve(async (req) => {
         permits,
         incidents,
         logs,
+        wireframes,
       ] = await Promise.all([
         admin
           .from("projects")
@@ -107,6 +108,11 @@ Deno.serve(async (req) => {
           .neq("status", "closed")
           .limit(10),
         admin.from("drill_core_logs").select("au_gpt").eq("project_id", project_id),
+        admin
+          .from("geology_wireframes")
+          .select("name,commodity,volume_m3,samples_used,created_at")
+          .eq("project_id", project_id)
+          .order("created_at", { ascending: false }),
       ]);
 
       const totalM = (holes.data ?? []).reduce(
@@ -217,6 +223,18 @@ ${
 }
 ${(incidents.data ?? []).length} incidentes abiertos.
 
+═══ MODELOS IMPLÍCITOS (wireframes RBF, subsuelo) ═══
+${(wireframes.data ?? []).length} modelo(s) calculado(s) desde ensayes reales:
+${
+  (wireframes.data ?? [])
+    .slice(0, 8)
+    .map(
+      (w) =>
+        `  · ${w.name} [${w.commodity ?? "?"}] ${w.volume_m3 ? `${Math.round(Number(w.volume_m3)).toLocaleString()} m³` : "vol ?"} · ${w.samples_used ?? "?"} muestras`,
+    )
+    .join("\n") || "  (ninguno aún — generar desde Estimación → Wireframe Studio)"
+}
+
 ═══ CATASTRO ═══
 ${(conc.data ?? []).length} concesiones, ${(conc.data ?? []).reduce((s: number, c) => s + (Number(c.area_ha) || 0), 0).toFixed(0)} ha total.
 ${(conc.data ?? [])
@@ -236,7 +254,7 @@ Hablas español por defecto. Tono: técnico, directo, citando evidencia concreta
 
 REGLAS:
 - Cita siempre el dato del proyecto que respalda tu afirmación (sondaje, ley, código de target, coordenada).
-- Para "¿dónde perforar?": razona con (a) targets de mayor score, (b) intercepts adyacentes, (c) anomalías geofísicas, (d) huecos de muestreo, (e) restricciones HSE/catastro.
+- Para "¿dónde perforar?": razona con (a) targets de mayor score, (b) intercepts adyacentes, (c) anomalías geofísicas, (d) huecos de muestreo, (e) restricciones HSE/catastro, (f) extensión/cierre de los modelos implícitos (wireframes) existentes.
 - Para interpretación: usa litología/alteración/mineralogía del marco geológico inyectado.
 - Si falta información, di qué levantar primero (survey IP, sondaje step-out, muestreo de canal).
 - Usa unidades SI, notación geológica estándar (Au g/t, Cu %, m, °).
