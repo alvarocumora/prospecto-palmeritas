@@ -97,7 +97,10 @@ function ProjectsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {projects.map((p) => (
-            <div key={p.id} className="rounded-xl border border-hairline bg-surface-3 p-5 shadow-sm transition-colors hover:border-accent-brand">
+            <div
+              key={p.id}
+              className="rounded-xl border border-hairline bg-surface-3 p-5 shadow-sm transition-colors hover:border-accent-brand"
+            >
               <div className="flex items-start justify-between">
                 <div>
                   <div className="font-display text-xl text-content">{p.name}</div>
@@ -144,20 +147,29 @@ function ProjectsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-content/60 p-4 backdrop-blur-sm">
           <form
             onSubmit={create}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="new-project-title"
             className="w-full max-w-md space-y-4 rounded-xl border border-hairline bg-surface-3 p-5 text-content shadow-2xl"
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-2xl">Nuevo proyecto</h2>
-              <button type="button" onClick={() => setOpen(false)} aria-label="Cerrar formulario" className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand">
+              <h2 id="new-project-title" className="font-display text-2xl">Nuevo proyecto</h2>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Cerrar formulario"
+                className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-md hover:bg-surface-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
+              >
                 <X className="h-5 w-5 text-content-muted" />
               </button>
             </div>
             {(["code", "name", "commodity", "region"] as const).map((f) => (
               <div key={f}>
-                <label className="font-mono text-[10px] uppercase text-content-muted">
+                <label htmlFor={`new-project-${f}`} className="font-mono text-[10px] uppercase text-content-muted">
                   {f === "code" ? "Código (único)" : f}
                 </label>
                 <input
+                  id={`new-project-${f}`}
                   type="text"
                   required={f === "code" || f === "name"}
                   value={form[f]}
@@ -168,10 +180,11 @@ function ProjectsPage() {
               </div>
             ))}
             <div>
-              <label className="font-mono text-[10px] uppercase text-content-muted">
+              <label htmlFor="new-project-description" className="font-mono text-[10px] uppercase text-content-muted">
                 Descripción
               </label>
               <textarea
+                id="new-project-description"
                 value={form.description}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
                 maxLength={500}
