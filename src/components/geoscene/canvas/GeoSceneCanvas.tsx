@@ -213,7 +213,7 @@ export function GeoSceneCanvas({
 
   const [spectralTop, setSpectralTop] = useState<SpectralTop>("p90");
   const [includeOxides, setIncludeOxides] = useState(false);
-  const [terrainOpacity, setTerrainOpacity] = useState(0.92);
+  const [terrainOpacity, setTerrainOpacity] = useState(() => (mode === "subsurface" ? 0.35 : 0.92));
   const [measuring, setMeasuring] = useState(false);
   const [measurePts, setMeasurePts] = useState<LngLat[]>([]);
   const [stereoOpen, setStereoOpen] = useState(false);
@@ -259,6 +259,10 @@ export function GeoSceneCanvas({
       getColor: [255, 255, 255, 235],
       opacity: terrainOpacity,
       material: { ambient: 0.45, diffuse: 0.6, shininess: 8, specularColor: [40, 40, 40] },
+      // Subsurface: el terreno no escribe profundidad, así las capas de
+      // subsuelo (sondajes, wireframes) dibujadas después no quedan
+      // ocluidas por él aunque geométricamente estén "detrás".
+      parameters: { depthMask: mode !== "subsurface" } as never,
     });
   }, [cadTerrain, cadMesh, terrainVisible, mode, terrainOpacity]);
 
