@@ -17,12 +17,12 @@ export const COLORS = {
   text: [30, 26, 22] as [number, number, number],
   muted: [110, 100, 92] as [number, number, number],
   hint: [150, 138, 128] as [number, number, number],
-  gold: [200, 146, 42] as [number, number, number],
-  goldDark: [140, 100, 28] as [number, number, number],
+  gold: [13, 43, 62] as [number, number, number],
+  goldDark: [13, 43, 62] as [number, number, number],
   rule: [200, 192, 184] as [number, number, number],
-  paper: [255, 253, 250] as [number, number, number],
-  panel: [248, 244, 238] as [number, number, number],
-  accentBg: [250, 240, 220] as [number, number, number],
+  paper: [255, 255, 255] as [number, number, number],
+  panel: [245, 242, 236] as [number, number, number],
+  accentBg: [236, 240, 250] as [number, number, number],
   warnBg: [253, 240, 215] as [number, number, number],
   warn: [184, 110, 20] as [number, number, number],
   warnDark: [120, 70, 10] as [number, number, number],
@@ -69,11 +69,11 @@ export function drawHeader(s: PdfState) {
   setRGB(doc, "text", COLORS.gold);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8.5);
-  doc.text("TRACKMIN GeoIntel", PAGE.margin, 12);
+  doc.text("GEOCAPITALS", PAGE.margin, 12);
   setRGB(doc, "text", COLORS.muted);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7.5);
-  doc.text("· TRK-ALH-001 · Prospecto Palmeras", PAGE.margin + 30, 12);
+  doc.text("· Informes de proyectos · Estrictamente confidencial", PAGE.margin + 24, 12);
   doc.setFontSize(7.5);
   doc.text("Informe Técnico NI 43-101", PAGE.width - PAGE.margin, 12, { align: "right" });
   setRGB(doc, "draw", COLORS.rule);
@@ -90,7 +90,7 @@ export function drawFooter(s: PdfState, totalPages?: number) {
   setRGB(doc, "text", COLORS.muted);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(7);
-  doc.text("CONFIDENCIAL · Inversiones Bioenergy SpA", PAGE.margin, 290);
+  doc.text("GEOCAPITALS · geocapitals.com · Preliminar, pendiente de revisión QP/CP", PAGE.margin, 290);
   const pageTxt = totalPages ? `Pág. ${s.pageNum} de ${totalPages}` : `Pág. ${s.pageNum}`;
   doc.text(pageTxt, PAGE.width - PAGE.margin, 290, { align: "right" });
   doc.text(new Date().toLocaleDateString("es-CL"), PAGE.width / 2, 290, { align: "center" });
