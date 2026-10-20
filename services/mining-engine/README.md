@@ -65,3 +65,26 @@ sin grabar concesiones ni publicar capas automáticamente.
 Celery + Redis, PostGIS persistence, S3, auditoría de acceso, límites de tasa,
 contadores, reintentos, ingestión real y exportación. La API de este PR NO
 afirma esas capacidades.
+
+## PR B — Geodesia y previsualización segura de KML/KMZ
+
+Rutas agregadas (todas requieren `MINING_ENGINE_TOKEN`):
+- `POST /geodesy/transform`: recibe `x`, `y`, `source_epsg`,
+  `target_epsg`; usa `pyproj.Transformer(always_xy=True)`. No infiere
+  husos UTM ni CRS desde rangos numéricos. EPSG:32718 / 32719 verificables
+  con coordenadas de prueba.
+- `POST /ingest/preview-kml`: `multipart/form-data` con campo `file`;
+  admite `.kml` y `.kmz`, máximo **8 MiB**, XML descomprimido hasta
+  **32 MiB**, 64 entradas ZIP, 5000 features y 250000 coordenadas.
+  Rechaza ZIP path traversal, symlinks, DTD/entidades XML y geometría inválida.
+  No sigue NetworkLinks ni descarga URLs externas.
+
+**Importante:** KML siempre utiliza longitud/latitud WGS84 (EPSG:4326);
+GeoJSON de salida permanece 4326. Alturas Z se omiten hasta identificar
+`altitudeMode` y datum vertical; una geometría es solo
+`preview_unverified`. No se guarda en PostGIS ni se publica en GeoScene3D.
+
+**No incluye aún:** DXF/SHP/LAS, CSV de sondajes, Celery/Redis, almacenamiento
+S3, control de cuotas, virus scan, topología detallada o persistencia.
+La importación definitiva exige un flujo adicional de revisión y autorización
+por proyecto desde el gateway de GeoCapitals.
