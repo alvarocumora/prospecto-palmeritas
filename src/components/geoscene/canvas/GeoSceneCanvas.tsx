@@ -8,7 +8,7 @@ import { GeoJsonLayer, PolygonLayer } from "@deck.gl/layers";
 import { SimpleMeshLayer } from "@deck.gl/mesh-layers";
 import { COORDINATE_SYSTEM, type Layer } from "@deck.gl/core";
 import { buildCadTerrainMesh } from "../cadTerrainMesh";
-import { cadElevationSampler, drapeFeatureCollection, type ElevationSampler } from "../terrainDrape";
+import { cadElevationSampler, drapeFeatureCollection, hybridElevationSampler, type ElevationSampler } from "../terrainDrape";
 import { discRing, planeFromProperties } from "../structuralPlanes";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
@@ -658,7 +658,7 @@ export function GeoSceneCanvas({
       data-geo-view-state={snapshotViewState ? JSON.stringify(snapshotViewState) : undefined}
       data-geo-scene-mode={mode}
       data-geo-terrain-source={
-        cadTerrain && terrainVisible ? "cad_contours" : terrainVisible ? "aws_terrarium" : "none"
+        cadTerrain && terrainVisible ? "cad_contours+aws_terrarium" : terrainVisible ? "aws_terrarium" : "none"
       }
     >
       <div className="absolute inset-0">

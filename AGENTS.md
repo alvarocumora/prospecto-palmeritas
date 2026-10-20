@@ -4,7 +4,7 @@
 - Terminal and workspace project viewers share UnifiedProjectScene adapters and one mounted GeoScene3D canvas; Planta/Perspectiva changes camera only, preserving layers and frame. ProjectTerrain3D remains for legacy report/marketing consumers, not terminal/workspace routing.
 - Rebuild Cholqui CAD terrain with scripts/build_cholqui_cad_terrain.py (numpy/scipy); retain source hash, interpolation constraints and datum disclosures so the derived grid is reproducible without backend changes.
 - Static terrain imagery uses stored asset pointers plus the provider's actual EPSG:4326 export extent, reprojected by imageDrape; preserve attribution and distinguish visual mosaics from analytical Sentinel rasters to prevent spatial stretching or false evidence claims.
-- GeoScene3D CAD uses the TerrainTile coverage mask and absolute elevations, with satellite UVs derived from the stored image's geographic extent; never fuse with global DEM or extrapolate unsupported cells.
+- GeoScene3D CAD uses the TerrainTile coverage mask and absolute elevations, with satellite UVs derived from the stored image's geographic extent; regional DEM (true scale) is the continuous base around it; drapes use CAD inside coverage and DEM outside — selection, never blending or extrapolating CAD cells.
 
 - Investment tickets: state machine enforced by trigger on investment_tickets; investors mutate only via SECURITY DEFINER RPCs (ticket_sign_contract/submit_payment/cancel), staff settles via ticket_settle which issues the spv_position — keeps ledger tamper-proof.
 - 3D viewing uses one engine: GeoScene3D (MapLibre + deck.gl) plus ProjectTerrain3D for CAD/DEM terrain; legacy three.js viewers are retired — never reintroduce parallel renderers, add canonical layers instead.
