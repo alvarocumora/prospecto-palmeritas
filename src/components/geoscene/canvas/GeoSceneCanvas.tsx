@@ -224,6 +224,18 @@ export function GeoSceneCanvas({
     () => (cadTerrain ? buildCadTerrainMesh(cadTerrain.tile, cadTerrain.imagery?.bbox) : null),
     [cadTerrain],
   );
+  // Subsurface: el relieve CAD se aclara para dejar ver sondajes y modelos
+  // implícitos por debajo, como el corte de referencia. El usuario puede
+  // seguir ajustando la opacidad manualmente desde el dock.
+  const lastModeForOpacity = useRef(mode);
+  useEffect(() => {
+    if (!cadMesh || mode === lastModeForOpacity.current) return;
+    if (mode === "subsurface") setTerrainOpacity(0.35);
+    else if (lastModeForOpacity.current === "subsurface" && mode === "surface") {
+      setTerrainOpacity(0.92);
+    }
+    lastModeForOpacity.current = mode;
+  }, [mode, cadMesh]);
   const cadTerrainLayer = useMemo(() => {
     if (!cadTerrain || !cadMesh || !terrainVisible || mode === "resource") return null;
     const { tile } = cadTerrain;
