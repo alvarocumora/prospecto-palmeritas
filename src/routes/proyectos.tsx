@@ -138,7 +138,11 @@ const SHOWCASE: Array<{
 
 function ProyectosPage() {
   const fetchRounds = useServerFn(getPublicRounds);
-  const rounds = useQuery({ queryKey: ["public-rounds"], queryFn: () => fetchRounds(), staleTime: 60_000 });
+  const rounds = useQuery({
+    queryKey: ["public-rounds"],
+    queryFn: () => fetchRounds(),
+    staleTime: 60_000,
+  });
   const fetchListings = useServerFn(getPublicListings);
   const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["public-listings"],
@@ -167,24 +171,77 @@ function ProyectosPage() {
           items: SHOWCASE.filter((p) => !p.stage.startsWith("Explotación")),
         },
       ].map((g) => (
-      <section key={g.key} className="mb-12">
-        <Eyebrow className="mb-2">{g.eyebrow}</Eyebrow>
-        <h2 className="font-serif text-2xl text-content mb-5">{g.title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5" id={g.key === "explotacion" ? "publicar" : undefined}>
-        {g.items.map((p) => {
-          const ficha = getTerminalProject(p.slug)?.ficha;
-          const round = rounds.data?.find(r => r.slug === p.slug);
-          return <InvestmentCard key={p.code} title={p.name} region={ficha?.region ?? p.region} commodity={ficha?.commodity ?? p.commodity} stage={p.stage} image={p.image} imageLabel="Imagen de archivo · procedencia por verificar" slug={p.slug}>
-            <p className="font-mono text-[10px] text-content-muted">DECLARADO · antecedentes del titular</p>
-            <dl className="grid grid-cols-3 gap-3 border-t border-hairline pt-3">{p.stats.map(([v,l]) => <div key={l} className="min-w-0"><dt className="text-[10px] text-content-muted">{l}</dt><dd className="font-serif text-xl">{v}</dd></div>)}</dl>
-            <ul className="space-y-1 text-xs text-content-muted">{p.bullets.map(b => <li key={b}>{b}</li>)}</ul>
-            {p.stage.startsWith("Explotación") && (round ? <RoundProgress round={round} compact /> : rounds.isError ? <BrandButton variant="outline" onClick={() => void rounds.refetch()}>Reintentar ronda</BrandButton> : <p role="status" className="text-xs text-content-muted">{rounds.isLoading ? "Consultando ronda…" : "Ronda no disponible"}</p>)}
-            <div className="flex flex-wrap gap-2">{[{tab:"simulador" as const,label:"Simular inversión"},{tab:"satelital" as const,label:"Satélite"},{tab:"dataroom" as const,label:"Data room"}].map(({tab,label}) => <BrandButton key={tab} asChild variant="ghost" size="md"><Link to="/terminal/$slug" params={{slug:p.slug}} search={{tab}}>{label}</Link></BrandButton>)}</div>
-            <p className="text-[10px] text-content-muted">Términos referenciales. Inversión ilíquida y riesgo de pérdida. Sin recursos certificados NI 43-101/JORC.</p>
-          </InvestmentCard>;
-        })}
-      </div>
-      </section>
+        <section key={g.key} className="mb-12">
+          <Eyebrow className="mb-2">{g.eyebrow}</Eyebrow>
+          <h2 className="font-serif text-2xl text-content mb-5">{g.title}</h2>
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5"
+            id={g.key === "explotacion" ? "publicar" : undefined}
+          >
+            {g.items.map((p) => {
+              const ficha = getTerminalProject(p.slug)?.ficha;
+              const round = rounds.data?.find((r) => r.slug === p.slug);
+              return (
+                <InvestmentCard
+                  key={p.code}
+                  title={p.name}
+                  region={ficha?.region ?? p.region}
+                  commodity={ficha?.commodity ?? p.commodity}
+                  stage={p.stage}
+                  image={p.image}
+                  imageLabel="Imagen de archivo · procedencia por verificar"
+                  slug={p.slug}
+                >
+                  <p className="font-mono text-[10px] text-content-muted">
+                    DECLARADO · antecedentes del titular
+                  </p>
+                  <dl className="grid grid-cols-3 gap-3 border-t border-hairline pt-3">
+                    {p.stats.map(([v, l]) => (
+                      <div key={l} className="min-w-0">
+                        <dt className="text-[10px] text-content-muted">{l}</dt>
+                        <dd className="font-serif text-xl">{v}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  <ul className="space-y-1 text-xs text-content-muted">
+                    {p.bullets.map((b) => (
+                      <li key={b}>{b}</li>
+                    ))}
+                  </ul>
+                  {p.stage.startsWith("Explotación") &&
+                    (round ? (
+                      <RoundProgress round={round} compact />
+                    ) : rounds.isError ? (
+                      <BrandButton variant="outline" onClick={() => void rounds.refetch()}>
+                        Reintentar ronda
+                      </BrandButton>
+                    ) : (
+                      <p role="status" className="text-xs text-content-muted">
+                        {rounds.isLoading ? "Consultando ronda…" : "Ronda no disponible"}
+                      </p>
+                    ))}
+                  <div className="flex flex-wrap gap-2">
+                    {[
+                      { tab: "simulador" as const, label: "Simular inversión" },
+                      { tab: "satelital" as const, label: "Satélite" },
+                      { tab: "dataroom" as const, label: "Data room" },
+                    ].map(({ tab, label }) => (
+                      <BrandButton key={tab} asChild variant="ghost" size="md">
+                        <Link to="/terminal/$slug" params={{ slug: p.slug }} search={{ tab }}>
+                          {label}
+                        </Link>
+                      </BrandButton>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-content-muted">
+                    Términos referenciales. Inversión ilíquida y riesgo de pérdida. Sin recursos
+                    certificados NI 43-101/JORC.
+                  </p>
+                </InvestmentCard>
+              );
+            })}
+          </div>
+        </section>
       ))}
 
       <Link
@@ -272,7 +329,10 @@ function ProyectosPage() {
         )}
       </section>
 
-      <section className="mt-12"><h2 className="mb-5 font-serif text-2xl">Explorar oportunidades publicadas</h2><DealFlow /></section>
+      <section className="mt-12">
+        <h2 className="mb-5 font-serif text-2xl">Explorar oportunidades publicadas</h2>
+        <DealFlow />
+      </section>
       {/* El deal flow vive en /inversionistas — aquí solo el puente, sin duplicar */}
       <section className="mt-20 rounded-lg border border-hairline bg-accent-brand-subtle p-8 flex flex-wrap items-center justify-between gap-5">
         <div>

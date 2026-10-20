@@ -93,7 +93,8 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
           options={countries}
         />
         {(filters.q || filters.commodity || filters.modality || filters.country) && (
-          <BrandButton variant="ghost"
+          <BrandButton
+            variant="ghost"
             type="button"
             onClick={() => setFilters(EMPTY_FILTERS)}
             className="text-[11px] font-mono uppercase tracking-wider text-content-subtle hover:text-accent-brand inline-flex items-center gap-1"
@@ -116,13 +117,24 @@ export function DealFlow({ initialListingId }: { initialListingId?: string }) {
             />
           ))}
         </div>
-      ) : isError ? (<div role="alert" className="py-8 text-content-muted">No pudimos cargar las oportunidades. <BrandButton variant="outline" onClick={() => void refetch()}>Reintentar</BrandButton></div>) : filtered.length === 0 ? (
+      ) : isError ? (
+        <div role="alert" className="py-8 text-content-muted">
+          No pudimos cargar las oportunidades.{" "}
+          <BrandButton variant="outline" onClick={() => void refetch()}>
+            Reintentar
+          </BrandButton>
+        </div>
+      ) : filtered.length === 0 ? (
         <EmptyState hasListings={listings.length > 0} onClear={() => setFilters(EMPTY_FILTERS)} />
       ) : (
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((l, idx) => (
             <Reveal key={l.id} delay={Math.min(idx, 5) * 60}>
-              <PublicListingCard listing={l} onOpen={() => setOpenId(l.id)} updatedAt={data?.updatedAt} />
+              <PublicListingCard
+                listing={l}
+                onOpen={() => setOpenId(l.id)}
+                updatedAt={data?.updatedAt}
+              />
             </Reveal>
           ))}
         </div>
@@ -182,7 +194,8 @@ function EmptyState({ hasListings, onClear }: { hasListings: boolean; onClear: (
           : "Estamos onboardeando proyectos. Solicita acceso institucional para recibir oportunidades en privado antes del listado público."}
       </p>
       {hasListings && (
-        <BrandButton variant="ghost"
+        <BrandButton
+          variant="ghost"
           onClick={onClear}
           className="mt-4 inline-flex items-center gap-1.5 text-sm text-accent-brand font-medium hover:underline"
         >
