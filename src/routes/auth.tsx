@@ -286,6 +286,50 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Investor journey: clear institutional offer, not an operations login.      */
+/* -------------------------------------------------------------------------- */
+
+function InvestorIntroPanel() {
+  const steps = [
+    ["01", "Evalúa", "Explora proyectos y revisa la evidencia disponible."],
+    ["02", "Verifica", "Completa tu identidad y accede a documentos."],
+    ["03", "Da seguimiento", "Consulta tickets y posiciones confirmadas."],
+  ];
+  return (
+    <aside className="relative hidden overflow-hidden border-r border-white/10 bg-[#111626] text-white lg:flex lg:flex-col">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(50,80,170,0.20),transparent_50%)]" />
+      <div className="relative flex flex-1 flex-col justify-center px-12 py-20 xl:px-20">
+        <p className="font-mono text-[11px] uppercase tracking-[0.27em] text-[#aebce9]">
+          Geocapitals · Espacio del inversionista
+        </p>
+        <h1 className="mt-7 max-w-lg font-serif text-5xl leading-tight">
+          De la geología al capital informado.
+        </h1>
+        <p className="mt-6 max-w-md text-base leading-relaxed text-white/70">
+          Evalúa oportunidades mineras, consulta documentos y sigue el estado de tus inversiones
+          desde un solo lugar.
+        </p>
+        <ol className="mt-12 max-w-lg divide-y divide-white/10 border-y border-white/10">
+          {steps.map(([number, title, description]) => (
+            <li key={number} className="flex gap-5 py-5">
+              <span className="font-mono text-sm text-[#e0a742]">{number}</span>
+              <div>
+                <h2 className="text-base font-medium">{title}</h2>
+                <p className="mt-1 text-sm text-white/60">{description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-10 max-w-md text-xs leading-relaxed text-white/50">
+          Las simulaciones son referenciales. Las solicitudes no representan posiciones
+          confirmadas ni garantías de rentabilidad.
+        </p>
+      </div>
+    </aside>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Auth page                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -442,7 +486,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-[#05070a] text-[#c9d4e3] grid lg:grid-cols-[1.15fr_1fr]">
-      <MineDescentPanel />
+      {isInvestor ? <InvestorIntroPanel /> : <MineDescentPanel />}
 
       {/* FORM panel */}
       <main className="relative flex items-center justify-center px-6 py-12 overflow-hidden">
