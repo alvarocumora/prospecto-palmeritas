@@ -187,14 +187,17 @@ export function MarketingHeader() {
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={menuOpen ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={menuOpen}
-          className="xl:hidden inline-flex items-center justify-center w-9 h-9 rounded-md border border-hairline text-content hover:border-accent-brand"
+          className="xl:hidden inline-flex min-h-11 min-w-11 items-center justify-center rounded-md border border-hairline text-content hover:border-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
         >
           {menuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
       </div>
       {menuOpen && (
         <div className="xl:hidden border-t border-hairline bg-white max-h-[80vh] overflow-y-auto">
-          <nav className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm">
+          <nav
+            aria-label="Navegación móvil"
+            className="max-w-7xl mx-auto px-5 py-3 flex flex-col text-sm"
+          >
             {PILLARS.map((p) => (
               <div key={p.label} className="py-2 border-b border-hairline last:border-0">
                 <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-content-subtle py-1">
@@ -205,7 +208,7 @@ export function MarketingHeader() {
                     key={n.to}
                     to={n.to}
                     onClick={() => setMenuOpen(false)}
-                    className="block py-2 text-content hover:text-accent-brand"
+                    className="flex min-h-11 items-center py-2 text-content hover:text-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
                   >
                     {n.label}
                   </Link>

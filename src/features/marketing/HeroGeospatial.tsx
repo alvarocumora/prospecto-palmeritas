@@ -8,8 +8,10 @@ import {
   BarChart3,
   ClipboardCheck,
 } from "lucide-react";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ClientOnly } from "@tanstack/react-router";
+import { PUBLIC_INTELLIGENCE_PATHS } from "./landingNavigation";
+import featureCatastro from "@/assets/feature-catastro.jpg";
 
 const HeroTerrain3D = lazy(() => import("./HeroTerrain3D"));
 
@@ -20,10 +22,18 @@ const VALUES = [
 ];
 
 const INTEL = [
-  { icon: Layers, label: "Capas geológicas", to: "/catastro/mapa" },
-  { icon: Satellite, label: "Imágenes satelitales", to: "/terminal/cholqui" },
-  { icon: BarChart3, label: "Análisis de datos", to: "/terminal/losverdes" },
-  { icon: ClipboardCheck, label: "Evaluación de proyectos", to: "/terminal" },
+  { icon: Layers, label: "Capas geológicas", to: PUBLIC_INTELLIGENCE_PATHS.geologicalLayers },
+  {
+    icon: Satellite,
+    label: "Imágenes satelitales",
+    to: PUBLIC_INTELLIGENCE_PATHS.satelliteImagery,
+  },
+  { icon: BarChart3, label: "Análisis de datos", to: PUBLIC_INTELLIGENCE_PATHS.dataAnalysis },
+  {
+    icon: ClipboardCheck,
+    label: "Evaluación de proyectos",
+    to: PUBLIC_INTELLIGENCE_PATHS.projectEvaluation,
+  },
 ];
 
 const LEGEND = [
@@ -34,14 +44,39 @@ const LEGEND = [
 ];
 
 export function HeroGeospatial() {
+  // Marketing is a customer entry point: avoid loading heavyweight WebGL / DEM
+  // during mobile hydration and respect reduced-motion preferences everywhere.
+  // The bundled thematic image remains a deterministic fallback.
+  const [enableDesktopTerrain, setEnableDesktopTerrain] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia(
+      "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+    );
+    const update = () => setEnableDesktopTerrain(media.matches);
+    update();
+    media.addEventListener("change", update);
+    return () => media.removeEventListener("change", update);
+  }, []);
+
   return (
     <section className="relative overflow-hidden border-b border-border bg-background text-foreground min-h-[680px]">
       <div className="absolute inset-y-0 right-0 w-full md:w-[62%]">
-        <ClientOnly fallback={null}>
-          <Suspense fallback={null}>
-            <HeroTerrain3D />
-          </Suspense>
-        </ClientOnly>
+        {/* Bundled imagery remains visible when WebGL, remote DEM or SSR is unavailable.
+            This is decorative context, NOT a georeferenced analytical layer. */}
+        <img
+          src={featureCatastro}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover opacity-25 saturate-75"
+        />
+        {enableDesktopTerrain && (
+          <ClientOnly fallback={null}>
+            <Suspense fallback={null}>
+              <HeroTerrain3D />
+            </Suspense>
+          </ClientOnly>
+        )}
       </div>
       <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent md:via-background/40" />
 

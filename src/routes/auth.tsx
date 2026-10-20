@@ -27,11 +27,11 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s) => authSearch.parse(s),
   head: () => ({
     meta: [
-      { title: "Acceso a la mina — Geocapitals" },
+      { title: "Acceso a GeoCapitals · Inversiones y geointeligencia" },
       {
         name: "description",
         content:
-          "Portal de acceso a la plataforma minera Geocapitals. Autorización, catastro y sala de operaciones.",
+          "Accede a tu espacio GeoCapitals para evaluar proyectos mineros, gestionar inversiones y usar herramientas profesionales.",
       },
     ],
   }),
@@ -286,6 +286,53 @@ function Metric({ icon, label, value }: { icon: React.ReactNode; label: string; 
 }
 
 /* -------------------------------------------------------------------------- */
+/*  Investor journey: clear institutional offer, not an operations login.      */
+/* -------------------------------------------------------------------------- */
+
+function InvestorIntroPanel() {
+  const steps = [
+    ["01", "Evalúa", "Explora proyectos y revisa la evidencia disponible."],
+    ["02", "Verifica", "Completa tu identidad y accede a documentos."],
+    ["03", "Da seguimiento", "Consulta tickets y posiciones confirmadas."],
+  ];
+  return (
+    <aside className="relative hidden overflow-hidden border-r border-white/10 bg-[#111626] text-white lg:flex lg:flex-col">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(50,80,170,0.20),transparent_50%)]"
+      />
+      <div className="relative flex flex-1 flex-col justify-center px-12 py-20 xl:px-20">
+        <p className="font-mono text-[11px] uppercase tracking-[0.27em] text-[#aebce9]">
+          Geocapitals · Espacio del inversionista
+        </p>
+        <h1 className="mt-7 max-w-lg font-serif text-5xl leading-tight">
+          De la geología al capital informado.
+        </h1>
+        <p className="mt-6 max-w-md text-base leading-relaxed text-white/70">
+          Evalúa oportunidades mineras, consulta documentos y sigue el estado de tus inversiones
+          desde un solo lugar.
+        </p>
+        <ol className="mt-12 max-w-lg divide-y divide-white/10 border-y border-white/10">
+          {steps.map(([number, title, description]) => (
+            <li key={number} className="flex gap-5 py-5">
+              <span className="font-mono text-sm text-[#e0a742]">{number}</span>
+              <div>
+                <h2 className="text-base font-medium">{title}</h2>
+                <p className="mt-1 text-sm text-white/60">{description}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+        <p className="mt-10 max-w-md text-xs leading-relaxed text-white/50">
+          Las simulaciones son referenciales. Las solicitudes no representan posiciones confirmadas
+          ni garantías de rentabilidad.
+        </p>
+      </div>
+    </aside>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
 /*  Auth page                                                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -293,6 +340,7 @@ function AuthPage() {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
   const search = Route.useSearch();
+  const isInvestor = search.intent === "investor";
   const [mode, setMode] = useState<Mode>(search.mode ?? (search.intent ? "signup" : "login"));
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -308,6 +356,11 @@ function AuthPage() {
     form?: string;
   }>({});
   const pwStrength = evaluatePassword(password);
+
+  // Re-entering /auth from a different client journey must use its intended mode.
+  useEffect(() => {
+    setMode(search.mode ?? (search.intent ? "signup" : "login"));
+  }, [search.mode, search.intent]);
   const authSteps = useRef([
     "Validando credenciales…",
     "Firmando token QP…",
@@ -436,7 +489,7 @@ function AuthPage() {
 
   return (
     <div className="min-h-screen bg-[#05070a] text-[#c9d4e3] grid lg:grid-cols-[1.15fr_1fr]">
-      <MineDescentPanel />
+      {isInvestor ? <InvestorIntroPanel /> : <MineDescentPanel />}
 
       {/* FORM panel */}
       <main className="relative flex items-center justify-center px-6 py-12 overflow-hidden">
@@ -464,21 +517,31 @@ function AuthPage() {
 
           <div className="text-center space-y-2">
             <p className="font-mono text-[10px] uppercase tracking-[0.4em] text-[#e0a742]">
-              Autorización de operador
+              {isInvestor ? "Espacio del inversionista" : "Acceso seguro a GeoCapitals"}
             </p>
             <h2 className="text-2xl font-bold text-white tracking-tight">
-              {mode === "login" ? "Ingreso a la mina" : "Registro de operador"}
+              {isInvestor
+                ? mode === "login"
+                  ? "Ingresa a tus inversiones"
+                  : "Crea tu cuenta de inversión"
+                : mode === "login"
+                  ? "Ingresa a tu espacio"
+                  : "Crea tu cuenta"}
             </h2>
             <p className="text-xs text-[#8a97ab]">
-              {mode === "login"
-                ? "Presenta tus credenciales para descender a la sala de operaciones."
-                : "Alta de credenciales para acceso al portal Geocapitals."}
+              {isInvestor
+                ? mode === "login"
+                  ? "Revisa tus solicitudes, documentos y posiciones confirmadas."
+                  : "Explora oportunidades y completa la verificación de identidad antes de invertir."
+                : mode === "login"
+                  ? "Accede a tus proyectos, catastro y herramientas profesionales."
+                  : "Crea tus credenciales para acceder a GeoCapitals."}
             </p>
           </div>
 
           {search.intent === "investor" && (
             <div className="rounded border border-[#e0a742]/40 bg-[#e0a742]/5 px-3 py-2 text-[11px] text-[#e0a742] font-mono text-center">
-              ✦ Acceso institucional · KYC/AML post registro
+              Verificación de identidad requerida antes de formalizar una inversión.
             </div>
           )}
 
@@ -540,7 +603,7 @@ function AuthPage() {
                   required
                   aria-invalid={!!errors.email}
                   className={inputCls(!!errors.email)}
-                  placeholder="geologo@empresa.com"
+                  placeholder={isInvestor ? "tu@correo.com" : "correo@empresa.com"}
                   maxLength={255}
                   autoComplete="email"
                   inputMode="email"
@@ -598,7 +661,7 @@ function AuthPage() {
                   <Fingerprint className="w-4 h-4" />
                 )}
                 <span className="relative">
-                  {mode === "login" ? "Autorizar acceso" : "Registrar operador"}
+                  {mode === "login" ? "Ingresar a mi cuenta" : "Crear cuenta"}
                 </span>
               </button>
             </form>
@@ -627,7 +690,9 @@ function AuthPage() {
           </div>
 
           <p className="text-center text-[10px] font-mono uppercase tracking-[0.35em] text-[#5f6b7d]">
-            Catastro · Geofísica · Sondajes · QA/QC
+            {isInvestor
+              ? "Proyectos · Verificación · Portafolio · Wallet"
+              : "Catastro · Geofísica · Sondajes · QA/QC"}
           </p>
         </div>
       </main>

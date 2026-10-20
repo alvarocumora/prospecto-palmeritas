@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { Search, Map, Bell, FileText, Layers, Building2, ArrowRight } from "lucide-react";
@@ -35,6 +35,8 @@ export const Route = createFileRoute("/catastro/")({
 
 function CatastroLanding() {
   const [q, setQ] = useState("");
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
   const search = useServerFn(searchConcessions);
   const mutation = useMutation({
     mutationFn: (term: string) => search({ data: { q: term, limit: 8 } }),
@@ -74,12 +76,13 @@ function CatastroLanding() {
                   value={q}
                   onChange={(e) => setQ(e.target.value)}
                   placeholder="Codelco, 96.511.760-2, RUT, código concesión, comuna…"
+                  disabled={!hydrated}
                   className="w-full pl-10 pr-4 py-3 rounded-md border border-border bg-background font-mono text-sm focus:outline-none focus:border-primary"
                 />
               </div>
               <button
                 type="submit"
-                disabled={mutation.isPending || q.trim().length < 2}
+                disabled={!hydrated || mutation.isPending || q.trim().length < 2}
                 className="px-5 py-3 rounded-md bg-primary text-primary-foreground font-mono text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
                 {mutation.isPending ? "Buscando…" : "Buscar"}

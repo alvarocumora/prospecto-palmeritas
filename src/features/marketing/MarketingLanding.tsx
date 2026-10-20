@@ -29,12 +29,12 @@ export function MarketingLanding() {
 
       {/* Franja de rigor */}
       <section className="border-b border-hairline bg-surface-2">
-        <div className="max-w-6xl mx-auto px-5 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-x-4 gap-y-4 px-5 py-5 font-mono text-[10px] leading-relaxed uppercase tracking-[0.1em] text-content-muted md:grid-cols-4 md:tracking-[0.16em]">
           {[
-            "Datos SERNAGEOMIN",
-            "Estándar NI 43-101 · CH 20235",
-            "Ley N° 18.045 · NCG 336",
-            "Documentos con QR verificable",
+            "Fuentes oficiales y declaradas",
+            "Estado de evidencia por proyecto",
+            "Informes y riesgos identificados",
+            "Documentos con trazabilidad",
           ].map((t) => (
             <div key={t} className="flex items-center gap-2">
               <Check className="w-3.5 h-3.5 text-accent-brand" /> {t}
