@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 import type { GeoSceneFilters } from "../types";
 import { sceneHolePassesTime, sceneInterceptPassesGrade } from "../filterPolicy";
+import { desurvey, sliceByDepth, type TrajectoryPoint } from "../drillGeometry";
 
 type Hole = {
   id?: string;
@@ -210,6 +211,18 @@ export function useDrillTrajectoriesLayer(
 
   const intercepts = useMemo(() => {
     const byHole = new Map(holes.map((hole) => [hole.hole_id, hole] as const));
+    const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
+    const localPath = (hole: Hole): TrajectoryPoint[] => {
+      const measured = real.get(hole.hole_id);
+      if (measured && measured.length >= 2) return measured;
+      const total = Number(hole.actual_depth ?? hole.planned_depth ?? 100);
+      return desurvey(
+        { x: Number(hole.easting ?? 0), y: Number(hole.northing ?? 0), z: Number(hole.elevation ?? 0) },
+        [{ md: 0, azimuth: hole.azimuth ?? 0, dip: hole.dip ?? -90 }],
+        total,
+      );
+    };
+    const paths = new Map<string, TrajectoryPoint[]>();
     return logs
       .filter(
         (log) =>
@@ -220,19 +233,18 @@ export function useDrillTrajectoriesLayer(
       )
       .map((log, index) => {
         const hole = byHole.get(log.hole_id)!;
+        if (!paths.has(hole.hole_id)) paths.set(hole.hole_id, localPath(hole));
+        const seg = sliceByDepth(paths.get(hole.hole_id)!, Number(log.depth_from), Number(log.depth_to));
         return {
           id: `${log.hole_id}-${index}`,
-          path: holeSegment(
-            hole,
-            centerLng,
-            centerLat,
-            Number(log.depth_from),
-            Number(log.depth_to),
+          path: seg.map(
+            (p) => [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
           ),
           au: Number(log.au_gpt ?? 0),
         };
-      });
-  }, [holes, logs, centerLng, centerLat, filters?.highGradeOnly]);
+      })
+      .filter((intercept) => intercept.path.length >= 2);
+  }, [holes, logs, real, centerLng, centerLat, filters?.highGradeOnly]);
 
   useEffect(() => {
     const entries: AnchorEntry[] = trajectories.map((trajectory) => ({
