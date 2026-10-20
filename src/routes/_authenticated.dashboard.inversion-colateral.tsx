@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { PageHeader, PlatformPage } from "@/components/ui-system";
 import {
   COLLATERAL_DISCLAIMERS,
   COLLATERAL_PARCELS,
@@ -111,42 +112,33 @@ function CollateralPage() {
   ];
 
   return (
-    <div data-theme="im-light" className="min-h-screen bg-surface text-content">
-      <div className="container mx-auto max-w-6xl p-4 md:p-8">
-        <Link
-          to="/dashboard/investments"
-          className="inline-flex items-center gap-1 text-[11px] font-mono text-content-subtle hover:text-content"
-        >
-          <ArrowLeft className="w-3 h-3" /> Mis inversiones
-        </Link>
-
-        <header className="mt-4 grid gap-6 md:grid-cols-[1fr_auto] md:items-end border-b border-hairline pb-8">
-          <div>
-            <p className="text-[11px] font-mono uppercase tracking-[0.2em] text-accent-brand">
-              Programa de inversión con colateral
-            </p>
-            <h1 className="mt-3 font-serif text-3xl md:text-5xl leading-tight">
-              Invierte en minería chilena, respaldado por una parcela.
-            </h1>
-            <p className="mt-4 max-w-2xl text-content-subtle">
-              Tu capital financia el portafolio minero Geocapitals. Recibes UF + 12 % anual con pago
-              mensual de intereses, y te entregamos en garantía una parcela con rol individual en la
-              Región del Maule.
-            </p>
-          </div>
-          <div className="flex flex-col gap-2">
+    <PlatformPage className="max-w-6xl">
+      <Link
+        to="/dashboard/investments"
+        className="mb-3 inline-flex min-h-11 items-center gap-2 text-xs text-content-muted hover:text-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
+      >
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+        Volver a mis inversiones
+      </Link>
+      <PageHeader
+        eyebrow="Capital · Inversión con colateral"
+        title="Inversión con respaldo inmobiliario"
+        description="Programa de financiamiento minero con pagos mensuales y parcelas previstas como garantía en la Región del Maule. Los términos y la constitución efectiva de garantías están sujetos a la documentación contractual."
+        actions={
+          <>
             <Link
               to="/dashboard/colateral-documentos"
-              className="text-sm text-accent-brand underline"
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-hairline px-4 py-2 text-sm text-accent-brand hover:border-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
             >
-              Documentos legales de los valles
+              Documentos legales
             </Link>
-            <Button onClick={download} disabled={busy} size="lg">
-              {busy ? <Loader2 className="animate-spin" /> : <FileDown />}
+            <Button onClick={download} disabled={busy} size="lg" className="min-h-11">
+              {busy ? <Loader2 className="animate-spin motion-reduce:animate-none" /> : <FileDown />}
               Descargar deck (PDF)
             </Button>
-          </div>
-        </header>
+          </>
+        }
+      />
 
         <figure className="mt-8 relative overflow-hidden border border-hairline">
           <img
@@ -293,7 +285,6 @@ function CollateralPage() {
             <p key={d}>{d}</p>
           ))}
         </footer>
-      </div>
-    </div>
+    </PlatformPage>
   );
 }
