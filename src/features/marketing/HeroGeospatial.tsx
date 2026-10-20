@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { lazy, Suspense } from "react";
 import { ClientOnly } from "@tanstack/react-router";
+import { PUBLIC_INTELLIGENCE_PATHS } from "./landingNavigation";
 
 const HeroTerrain3D = lazy(() => import("./HeroTerrain3D"));
 
@@ -20,10 +21,10 @@ const VALUES = [
 ];
 
 const INTEL = [
-  { icon: Layers, label: "Capas geológicas", to: "/catastro/mapa" },
-  { icon: Satellite, label: "Imágenes satelitales", to: "/terminal/cholqui" },
-  { icon: BarChart3, label: "Análisis de datos", to: "/terminal/losverdes" },
-  { icon: ClipboardCheck, label: "Evaluación de proyectos", to: "/terminal" },
+  { icon: Layers, label: "Capas geológicas", to: PUBLIC_INTELLIGENCE_PATHS.geologicalLayers },
+  { icon: Satellite, label: "Imágenes satelitales", to: PUBLIC_INTELLIGENCE_PATHS.satelliteImagery },
+  { icon: BarChart3, label: "Análisis de datos", to: PUBLIC_INTELLIGENCE_PATHS.dataAnalysis },
+  { icon: ClipboardCheck, label: "Evaluación de proyectos", to: PUBLIC_INTELLIGENCE_PATHS.projectEvaluation },
 ];
 
 const LEGEND = [
