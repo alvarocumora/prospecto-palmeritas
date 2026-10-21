@@ -35,6 +35,8 @@ export function AnalysisDock({
   onSection,
   propertyOn = false,
   onProperty,
+  onGeologyMap,
+  geologyMapBusy = false,
 }: {
   spectralTop: SpectralTop;
   onSpectralTop: (v: SpectralTop) => void;
@@ -56,6 +58,8 @@ export function AnalysisDock({
   onSection: () => void;
   propertyOn?: boolean;
   onProperty?: () => void;
+  onGeologyMap?: () => void;
+  geologyMapBusy?: boolean;
 }) {
   const len = pathLength(measurePts);
   const area = polygonArea(measurePts);
@@ -151,6 +155,16 @@ export function AnalysisDock({
         >
           Medir
         </button>
+        {onGeologyMap && (
+          <button
+            type="button"
+            disabled={geologyMapBusy}
+            onClick={onGeologyMap}
+            className={`${btn(false)} disabled:opacity-40`}
+          >
+            {geologyMapBusy ? "Generando…" : "Mapa PDF"}
+          </button>
+        )}
         <button
           type="button"
           aria-pressed={stereoOpen}

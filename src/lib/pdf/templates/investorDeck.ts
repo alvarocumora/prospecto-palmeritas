@@ -35,7 +35,7 @@ const CW = W - M * 2;
 
 export async function renderInvestorDeck(doc: jsPDF, model: ProjectDoc): Promise<void> {
   if (model.visualSlides?.length) {
-    const { renderVisualInvestorSlides } = await import('./visualInvestorSlides');
+    const { renderVisualInvestorSlides } = await import("./visualInvestorSlides");
     await renderVisualInvestorSlides(doc, model);
     return;
   }
