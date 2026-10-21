@@ -358,7 +358,8 @@ export function GeoSceneCanvas({
     try {
       const image = await captureView();
       if (!image) toast.message("No se pudo capturar la vista; el mapa sale sin imagen.");
-      const summary = summarizeProjectGeology(resolvedProjectLayers);
+      const visibleOnly = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
+      const summary = summarizeProjectGeology(visibleOnly, resolvedProjectLayers);
       const { buildGeologicalMapPdf } = await import("@/lib/pdf/geologicalMapPdf");
       const blob = await buildGeologicalMapPdf({
         projectName: project?.name ?? "Proyecto",

@@ -21,11 +21,21 @@ export type GeologyMapSummary = {
   gaps: string[];
 };
 
-/** Cruza las capas reales cargadas en el visor para armar la leyenda del mapa geológico. */
+/**
+ * Cruza las capas reales cargadas en el visor para armar la leyenda del mapa
+ * geológico. `visibleLayers` debe ser exactamente lo que se capturó en la
+ * imagen (las capas encendidas); `allLayers` es el set completo resuelto,
+ * usado solo para avisar si hay carta oficial cargada pero apagada — nunca
+ * para construir la leyenda, que debe coincidir con lo que la imagen muestra.
+ */
 export function summarizeProjectGeology(
-  layers: ReadonlyArray<{ id: string; data?: FeatureCollection }>,
+  visibleLayers: ReadonlyArray<{ id: string; data?: FeatureCollection }>,
+  allLayers: ReadonlyArray<{ id: string; data?: FeatureCollection }> = visibleLayers,
 ): GeologyMapSummary {
-  const get = (id: string) => layers.find((l) => l.id === id)?.data?.features ?? [];
+  const get = (id: string) => visibleLayers.find((l) => l.id === id)?.data?.features ?? [];
+  const hasHidden = (id: string) =>
+    !visibleLayers.some((l) => l.id === id) &&
+    (allLayers.find((l) => l.id === id)?.data?.features.length ?? 0) > 0;
 
   const unitsSeen = new Map<string, GeologyUnit>();
   const sheets = new Set<string>();
@@ -57,8 +67,20 @@ export function summarizeProjectGeology(
   const units = [...unitsSeen.values()].sort((a, b) => a.code.localeCompare(b.code, "es"));
 
   const gaps: string[] = [];
-  if (!units.length) gaps.push("Sin carta geológica vectorial oficial publicada para esta zona.");
-  if (!faultFeatures.length) gaps.push("Sin fallas de carta oficial dentro del área del proyecto.");
+  if (!units.length) {
+    gaps.push(
+      hasHidden("geology.official_map_units")
+        ? "Carta geológica (unidades) cargada pero apagada en la vista capturada — enciéndela antes de exportar para incluirla."
+        : "Sin carta geológica vectorial oficial publicada para esta zona.",
+    );
+  }
+  if (!faultFeatures.length) {
+    gaps.push(
+      hasHidden("geology.official_faults")
+        ? "Fallas de carta oficial cargadas pero apagadas en la vista capturada — enciéndelas antes de exportar para incluirlas."
+        : "Sin fallas de carta oficial dentro del área del proyecto.",
+    );
+  }
   if (!structures.length) gaps.push("Sin estructuras medidas en terreno cargadas.");
 
   return {
