@@ -44,7 +44,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       y+=paragraph(doc,44,y,item.body,470,bodySize)+9;
     }
     fill(doc,GC_COLOR.paperDeep); doc.rect(44,468,872,24,'F');
-    paragraph(doc,52,477,s.note+' · Sin recursos ni reservas certificados NI 43-101/JORC.',850,6.1);
+    paragraph(doc,52,477,s.note+(s.note.includes('NI 43-101') ? '' : ' · Sin recursos ni reservas certificados NI 43-101/JORC.'),850,6.1);
     if (i===slides.length-1) { doc.addImage(qr,'PNG',822,355,80,80); doc.link(822,355,80,80,{url:model.liveUrl}); }
   }
 }
