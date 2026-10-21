@@ -6,10 +6,10 @@ import { letterhead, section } from '../brand/institutional';
 
 async function imageData(url: string): Promise<string> {
   const img = new Image(); img.crossOrigin = 'anonymous'; img.src = url; await img.decode();
-  const canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 1200;
+  const canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 1094;
   const context = canvas.getContext('2d'); if (!context) throw new Error('Image canvas unavailable');
-  const scale = Math.max(1200/img.naturalWidth, 1200/img.naturalHeight);
-  context.drawImage(img, (1200-img.naturalWidth*scale)/2, (1200-img.naturalHeight*scale)/2, img.naturalWidth*scale, img.naturalHeight*scale);
+  const scale = Math.max(1200/img.naturalWidth, 1094/img.naturalHeight);
+  context.drawImage(img, (1200-img.naturalWidth*scale)/2, (1094-img.naturalHeight*scale)/2, img.naturalWidth*scale, img.naturalHeight*scale);
   return canvas.toDataURL('image/jpeg', .88);
 }
 /** Visual layout inside the canonical deck renderer, not a separate exporter. */
