@@ -10,7 +10,7 @@ export function DeckSlide({ slide, index, total }: { slide: InvestorVisualSlide;
       <div className="investor-stats">{slide.stats.map(s => <div key={s.label}><strong>{s.value}</strong><span>{s.label}</span>{s.note && <small>{s.note}</small>}</div>)}</div>
       <div className="investor-items">{slide.items.map(item => <section key={item.title}><h2>{item.title}</h2><p>{item.body}</p></section>)}</div>
     </div>
-    <footer><p>{slide.note} · Sin recursos ni reservas certificados NI 43-101/JORC.</p><span>{String(index + 1).padStart(2, '0')} / {total}</span></footer>
+    <footer><p>{slide.note}{slide.note.includes('NI 43-101') ? '' : ' · Sin recursos ni reservas certificados NI 43-101/JORC.'}</p><span>{String(index + 1).padStart(2, '0')} / {total}</span></footer>
   </article>;
 }
 export function ScaledDeckSlide(props: Parameters<typeof DeckSlide>[0]) {

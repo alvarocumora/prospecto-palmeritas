@@ -6,10 +6,10 @@ import { letterhead, section } from '../brand/institutional';
 
 async function imageData(url: string): Promise<string> {
   const img = new Image(); img.crossOrigin = 'anonymous'; img.src = url; await img.decode();
-  const canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 1200;
+  const canvas = document.createElement('canvas'); canvas.width = 1200; canvas.height = 1094;
   const context = canvas.getContext('2d'); if (!context) throw new Error('Image canvas unavailable');
-  const scale = Math.max(1200/img.naturalWidth, 1200/img.naturalHeight);
-  context.drawImage(img, (1200-img.naturalWidth*scale)/2, (1200-img.naturalHeight*scale)/2, img.naturalWidth*scale, img.naturalHeight*scale);
+  const scale = Math.max(1200/img.naturalWidth, 1094/img.naturalHeight);
+  context.drawImage(img, (1200-img.naturalWidth*scale)/2, (1094-img.naturalHeight*scale)/2, img.naturalWidth*scale, img.naturalHeight*scale);
   return canvas.toDataURL('image/jpeg', .88);
 }
 /** Visual layout inside the canonical deck renderer, not a separate exporter. */
@@ -44,7 +44,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       y+=paragraph(doc,44,y,item.body,470,bodySize)+9;
     }
     fill(doc,GC_COLOR.paperDeep); doc.rect(44,468,872,24,'F');
-    paragraph(doc,52,477,s.note+' · Sin recursos ni reservas certificados NI 43-101/JORC.',850,6.1);
+    paragraph(doc,52,477,s.note+(s.note.includes('NI 43-101') ? '' : ' · Sin recursos ni reservas certificados NI 43-101/JORC.'),850,6.1);
     if (i===slides.length-1) { doc.addImage(qr,'PNG',822,355,80,80); doc.link(822,355,80,80,{url:model.liveUrl}); }
   }
 }
