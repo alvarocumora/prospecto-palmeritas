@@ -342,7 +342,7 @@ function renderFactSheet(ctx: Ctx) {
   let ly = y;
   if (d.map) {
     const m = d.map;
-    const ih = Math.min(lw / m.aspect, 150);
+    const ih = Math.min(lw / m.aspect, 120);
     const iw = ih * m.aspect;
     if (m.imageDataUrl) ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, iw, ih, undefined, "MEDIUM");
     else {
