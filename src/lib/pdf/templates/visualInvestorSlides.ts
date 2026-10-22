@@ -42,7 +42,7 @@ function ficha(doc: jsPDF, x: number, y: number, f: NonNullable<InvestorVisualSl
 function footer(doc: jsPDF, W: number, H: number, note: string, page: number, total: number, dark = false) {
   font(doc, 'body', 'normal', 5.6); ink(doc, dark ? CREAM : GC_COLOR.slate);
   const full = note + (note.includes('NI 43-101') ? '' : ' Sin recursos ni reservas certificados NI 43-101/JORC.');
-  doc.text(lines(doc, '* ' + full, W - 140).slice(0, 2), 44, H - 22);
+  doc.text(lines(doc, '* ' + full, W - 120).slice(0, 3), 44, H - 28);
   font(doc, 'body', 'bold', 7); doc.text(`${String(page).padStart(2, '0')} / ${total}`, W - 44, H - 22, { align: 'right' });
 }
 
@@ -119,6 +119,6 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       font(doc, 'body', 'normal', 6.5); ink(doc, GC_COLOR.slate); doc.text(GC_BRAND.site, W - 107, 214, { align: 'center' });
     }
     stroke(doc, CREAM); doc.setLineWidth(0.6); doc.line(44, H - 38, split - 30, H - 38);
-    footer(doc, split + 60, H, s.note, i + 1, total);
+    footer(doc, split, H, s.note, i + 1, total);
   }
 }
