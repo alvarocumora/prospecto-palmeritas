@@ -71,7 +71,6 @@ function cholquiDoc(family: ResearchFamily, issued: string): ResearchDoc {
     { label: "Superficie", value: `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`, provenance: "DECLARADO", sourceId: "dossier", note: `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias` },
     { label: "Etapa", value: "Explotación declarada", provenance: "DECLARADO", sourceId: "dossier", note: "Capacidad 5.000–15.000 t/mes no auditada" },
     { label: "Cu total máximo", value: pct(max), provenance: "MEDIDO", sourceId: "lab-AG2463714", note: "Máximo de muestras puntuales; no es ley media ni recurso", conflictId: sampleConflict },
-    { label: "Rango Cu total", value: `${num(min)}–${num(max)} %`, provenance: "MEDIDO", sourceId: "lab-AG2463714", conflictId: sampleConflict },
     { label: "Valorización", value: `USD ${CHOLQUI_ROUND.valuationLowUsd / 1e6}–${CHOLQUI_ROUND.valuationHighUsd / 1e6} M`, provenance: "REFERENCIAL", sourceId: "dossier", note: "Referencia declarada; no es tasación ni auditoría" },
     { label: "Horizonte de negocio", value: `${CHOLQUI_ROUND.horizonYears} años`, provenance: "DECLARADO", sourceId: "dossier" },
   ];

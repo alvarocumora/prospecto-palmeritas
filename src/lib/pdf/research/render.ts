@@ -262,7 +262,7 @@ function cover(ctx: Ctx) {
 function executive(ctx: Ctx) {
   const { d } = ctx;
   let y = section(ctx, TOP + 14, "01", "Resumen ejecutivo");
-  y += text(ctx, d.thesis, M, y, CW, { size: 10, family: "display", lh: 1.4 }) + 12;
+  y += text(ctx, d.thesis, M, y, CW, { size: 9.5, family: "display", lh: 1.4 }) + 10;
   const cw = (CW - 20) / 2;
   let ly = bulletList(ctx, "Hallazgos principales", d.findings, M, y, cw);
   ly = bulletList(ctx, "Fortalezas", d.strengths, M, ly, cw);
@@ -270,12 +270,9 @@ function executive(ctx: Ctx) {
   ry = bulletList(ctx, "Próximos pasos", d.nextSteps, M + cw + 20, ry, cw);
   y = Math.max(ly, ry) + 2;
   kicker(ctx, "Parámetros verificables", M, y);
-  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 40, "parámetros ejecutivos") + 12;
-  void 0;
+  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 64, "parámetros ejecutivos") + 12;
   kicker(ctx, `Términos de la ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
-  const end = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 40, "términos");
-  // eslint-disable-next-line no-console
-  if (typeof process !== "undefined" && process.env.RS_DEBUG) console.log("exec end", end, BOTTOM);
+  paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 64, "términos");
 }
 
 function geology(ctx: Ctx, num = "02") {
