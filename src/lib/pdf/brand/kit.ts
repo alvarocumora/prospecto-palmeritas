@@ -76,6 +76,54 @@ export async function ensureBrandFonts(doc: jsPDF): Promise<void> {
   branded.add(doc);
 }
 
+/**
+ * IBM Plex Mono (cifras, coordenadas, folios). Opt-in: solo los documentos
+ * de investigación la incrustan, para no alterar el peso de los PDFs públicos.
+ */
+const MONO_FILES: Array<[string, string]> = [
+  ["PlexMono-Regular.ttf", "normal"],
+  ["PlexMono-SemiBold.ttf", "bold"],
+];
+let monoCache: Promise<Array<[string, string]> | null> | null = null;
+const monoDocs = new WeakSet<jsPDF>();
+
+export async function ensureMonoFont(doc: jsPDF): Promise<boolean> {
+  if (monoDocs.has(doc)) return true;
+  monoCache ??= (async () => {
+    try {
+      return await Promise.all(
+        MONO_FILES.map(async ([file]) => {
+          const url = fontUrl(file);
+          if (!url) throw new Error(file);
+          const res = await fetch(url);
+          if (!res.ok) throw new Error(file);
+          const bytes = new Uint8Array(await res.arrayBuffer());
+          let bin = "";
+          for (let i = 0; i < bytes.length; i += 0x8000)
+            bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+          return [file, btoa(bin)] as [string, string];
+        }),
+      );
+    } catch {
+      monoCache = null;
+      return null;
+    }
+  })();
+  const data = await monoCache;
+  if (!data) return false;
+  data.forEach(([file, b64], i) => {
+    doc.addFileToVFS(file, b64);
+    doc.addFont(file, "GCMono", MONO_FILES[i][1]);
+  });
+  monoDocs.add(doc);
+  return true;
+}
+
+export function monoFont(doc: jsPDF, style: "normal" | "bold", size: number) {
+  doc.setFont(monoDocs.has(doc) ? "GCMono" : "courier", style);
+  doc.setFontSize(size);
+}
+
 export function font(
   doc: jsPDF,
   family: "display" | "body",

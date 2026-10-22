@@ -66,3 +66,10 @@
 - [x] Sondajes por mínima curvatura (sin datos cargados aún para verlos).
 - [ ] Red estereográfica de rumbos y manteos.
 - [ ] Conector OMF — espera archivo real de software minero.
+
+## Sistema documental research (preview interna)
+- [x] Memorándum de inversión Cholqui (4 pág.), ficha A4 (Cholqui, Los Verdes) e informe técnico A4, en /dashboard/documentos/research, solo personal.
+- [x] Validación de discrepancias que bloquea la exportación pública; Plex Mono incrustada; pruebas de PDF.
+- [ ] Rediseñar el deck 16:9 editorial con los mismos componentes (el deck público sigue intacto).
+- [ ] Revisar el aviso de control de calidad que aparece en el memorándum.
+- [ ] Actualización trimestral y cartola: bloqueadas por falta de datos verificados o privacidad.
