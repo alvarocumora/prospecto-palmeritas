@@ -332,7 +332,7 @@ function renderFactSheet(ctx: Ctx) {
   let ly = y;
   if (d.map) {
     const m = d.map;
-    const ih = Math.min(lw / m.aspect, 165);
+    const ih = Math.min(lw / m.aspect, 150);
     const iw = ih * m.aspect;
     if (m.imageDataUrl) ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, iw, ih, undefined, "MEDIUM");
     else {
@@ -342,16 +342,14 @@ function renderFactSheet(ctx: Ctx) {
     ly += ih + 6;
     ly += text(ctx, `${m.attribution} [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · Adquisición ${m.acquisition}. ${m.caption}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 8;
   }
-  kicker(ctx, "Perfil del activo", rx, y + 4);
-  const ry = paramTable(ctx, rx, y + 10, rw, d.params, BOTTOM - 200, "perfil") + 12;
+  kicker(ctx, "Tesis", rx, y + 4);
+  let ry = y + 14 + text(ctx, d.thesis, rx, y + 14, rw, { size: RS_TYPE.body, lh: 1.35 }) + 8;
+  ry = bulletList(ctx, "Incertidumbres", d.uncertainties, rx, ry, rw);
   y = Math.max(ly, ry);
+  kicker(ctx, "Perfil del activo", M, y);
+  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 112, "perfil") + 12;
   kicker(ctx, `Ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
-  y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 160, "ronda ficha") + 12;
-  const cw = (CW - 20) / 2;
-  kicker(ctx, "Tesis", M, y);
-  const th = text(ctx, d.thesis, M, y + 10, cw, { size: RS_TYPE.body, lh: 1.35 });
-  const uy = bulletList(ctx, "Incertidumbres", d.uncertainties, M + cw + 20, y, cw);
-  y = Math.max(y + 10 + th, uy) + 6;
+  y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 112, "ronda ficha") + 6;
   if (y > BOTTOM - 112) ctx.overflow.push("ficha: contenido excede la página");
   disclaimers(ctx, BOTTOM - 108, BOTTOM - 40);
 }
