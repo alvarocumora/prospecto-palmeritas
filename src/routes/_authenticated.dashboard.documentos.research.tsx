@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useIsSuperAdmin } from "@/hooks/useIsSuperAdmin";
 import { FAMILY_LABEL, integrityProblems, publicExportBlocked, type ResearchFamily } from "@/lib/pdf/research/model";
 import { availability, buildResearchDoc, type ResearchProject } from "@/lib/pdf/research/projects";
 import { RESEARCH_DOCS_EXPERIMENTAL, buildResearchPdf, researchFilename } from "@/lib/pdf/research/build";
@@ -23,7 +24,9 @@ const PROJECTS: Array<{ id: ResearchProject; label: string }> = [
 ];
 
 function ResearchStudio() {
-  const { profile, loading } = useAuth();
+  const { profile, loading: authLoading } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsSuperAdmin();
+  const loading = authLoading || adminLoading;
   const [family, setFamily] = useState<ResearchFamily>("memo");
   const [project, setProject] = useState<ResearchProject>("cholqui");
   const [url, setUrl] = useState<string | null>(null);
@@ -34,7 +37,7 @@ function ResearchStudio() {
 
   const avail = availability(family, project);
   const model = useMemo(() => buildResearchDoc(family, project), [family, project]);
-  const isStaff = profile?.account_type === "geocapitals_team";
+  const isStaff = profile?.account_type === "geocapitals_team" || isAdmin;
 
   useEffect(() => {
     if (!isStaff || !model) {
