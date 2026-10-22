@@ -114,18 +114,19 @@ export const getMyWallet = createServerFn({ method: "GET" })
       supabase
         .from("investment_tickets")
         .select(
-          "id, ticket_code, spv_id, amount, currency, shares_allocated, status, signed_at, created_at",
+          "id, ticket_code, spv_id, amount, currency, shares_allocated, status, signed_at, created_at, is_test",
         )
         .eq("investor_user_id", userId)
         .order("created_at", { ascending: false }),
       supabase
         .from("spv_positions")
-        .select("id, spv_id, shares, amount_paid, currency, status, subscribed_on, document_url")
+        .select("id, spv_id, shares, amount_paid, currency, status, subscribed_on, document_url, is_test")
         .eq("investor_user_id", userId),
     ]);
     const tickets: WalletTicket[] = (t ?? []).map((r) => {
       const m = meta(r.spv_id);
-      return { ...r, amount: Number(r.amount), project: m.project, token: m.token };
+      const { is_test, ...rest } = r;
+      return { ...rest, amount: Number(r.amount), project: is_test ? `${m.project} · PRUEBA` : m.project, token: m.token };
     });
     const positions: WalletPosition[] = (pos ?? []).map((r) => {
       const m = meta(r.spv_id);
@@ -137,7 +138,7 @@ export const getMyWallet = createServerFn({ method: "GET" })
         status: r.status,
         subscribed_on: r.subscribed_on,
         document_url: r.document_url,
-        project: m.project,
+        project: r.is_test ? `${m.project} · PRUEBA` : m.project,
         token: m.token,
         slug: m.slug,
         pctOfSpv: m.total ? (Number(r.shares) / m.total) * 100 : null,
