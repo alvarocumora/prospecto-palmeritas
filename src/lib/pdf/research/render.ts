@@ -163,7 +163,7 @@ function paramRows(ctx: Ctx, ps: ResearchParam[]) {
 }
 
 function paramTable(ctx: Ctx, x: number, y: number, w: number, ps: ResearchParam[], maxY?: number, label = "parámetros") {
-  const widths = [w * 0.4, w * 0.34, w * 0.17, w * 0.09];
+  const widths = w > 300 ? [w * 0.36, w * 0.38, w * 0.16, w * 0.1] : [w * 0.4, w * 0.34, w * 0.17, w * 0.09];
   const rows = paramRows(ctx, ps);
   // Render conflict rows in cobalt via the CONFLICT_LABEL first line.
   return table(ctx, x, y, w, ["Parámetro", "Valor", "Clase", "Ref."], rows, widths, [3], maxY, label);
@@ -262,19 +262,17 @@ function cover(ctx: Ctx) {
 function executive(ctx: Ctx) {
   const { d } = ctx;
   let y = section(ctx, TOP + 14, "01", "Resumen ejecutivo");
-  y += text(ctx, d.thesis, M, y, CW, { size: 10, family: "display", lh: 1.45 }) + 14;
-  const lw = CW * 0.42;
-  const rx = M + lw + 20;
-  const rw = CW - lw - 20;
-  let ly = bulletList(ctx, "Hallazgos principales", d.findings, M, y, lw);
-  ly = bulletList(ctx, "Fortalezas", d.strengths, M, ly, lw);
-  ly = bulletList(ctx, "Incertidumbres", d.uncertainties, M, ly, lw);
-  ly = bulletList(ctx, "Próximos pasos", d.nextSteps, M, ly, lw);
-  kicker(ctx, "Parámetros verificables", rx, y);
-  let ry = paramTable(ctx, rx, y + 6, rw, d.params, BOTTOM - 120, "parámetros ejecutivos") + 16;
-  kicker(ctx, `Términos de la ronda · equity · ${d.termsIssuer ?? ""}`, rx, ry);
-  ry = paramTable(ctx, rx, ry + 6, rw, d.terms, BOTTOM - 70, "términos") + 10;
-  if (Math.max(ly, ry) > BOTTOM - 60) ctx.overflow.push("resumen ejecutivo excede la página");
+  y += text(ctx, d.thesis, M, y, CW, { size: 10, family: "display", lh: 1.4 }) + 12;
+  const cw = (CW - 20) / 2;
+  let ly = bulletList(ctx, "Hallazgos principales", d.findings, M, y, cw);
+  ly = bulletList(ctx, "Fortalezas", d.strengths, M, ly, cw);
+  let ry = bulletList(ctx, "Incertidumbres", d.uncertainties, M + cw + 20, y, cw);
+  ry = bulletList(ctx, "Próximos pasos", d.nextSteps, M + cw + 20, ry, cw);
+  y = Math.max(ly, ry) + 2;
+  kicker(ctx, "Parámetros verificables", M, y);
+  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 40, "parámetros ejecutivos") + 12;
+  kicker(ctx, `Términos de la ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
+  paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 40, "términos");
 }
 
 function geology(ctx: Ctx, num = "02") {
@@ -320,41 +318,42 @@ function renderMemo(ctx: Ctx) {
 function renderFactSheet(ctx: Ctx) {
   const { d } = ctx;
   newPage(ctx, true);
-  kicker(ctx, d.title, M, TOP + 10, C.cobalt);
-  font(ctx.doc, "display", "normal", 30);
+  kicker(ctx, d.title, M, TOP + 6, C.cobalt);
+  font(ctx.doc, "display", "normal", 28);
   color(ctx.doc, C.ink);
-  ctx.doc.text(d.projectName, M, TOP + 44);
-  text(ctx, d.subtitle, M, TOP + 52, CW, { size: 10, c: C.muted });
-  let y = TOP + 76;
+  ctx.doc.text(d.projectName, M, TOP + 36);
+  text(ctx, d.subtitle, M, TOP + 42, CW, { size: 9.5, c: C.muted });
+  let y = TOP + 62;
   hair(ctx.doc, y, M, W - M, C.ink, 0.8);
-  y += 12;
-  const lw = CW * 0.56;
-  const rx = M + lw + 18;
-  const rw = CW - lw - 18;
-  // Left: map + thesis
+  y += 10;
+  const lw = CW * 0.42;
+  const rx = M + lw + 16;
+  const rw = CW - lw - 16;
   let ly = y;
   if (d.map) {
     const m = d.map;
-    const ih = lw / m.aspect;
-    if (m.imageDataUrl) ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, lw, ih, undefined, "MEDIUM");
+    const ih = Math.min(lw / m.aspect, 210);
+    const iw = ih * m.aspect;
+    if (m.imageDataUrl) ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, iw, ih, undefined, "MEDIUM");
     else {
       stroke(ctx.doc, C.hairline);
-      ctx.doc.rect(M, ly, lw, ih);
+      ctx.doc.rect(M, ly, iw, ih);
     }
     ly += ih + 6;
-    ly += text(ctx, `${m.attribution} [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · Adquisición ${m.acquisition}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 12;
+    ly += text(ctx, `${m.attribution} [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · Adquisición ${m.acquisition}. ${m.caption}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 8;
   }
-  kicker(ctx, "Tesis", M, ly);
-  ly += 10 + text(ctx, d.thesis, M, ly + 10, lw, { size: 9.5, family: "display", lh: 1.4 }) + 12;
-  ly = bulletList(ctx, "Incertidumbres", d.uncertainties, M, ly, lw);
-  // Right: parameters + terms
   kicker(ctx, "Perfil del activo", rx, y + 4);
-  let ry = paramTable(ctx, rx, y + 10, rw, d.params, BOTTOM - 200, "perfil") + 14;
-  kicker(ctx, "Ronda · equity", rx, ry);
-  ry = paramTable(ctx, rx, ry + 6, rw, d.terms, BOTTOM - 120, "ronda ficha") + 10;
-  y = Math.max(ly, ry) + 6;
-  if (y > BOTTOM - 120) ctx.overflow.push("ficha: contenido excede la página");
-  disclaimers(ctx, BOTTOM - 116, BOTTOM - 46);
+  const ry = paramTable(ctx, rx, y + 10, rw, d.params, BOTTOM - 200, "perfil") + 12;
+  y = Math.max(ly, ry);
+  kicker(ctx, `Ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
+  y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 160, "ronda ficha") + 12;
+  const cw = (CW - 20) / 2;
+  kicker(ctx, "Tesis", M, y);
+  const th = text(ctx, d.thesis, M, y + 10, cw, { size: RS_TYPE.body, lh: 1.35 });
+  const uy = bulletList(ctx, "Incertidumbres", d.uncertainties, M + cw + 20, y, cw);
+  y = Math.max(y + 10 + th, uy) + 6;
+  if (y > BOTTOM - 112) ctx.overflow.push("ficha: contenido excede la página");
+  disclaimers(ctx, BOTTOM - 108, BOTTOM - 40);
 }
 
 function renderTechnical(ctx: Ctx) {
