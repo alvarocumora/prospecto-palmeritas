@@ -8357,6 +8357,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
@@ -8385,6 +8386,7 @@ export type Database = {
           instrument_type?: string
           investor_signature_name?: string | null
           investor_user_id: string
+          is_test?: boolean
           listing_ref?: string | null
           notes?: string | null
           payment_proof_url?: string | null
@@ -8413,6 +8415,7 @@ export type Database = {
           instrument_type?: string
           investor_signature_name?: string | null
           investor_user_id?: string
+          is_test?: boolean
           listing_ref?: string | null
           notes?: string | null
           payment_proof_url?: string | null
@@ -16498,6 +16501,7 @@ export type Database = {
           investor_email: string | null
           investor_name: string
           investor_user_id: string | null
+          is_test: boolean
           notes: string | null
           shares: number
           spv_id: string
@@ -16516,6 +16520,7 @@ export type Database = {
           investor_email?: string | null
           investor_name: string
           investor_user_id?: string | null
+          is_test?: boolean
           notes?: string | null
           shares?: number
           spv_id: string
@@ -16534,6 +16539,7 @@ export type Database = {
           investor_email?: string | null
           investor_name?: string
           investor_user_id?: string | null
+          is_test?: boolean
           notes?: string | null
           shares?: number
           spv_id?: string
@@ -20264,6 +20270,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
@@ -20301,6 +20308,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
@@ -20343,6 +20351,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
@@ -20380,6 +20389,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
@@ -20417,6 +20427,7 @@ export type Database = {
           instrument_type: string
           investor_signature_name: string | null
           investor_user_id: string
+          is_test: boolean
           listing_ref: string | null
           notes: string | null
           payment_proof_url: string | null
