@@ -350,7 +350,7 @@ function renderFactSheet(ctx: Ctx) {
       ctx.doc.rect(M, ly, iw, ih);
     }
     ly += ih + 6;
-    ly += text(ctx, `${m.attribution} [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · Adquisición ${m.acquisition}. ${m.caption}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 8;
+    ly += text(ctx, `Imagen de contexto [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · adquisición ${m.acquisition.toLowerCase()}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 8;
   }
   kicker(ctx, "Tesis", rx, y + 4);
   let ry = y + 14 + text(ctx, d.thesis, rx, y + 14, rw, { size: RS_TYPE.body, lh: 1.35 }) + 8;
