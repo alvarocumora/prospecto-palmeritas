@@ -161,6 +161,7 @@ import { Route as AuthenticatedDashboardAdminInvestmentsRouteImport } from './ro
 import { Route as AuthenticatedDashboardClientesPartnerIdRouteImport } from './routes/_authenticated.dashboard.clientes_.$partnerId'
 import { Route as AuthenticatedDashboardDocumentosIndexRouteImport } from './routes/_authenticated.dashboard.documentos.index'
 import { Route as AuthenticatedDashboardDocumentosTemplateIdRouteImport } from './routes/_authenticated.dashboard.documentos.$templateId'
+import { Route as AuthenticatedDashboardDocumentosResearchRouteImport } from './routes/_authenticated.dashboard.documentos.research'
 import { Route as AuthenticatedDashboardGeophysicsSurveyIdRouteImport } from './routes/_authenticated.dashboard.geophysics.$surveyId'
 import { Route as AuthenticatedDashboardListingsListingIdRouteImport } from './routes/_authenticated.dashboard.listings.$listingId'
 import { Route as AuthenticatedDashboardPipelineIndexRouteImport } from './routes/_authenticated.dashboard.pipeline.index'
@@ -1026,6 +1027,12 @@ const AuthenticatedDashboardDocumentosTemplateIdRoute =
     path: '/dashboard/documentos/$templateId',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedDashboardDocumentosResearchRoute =
+  AuthenticatedDashboardDocumentosResearchRouteImport.update({
+    id: '/dashboard/documentos/research',
+    path: '/dashboard/documentos/research',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedDashboardGeophysicsSurveyIdRoute =
   AuthenticatedDashboardGeophysicsSurveyIdRouteImport.update({
     id: '/$surveyId',
@@ -1350,6 +1357,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/admin/investments': typeof AuthenticatedDashboardAdminInvestmentsRoute
   '/dashboard/clientes/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  '/dashboard/documentos/research': typeof AuthenticatedDashboardDocumentosResearchRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
@@ -1532,6 +1540,7 @@ export interface FileRoutesByTo {
   '/dashboard/admin/investments': typeof AuthenticatedDashboardAdminInvestmentsRoute
   '/dashboard/clientes/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  '/dashboard/documentos/research': typeof AuthenticatedDashboardDocumentosResearchRoute
   '/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
@@ -1716,6 +1725,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/admin_/investments': typeof AuthenticatedDashboardAdminInvestmentsRoute
   '/_authenticated/dashboard/clientes_/$partnerId': typeof AuthenticatedDashboardClientesPartnerIdRoute
   '/_authenticated/dashboard/documentos/$templateId': typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  '/_authenticated/dashboard/documentos/research': typeof AuthenticatedDashboardDocumentosResearchRoute
   '/_authenticated/dashboard/geophysics/$surveyId': typeof AuthenticatedDashboardGeophysicsSurveyIdRouteWithChildren
   '/_authenticated/dashboard/listings/$listingId': typeof AuthenticatedDashboardListingsListingIdRoute
   '/_authenticated/dashboard/pipeline/$code': typeof AuthenticatedDashboardPipelineCodeRoute
@@ -1900,6 +1910,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/investments'
     | '/dashboard/clientes/$partnerId'
     | '/dashboard/documentos/$templateId'
+    | '/dashboard/documentos/research'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/pipeline/$code'
@@ -2082,6 +2093,7 @@ export interface FileRouteTypes {
     | '/dashboard/admin/investments'
     | '/dashboard/clientes/$partnerId'
     | '/dashboard/documentos/$templateId'
+    | '/dashboard/documentos/research'
     | '/dashboard/geophysics/$surveyId'
     | '/dashboard/listings/$listingId'
     | '/dashboard/pipeline/$code'
@@ -2265,6 +2277,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/admin_/investments'
     | '/_authenticated/dashboard/clientes_/$partnerId'
     | '/_authenticated/dashboard/documentos/$templateId'
+    | '/_authenticated/dashboard/documentos/research'
     | '/_authenticated/dashboard/geophysics/$surveyId'
     | '/_authenticated/dashboard/listings/$listingId'
     | '/_authenticated/dashboard/pipeline/$code'
@@ -3452,6 +3465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/dashboard/documentos/research': {
+      id: '/_authenticated/dashboard/documentos/research'
+      path: '/dashboard/documentos/research'
+      fullPath: '/dashboard/documentos/research'
+      preLoaderRoute: typeof AuthenticatedDashboardDocumentosResearchRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/dashboard/geophysics/$surveyId': {
       id: '/_authenticated/dashboard/geophysics/$surveyId'
       path: '/$surveyId'
@@ -3816,6 +3836,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedDashboardAdminInvestmentsRoute: typeof AuthenticatedDashboardAdminInvestmentsRoute
   AuthenticatedDashboardClientesPartnerIdRoute: typeof AuthenticatedDashboardClientesPartnerIdRoute
   AuthenticatedDashboardDocumentosTemplateIdRoute: typeof AuthenticatedDashboardDocumentosTemplateIdRoute
+  AuthenticatedDashboardDocumentosResearchRoute: typeof AuthenticatedDashboardDocumentosResearchRoute
   AuthenticatedDashboardPipelineCodeRoute: typeof AuthenticatedDashboardPipelineCodeRoute
   AuthenticatedDashboardProjectsProjectIdRoute: typeof AuthenticatedDashboardProjectsProjectIdRoute
   AuthenticatedDashboardProjectsCompararRoute: typeof AuthenticatedDashboardProjectsCompararRoute
@@ -3920,6 +3941,8 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
     AuthenticatedDashboardClientesPartnerIdRoute,
   AuthenticatedDashboardDocumentosTemplateIdRoute:
     AuthenticatedDashboardDocumentosTemplateIdRoute,
+  AuthenticatedDashboardDocumentosResearchRoute:
+    AuthenticatedDashboardDocumentosResearchRoute,
   AuthenticatedDashboardPipelineCodeRoute:
     AuthenticatedDashboardPipelineCodeRoute,
   AuthenticatedDashboardProjectsProjectIdRoute:
