@@ -70,7 +70,7 @@ function cholquiDoc(family: ResearchFamily, issued: string): ResearchDoc {
     { label: "Ubicación", value: "Melipilla, Región Metropolitana", provenance: "DECLARADO", sourceId: "dossier" },
     { label: "Superficie", value: `~${CHOLQUI.areaHa.toLocaleString("es-CL")} ha`, provenance: "DECLARADO", sourceId: "dossier", note: `${CHOLQUI.pedimentos} pedimentos + ${CHOLQUI.pertenencias} pertenencias` },
     { label: "Etapa", value: "Explotación declarada", provenance: "DECLARADO", sourceId: "dossier", note: "Capacidad 5.000–15.000 t/mes no auditada" },
-    { label: "Cu total máximo", value: pct(max), provenance: "MEDIDO", sourceId: "lab-AG2463714", note: "Máximo de muestras puntuales superficiales; no es ley media ni recurso", conflictId: sampleConflict },
+    { label: "Cu total máximo", value: pct(max), provenance: "MEDIDO", sourceId: "lab-AG2463714", note: "Máximo de muestras puntuales; no es ley media ni recurso", conflictId: sampleConflict },
     { label: "Rango Cu total", value: `${num(min)}–${num(max)} %`, provenance: "MEDIDO", sourceId: "lab-AG2463714", conflictId: sampleConflict },
     { label: "Valorización", value: `USD ${CHOLQUI_ROUND.valuationLowUsd / 1e6}–${CHOLQUI_ROUND.valuationHighUsd / 1e6} M`, provenance: "REFERENCIAL", sourceId: "dossier", note: "Referencia declarada; no es tasación ni auditoría" },
     { label: "Horizonte de negocio", value: `${CHOLQUI_ROUND.horizonYears} años`, provenance: "DECLARADO", sourceId: "dossier" },
@@ -82,8 +82,7 @@ function cholquiDoc(family: ResearchFamily, issued: string): ResearchDoc {
     { label: "Tamaño de la ronda", value: roundConflict ? "Dossier USD 1,5 M · plataforma USD 1,0 M" : "USD 1,5 M", provenance: "DECLARADO", sourceId: "dossier", conflictId: roundConflict },
     { label: "Acciones / precio", value: `${DECK_TERMS.shares.toLocaleString("es-CL")} × USD ${DECK_TERMS.shareUsd}`, provenance: "DECLARADO", sourceId: "dossier", conflictId: roundConflict },
     { label: "Ticket mínimo", value: `USD ${DECK_TERMS.minUsd.toLocaleString("es-CL")} · ${DECK_TERMS.minShares} acciones`, provenance: "DECLARADO", sourceId: "dossier", conflictId: conflict("cholqui-min-ticket") },
-    { label: "Colocación declarada", value: `${DECK_TERMS.cholquiPlacement} %`, provenance: "DECLARADO", sourceId: "dossier", note: "Declarada por la emisora; no es efectivo recaudado" },
-    { label: "Uso de fondos (principal)", value: `${CHOLQUI_ROUND.useOfFunds[0].label} · ${CHOLQUI_ROUND.useOfFunds[0].pct} %`, provenance: "DECLARADO", sourceId: "platform" },
+    { label: "Colocación declarada", value: `${DECK_TERMS.cholquiPlacement} %`, provenance: "DECLARADO", sourceId: "dossier", note: "No es efectivo recaudado" },
   ];
 
   const risks: RiskRow[] = [

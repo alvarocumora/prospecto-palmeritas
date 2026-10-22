@@ -271,8 +271,11 @@ function executive(ctx: Ctx) {
   y = Math.max(ly, ry) + 2;
   kicker(ctx, "Parámetros verificables", M, y);
   y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 40, "parámetros ejecutivos") + 12;
+  void 0;
   kicker(ctx, `Términos de la ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
-  paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 40, "términos");
+  const end = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 40, "términos");
+  // eslint-disable-next-line no-console
+  if (typeof process !== "undefined" && process.env.RS_DEBUG) console.log("exec end", end, BOTTOM);
 }
 
 function geology(ctx: Ctx, num = "02") {
