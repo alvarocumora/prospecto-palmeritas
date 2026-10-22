@@ -9,6 +9,7 @@ import { FICHAS } from "@/lib/investor/fichas";
 import type { Discrepancy } from "./model";
 
 const DOSSIER = "Dossier comercial octubre 2026";
+const differs = (a: number, b: number) => a !== b;
 const usd = (n: number) => `USD ${n.toLocaleString("es-CL")}`;
 
 /** Sample count stated in the dossier ("siete análisis puntuales"). */
@@ -17,7 +18,7 @@ export const DOSSIER_CHOLQUI_SAMPLES = 7;
 export function findDiscrepancies(project: "cholqui" | "losverdes"): Discrepancy[] {
   const out: Discrepancy[] = [];
   if (project === "cholqui") {
-    if (DECK_TERMS.roundUsd !== CHOLQUI_ROUND.roundSizeUsd)
+    if (differs(DECK_TERMS.roundUsd, CHOLQUI_ROUND.roundSizeUsd))
       out.push({
         id: "cholqui-round-size",
         project: "Cholqui",
@@ -28,7 +29,7 @@ export function findDiscrepancies(project: "cholqui" | "losverdes"): Discrepancy
         platformSource: "Términos referenciales de la plataforma (CHOLQUI_ROUND)",
         blocking: true,
       });
-    if (CHOLQUI_ASSAYS.length !== DOSSIER_CHOLQUI_SAMPLES)
+    if (differs(CHOLQUI_ASSAYS.length, DOSSIER_CHOLQUI_SAMPLES))
       out.push({
         id: "cholqui-sample-count",
         project: "Cholqui",
@@ -39,7 +40,7 @@ export function findDiscrepancies(project: "cholqui" | "losverdes"): Discrepancy
         platformSource: "Ensayes registrados en la plataforma (Andes Analytical / FGF)",
         blocking: true,
       });
-    if (DECK_TERMS.minUsd !== CHOLQUI_ROUND.minTicketUsd)
+    if (differs(DECK_TERMS.minUsd, CHOLQUI_ROUND.minTicketUsd))
       out.push({
         id: "cholqui-min-ticket",
         project: "Cholqui",
@@ -52,7 +53,7 @@ export function findDiscrepancies(project: "cholqui" | "losverdes"): Discrepancy
       });
   } else {
     const lv = FICHAS.losverdes;
-    if (DECK_TERMS.minUsd !== lv.minTicketUsd)
+    if (differs(DECK_TERMS.minUsd, lv.minTicketUsd))
       out.push({
         id: "losverdes-min-ticket",
         project: "Los Verdes – Tilama",
@@ -63,7 +64,7 @@ export function findDiscrepancies(project: "cholqui" | "losverdes"): Discrepancy
         platformSource: "Ficha de inversión de la plataforma",
         blocking: true,
       });
-    if (DECK_TERMS.roundUsd !== lv.roundSizeUsd)
+    if (differs(DECK_TERMS.roundUsd, lv.roundSizeUsd))
       out.push({
         id: "losverdes-round-size",
         project: "Los Verdes – Tilama",
