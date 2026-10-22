@@ -354,7 +354,6 @@ function renderFactSheet(ctx: Ctx) {
   }
   kicker(ctx, "Tesis", rx, y + 4);
   let ry = y + 14 + text(ctx, d.thesis, rx, y + 14, rw, { size: RS_TYPE.body, lh: 1.35 }) + 8;
-  ry = bulletList(ctx, "Incertidumbres", d.uncertainties, rx, ry, rw);
   y = Math.max(ly, ry);
   kicker(ctx, "Perfil del activo", M, y);
   y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 70, "perfil") + 12;
@@ -362,6 +361,7 @@ function renderFactSheet(ctx: Ctx) {
   y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 70, "ronda ficha") + 6;
   newPage(ctx);
   y = section(ctx, TOP + 14, "02", "Riesgos, fuentes y advertencias");
+  y = bulletList(ctx, "Incertidumbres", d.uncertainties, M, y, CW) + 4;
   y = table(ctx, M, y, CW, ["Área", "Riesgo", "Nivel", "Estado"], d.risks.map((r) => [r.area, r.risk, r.level, r.status]), [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3], [], BOTTOM - 60, "riesgos ficha") + 14;
   y = discrepancyBlock(ctx, y);
   y = sourceRegister(ctx, y);
