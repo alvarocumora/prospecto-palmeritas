@@ -24,7 +24,7 @@ const BOTTOM = H - 64;
 
 export type RenderReport = { pages: number; overflow: string[] };
 
-type Ctx = { doc: jsPDF; d: ResearchDoc; overflow: string[]; refs: Map<string, number>; pageRefs: Set<string> };
+type Ctx = { doc: jsPDF; d: ResearchDoc; overflow: string[]; refs: Map<string, number>; pageRefs: Set<string>; bottom: number };
 
 function color(doc: jsPDF, c: RGB) {
   ink(doc, c);
@@ -52,6 +52,7 @@ function text(ctx: Ctx, s: string, x: number, y: number, w: number, o: { size?: 
   const h = lines.length * lh;
   if (o.maxH && h > o.maxH + 0.5) ctx.overflow.push(`${o.label ?? s.slice(0, 40)} (${Math.round(h)} > ${Math.round(o.maxH)})`);
   ctx.doc.text(lines, x, y + size * 0.8, { lineHeightFactor: o.lh ?? 1.35 });
+  ctx.bottom = Math.max(ctx.bottom, y + h);
   return h;
 }
 
@@ -78,7 +79,12 @@ function chrome(ctx: Ctx) {
 
 function sourcesFooter(ctx: Ctx) {
   const ids = [...ctx.pageRefs].sort((a, b) => ctx.refs.get(a)! - ctx.refs.get(b)!);
-  if (!ids.length) return;
+  const page = ctx.doc.getNumberOfPages();
+  if (!ids.length) {
+    if (ctx.bottom > BOTTOM) ctx.overflow.push(`página ${page}: contenido bajo el pie`);
+    ctx.bottom = 0;
+    return;
+  }
   const lines = ids.map((id) => {
     const s = ctx.d.sources.find((x) => x.id === id)!;
     return `[${ctx.refs.get(id)}] ${s.label} · ${s.period} · ${s.provenance}`;
@@ -87,6 +93,8 @@ function sourcesFooter(ctx: Ctx) {
   const wrapped = lines.flatMap((l) => ctx.doc.splitTextToSize(l, CW) as string[]);
   const h = wrapped.length * RS_TYPE.note * 1.3;
   const y0 = BOTTOM - h - 6;
+  if (ctx.bottom > y0 - 10) ctx.overflow.push(`página ${page}: contenido se superpone a las fuentes (${Math.round(ctx.bottom)} > ${Math.round(y0 - 10)})`);
+  ctx.bottom = 0;
   hair(ctx.doc, y0 - 6);
   color(ctx.doc, C.muted);
   ctx.doc.text(wrapped, M, y0 + 4, { lineHeightFactor: 1.3 });
@@ -150,6 +158,7 @@ function table(ctx: Ctx, x: number, y: number, w: number, head: string[], rows: 
     y += rh;
     hair(doc, y, x, x + w);
   }
+  ctx.bottom = Math.max(ctx.bottom, y);
   return y;
 }
 
@@ -186,6 +195,7 @@ function mapFigure(ctx: Ctx, y: number, maxH: number) {
   const imgH = imgW / m.aspect;
   if (m.imageDataUrl) {
     ctx.doc.addImage(m.imageDataUrl, "JPEG", M, y, imgW, imgH, undefined, "MEDIUM");
+    ctx.bottom = Math.max(ctx.bottom, y + imgH);
   } else {
     stroke(ctx.doc, C.hairline);
     ctx.doc.rect(M, y, imgW, imgH);
@@ -347,11 +357,15 @@ function renderFactSheet(ctx: Ctx) {
   ry = bulletList(ctx, "Incertidumbres", d.uncertainties, rx, ry, rw);
   y = Math.max(ly, ry);
   kicker(ctx, "Perfil del activo", M, y);
-  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 112, "perfil") + 12;
+  y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 70, "perfil") + 12;
   kicker(ctx, `Ronda · equity · ${d.termsIssuer ?? ""}`, M, y);
-  y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 112, "ronda ficha") + 6;
-  if (y > BOTTOM - 112) ctx.overflow.push("ficha: contenido excede la página");
-  disclaimers(ctx, BOTTOM - 108, BOTTOM - 40);
+  y = paramTable(ctx, M, y + 6, CW, d.terms, BOTTOM - 70, "ronda ficha") + 6;
+  newPage(ctx);
+  y = section(ctx, TOP + 14, "02", "Riesgos, fuentes y advertencias");
+  y = table(ctx, M, y, CW, ["Área", "Riesgo", "Nivel", "Estado"], d.risks.map((r) => [r.area, r.risk, r.level, r.status]), [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3], [], BOTTOM - 60, "riesgos ficha") + 14;
+  y = discrepancyBlock(ctx, y);
+  y = sourceRegister(ctx, y);
+  disclaimers(ctx, y + 4, BOTTOM - 10);
 }
 
 function renderTechnical(ctx: Ctx) {
@@ -386,7 +400,7 @@ function renderTechnical(ctx: Ctx) {
 
 /** Render into an A4 portrait jsPDF already loaded with brand + mono fonts. */
 export function renderResearchDoc(doc: jsPDF, d: ResearchDoc): RenderReport {
-  const ctx: Ctx = { doc, d, overflow: [], refs: new Map(), pageRefs: new Set() };
+  const ctx: Ctx = { doc, d, overflow: [], refs: new Map(), pageRefs: new Set(), bottom: 0 };
   if (d.family === "memo") renderMemo(ctx);
   else if (d.family === "factsheet") renderFactSheet(ctx);
   else if (d.family === "technical") renderTechnical(ctx);

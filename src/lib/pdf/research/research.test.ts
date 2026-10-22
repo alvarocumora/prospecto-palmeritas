@@ -32,8 +32,8 @@ describe("research documents", () => {
     expect(Math.min(...sizes)).toBeGreaterThanOrEqual(RS_TYPE.note);
   });
 
-  it("fact sheet is one page and technical report renders without overflow", () => {
-    expect(render("factsheet").report).toEqual({ pages: 1, overflow: [] });
+  it("fact sheet is two pages and technical report renders without overflow", () => {
+    expect(render("factsheet").report).toEqual({ pages: 2, overflow: [] });
     expect(render("factsheet", "losverdes").report.overflow).toEqual([]);
     expect(render("technical").report.overflow).toEqual([]);
   });
