@@ -11,7 +11,9 @@ async function imageData(url: string, w: number, h: number): Promise<string> {
   const img = new Image(); img.crossOrigin = 'anonymous'; img.src = url; await img.decode();
   const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
   const c = canvas.getContext('2d'); if (!c) throw new Error('Image canvas unavailable');
-  const s = Math.max(w / img.naturalWidth, h / img.naturalHeight);
+  const contain = url.includes('plataforma');
+  if (contain) { c.fillStyle = '#1E2533'; c.fillRect(0, 0, w, h); }
+  const s = (contain ? Math.min : Math.max)(w / img.naturalWidth, h / img.naturalHeight);
   c.drawImage(img, (w - img.naturalWidth * s) / 2, (h - img.naturalHeight * s) / 2, img.naturalWidth * s, img.naturalHeight * s);
   return canvas.toDataURL('image/jpeg', .86);
 }
