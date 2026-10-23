@@ -2,7 +2,7 @@ import type jsPDF from 'jspdf';
 import type { InvestorVisualSlide, ProjectDoc } from '../model';
 import { GC_BRAND, GC_COLOR, GC_PAGE, type RGB } from '../brand/tokens';
 import { fill, ink, font, brandQr, drawMark, stroke } from '../brand/kit';
-import { IM_GOLD, IM_NAVY } from '../brand/institutional';
+import { IM_GOLD, IM_NAVY, mineralTexture } from '../brand/institutional';
 
 const PAPER: RGB = [247, 244, 238];
 const CREAM: RGB = [236, 229, 214];
@@ -77,7 +77,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
 
     if (s.hero) {
       doc.addImage(img.full, 'JPEG', 0, 0, W, H, undefined, 'FAST');
-      fill(doc, IM_NAVY); doc.setGState(new (doc as any).GState({ opacity: 0.82 })); doc.rect(0, 0, 600, H, 'F'); doc.setGState(new (doc as any).GState({ opacity: 1 }));
+      fill(doc, IM_NAVY); doc.setGState(new (doc as any).GState({ opacity: 0.82 })); doc.rect(0, 0, 600, H, 'F'); doc.setGState(new (doc as any).GState({ opacity: 1 })); mineralTexture(doc, 0, 0, 600, H, IM_GOLD, 0.16); fill(doc, IM_GOLD); doc.rect(600, 0, 2, H, 'F');
       const mw = drawMark(doc, 44, 40, 20); font(doc, 'body', 'bold', 10); ink(doc, PAPER); doc.text(GC_BRAND.name, 44 + mw + 8, 55, { charSpace: 1 });
       font(doc, 'body', 'bold', 8); ink(doc, IM_GOLD); doc.text(s.kicker.toUpperCase(), 44, 150, { charSpace: 1.2 });
       font(doc, 'display', 'bold', 46); ink(doc, PAPER); const t = lines(doc, s.title, 500); doc.text(t, 44, 196, { lineHeightFactor: 1.02 });
@@ -98,6 +98,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
 
     // Panel editorial izquierdo + imagen a sangre derecha
     fill(doc, PAPER); doc.rect(0, 0, W, H, 'F');
+    fill(doc, IM_NAVY); doc.rect(0, 0, split, 18, 'F'); mineralTexture(doc, 0, 0, split, 18, IM_GOLD, 0.25);
     doc.addImage(img.half, 'JPEG', split, 0, W - split, H, undefined, 'FAST');
     fill(doc, IM_GOLD); doc.rect(split, 0, 3, H, 'F');
     const mw = drawMark(doc, 44, 30, 14); font(doc, 'body', 'bold', 7.5); ink(doc, IM_NAVY); doc.text(GC_BRAND.name, 44 + mw + 6, 41, { charSpace: 1 });
