@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ArrowRight, Compass, FileSearch, Landmark, LineChart, ShieldCheck } from "lucide-react";
 import { getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { MarketingHeader, MarketingFooter } from "@/features/marketing/MarketingShell";
@@ -28,7 +28,6 @@ export const Route = createFileRoute("/inversion/terminal")({
       { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(roundsQuery),
   component: InvestorTerminal,
 });
 
@@ -43,7 +42,7 @@ const META: Record<PublicRound["slug"], { place: string; metal: string; horizon:
 };
 
 function InvestorTerminal() {
-  const { data: rounds } = useSuspenseQuery(roundsQuery);
+  const { data: rounds = [] } = useQuery(roundsQuery);
   const target = rounds.reduce((a, r) => a + r.target, 0);
   const committed = rounds.reduce((a, r) => a + r.committed, 0);
 
