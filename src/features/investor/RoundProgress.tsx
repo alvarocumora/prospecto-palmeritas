@@ -4,9 +4,15 @@ import { money, roundBreakdown } from "./investmentPresentation";
 export function RoundProgress({ round, compact }: { round: PublicRound; compact?: boolean }) {
   const b = roundBreakdown(round);
   return (
-    <div className={compact ? "mt-4 border-t border-hairline pt-4" : "mt-5 border-t border-hairline pt-5"}>
+    <div
+      className={
+        compact ? "mt-4 border-t border-hairline pt-4" : "mt-5 border-t border-hairline pt-5"
+      }
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <span className="text-xs font-medium text-content-muted">Objetivo de ronda · referencial</span>
+        <span className="text-xs font-medium text-content-muted">
+          Objetivo de ronda · referencial
+        </span>
         <span className="font-mono text-sm">{b.valid ? money(round.target) : "Por verificar"}</span>
       </div>
       {b.valid && (
@@ -35,7 +41,10 @@ export function RoundProgress({ round, compact }: { round: PublicRound; compact?
             Liquidado · {b.settledPct?.toFixed(1)} %
           </span>
           <span className="inline-flex items-center gap-1.5">
-            <span aria-hidden className="h-2 w-2 shrink-0 border border-accent-brand bg-accent-brand/25" />
+            <span
+              aria-hidden
+              className="h-2 w-2 shrink-0 border border-accent-brand bg-accent-brand/25"
+            />
             Comprometido + declarado · {b.combinedPct?.toFixed(1)} %
           </span>
         </div>
