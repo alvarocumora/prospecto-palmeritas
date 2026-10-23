@@ -5,6 +5,7 @@
  */
 import type jsPDF from "jspdf";
 import { drawMark, fill, font, ink, monoFont, stroke } from "../brand/kit";
+import { mineralTexture } from "../brand/institutional";
 import { GC_BRAND, type RGB } from "../brand/tokens";
 import {
   CONFLICT_LABEL,
@@ -66,14 +67,19 @@ function chrome(ctx: Ctx) {
   const { doc, d } = ctx;
   fill(doc, C.paper);
   doc.rect(0, 0, W, H, "F");
-  const mw = drawMark(doc, M, 34, 14);
+  // Banda navy con textura mineral (terminal Mineral Capital)
+  fill(doc, C.ink);
+  doc.rect(0, 0, W, 58, "F");
+  mineralTexture(doc, 0, 0, W, 58, C.gold, 0.22);
+  fill(doc, C.gold);
+  doc.rect(0, 58, W, 1.2, "F");
+  const mw = drawMark(doc, M, 22, 14);
   font(doc, "body", "bold", RS_TYPE.note);
-  color(doc, C.ink);
-  doc.text(`${GC_BRAND.name} RESEARCH`, M + mw + 6, 44, { charSpace: 0.8 });
-  kicker(ctx, `${d.code} · ${d.version}`, W - M - doc.getTextWidth(`${d.code} · ${d.version}`.toUpperCase()) - 8, 44);
-  hair(doc, 60, M, W - M, C.ink, 0.6);
+  color(doc, C.white);
+  doc.text(`${GC_BRAND.name} RESEARCH`, M + mw + 6, 32, { charSpace: 0.8 });
+  kicker(ctx, `${d.code} · ${d.version}`, W - M - doc.getTextWidth(`${d.code} · ${d.version}`.toUpperCase()) - 8, 32, C.gold);
   if (d.draft) {
-    kicker(ctx, d.classification, M, 72, C.cobalt);
+    kicker(ctx, d.classification, M, 74, C.cobalt);
   }
 }
 
@@ -247,7 +253,7 @@ function cover(ctx: Ctx) {
   color(doc, C.ink);
   doc.text(d.projectName, M, 236);
   text(ctx, d.subtitle, M, 256, CW, { size: 13, family: "display", style: "italic", c: C.muted });
-  hair(doc, 300, M, W - M, C.ink, 0.8);
+  hair(doc, 300, M, W - M, C.gold, 1.2);
   const meta: Array<[string, string]> = [
     ["Código", d.code],
     ["Emisión", d.issued],

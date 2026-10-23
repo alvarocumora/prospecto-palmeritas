@@ -19,10 +19,10 @@ function render(family: "memo" | "factsheet" | "technical", project: "cholqui" |
 }
 
 describe("research documents", () => {
-  it("uses the exact platform palette", () => {
-    expect(RS_COLOR.paper).toEqual([247, 245, 240]);
-    expect(RS_COLOR.ink).toEqual([26, 26, 46]);
-    expect(RS_COLOR.cobalt).toEqual([43, 74, 203]);
+  it("uses the Mineral Capital palette (navy, copper, gold)", () => {
+    expect(RS_COLOR.ink).toEqual([15, 30, 61]);
+    expect(RS_COLOR.cobalt).toEqual([168, 106, 58]);
+    expect(RS_COLOR.gold).toEqual([201, 164, 92]);
   });
 
   it("Cholqui memorandum has exactly four pages, no overflow, no text below 7.5 pt", () => {
