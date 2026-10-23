@@ -122,7 +122,7 @@ export const FICHAS: Record<FichaSlug, ProjectFicha> = {
     ],
     valuationUsd: { low: 8_000_000, high: 12_000_000, method: "Cubicación interna + comparables" },
     roundSizeUsd: 1_500_000,
-    minTicketUsd: 50_000,
+    minTicketUsd: 15_000,
     instrument: "Equity SpA",
     equityOfferedPct: 12,
     horizonYears: 5,
