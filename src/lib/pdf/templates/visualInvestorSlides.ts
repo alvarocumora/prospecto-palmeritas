@@ -20,6 +20,19 @@ async function imageData(url: string, w: number, h: number): Promise<string> {
 
 function lines(doc: jsPDF, text: string, w: number) { return doc.splitTextToSize(text, w) as string[]; }
 
+/** Tamaño de fuente que hace caber `text` en `maxW` sin bajar de `min`. */
+export function fitSize(doc: jsPDF, text: string, maxW: number, size: number, min = 12): number {
+  let s = size;
+  font(doc, 'display', 'bold', s);
+  while (s > min && doc.getTextWidth(text) > maxW) { s -= 0.5; font(doc, 'display', 'bold', s); }
+  return s;
+}
+
+/** Cifras de todas las columnas comparten un tamaño, ajustado a la más ancha. */
+function statSize(doc: jsPDF, values: string[], colW: number, size: number) {
+  return Math.min(...values.map(v => fitSize(doc, v, colW, size)));
+}
+
 /** Ficha de inversión estilo app: tarjeta navy con ronda, barra y valuación. */
 function ficha(doc: jsPDF, x: number, y: number, f: NonNullable<InvestorVisualSlide['ficha']>) {
   const w = 250, h = 196;
@@ -42,7 +55,7 @@ function ficha(doc: jsPDF, x: number, y: number, f: NonNullable<InvestorVisualSl
 }
 
 function footer(doc: jsPDF, W: number, H: number, note: string, page: number, total: number, dark = false) {
-  font(doc, 'body', 'normal', 5.6); ink(doc, dark ? CREAM : GC_COLOR.slate);
+  font(doc, 'body', 'normal', 7); ink(doc, dark ? CREAM : GC_COLOR.slate);
   const full = note + (note.includes('NI 43-101') ? '' : ' Sin recursos ni reservas certificados NI 43-101/JORC.');
   doc.text(lines(doc, '* ' + full, W - 120).slice(0, 3), 44, H - 28);
   font(doc, 'body', 'bold', 7); doc.text(`${String(page).padStart(2, '0')} / ${total}`, W - 44, H - 22, { align: 'right' });
@@ -70,10 +83,14 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       font(doc, 'display', 'bold', 46); ink(doc, PAPER); const t = lines(doc, s.title, 500); doc.text(t, 44, 196, { lineHeightFactor: 1.02 });
       let y = 196 + t.length * 47 + 6;
       font(doc, 'body', 'normal', 12); ink(doc, CREAM); const l = lines(doc, s.lead, 470); doc.text(l, 44, y); y += l.length * 16 + 34;
-      s.stats.forEach((st, j) => {
-        const x = 44 + j * 172; font(doc, 'display', 'bold', 26); ink(doc, PAPER); doc.text(st.value, x, y);
-        font(doc, 'body', 'normal', 7.5); ink(doc, GC_COLOR.cobaltSoft); doc.text(st.label, x, y + 15);
-      });
+      {
+        const cw = 512 / Math.max(1, s.stats.length);
+        const fs = statSize(doc, s.stats.map(st => st.value), cw - 18, 26);
+        s.stats.forEach((st, j) => {
+          const x = 44 + j * cw; font(doc, 'display', 'bold', fs); ink(doc, PAPER); doc.text(st.value, x, y);
+          font(doc, 'body', 'normal', 7.5); ink(doc, GC_COLOR.cobaltSoft); doc.text(lines(doc, st.label, cw - 18).slice(0, 2), x, y + 15);
+        });
+      }
       font(doc, 'body', 'normal', 8); ink(doc, CREAM); doc.text(s.items.map(it => `${it.title} — ${it.body}`), 44, y + 56, { lineHeightFactor: 1.6 });
       footer(doc, W, H, s.note, i + 1, total, true);
       continue;
@@ -90,14 +107,15 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
     font(doc, 'body', 'normal', 10.5); ink(doc, GC_COLOR.inkSoft); const l = lines(doc, s.lead, 410); doc.text(l, 44, y, { lineHeightFactor: 1.4 }); y += l.length * 14.7 + 22;
 
     if (s.stats.length) {
-      const sw = 412 / s.stats.length;
+      const sw = 420 / s.stats.length;
+      const fs = statSize(doc, s.stats.map(st => st.value), sw - 22, s.stats.length > 2 ? 22 : 26);
       s.stats.forEach((st, j) => {
-        const x = 44 + j * sw;
-        if (j > 0) { stroke(doc, CREAM); doc.setLineWidth(0.8); doc.line(x - 10, y - 20, x - 10, y + 20); }
-        font(doc, 'display', 'bold', s.stats.length > 2 ? 21 : 25); ink(doc, GC_COLOR.cobalt); doc.text(st.value, x, y);
-        font(doc, 'body', 'normal', 7); ink(doc, GC_COLOR.slate); doc.text(lines(doc, [st.label, st.note].filter(Boolean).join(' · '), sw - 14).slice(0, 2), x, y + 13);
+        const x = 44 + j * sw + (j > 0 ? 6 : 0);
+        if (j > 0) { stroke(doc, CREAM); doc.setLineWidth(0.8); doc.line(x - 10, y - 20, x - 10, y + 22); }
+        font(doc, 'display', 'bold', fs); ink(doc, GC_COLOR.cobalt); doc.text(st.value, x, y);
+        font(doc, 'body', 'normal', 7.5); ink(doc, GC_COLOR.slate); doc.text(lines(doc, [st.label, st.note].filter(Boolean).join(' · '), sw - 22).slice(0, 2), x, y + 14);
       });
-      y += 50;
+      y += 54;
     }
     const size = s.items.length > 3 ? 8.6 : 9.6;
     for (const [j, it] of s.items.entries()) {
@@ -105,7 +123,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       fill(doc, IM_GOLD); doc.circle(48, y - 3, 2, 'F');
       font(doc, 'body', 'bold', size + 0.6); ink(doc, IM_NAVY); doc.text(lines(doc, it.title, 400)[0], 58, y);
       y += size + 4;
-      font(doc, 'body', 'normal', size); ink(doc, GC_COLOR.inkSoft); const b = lines(doc, it.body, 396).slice(0, 3); doc.text(b, 58, y, { lineHeightFactor: 1.35 });
+      font(doc, 'body', 'normal', size); ink(doc, GC_COLOR.inkSoft); const b = lines(doc, it.body.replace(/\s*→\s*/g, ' · '), 396).slice(0, 3); doc.text(b, 58, y, { lineHeightFactor: 1.35 });
       y += b.length * size * 1.35 + (j < s.items.length - 1 ? 10 : 0);
     }
 

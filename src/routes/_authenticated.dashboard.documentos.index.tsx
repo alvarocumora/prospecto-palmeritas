@@ -138,6 +138,30 @@ function DocumentsGallery() {
         </div>
       </div>
 
+      {/* Bloque 0 · Centro documental: familias institucionales. */}
+      <section className="mb-12" aria-labelledby="centro-doc">
+        <div id="centro-doc" className="text-[10px] font-mono uppercase tracking-wider text-content-subtle mb-3">
+          Centro documental
+        </div>
+        <div className="grid gap-px bg-hairline border border-hairline sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { k: "Presentación 16:9", t: "Deck de inversión 2026", d: "Diez láminas, ronda Serie A y descarga PDF.", to: "/inversion/deck" as const },
+            { k: "Research A4", t: "Memorándum, ficha e informe técnico", d: "Vista previa con procedencia por dato. Uso interno.", to: "/dashboard/documentos/research" as const },
+            { k: "Inversión", t: "Cartola y contratos SPV", d: "Posiciones confirmadas, órdenes y contratos firmados.", to: "/dashboard/investments" as const },
+            { k: "Colateral", t: "Mutuo con garantía", d: "Documentos legales del programa inmobiliario.", to: "/dashboard/colateral-documentos" as const },
+          ].map((c) => (
+            <Link key={c.to} to={c.to} className="group bg-surface p-5 min-h-[140px] flex flex-col hover:bg-surface-2">
+              <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-accent-brand">{c.k}</span>
+              <span className="font-display text-lg text-content mt-2">{c.t}</span>
+              <span className="text-sm text-content-subtle mt-1 flex-1">{c.d}</span>
+              <span className="mt-3 inline-flex items-center gap-1 text-sm text-accent-brand">
+                Abrir <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </span>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Bloque 1 · Documentos guardados por cliente / operación. */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-3">
