@@ -56,7 +56,10 @@ describe("investment one-pager layout", () => {
       }
       return original(...args);
     });
-    const legal = "El capital está expuesto a riesgo de pérdida y la información requiere debida diligencia. ".repeat(40);
+    const legal =
+      "El capital está expuesto a riesgo de pérdida y la información requiere debida diligencia. ".repeat(
+        40,
+      );
     await renderOnePager(doc, { ...base, disclaimers: [legal] });
     expect(doc.getNumberOfPages()).toBeGreaterThan(1);
     expect(text.mock.calls.some((call) => call[0] === "ADVERTENCIAS COMPLETAS")).toBe(true);
@@ -79,9 +82,7 @@ describe("investment one-pager layout", () => {
     });
     expect(doc.getNumberOfPages()).toBe(2);
     expect(
-      text.mock.calls.some(
-        (c) => typeof c[0] === "string" && c[0].includes("Esri World Imagery"),
-      ),
+      text.mock.calls.some((c) => typeof c[0] === "string" && c[0].includes("Esri World Imagery")),
     ).toBe(true);
     expect(text.mock.calls.some((c) => c[0] === "NOTA CARTOGRÁFICA")).toBe(true);
   });
