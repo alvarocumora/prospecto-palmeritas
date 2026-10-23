@@ -231,7 +231,8 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   ink(doc, GC_COLOR.paper);
   const nameLines = doc.splitTextToSize(model.name, CW - 22) as string[];
   nameLines.slice(0, 2).forEach((line, i) => doc.text(line, M, 93 + i * 25));
-  if (nameLines.length > 2) notes.push({ heading: "Nombre completo del proyecto", text: model.name });
+  if (nameLines.length > 2)
+    notes.push({ heading: "Nombre completo del proyecto", text: model.name });
   font(doc, "body", "normal", 8.5);
   ink(doc, GC_COLOR.cobaltSoft);
   doc.text(
@@ -266,7 +267,9 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   font(doc, "body", "normal", 7.5);
   ink(doc, GC_COLOR.slate);
   const cleanUrl = model.liveUrl.replace(/^https?:\/\//, "");
-  doc.text(oneLine(doc, cleanUrl, fig.qrW - 12), fig.qrX + fig.qrW / 2, fig.figY + 125, { align: "center" });
+  doc.text(oneLine(doc, cleanUrl, fig.qrW - 12), fig.qrX + fig.qrW / 2, fig.figY + 125, {
+    align: "center",
+  });
 
   const source =
     [model.map?.source, model.map?.imagery, model.map?.crs].filter(Boolean).join(" · ") ||
