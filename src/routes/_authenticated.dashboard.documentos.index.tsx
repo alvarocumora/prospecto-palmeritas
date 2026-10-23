@@ -150,7 +150,7 @@ function DocumentsGallery() {
             { k: "Inversión", t: "Cartola y contratos SPV", d: "Posiciones confirmadas, órdenes y contratos firmados.", to: "/dashboard/investments" as const },
             { k: "Colateral", t: "Mutuo con garantía", d: "Documentos legales del programa inmobiliario.", to: "/dashboard/colateral-documentos" as const },
           ].map((c) => (
-            <Link key={c.to} to={c.to} className="group bg-surface p-5 min-h-[140px] flex flex-col hover:bg-surface-muted">
+            <Link key={c.to} to={c.to} className="group bg-surface p-5 min-h-[140px] flex flex-col hover:bg-surface-2">
               <span className="text-[10px] font-mono uppercase tracking-[0.18em] text-accent-brand">{c.k}</span>
               <span className="font-display text-lg text-content mt-2">{c.t}</span>
               <span className="text-sm text-content-subtle mt-1 flex-1">{c.d}</span>
