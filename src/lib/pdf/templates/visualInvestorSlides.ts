@@ -123,7 +123,7 @@ export async function renderVisualInvestorSlides(doc: jsPDF, model: ProjectDoc) 
       fill(doc, IM_GOLD); doc.circle(48, y - 3, 2, 'F');
       font(doc, 'body', 'bold', size + 0.6); ink(doc, IM_NAVY); doc.text(lines(doc, it.title, 400)[0], 58, y);
       y += size + 4;
-      font(doc, 'body', 'normal', size); ink(doc, GC_COLOR.inkSoft); const b = lines(doc, it.body, 396).slice(0, 3); doc.text(b, 58, y, { lineHeightFactor: 1.35 });
+      font(doc, 'body', 'normal', size); ink(doc, GC_COLOR.inkSoft); const b = lines(doc, it.body.replace(/\s*→\s*/g, ' · '), 396).slice(0, 3); doc.text(b, 58, y, { lineHeightFactor: 1.35 });
       y += b.length * size * 1.35 + (j < s.items.length - 1 ? 10 : 0);
     }
 
