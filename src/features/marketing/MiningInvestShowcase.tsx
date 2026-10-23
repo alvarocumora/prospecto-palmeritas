@@ -73,15 +73,34 @@ export function MiningInvestShowcase() {
           {usd(ROUND.sharePrice)}.
         </p>
 
-        <dl className="mt-8 grid gap-px border border-hairline bg-hairline sm:grid-cols-3" aria-label="Condiciones referenciales de la ronda">
+        <dl
+          className="mt-8 grid gap-px border border-hairline bg-hairline sm:grid-cols-3"
+          aria-label="Condiciones referenciales de la ronda"
+        >
           {[
-            { label: "Ronda por proyecto", value: usd(ROUND.target), note: "Monto objetivo declarado" },
-            { label: "Precio por acción", value: usd(ROUND.sharePrice), note: "Condición sujeta a contrato" },
-            { label: "Ticket inicial", value: usd(ROUND.minTicket), note: "Verificar mínimo por proyecto" },
+            {
+              label: "Ronda por proyecto",
+              value: usd(ROUND.target),
+              note: "Monto objetivo declarado",
+            },
+            {
+              label: "Precio por acción",
+              value: usd(ROUND.sharePrice),
+              note: "Condición sujeta a contrato",
+            },
+            {
+              label: "Ticket inicial",
+              value: usd(ROUND.minTicket),
+              note: "Verificar mínimo por proyecto",
+            },
           ].map((metric) => (
             <div key={metric.label} className="bg-surface px-5 py-5">
-              <dt className="font-mono text-[11px] uppercase tracking-wider text-content-muted">{metric.label}</dt>
-              <dd className="mt-2 font-serif text-[clamp(1.5rem,3vw,2.2rem)] leading-none tabular-nums text-content">{metric.value}</dd>
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-content-muted">
+                {metric.label}
+              </dt>
+              <dd className="mt-2 font-serif text-[clamp(1.5rem,3vw,2.2rem)] leading-none tabular-nums text-content">
+                {metric.value}
+              </dd>
               <p className="mt-2 text-xs leading-relaxed text-content-muted">{metric.note}</p>
             </div>
           ))}
@@ -105,7 +124,9 @@ export function MiningInvestShowcase() {
                   aria-label={`Seleccionar ${p.name} para simular inversión`}
                   className="flex min-h-11 w-full flex-wrap items-center justify-between gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
                 >
-                  <span className="font-serif text-[1.7rem] leading-tight tracking-tight">{p.name}</span>
+                  <span className="font-serif text-[1.7rem] leading-tight tracking-tight">
+                    {p.name}
+                  </span>
                   <span className="border border-accent-brand px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-accent-brand">
                     Ronda {usd(rounds.find((r) => r.slug === p.slug)?.target ?? ROUND.target)}
                   </span>
@@ -173,7 +194,9 @@ export function MiningInvestShowcase() {
               onChange={(e) => setAmount(Number(e.target.value) || 0)}
               className="mt-2 min-h-12 w-full border border-hairline bg-surface px-3 py-2 font-mono text-lg tabular-nums focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
             />
-            <p id="mining-invest-help" className="mt-2 text-xs text-content-muted">Simulación de acciones, no orden de compra ni confirmación de disponibilidad.</p>
+            <p id="mining-invest-help" className="mt-2 text-xs text-content-muted">
+              Simulación de acciones, no orden de compra ni confirmación de disponibilidad.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               {[15000, 30000, 50000, 100000].map((v) => (
                 <button
