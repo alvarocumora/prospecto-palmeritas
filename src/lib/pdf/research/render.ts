@@ -253,7 +253,7 @@ function cover(ctx: Ctx) {
   color(doc, C.ink);
   doc.text(d.projectName, M, 236);
   text(ctx, d.subtitle, M, 256, CW, { size: 13, family: "display", style: "italic", c: C.muted });
-  hair(doc, 300, M, W - M, C.ink, 0.8);
+  hair(doc, 300, M, W - M, C.gold, 1.2);
   const meta: Array<[string, string]> = [
     ["Código", d.code],
     ["Emisión", d.issued],
