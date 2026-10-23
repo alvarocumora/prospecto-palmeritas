@@ -73,15 +73,28 @@ export function MiningInvestShowcase() {
           {usd(ROUND.sharePrice)}.
         </p>
 
-        <div className="mt-10 grid lg:grid-cols-[1fr_1fr] gap-6">
+        <dl className="mt-8 grid gap-px border border-hairline bg-hairline sm:grid-cols-3" aria-label="Condiciones referenciales de la ronda">
+          {[
+            { label: "Ronda por proyecto", value: usd(ROUND.target), note: "Monto objetivo declarado" },
+            { label: "Precio por acción", value: usd(ROUND.sharePrice), note: "Condición sujeta a contrato" },
+            { label: "Ticket inicial", value: usd(ROUND.minTicket), note: "Verificar mínimo por proyecto" },
+          ].map((metric) => (
+            <div key={metric.label} className="bg-surface px-5 py-5">
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-content-muted">{metric.label}</dt>
+              <dd className="mt-2 font-serif text-[clamp(1.5rem,3vw,2.2rem)] leading-none tabular-nums text-content">{metric.value}</dd>
+              <p className="mt-2 text-xs leading-relaxed text-content-muted">{metric.note}</p>
+            </div>
+          ))}
+        </dl>
+        <div className="mt-8 grid items-start gap-6 lg:grid-cols-[1fr_1fr]">
           <div className="grid gap-4">
             {PROJECTS.map((p) => (
               <article
                 key={p.slug}
-                className={`text-left border p-5 bg-surface transition-colors ${
+                className={`relative border bg-surface p-5 text-left transition-[border-color,box-shadow] sm:p-6 ${
                   slug === p.slug
-                    ? "border-accent-brand"
-                    : "border-hairline hover:border-content-muted"
+                    ? "border-accent-brand shadow-[inset_3px_0_0_var(--accent-brand)]"
+                    : "border-hairline hover:border-accent-brand"
                 }`}
               >
                 <button
@@ -90,14 +103,14 @@ export function MiningInvestShowcase() {
                   disabled={!hydrated}
                   aria-pressed={slug === p.slug}
                   aria-label={`Seleccionar ${p.name} para simular inversión`}
-                  className="flex min-h-11 w-full items-center justify-between gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
+                  className="flex min-h-11 w-full flex-wrap items-center justify-between gap-3 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
                 >
-                  <span className="font-serif text-2xl">{p.name}</span>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand border border-accent-brand px-2 py-0.5">
+                  <span className="font-serif text-[1.7rem] leading-tight tracking-tight">{p.name}</span>
+                  <span className="border border-accent-brand px-2.5 py-1 font-mono text-[11px] uppercase tracking-wider text-accent-brand">
                     Ronda {usd(rounds.find((r) => r.slug === p.slug)?.target ?? ROUND.target)}
                   </span>
                 </button>
-                <div className="mt-1 text-xs text-content-muted">
+                <div className="mt-2 text-sm text-content-muted">
                   {getTerminalProject(p.slug)?.ficha.region ?? "Ubicación por verificar"}
                 </div>
                 <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.15em]">
@@ -142,35 +155,38 @@ export function MiningInvestShowcase() {
             ))}
           </div>
 
-          <div className="border border-hairline bg-surface-2 p-6">
+          <div className="border border-hairline bg-surface-2 p-5 shadow-[0_16px_40px_-36px_rgba(17,29,53,0.5)] sm:p-7">
             <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.2em] text-content-muted">
               <Calculator className="w-3.5 h-3.5" /> Simulación ·{" "}
               {PROJECTS.find((p) => p.slug === slug)?.name}
             </div>
-            <label className="block mt-5 text-sm">
+            <label htmlFor="mining-invest-amount" className="block mt-5 text-sm font-medium">
               Monto a invertir (USD) · desde {usd(minTicket)}
             </label>
             <input
+              id="mining-invest-amount"
+              aria-describedby="mining-invest-help"
               type="number"
               min={minTicket}
               step={sharePrice}
               value={amount}
               onChange={(e) => setAmount(Number(e.target.value) || 0)}
-              className="mt-2 w-full border border-hairline bg-surface px-3 py-2 font-mono text-lg"
+              className="mt-2 min-h-12 w-full border border-hairline bg-surface px-3 py-2 font-mono text-lg tabular-nums focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand"
             />
-            <div className="mt-2 flex flex-wrap gap-2">
+            <p id="mining-invest-help" className="mt-2 text-xs text-content-muted">Simulación de acciones, no orden de compra ni confirmación de disponibilidad.</p>
+            <div className="mt-3 flex flex-wrap gap-2">
               {[15000, 30000, 50000, 100000].map((v) => (
                 <button
                   key={v}
                   type="button"
                   onClick={() => setAmount(v)}
-                  className="border border-hairline px-2.5 py-1 text-xs font-mono hover:border-accent-brand"
+                  className="min-h-10 border border-hairline px-3 py-1.5 text-xs font-mono hover:border-accent-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
                 >
                   {usd(v)}
                 </button>
               ))}
             </div>
-            <dl className="mt-6 grid grid-cols-3 gap-4">
+            <dl className="mt-6 grid gap-4 border-y border-hairline py-5 sm:grid-cols-3">
               <div>
                 <dt className="text-xs text-content-muted">Acciones serie preferente</dt>
                 <dd className="font-serif text-3xl">{shares.toLocaleString("es-CL")}</dd>
@@ -225,7 +241,7 @@ export function MiningInvestShowcase() {
               type="button"
               disabled={!valid || !hydrated}
               onClick={emit}
-              className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-accent-brand text-surface px-4 py-3 text-sm font-medium disabled:opacity-40"
+              className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-accent-brand px-4 py-3 text-sm font-semibold text-accent-brand-contrast transition-colors hover:bg-im-cobalt-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand disabled:cursor-not-allowed disabled:opacity-40"
             >
               Emitir ticket <ArrowRight className="w-4 h-4" />
             </button>
