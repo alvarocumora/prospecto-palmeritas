@@ -27,7 +27,7 @@ type Note = { heading: string; text: string };
 
 function oneLine(doc: jsPDF, text: string, width: number): string {
   const lines = doc.splitTextToSize(text, width) as string[];
-  return lines.length > 1 ? lines[0].replace(/[\s,;]+$/, "") + "…" : lines[0] ?? "";
+  return lines.length > 1 ? lines[0].replace(/[\s,;]+$/, "") + "…" : (lines[0] ?? "");
 }
 
 function drawFooter(doc: jsPDF, page: number, total: number, model: ProjectDoc) {
@@ -224,7 +224,9 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   doc.text(GC_BRAND.tagline, M + markW + 8, 51);
   font(doc, "body", "normal", 7.5);
   ink(doc, GC_COLOR.cobaltSoft);
-  doc.text(oneLine(doc, model.code + " · " + model.docVersion + " · " + issued, 190), W - M, 40, { align: "right" });
+  doc.text(oneLine(doc, model.code + " · " + model.docVersion + " · " + issued, 190), W - M, 40, {
+    align: "right",
+  });
   font(doc, "display", "bold", 24);
   ink(doc, GC_COLOR.paper);
   const nameLines = doc.splitTextToSize(model.name, CW - 22) as string[];
@@ -232,7 +234,11 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   if (nameLines.length > 2) notes.push({ heading: "Nombre completo del proyecto", text: model.name });
   font(doc, "body", "normal", 8.5);
   ink(doc, GC_COLOR.cobaltSoft);
-  doc.text(oneLine(doc, model.subtitle + " · " + model.location, CW), M, nameLines.length > 1 ? 143 : 126);
+  doc.text(
+    oneLine(doc, model.subtitle + " · " + model.location, CW),
+    M,
+    nameLines.length > 1 ? 143 : 126,
+  );
 
   eyebrow(doc, M, 172, "Cifras clave · antecedentes declarados o referenciales");
   renderKpis(doc, model, notes);
@@ -242,20 +248,29 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   const fig = renderFigure(doc, model, notes);
 
   const qrSize = 92;
-  doc.addImage(qr, "PNG", fig.qrX + (fig.qrW - qrSize) / 2, fig.figY + 8, qrSize, qrSize, undefined, "FAST");
+  doc.addImage(
+    qr,
+    "PNG",
+    fig.qrX + (fig.qrW - qrSize) / 2,
+    fig.figY + 8,
+    qrSize,
+    qrSize,
+    undefined,
+    "FAST",
+  );
   font(doc, "body", "bold", 8);
   ink(doc, GC_COLOR.ink);
-  doc.text("ABRIR FICHA Y MAPA", fig.qrX + fig.qrW / 2, fig.figY + 110, { align: "center" });
+  doc.text("ABRIR FICHA Y MAPA", fig.qrX + fig.qrW / 2, fig.figY + 110, {
+    align: "center",
+  });
   font(doc, "body", "normal", 7.5);
   ink(doc, GC_COLOR.slate);
   const cleanUrl = model.liveUrl.replace(/^https?:\/\//, "");
   doc.text(oneLine(doc, cleanUrl, fig.qrW - 12), fig.qrX + fig.qrW / 2, fig.figY + 125, { align: "center" });
 
-  const source = [
-    model.map?.source,
-    model.map?.imagery,
-    model.map?.crs,
-  ].filter(Boolean).join(" · ") || "Fuente y metodología en informe técnico";
+  const source =
+    [model.map?.source, model.map?.imagery, model.map?.crs].filter(Boolean).join(" · ") ||
+    "Fuente y metodología en informe técnico";
   font(doc, "body", "normal", 7.5);
   ink(doc, GC_COLOR.slate);
   doc.text(oneLine(doc, "Fuente: " + source, CW), M, 629);
@@ -274,7 +289,9 @@ export async function renderOnePager(doc: jsPDF, model: ProjectDoc): Promise<voi
   doc.text("CONTACTO Y SIGUIENTE PASO", M + 15, 664);
   font(doc, "body", "normal", 8.5);
   ink(doc, GC_COLOR.ink);
-  const direct = [model.contact?.name, model.contact?.email, model.contact?.phone].filter(Boolean).join(" · ");
+  const direct = [model.contact?.name, model.contact?.email, model.contact?.phone]
+    .filter(Boolean)
+    .join(" · ");
   doc.text(oneLine(doc, direct || GC_BRAND.email, CW - 30), M + 15, 679);
   font(doc, "body", "normal", 8);
   ink(doc, GC_COLOR.inkSoft);
