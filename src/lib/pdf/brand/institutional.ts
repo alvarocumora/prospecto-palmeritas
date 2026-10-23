@@ -8,9 +8,38 @@ import type jsPDF from "jspdf";
 import { GC_BRAND, GC_COLOR, type RGB } from "./tokens";
 import { drawMark, fill, font, ink, stroke } from "./kit";
 
-export const IM_NAVY: RGB = [13, 43, 62];
-export const IM_GOLD: RGB = [185, 138, 47];
+/** Mineral Capital (2026-10): navy profundo, oro refinado, cobre mineral. */
+export const IM_NAVY: RGB = [15, 30, 61]; // #0F1E3D
+export const IM_GOLD: RGB = [201, 164, 92]; // #C9A45C
+export const IM_COPPER: RGB = [168, 106, 58]; // #A86A3A
 export const IM_RULE: RGB = [199, 208, 216];
+
+/**
+ * Textura mineral: curvas de nivel vectoriales sutiles (decorativas, no
+ * cartográficas — no representan relieve real de ningún proyecto).
+ */
+export function mineralTexture(doc: jsPDF, x: number, y: number, w: number, h: number, c: RGB = IM_GOLD, opacity = 0.18) {
+  const G = (doc as any).GState;
+  if (G) doc.setGState(new G({ opacity }));
+  stroke(doc, c);
+  doc.setLineWidth(0.4);
+  const cx = x + w * 0.78, cy = y + h * 0.55;
+  for (let r = 1; r <= 14; r++) {
+    const base = r * Math.max(w, h) * 0.045;
+    const pts: Array<[number, number]> = [];
+    for (let a = 0; a <= 64; a++) {
+      const t = (a / 64) * Math.PI * 2;
+      const k = base * (1 + 0.12 * Math.sin(3 * t + r * 0.7) + 0.06 * Math.cos(5 * t - r));
+      pts.push([cx + Math.cos(t) * k * 1.35, cy + Math.sin(t) * k]);
+    }
+    const segs = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]]);
+    doc.saveGraphicsState();
+    doc.rect(x, y, w, h, null as any); (doc as any).clip(); (doc as any).discardPath();
+    doc.lines(segs, pts[0][0], pts[0][1], [1, 1], 'S');
+    doc.restoreGraphicsState();
+  }
+  if (G) doc.setGState(new G({ opacity: 1 }));
+}
 
 export type Frame = { w: number; h: number; m: number };
 

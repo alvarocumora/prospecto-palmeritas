@@ -5,13 +5,15 @@
  */
 import type { RGB } from "../brand/tokens";
 
-/** Institutional Modernist palette — exact platform tokens (docs/brand-identity.md). */
+/** Mineral Capital palette (2026-10) — matches platform --im-* tokens. */
 export const RS_COLOR = {
-  paper: [247, 245, 240] as RGB, // #F7F5F0
-  ink: [26, 26, 46] as RGB, // #1A1A2E
-  muted: [107, 107, 123] as RGB, // #6B6B7B
-  hairline: [227, 224, 216] as RGB, // #E3E0D8
-  cobalt: [43, 74, 203] as RGB, // #2B4ACB
+  paper: [250, 248, 243] as RGB, // blanco cálido
+  ink: [15, 30, 61] as RGB, // navy profundo #0F1E3D
+  muted: [92, 102, 122] as RGB, // navy secundario
+  hairline: [227, 222, 210] as RGB,
+  /** Acento (cobre mineral). Nombre legacy conservado por compatibilidad. */
+  cobalt: [168, 106, 58] as RGB, // #A86A3A
+  gold: [201, 164, 92] as RGB, // #C9A45C
   white: [255, 255, 255] as RGB,
 } as const;
 
