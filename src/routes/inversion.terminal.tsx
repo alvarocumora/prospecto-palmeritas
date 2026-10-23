@@ -88,7 +88,7 @@ function InvestorTerminal() {
             </Link>
             <Link
               to="/inversion/deck"
-              search={{ slide: 1 } as never}
+              search={{ slide: 1, print: undefined }}
               className="inline-flex h-11 items-center gap-2 rounded-sm border border-im-gold/60 px-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-im-gold hover:bg-im-gold/10"
             >
               Ver deck de inversión
@@ -137,7 +137,7 @@ function InvestorTerminal() {
                     ))}
                   </dl>
                   <Link
-                    to="/proyectos/$slug"
+                    to="/proyectos/ficha/$slug"
                     params={{ slug: r.slug }}
                     className="mt-6 inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-brand hover:underline"
                   >
