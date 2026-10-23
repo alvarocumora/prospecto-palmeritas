@@ -565,6 +565,8 @@
   --color-im-cobalt-wash: var(--im-cobalt-wash);
   --color-im-line: var(--im-line);
   --color-im-line-strong: var(--im-line-strong);
+  --color-im-gold: var(--im-gold);
+  --color-im-navy-2: var(--im-navy-2);
 
   /* Escala de radio del rediseño (radio medio, generoso). Aditiva: ningún
      componente la consume todavía. El Operations Console mantiene su 2px. */
@@ -602,17 +604,21 @@
   /* ── Institutional Modernist — primitivos (Capa 1, rediseño total) ──────
      Editorial premium: papel hueso cálido + tinta azulada + acento cobalto.
      Valores hex de referencia en comentario; expresados en OKLCH. */
-  --im-paper: oklch(0.965 0.006 85); /* #F7F5F0 papel hueso */
-  --im-paper-2: oklch(0.945 0.007 85); /* panel cálido */
-  --im-card: oklch(0.99 0.004 85); /* card sobre papel */
-  --im-ink: oklch(0.23 0.03 285); /* #1A1A2E tinta */
-  --im-ink-soft: oklch(0.4 0.025 285); /* texto secundario */
-  --im-gray: oklch(0.52 0.012 285); /* #6B6B7B sutil */
-  --im-cobalt: oklch(0.47 0.17 267); /* #2B4ACB acento */
-  --im-cobalt-deep: oklch(0.4 0.16 267); /* hover / pressed */
-  --im-cobalt-wash: oklch(0.93 0.04 267); /* realce suave / acento sobre fondo oscuro */
-  --im-line: oklch(0.91 0.008 85); /* #E3E0D8 línea */
-  --im-line-strong: oklch(0.85 0.01 85); /* línea marcada */
+  /* Refresh 2026-10 "Mineral Capital": blanco, navy, cobre y oro.
+     Los nombres --im-* se conservan para no romper consumidores. */
+  --im-paper: oklch(0.985 0.004 80); /* blanco cálido */
+  --im-paper-2: oklch(0.96 0.008 75); /* panel marfil */
+  --im-card: oklch(1 0 0); /* blanco puro */
+  --im-ink: oklch(0.24 0.06 262); /* navy profundo #0F1E3D */
+  --im-ink-soft: oklch(0.42 0.04 262); /* navy texto secundario */
+  --im-gray: oklch(0.55 0.02 262);
+  --im-cobalt: oklch(0.58 0.12 48); /* cobre mineral #B8703F (acción) */
+  --im-cobalt-deep: oklch(0.5 0.12 45); /* cobre oxidado */
+  --im-cobalt-wash: oklch(0.82 0.1 80); /* oro sobre navy */
+  --im-line: oklch(0.91 0.01 75);
+  --im-line-strong: oklch(0.84 0.02 70);
+  --im-gold: oklch(0.76 0.11 82); /* oro refinado #C9A45C */
+  --im-navy-2: oklch(0.3 0.06 262); /* navy panel */
 
   /* ── Capa semántica (Capa 2) — el contrato del rediseño ─────────────────
      Apunta a la paleta Institutional Modernist. Aditivo: ningún componente
