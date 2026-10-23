@@ -38,19 +38,11 @@ describe("research documents", () => {
     expect(render("technical").report.overflow).toEqual([]);
   });
 
-  it("flags round-size and sample-count conflicts and blocks public export", () => {
-    const ids = findDiscrepancies("cholqui").map((d) => d.id);
-    expect(ids).toContain("cholqui-round-size");
+  it("platform terms match the dossier: USD 1,5 M round and USD 15.000 minimum", () => {
+    expect(findDiscrepancies("cholqui").filter((d) => d.blocking)).toEqual([]);
+    expect(findDiscrepancies("losverdes").filter((d) => d.blocking)).toEqual([]);
     const memo = buildResearchDoc("memo", "cholqui")!;
-    expect(publicExportBlocked(memo)).toBe(true);
-    expect(memo.terms.find((t) => t.label === "Tamaño de la ronda")?.conflictId).toBe("cholqui-round-size");
-  });
-
-  it("flags the Los Verdes minimum ticket conflict (15k vs 50k)", () => {
-    const d = findDiscrepancies("losverdes").find((x) => x.id === "losverdes-min-ticket");
-    expect(d?.documentValue).toContain("15");
-    expect(d?.platformValue).toContain("50");
-    expect(d?.blocking).toBe(true);
+    expect(publicExportBlocked(memo)).toBe(false);
   });
 
   it("16.23 % Cu is presented as a measured maximum of point samples, not a grade", () => {

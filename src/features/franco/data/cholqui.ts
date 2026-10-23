@@ -716,7 +716,8 @@ export const CHOLQUI_ROUND = {
   valuationLowUsd: 4_000_000,
   valuationHighUsd: 6_000_000,
   valuationMethod: "Comparables + flujo a tarifa ENAMI 1,5–2,5 % Cu soluble",
-  roundSizeUsd: 1_000_000,
+  // Homologado al dossier comercial oct. 2026 (15.000 acciones × USD 100), aprobado por alvarocumora 2026-10-22.
+  roundSizeUsd: 1_500_000,
   minTicketUsd: 15_000,
   instrument: "Equity SpA",
   equityOfferedPct: 15,
