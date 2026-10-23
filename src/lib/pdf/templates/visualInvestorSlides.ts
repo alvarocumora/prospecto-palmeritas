@@ -55,7 +55,7 @@ function ficha(doc: jsPDF, x: number, y: number, f: NonNullable<InvestorVisualSl
 }
 
 function footer(doc: jsPDF, W: number, H: number, note: string, page: number, total: number, dark = false) {
-  font(doc, 'body', 'normal', 5.6); ink(doc, dark ? CREAM : GC_COLOR.slate);
+  font(doc, 'body', 'normal', 7); ink(doc, dark ? CREAM : GC_COLOR.slate);
   const full = note + (note.includes('NI 43-101') ? '' : ' Sin recursos ni reservas certificados NI 43-101/JORC.');
   doc.text(lines(doc, '* ' + full, W - 120).slice(0, 3), 44, H - 28);
   font(doc, 'body', 'bold', 7); doc.text(`${String(page).padStart(2, '0')} / ${total}`, W - 44, H - 22, { align: 'right' });
