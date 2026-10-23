@@ -56,7 +56,9 @@ export function InvestmentCard({
           <span className="border border-hairline px-2 py-1">{stage || "Etapa por verificar"}</span>
         </div>
         <div>
-          <h3 className="font-serif text-[1.7rem] leading-[1.12] tracking-tight text-content">{title}</h3>
+          <h3 className="font-serif text-[1.7rem] leading-[1.12] tracking-tight text-content">
+            {title}
+          </h3>
           <p className="mt-3 flex items-start gap-1.5 text-sm leading-relaxed text-content-muted">
             <MapPin className="mt-0.5 size-3.5 shrink-0" />
             {region || "Ubicación por verificar"}
