@@ -22,7 +22,8 @@ export const Route = createFileRoute("/inversion/terminal")({
       { property: "og:title", content: "GeoCapitals Investor Terminal" },
       {
         property: "og:description",
-        content: "Invierte en minería chilena en explotación desde USD 15.000, con trazabilidad documental.",
+        content:
+          "Invierte en minería chilena en explotación desde USD 15.000, con trazabilidad documental.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -36,9 +37,22 @@ const usd = (n: number) =>
     ? `USD ${(n / 1_000_000).toLocaleString("es-CL", { maximumFractionDigits: 2 })} M`
     : `USD ${n.toLocaleString("es-CL")}`;
 
-const META: Record<PublicRound["slug"], { place: string; metal: string; horizon: string; value: string }> = {
-  cholqui: { place: "Melipilla · Región Metropolitana", metal: "Cu", horizon: "4 años", value: "USD 4–6 M" },
-  losverdes: { place: "Los Vilos · Choapa · Coquimbo", metal: "Cu-Mo", horizon: "5 años", value: "USD 8–12 M" },
+const META: Record<
+  PublicRound["slug"],
+  { place: string; metal: string; horizon: string; value: string }
+> = {
+  cholqui: {
+    place: "Melipilla · Región Metropolitana",
+    metal: "Cu",
+    horizon: "4 años",
+    value: "USD 4–6 M",
+  },
+  losverdes: {
+    place: "Los Vilos · Choapa · Coquimbo",
+    metal: "Cu-Mo",
+    horizon: "5 años",
+    value: "USD 8–12 M",
+  },
 };
 
 function InvestorTerminal() {
@@ -66,13 +80,18 @@ function InvestorTerminal() {
 
           <div className="mt-10 grid grid-cols-2 gap-px overflow-hidden rounded-brand-md border border-im-gold/30 bg-im-gold/20 md:grid-cols-4">
             {[
-              { l: "Rondas abiertas", v: String(rounds.filter((r) => r.open).length || rounds.length) },
+              {
+                l: "Rondas abiertas",
+                v: String(rounds.filter((r) => r.open).length || rounds.length),
+              },
               { l: "Meta conjunta", v: usd(target) },
               { l: "Colocado declarado", v: usd(committed) },
               { l: "Ticket mínimo", v: usd(rounds[0]?.minTicket ?? 15_000) },
             ].map((k) => (
               <div key={k.l} className="bg-surface-inverse px-4 py-5">
-                <div className="font-mono text-[10px] uppercase tracking-[0.16em] opacity-70">{k.l}</div>
+                <div className="font-mono text-[10px] uppercase tracking-[0.16em] opacity-70">
+                  {k.l}
+                </div>
                 <div className="mt-2 font-mono text-xl text-im-gold sm:text-2xl">{k.v}</div>
               </div>
             ))}
@@ -98,17 +117,24 @@ function InvestorTerminal() {
 
       {/* Oportunidades */}
       <section className="mx-auto max-w-6xl px-5 py-14">
-        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-brand">Oportunidades</p>
+        <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-accent-brand">
+          Oportunidades
+        </p>
         <h2 className="mt-2 font-serif text-3xl">Rondas en curso</h2>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
           {rounds.map((r) => {
             const m = META[r.slug];
             const pct = r.target ? Math.min(100, (r.committed / r.target) * 100) : 0;
             return (
-              <article key={r.code} className="overflow-hidden rounded-brand-md border border-hairline bg-surface-3">
+              <article
+                key={r.code}
+                className="overflow-hidden rounded-brand-md border border-hairline bg-surface-3"
+              >
                 <div className="mineral-texture bg-surface-inverse px-6 py-5 text-accent-brand-contrast">
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.18em]">
-                    <span className="text-im-gold">{r.token} · {m.metal}</span>
+                    <span className="text-im-gold">
+                      {r.token} · {m.metal}
+                    </span>
                     <span className="opacity-70">En explotación</span>
                   </div>
                   <h3 className="mt-3 font-serif text-2xl">{r.name}</h3>
@@ -117,7 +143,9 @@ function InvestorTerminal() {
                 <div className="p-6">
                   <div className="flex items-baseline justify-between">
                     <span className="font-mono text-2xl">{usd(r.target)}</span>
-                    <span className="font-mono text-sm text-accent-brand">{pct.toFixed(0)}% colocado*</span>
+                    <span className="font-mono text-sm text-accent-brand">
+                      {pct.toFixed(0)}% colocado*
+                    </span>
                   </div>
                   <div className="mt-3 h-1 w-full bg-surface-2">
                     <div className="h-1 bg-accent-brand" style={{ width: `${pct}%` }} />
@@ -130,7 +158,9 @@ function InvestorTerminal() {
                       ["Horizonte", m.horizon],
                     ].map(([k, v]) => (
                       <div key={k}>
-                        <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-content-subtle">{k}</dt>
+                        <dt className="font-mono text-[10px] uppercase tracking-[0.14em] text-content-subtle">
+                          {k}
+                        </dt>
                         <dd className="mt-0.5 font-mono">{v}</dd>
                       </div>
                     ))}
@@ -155,10 +185,26 @@ function InvestorTerminal() {
           <h2 className="font-serif text-3xl">Cómo invertir</h2>
           <ol className="mt-8 grid gap-px overflow-hidden rounded-brand-md border border-hairline bg-hairline sm:grid-cols-2 lg:grid-cols-4">
             {[
-              { i: Compass, t: "Descubre el activo", d: "Ubicación, pertenencias y estado de cada faena." },
-              { i: FileSearch, t: "Analiza la evidencia", d: "Muestras, informes y fuentes citadas por dato." },
-              { i: Landmark, t: "Estructura la inversión", d: "Ticket, contrato con la SPV y firma en línea." },
-              { i: LineChart, t: "Sigue tu posición", d: "Wallet con acciones confirmadas y cartola PDF." },
+              {
+                i: Compass,
+                t: "Descubre el activo",
+                d: "Ubicación, pertenencias y estado de cada faena.",
+              },
+              {
+                i: FileSearch,
+                t: "Analiza la evidencia",
+                d: "Muestras, informes y fuentes citadas por dato.",
+              },
+              {
+                i: Landmark,
+                t: "Estructura la inversión",
+                d: "Ticket, contrato con la SPV y firma en línea.",
+              },
+              {
+                i: LineChart,
+                t: "Sigue tu posición",
+                d: "Wallet con acciones confirmadas y cartola PDF.",
+              },
             ].map((s, n) => (
               <li key={s.t} className="bg-surface-3 p-6">
                 <div className="flex items-center gap-3">
@@ -175,11 +221,11 @@ function InvestorTerminal() {
 
       <section className="mx-auto max-w-6xl px-5 py-8">
         <p className="flex gap-2 text-[11px] leading-relaxed text-content-muted">
-          <ShieldCheck className="h-4 w-4 shrink-0 text-accent-brand" />
-          * Colocación declarada por la emisora (Valle Escondido SpA), no equivale a efectivo recaudado.
-          Valuaciones referenciales sin auditoría; capacidad productiva declarada por el titular, sin
-          recursos certificados NI 43-101/JORC. Inversión ilíquida y de riesgo; no constituye oferta
-          pública de valores.
+          <ShieldCheck className="h-4 w-4 shrink-0 text-accent-brand" />* Colocación declarada por
+          la emisora (Valle Escondido SpA), no equivale a efectivo recaudado. Valuaciones
+          referenciales sin auditoría; capacidad productiva declarada por el titular, sin recursos
+          certificados NI 43-101/JORC. Inversión ilíquida y de riesgo; no constituye oferta pública
+          de valores.
         </p>
       </section>
 

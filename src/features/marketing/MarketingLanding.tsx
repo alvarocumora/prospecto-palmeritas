@@ -47,8 +47,12 @@ export function MarketingLanding() {
       <section className="mineral-texture bg-surface-inverse text-accent-brand-contrast">
         <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-10 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-im-gold">Investor Terminal</p>
-            <h2 className="mt-2 font-serif text-2xl md:text-3xl">Rondas de cobre en explotación, desde USD 15.000.</h2>
+            <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-im-gold">
+              Investor Terminal
+            </p>
+            <h2 className="mt-2 font-serif text-2xl md:text-3xl">
+              Rondas de cobre en explotación, desde USD 15.000.
+            </h2>
           </div>
           <Link
             to="/inversion/terminal"

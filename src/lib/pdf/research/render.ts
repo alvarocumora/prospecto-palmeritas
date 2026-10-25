@@ -25,7 +25,14 @@ const BOTTOM = H - 64;
 
 export type RenderReport = { pages: number; overflow: string[] };
 
-type Ctx = { doc: jsPDF; d: ResearchDoc; overflow: string[]; refs: Map<string, number>; pageRefs: Set<string>; bottom: number };
+type Ctx = {
+  doc: jsPDF;
+  d: ResearchDoc;
+  overflow: string[];
+  refs: Map<string, number>;
+  pageRefs: Set<string>;
+  bottom: number;
+};
 
 function color(doc: jsPDF, c: RGB) {
   ink(doc, c);
@@ -43,7 +50,22 @@ function refNo(ctx: Ctx, id: string) {
 }
 
 /** Wrapped text; returns height. Registers overflow beyond maxH. */
-function text(ctx: Ctx, s: string, x: number, y: number, w: number, o: { size?: number; family?: "body" | "display" | "mono"; style?: "normal" | "bold" | "italic"; c?: RGB; lh?: number; maxH?: number; label?: string } = {}) {
+function text(
+  ctx: Ctx,
+  s: string,
+  x: number,
+  y: number,
+  w: number,
+  o: {
+    size?: number;
+    family?: "body" | "display" | "mono";
+    style?: "normal" | "bold" | "italic";
+    c?: RGB;
+    lh?: number;
+    maxH?: number;
+    label?: string;
+  } = {},
+) {
   const size = o.size ?? RS_TYPE.body;
   if (o.family === "mono") monoFont(ctx.doc, o.style === "bold" ? "bold" : "normal", size);
   else font(ctx.doc, o.family ?? "body", o.style ?? "normal", size);
@@ -51,7 +73,8 @@ function text(ctx: Ctx, s: string, x: number, y: number, w: number, o: { size?: 
   const lines = ctx.doc.splitTextToSize(s, w) as string[];
   const lh = size * (o.lh ?? 1.35);
   const h = lines.length * lh;
-  if (o.maxH && h > o.maxH + 0.5) ctx.overflow.push(`${o.label ?? s.slice(0, 40)} (${Math.round(h)} > ${Math.round(o.maxH)})`);
+  if (o.maxH && h > o.maxH + 0.5)
+    ctx.overflow.push(`${o.label ?? s.slice(0, 40)} (${Math.round(h)} > ${Math.round(o.maxH)})`);
   ctx.doc.text(lines, x, y + size * 0.8, { lineHeightFactor: o.lh ?? 1.35 });
   ctx.bottom = Math.max(ctx.bottom, y + h);
   return h;
@@ -77,7 +100,13 @@ function chrome(ctx: Ctx) {
   font(doc, "body", "bold", RS_TYPE.note);
   color(doc, C.white);
   doc.text(`${GC_BRAND.name} RESEARCH`, M + mw + 6, 32, { charSpace: 0.8 });
-  kicker(ctx, `${d.code} · ${d.version}`, W - M - doc.getTextWidth(`${d.code} · ${d.version}`.toUpperCase()) - 8, 32, C.gold);
+  kicker(
+    ctx,
+    `${d.code} · ${d.version}`,
+    W - M - doc.getTextWidth(`${d.code} · ${d.version}`.toUpperCase()) - 8,
+    32,
+    C.gold,
+  );
   if (d.draft) {
     kicker(ctx, d.classification, M, 74, C.cobalt);
   }
@@ -99,7 +128,10 @@ function sourcesFooter(ctx: Ctx) {
   const wrapped = lines.flatMap((l) => ctx.doc.splitTextToSize(l, CW) as string[]);
   const h = wrapped.length * RS_TYPE.note * 1.3;
   const y0 = BOTTOM - h - 6;
-  if (ctx.bottom > y0 - 10) ctx.overflow.push(`página ${page}: contenido se superpone a las fuentes (${Math.round(ctx.bottom)} > ${Math.round(y0 - 10)})`);
+  if (ctx.bottom > y0 - 10)
+    ctx.overflow.push(
+      `página ${page}: contenido se superpone a las fuentes (${Math.round(ctx.bottom)} > ${Math.round(y0 - 10)})`,
+    );
   ctx.bottom = 0;
   hair(ctx.doc, y0 - 6);
   color(ctx.doc, C.muted);
@@ -127,7 +159,18 @@ function section(ctx: Ctx, y: number, num: string, label: string) {
 }
 
 /** Light vector table: top rule ink, hairline separators, no cell borders. */
-function table(ctx: Ctx, x: number, y: number, w: number, head: string[], rows: string[][], widths: number[], numeric: number[] = [], maxY = BOTTOM - 80, label = "tabla") {
+function table(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  w: number,
+  head: string[],
+  rows: string[][],
+  widths: number[],
+  numeric: number[] = [],
+  maxY = BOTTOM - 80,
+  label = "tabla",
+) {
   const { doc } = ctx;
   hair(doc, y, x, x + w, C.ink, 0.8);
   monoFont(doc, "normal", RS_TYPE.note);
@@ -135,7 +178,10 @@ function table(ctx: Ctx, x: number, y: number, w: number, head: string[], rows: 
   let cx = x;
   head.forEach((h, i) => {
     const right = numeric.includes(i);
-    doc.text(h.toUpperCase(), right ? cx + widths[i] - 4 : cx, y + 12, { align: right ? "right" : "left", charSpace: 0.3 });
+    doc.text(h.toUpperCase(), right ? cx + widths[i] - 4 : cx, y + 12, {
+      align: right ? "right" : "left",
+      charSpace: 0.3,
+    });
     cx += widths[i];
   });
   y += 18;
@@ -158,7 +204,10 @@ function table(ctx: Ctx, x: number, y: number, w: number, head: string[], rows: 
       if (numeric.includes(i)) monoFont(doc, "normal", RS_TYPE.body);
       else font(doc, "body", i === 0 ? "bold" : "normal", RS_TYPE.body);
       color(doc, isConflict ? C.cobalt : C.ink);
-      doc.text(lines, right ? cx + widths[i] - 4 : cx, y + 6 + RS_TYPE.body * 0.8, { align: right ? "right" : "left", lineHeightFactor: 1.3 });
+      doc.text(lines, right ? cx + widths[i] - 4 : cx, y + 6 + RS_TYPE.body * 0.8, {
+        align: right ? "right" : "left",
+        lineHeightFactor: 1.3,
+      });
       cx += widths[i];
     });
     y += rh;
@@ -177,11 +226,31 @@ function paramRows(ctx: Ctx, ps: ResearchParam[]) {
   ]);
 }
 
-function paramTable(ctx: Ctx, x: number, y: number, w: number, ps: ResearchParam[], maxY?: number, label = "parámetros") {
-  const widths = w > 300 ? [w * 0.36, w * 0.38, w * 0.16, w * 0.1] : [w * 0.4, w * 0.34, w * 0.17, w * 0.09];
+function paramTable(
+  ctx: Ctx,
+  x: number,
+  y: number,
+  w: number,
+  ps: ResearchParam[],
+  maxY?: number,
+  label = "parámetros",
+) {
+  const widths =
+    w > 300 ? [w * 0.36, w * 0.38, w * 0.16, w * 0.1] : [w * 0.4, w * 0.34, w * 0.17, w * 0.09];
   const rows = paramRows(ctx, ps);
   // Render conflict rows in cobalt via the CONFLICT_LABEL first line.
-  return table(ctx, x, y, w, ["Parámetro", "Valor", "Clase", "Ref."], rows, widths, [3], maxY, label);
+  return table(
+    ctx,
+    x,
+    y,
+    w,
+    ["Parámetro", "Valor", "Clase", "Ref."],
+    rows,
+    widths,
+    [3],
+    maxY,
+    label,
+  );
 }
 
 function bulletList(ctx: Ctx, title: string, items: string[], x: number, y: number, w: number) {
@@ -205,7 +274,9 @@ function mapFigure(ctx: Ctx, y: number, maxH: number) {
   } else {
     stroke(ctx.doc, C.hairline);
     ctx.doc.rect(M, y, imgW, imgH);
-    text(ctx, "Imagen no cargada en esta exportación.", M + 12, y + imgH / 2 - 6, imgW - 24, { c: C.muted });
+    text(ctx, "Imagen no cargada en esta exportación.", M + 12, y + imgH / 2 - 6, imgW - 24, {
+      c: C.muted,
+    });
   }
   const mx = M + imgW + 14;
   const mw = W - M - mx;
@@ -221,27 +292,78 @@ function mapFigure(ctx: Ctx, y: number, maxH: number) {
     for (const [k, v] of meta) {
       kicker(ctx, k, mx, my + 7);
       my += 11;
-      my += text(ctx, v, mx, my, mw, { family: k === "Extensión" || k === "CRS" ? "mono" : "body", size: RS_TYPE.note }) + 6;
+      my +=
+        text(ctx, v, mx, my, mw, {
+          family: k === "Extensión" || k === "CRS" ? "mono" : "body",
+          size: RS_TYPE.note,
+        }) + 6;
     }
-    return Math.max(y + imgH, my) + 8 + text(ctx, m.caption, M, Math.max(y + imgH, my) + 8, CW, { size: RS_TYPE.note, c: C.muted, style: "italic" }) + 10;
+    return (
+      Math.max(y + imgH, my) +
+      8 +
+      text(ctx, m.caption, M, Math.max(y + imgH, my) + 8, CW, {
+        size: RS_TYPE.note,
+        c: C.muted,
+        style: "italic",
+      }) +
+      10
+    );
   }
   let yy = y + imgH + 8;
-  yy += text(ctx, `${m.caption} ${meta.map(([k, v]) => `${k}: ${v}`).join(" · ")}`, M, yy, CW, { size: RS_TYPE.note, c: C.muted });
+  yy += text(ctx, `${m.caption} ${meta.map(([k, v]) => `${k}: ${v}`).join(" · ")}`, M, yy, CW, {
+    size: RS_TYPE.note,
+    c: C.muted,
+  });
   return yy + 10;
 }
 
 function disclaimers(ctx: Ctx, y: number, maxY: number) {
   kicker(ctx, "Advertencias", M, y);
   y += 10;
-  const body = [...ctx.d.disclaimers, ...(ctx.d.separateInstrumentNote ? [ctx.d.separateInstrumentNote] : [])].join(" ");
-  return y + text(ctx, body, M, y, CW, { size: RS_TYPE.note, c: C.muted, maxH: maxY - y, label: "advertencias" });
+  const body = [
+    ...ctx.d.disclaimers,
+    ...(ctx.d.separateInstrumentNote ? [ctx.d.separateInstrumentNote] : []),
+  ].join(" ");
+  return (
+    y +
+    text(ctx, body, M, y, CW, {
+      size: RS_TYPE.note,
+      c: C.muted,
+      maxH: maxY - y,
+      label: "advertencias",
+    })
+  );
 }
 
 function discrepancyBlock(ctx: Ctx, y: number) {
   const ds = ctx.d.discrepancies;
   if (!ds.length) return y;
-  kicker(ctx, `Discrepancias entre fuentes · ${ds.filter((d) => d.blocking).length} bloqueantes`, M, y, C.cobalt);
-  return table(ctx, M, y + 6, CW, ["Campo", "Documento", "Plataforma", "Estado"], ds.map((d) => [d.field, `${d.documentValue}\n${d.documentSource}`, `${d.platformValue}\n${d.platformSource}`, d.blocking ? "Bloqueante" : "Informativa"]), [CW * 0.2, CW * 0.32, CW * 0.32, CW * 0.16], [], BOTTOM - 40, "discrepancias") + 14;
+  kicker(
+    ctx,
+    `Discrepancias entre fuentes · ${ds.filter((d) => d.blocking).length} bloqueantes`,
+    M,
+    y,
+    C.cobalt,
+  );
+  return (
+    table(
+      ctx,
+      M,
+      y + 6,
+      CW,
+      ["Campo", "Documento", "Plataforma", "Estado"],
+      ds.map((d) => [
+        d.field,
+        `${d.documentValue}\n${d.documentSource}`,
+        `${d.platformValue}\n${d.platformSource}`,
+        d.blocking ? "Bloqueante" : "Informativa",
+      ]),
+      [CW * 0.2, CW * 0.32, CW * 0.32, CW * 0.16],
+      [],
+      BOTTOM - 40,
+      "discrepancias",
+    ) + 14
+  );
 }
 
 /* ---------------- Templates ---------------- */
@@ -260,18 +382,31 @@ function cover(ctx: Ctx) {
     ["Versión", d.version],
     ["Categoría", d.category],
     ["Clasificación", d.classification],
-    ["Exportación pública", publicExportBlocked(d) ? "BLOQUEADA · datos por confirmar" : "Habilitada tras aprobación"],
+    [
+      "Exportación pública",
+      publicExportBlocked(d) ? "BLOQUEADA · datos por confirmar" : "Habilitada tras aprobación",
+    ],
   ];
   let y = 318;
   meta.forEach(([k, v], i) => {
     const x = M + (i % 2) * (CW / 2);
     kicker(ctx, k, x, y);
-    text(ctx, v, x, y + 5, CW / 2 - 16, { family: "mono", size: RS_TYPE.body, c: k === "Exportación pública" && publicExportBlocked(d) ? C.cobalt : C.ink });
+    text(ctx, v, x, y + 5, CW / 2 - 16, {
+      family: "mono",
+      size: RS_TYPE.body,
+      c: k === "Exportación pública" && publicExportBlocked(d) ? C.cobalt : C.ink,
+    });
     if (i % 2) y += 40;
   });
   y += 20;
   kicker(ctx, "Resumen", M, y);
-  text(ctx, d.thesis, M, y + 10, CW * 0.78, { size: 11, family: "display", lh: 1.45, maxH: 160, label: "tesis portada" });
+  text(ctx, d.thesis, M, y + 10, CW * 0.78, {
+    size: 11,
+    family: "display",
+    lh: 1.45,
+    maxH: 160,
+    label: "tesis portada",
+  });
   disclaimers(ctx, BOTTOM - 120, BOTTOM - 10);
 }
 
@@ -299,7 +434,19 @@ function geology(ctx: Ctx, num = "02") {
     kicker(ctx, "Análisis puntuales de laboratorio", M, y);
     const a = d.assays;
     const refs = a.sourceIds.map((id) => `[${refNo(ctx, id)}]`).join(" ");
-    y = table(ctx, M, y + 6, CW, a.head, a.rows, [CW * 0.1, CW * 0.36, CW * 0.1, CW * 0.1, CW * 0.1, CW * 0.1, CW * 0.14], a.numericCols, BOTTOM - 70, "ensayes") + 8;
+    y =
+      table(
+        ctx,
+        M,
+        y + 6,
+        CW,
+        a.head,
+        a.rows,
+        [CW * 0.1, CW * 0.36, CW * 0.1, CW * 0.1, CW * 0.1, CW * 0.1, CW * 0.14],
+        a.numericCols,
+        BOTTOM - 70,
+        "ensayes",
+      ) + 8;
     y += text(ctx, `${a.note} Fuentes ${refs}.`, M, y, CW, { size: RS_TYPE.note, c: C.muted });
   }
 }
@@ -307,17 +454,58 @@ function geology(ctx: Ctx, num = "02") {
 function risks(ctx: Ctx, num = "03") {
   const { d } = ctx;
   let y = section(ctx, TOP + 14, num, "Riesgos y due diligence pendiente");
-  y = table(ctx, M, y, CW, ["Área", "Riesgo", "Nivel", "Estado"], d.risks.map((r) => [r.area, r.risk, r.level, r.status]), [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3], [], BOTTOM - 60, "riesgos") + 6;
-  y += text(ctx, "Nivel: evaluación cualitativa de GeoCapitals, no modelada.", M, y, CW, { size: RS_TYPE.note, c: C.muted }) + 14;
+  y =
+    table(
+      ctx,
+      M,
+      y,
+      CW,
+      ["Área", "Riesgo", "Nivel", "Estado"],
+      d.risks.map((r) => [r.area, r.risk, r.level, r.status]),
+      [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3],
+      [],
+      BOTTOM - 60,
+      "riesgos",
+    ) + 6;
+  y +=
+    text(ctx, "Nivel: evaluación cualitativa de GeoCapitals, no modelada.", M, y, CW, {
+      size: RS_TYPE.note,
+      c: C.muted,
+    }) + 14;
   kicker(ctx, "Due diligence", M, y);
-  y = table(ctx, M, y + 6, CW, ["Elemento", "Estado"], d.dueDiligence.map((x) => [x.item, x.status]), [CW * 0.7, CW * 0.3], [], BOTTOM - 60, "due diligence") + 14;
+  y =
+    table(
+      ctx,
+      M,
+      y + 6,
+      CW,
+      ["Elemento", "Estado"],
+      d.dueDiligence.map((x) => [x.item, x.status]),
+      [CW * 0.7, CW * 0.3],
+      [],
+      BOTTOM - 60,
+      "due diligence",
+    ) + 14;
   y = discrepancyBlock(ctx, y);
   return y;
 }
 
 function sourceRegister(ctx: Ctx, y: number) {
   kicker(ctx, "Registro de fuentes", M, y);
-  return table(ctx, M, y + 6, CW, ["Ref.", "Fuente", "Período", "Clase"], ctx.d.sources.map((s, i) => [`[${i + 1}]`, s.label, s.period, s.provenance]), [CW * 0.08, CW * 0.56, CW * 0.2, CW * 0.16], [], BOTTOM - 20, "fuentes") + 12;
+  return (
+    table(
+      ctx,
+      M,
+      y + 6,
+      CW,
+      ["Ref.", "Fuente", "Período", "Clase"],
+      ctx.d.sources.map((s, i) => [`[${i + 1}]`, s.label, s.period, s.provenance]),
+      [CW * 0.08, CW * 0.56, CW * 0.2, CW * 0.16],
+      [],
+      BOTTOM - 20,
+      "fuentes",
+    ) + 12
+  );
 }
 
 function renderMemo(ctx: Ctx) {
@@ -350,16 +538,25 @@ function renderFactSheet(ctx: Ctx) {
     const m = d.map;
     const ih = Math.min(lw / m.aspect, 120);
     const iw = ih * m.aspect;
-    if (m.imageDataUrl) ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, iw, ih, undefined, "MEDIUM");
+    if (m.imageDataUrl)
+      ctx.doc.addImage(m.imageDataUrl, "JPEG", M, ly, iw, ih, undefined, "MEDIUM");
     else {
       stroke(ctx.doc, C.hairline);
       ctx.doc.rect(M, ly, iw, ih);
     }
     ly += ih + 6;
-    ly += text(ctx, `Imagen de contexto [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · adquisición ${m.acquisition.toLowerCase()}`, M, ly, lw, { size: RS_TYPE.note, c: C.muted }) + 8;
+    ly +=
+      text(
+        ctx,
+        `Imagen de contexto [${refNo(ctx, m.sourceId)}] · CRS ${m.crs} · adquisición ${m.acquisition.toLowerCase()}`,
+        M,
+        ly,
+        lw,
+        { size: RS_TYPE.note, c: C.muted },
+      ) + 8;
   }
   kicker(ctx, "Tesis", rx, y + 4);
-  let ry = y + 14 + text(ctx, d.thesis, rx, y + 14, rw, { size: RS_TYPE.body, lh: 1.35 }) + 8;
+  const ry = y + 14 + text(ctx, d.thesis, rx, y + 14, rw, { size: RS_TYPE.body, lh: 1.35 }) + 8;
   y = Math.max(ly, ry);
   kicker(ctx, "Perfil del activo", M, y);
   y = paramTable(ctx, M, y + 6, CW, d.params, BOTTOM - 70, "perfil") + 12;
@@ -368,7 +565,19 @@ function renderFactSheet(ctx: Ctx) {
   newPage(ctx);
   y = section(ctx, TOP + 14, "02", "Riesgos, fuentes y advertencias");
   y = bulletList(ctx, "Incertidumbres", d.uncertainties, M, y, CW) + 4;
-  y = table(ctx, M, y, CW, ["Área", "Riesgo", "Nivel", "Estado"], d.risks.map((r) => [r.area, r.risk, r.level, r.status]), [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3], [], BOTTOM - 60, "riesgos ficha") + 14;
+  y =
+    table(
+      ctx,
+      M,
+      y,
+      CW,
+      ["Área", "Riesgo", "Nivel", "Estado"],
+      d.risks.map((r) => [r.area, r.risk, r.level, r.status]),
+      [CW * 0.16, CW * 0.44, CW * 0.1, CW * 0.3],
+      [],
+      BOTTOM - 60,
+      "riesgos ficha",
+    ) + 14;
   y = discrepancyBlock(ctx, y);
   y = sourceRegister(ctx, y);
   disclaimers(ctx, y + 4, BOTTOM - 10);
@@ -383,15 +592,34 @@ function renderTechnical(ctx: Ctx) {
   ctx.doc.text(`${d.projectName} · evidencia técnica`, M, TOP + 44);
   let y = TOP + 64;
   kicker(ctx, "Control documental", M, y);
-  y = table(ctx, M, y + 6, CW, ["Campo", "Antecedente"], [
-    ["Código / versión", `${d.code} · ${d.version}`],
-    ["Emisión", d.issued],
-    ["Preparado por", "GeoCapitals · equipo técnico (compilación)"],
-    ["Revisión QP/CP", "No designada · documento no certificado"],
-    ["Estado", d.classification],
-  ], [CW * 0.3, CW * 0.7], [], BOTTOM, "control") + 18;
-  y = section(ctx, y, "01", "Alcance y método") ;
-  y += text(ctx, "Compilación de evidencia existente en la plataforma: ensayes de laboratorio externos, cartografía citada por el titular e imagen satelital de contexto. Se presentan estadísticas descriptivas; no se estiman leyes medias, continuidad, recursos ni reservas.", M, y, CW) + 14;
+  y =
+    table(
+      ctx,
+      M,
+      y + 6,
+      CW,
+      ["Campo", "Antecedente"],
+      [
+        ["Código / versión", `${d.code} · ${d.version}`],
+        ["Emisión", d.issued],
+        ["Preparado por", "GeoCapitals · equipo técnico (compilación)"],
+        ["Revisión QP/CP", "No designada · documento no certificado"],
+        ["Estado", d.classification],
+      ],
+      [CW * 0.3, CW * 0.7],
+      [],
+      BOTTOM,
+      "control",
+    ) + 18;
+  y = section(ctx, y, "01", "Alcance y método");
+  y +=
+    text(
+      ctx,
+      "Compilación de evidencia existente en la plataforma: ensayes de laboratorio externos, cartografía citada por el titular e imagen satelital de contexto. Se presentan estadísticas descriptivas; no se estiman leyes medias, continuidad, recursos ni reservas.",
+      M,
+      y,
+      CW,
+    ) + 14;
   kicker(ctx, "Estadística descriptiva", M, y);
   y = paramTable(ctx, M, y + 6, CW, d.assayStats ?? [], BOTTOM - 20, "estadística") + 10;
   newPage(ctx);

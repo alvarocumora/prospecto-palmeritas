@@ -21,12 +21,7 @@ export const RS_COLOR = {
 export const RS_TYPE = { note: 7.5, body: 8.5, deckBody: 9 } as const;
 
 export type Provenance =
-  | "MEDIDO"
-  | "OFICIAL"
-  | "DECLARADO"
-  | "MODELADO"
-  | "REFERENCIAL"
-  | "PENDIENTE";
+  "MEDIDO" | "OFICIAL" | "DECLARADO" | "MODELADO" | "REFERENCIAL" | "PENDIENTE";
 
 export type ResearchSource = {
   id: string;
@@ -74,7 +69,12 @@ export type ResearchMap = {
 
 export type ResearchFamily = "memo" | "factsheet" | "technical" | "quarterly" | "statement";
 
-export type RiskRow = { area: string; risk: string; level: "Alto" | "Medio" | "Bajo"; status: string };
+export type RiskRow = {
+  area: string;
+  risk: string;
+  level: "Alto" | "Medio" | "Bajo";
+  status: string;
+};
 
 export type ResearchDoc = {
   family: ResearchFamily;
@@ -97,7 +97,13 @@ export type ResearchDoc = {
   /** Equity round terms only. The collateralised loan is a separate instrument. */
   terms: ResearchParam[];
   termsIssuer?: string;
-  assays?: { head: string[]; rows: string[][]; numericCols: number[]; sourceIds: string[]; note: string };
+  assays?: {
+    head: string[];
+    rows: string[][];
+    numericCols: number[];
+    sourceIds: string[];
+    note: string;
+  };
   assayStats?: ResearchParam[];
   map?: ResearchMap;
   risks: RiskRow[];
@@ -128,7 +134,9 @@ export function integrityProblems(doc: ResearchDoc): string[] {
       problems.push(`Discrepancia no registrada: ${p.label}`);
   };
   [...doc.params, ...doc.terms, ...(doc.assayStats ?? [])].forEach(check);
-  doc.assays?.sourceIds.forEach((id) => !ids.has(id) && problems.push(`Sin fuente de ensaye: ${id}`));
+  doc.assays?.sourceIds.forEach(
+    (id) => !ids.has(id) && problems.push(`Sin fuente de ensaye: ${id}`),
+  );
   if (doc.map && !ids.has(doc.map.sourceId)) problems.push("Mapa sin fuente");
   return problems;
 }
