@@ -149,6 +149,28 @@ for (const width of [390, 1440]) {
     await snapshot(page, prefix + "-perspective");
   });
 
+  await scenario(page, prefix + "-project-investment-kit", async () => {
+    // Test the real selected-project flow; never request confidential assets.
+    await page.getByRole("link", { name: /Kit y documentos/i }).click({ noWaitAfter: true });
+    await page.waitForURL(/\/terminal\/losverdes.*tab=dataroom/, { timeout: 20000 });
+    await page.getByRole("heading", { name: /Documentación para evaluar/i }).waitFor({
+      timeout: 15000,
+    });
+    const privateDoc = page
+      .getByRole("article")
+      .filter({ has: page.getByRole("heading", { name: "Modelo financiero confidencial" }) });
+    assert.ok(await privateDoc.getByRole("link", { name: /Consultar requisitos/i }).isVisible());
+    assert.equal(await privateDoc.getByRole("link", { name: /Descargar/i }).count(), 0);
+    await snapshot(page, prefix + "-project-kit");
+
+    await page.getByRole("link", { name: /Simular participación/i }).click({ noWaitAfter: true });
+    await page.waitForURL(/tab=simulador/, { timeout: 20000 });
+    await page.getByText("Simulador de inversión", { exact: true }).waitFor({
+      timeout: 15000,
+    });
+    await snapshot(page, prefix + "-investment-simulator");
+  });
+
   await scenario(page, prefix + "-guest-cannot-access-portfolio", async () => {
     await startAt(page, "/dashboard/investments");
     await page.waitForURL(/\/auth(?:\?|$)/, { timeout: 12000 });
