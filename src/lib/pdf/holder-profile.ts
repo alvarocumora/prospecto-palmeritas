@@ -9,9 +9,19 @@
  *
  * Produces a single PDF for executive distribution / due-diligence.
  */
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
+import { jsPDF } from "jspdf";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  drawFooter,
+  drawHeader,
+  editorialTable,
+  ensureBrandFonts,
+  eyebrow,
+  fitTableRows,
+  font,
+  paragraph,
+  title,
+} from "./brand/kit";
 
 export type HolderProfileInput = {
   projectId: string;
@@ -57,50 +67,71 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
   const pubs = (pubsRes.data ?? []).filter(matchPub);
   const cases = (casesRes.data ?? []).filter(matchCase);
 
-  // Build PDF
+  // Build PDF — estructura de marca institucional (brand/kit), igual que
+  // propertyAnalysisPdf.ts, para documentos de due diligence puntuales.
   const doc = new jsPDF({ unit: "pt", format: "a4" });
-  const pageW = doc.internal.pageSize.getWidth();
+  await ensureBrandFonts(doc);
+  const w = doc.internal.pageSize.getWidth();
+  const h = doc.internal.pageSize.getHeight();
+  const m = 48;
+  const cw = w - 2 * m;
+  const issued = new Date().toLocaleDateString("es-CL");
+  let page = 1;
+  const start = () => {
+    drawHeader(doc, { w, m, left: "Perfil de titular minero", right: issued });
+  };
+  const ensure = (y: number, need: number) => {
+    if (y + need < h - 50) return y;
+    drawFooter(doc, { w, h, m, left: projectName, page });
+    doc.addPage();
+    page++;
+    start();
+    return 70;
+  };
+  const pagedTable = (y: number, head: string[], rows: string[][]): number => {
+    let rest = rows;
+    let cy = y;
+    while (rest.length) {
+      font(doc, "body", "normal", 8);
+      const fit = fitTableRows(doc, { head, rows: rest, w: cw, size: 8 }, h - 50 - cy);
+      if (!fit) {
+        cy = ensure(cy, h - 50 - cy + 1);
+        continue;
+      }
+      cy +=
+        editorialTable(doc, { x: m, y: cy, w: cw, head, rows: rest.slice(0, fit), size: 8 }) + 4;
+      rest = rest.slice(fit);
+      if (rest.length) cy = ensure(cy, 9999);
+    }
+    return cy;
+  };
 
-  // Header
-  doc.setFillColor(15, 23, 42);
-  doc.rect(0, 0, pageW, 70, "F");
-  doc.setTextColor(255, 215, 0);
-  doc.setFontSize(16);
-  doc.text("PERFIL DE TITULAR MINERO", 40, 30);
-  doc.setTextColor(200, 200, 200);
-  doc.setFontSize(9);
-  doc.text(`Geocapitals · Proyecto: ${projectName}`, 40, 48);
-  doc.text(`Generado: ${new Date().toLocaleString("es-CL")}`, 40, 60);
+  start();
+  let y = 76;
+  eyebrow(doc, m, y, projectName);
+  y += 16;
+  y += title(doc, m, y + 8, "Perfil de titular minero", 22, cw) + 10;
 
-  doc.setTextColor(0, 0, 0);
-  let y = 95;
+  y +=
+    paragraph(doc, m, y, `Titular: ${holderName ?? "—"}  ·  RUT: ${holderRut ?? "—"}`, cw, 9) + 10;
+  y +=
+    paragraph(
+      doc,
+      m,
+      y,
+      `Publicaciones en Boletín Oficial de Minería: ${pubs.length}  ·  Causas judiciales (PJUD): ${cases.length}`,
+      cw,
+      9,
+    ) + 12;
 
-  // Identity
-  doc.setFontSize(12);
-  doc.text("Identidad", 40, y);
-  y += 14;
-  doc.setFontSize(10);
-  doc.text(`Titular: ${holderName ?? "—"}`, 40, y);
-  y += 12;
-  doc.text(`RUT: ${holderRut ?? "—"}`, 40, y);
-  y += 18;
-
-  // Summary metrics
-  doc.setFontSize(12);
-  doc.text("Resumen", 40, y);
-  y += 14;
-  doc.setFontSize(10);
-  doc.text(`Publicaciones en Boletín Oficial de Minería: ${pubs.length}`, 40, y);
-  y += 12;
-  doc.text(`Causas judiciales (PJUD): ${cases.length}`, 40, y);
-  y += 8;
-
-  // Publications table
+  y = ensure(y, 60);
+  eyebrow(doc, m, y + 8, "Publicaciones en Boletín Oficial de Minería");
+  y += 20;
   if (pubs.length > 0) {
-    autoTable(doc, {
-      startY: y + 12,
-      head: [["Fecha", "N°", "Tipo", "Concesión", "Comuna", "Área (ha)"]],
-      body: pubs
+    y = pagedTable(
+      y,
+      ["Fecha", "N°", "Tipo", "Concesión", "Comuna", "Área (ha)"],
+      pubs
         .slice(0, 50)
         .map((p) => [
           p.publication_date ?? "—",
@@ -110,22 +141,19 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
           p.comuna ?? "—",
           p.area_ha != null ? String(p.area_ha) : "—",
         ]),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [30, 41, 59], textColor: 255 },
-      margin: { left: 40, right: 40 },
-    });
-    y = (doc as unknown as { lastAutoTable?: { finalY: number } }).lastAutoTable?.finalY ?? y;
+    );
   } else {
-    doc.text("Sin publicaciones recientes en el Boletín.", 40, y + 14);
-    y += 26;
+    y += paragraph(doc, m, y, "Sin publicaciones recientes en el Boletín.", cw, 9) + 10;
   }
 
-  // Court cases table
+  y = ensure(y, 60);
+  eyebrow(doc, m, y + 8, "Causas judiciales (PJUD)");
+  y += 20;
   if (cases.length > 0) {
-    autoTable(doc, {
-      startY: y + 14,
-      head: [["Fecha", "Rol", "Tribunal", "Materia", "Demandante", "Estado"]],
-      body: cases
+    y = pagedTable(
+      y,
+      ["Fecha", "Rol", "Tribunal", "Materia", "Demandante", "Estado"],
+      cases
         .slice(0, 50)
         .map((c) => [
           c.filed_at ?? "—",
@@ -135,27 +163,12 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
           c.plaintiff ?? "—",
           c.status ?? "—",
         ]),
-      styles: { fontSize: 8 },
-      headStyles: { fillColor: [127, 29, 29], textColor: 255 },
-      margin: { left: 40, right: 40 },
-    });
+    );
   } else {
-    doc.text("Sin causas judiciales registradas.", 40, y + 26);
+    y += paragraph(doc, m, y, "Sin causas judiciales registradas.", cw, 9);
   }
 
-  // Footer page numbers
-  const pages = doc.getNumberOfPages();
-  for (let i = 1; i <= pages; i++) {
-    doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(120, 120, 120);
-    doc.text(
-      `Geocapitals · Perfil de Titular · Página ${i}/${pages}`,
-      pageW / 2,
-      doc.internal.pageSize.getHeight() - 20,
-      { align: "center" },
-    );
-  }
+  drawFooter(doc, { w, h, m, left: projectName, page });
 
   const safeName = (holderName ?? holderRut ?? "titular")
     .replace(/[^a-zA-Z0-9-]+/g, "_")
