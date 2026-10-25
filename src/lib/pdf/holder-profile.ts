@@ -76,6 +76,7 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
   const m = 48;
   const cw = w - 2 * m;
   const issued = new Date().toLocaleDateString("es-CL");
+  const TOP = 70;
   let page = 1;
   const start = () => {
     drawHeader(doc, { w, m, left: "Perfil de titular minero", right: issued });
@@ -86,7 +87,7 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
     doc.addPage();
     page++;
     start();
-    return 70;
+    return TOP;
   };
   const pagedTable = (y: number, head: string[], rows: string[][]): number => {
     let rest = rows;
@@ -95,7 +96,10 @@ export async function generateHolderProfilePdf(input: HolderProfileInput) {
       font(doc, "body", "normal", 8);
       const fit = fitTableRows(doc, { head, rows: rest, w: cw, size: 8 }, h - 50 - cy);
       if (!fit) {
-        cy = ensure(cy, h - 50 - cy + 1);
+        if (cy === TOP) {
+          throw new Error("Una fila excede la página; divida su contenido antes de exportar.");
+        }
+        cy = ensure(cy, 9999);
         continue;
       }
       cy +=

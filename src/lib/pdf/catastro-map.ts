@@ -63,6 +63,7 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
   const cw = w - m * 2;
   const issued = new Date().toLocaleDateString("es-CL");
   const footerLeft = "Fuente: SERNAGEOMIN — Catastro Minero (ArcGIS REST · WGS84_Concesion)";
+  const TOP = 64;
   const start = () => {
     drawHeader(doc, { w, m, left: "Catastro minero — Reporte de mapa", right: issued });
   };
@@ -70,7 +71,26 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
     if (y + need < h - 40) return y;
     doc.addPage();
     start();
-    return 64;
+    return TOP;
+  };
+  const pagedTable = (y: number, head: string[], rows: string[][], size: number): number => {
+    let rest = rows;
+    let cy = y;
+    while (rest.length) {
+      font(doc, "body", "normal", size);
+      const fit = fitTableRows(doc, { head, rows: rest, w: cw, size }, h - 40 - cy);
+      if (!fit) {
+        if (cy === TOP) {
+          throw new Error("Una fila excede la página; divida su contenido antes de exportar.");
+        }
+        cy = ensure(cy, 9999);
+        continue;
+      }
+      cy += editorialTable(doc, { x: m, y: cy, w: cw, head, rows: rest.slice(0, fit), size });
+      rest = rest.slice(fit);
+      if (rest.length) cy = ensure(cy, 9999);
+    }
+    return cy;
   };
   start();
   let y = 60;
@@ -145,7 +165,7 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
       c.area_ha != null ? String(c.area_ha) : "—",
       c.expires_at ?? "—",
     ]);
-    y += editorialTable(doc, { x: m, y, w: cw, head, rows, size: 7.6 }) + 10;
+    y = pagedTable(y, head, rows, 7.6) + 10;
   }
 
   // SERNAGEOMIN features table (truncate to fit)
@@ -174,18 +194,7 @@ export async function exportCatastroMapPdf(input: CatastroPdfInput): Promise<voi
         venc,
       ];
     });
-    let rest = rows;
-    while (rest.length) {
-      font(doc, "body", "normal", 6.8);
-      const fit = fitTableRows(doc, { head, rows: rest, w: cw, size: 6.8 }, h - 40 - y);
-      if (!fit) {
-        y = ensure(y, h - 40 - y + 1);
-        continue;
-      }
-      y += editorialTable(doc, { x: m, y, w: cw, head, rows: rest.slice(0, fit), size: 6.8 });
-      rest = rest.slice(fit);
-      if (rest.length) y = ensure(y, 9999);
-    }
+    y = pagedTable(y, head, rows, 6.8);
     if (catastroFeatures.length > 200) {
       font(doc, "body", "italic", 7.4);
       ink(doc, GC_COLOR.slate);
