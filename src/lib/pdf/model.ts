@@ -21,7 +21,13 @@ export type InvestorVisualSlide = {
   items: Array<{ title: string; body: string }>;
   note: string;
   /** Ficha de inversión superpuesta (proyecto con ronda abierta). */
-  ficha?: { project: string; commodity: string; placement: number; valuation: string; horizon: string };
+  ficha?: {
+    project: string;
+    commodity: string;
+    placement: number;
+    valuation: string;
+    horizon: string;
+  };
 };
 
 export type EvidenceStatus =

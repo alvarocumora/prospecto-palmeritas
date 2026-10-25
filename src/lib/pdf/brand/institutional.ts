@@ -18,12 +18,22 @@ export const IM_RULE: RGB = [199, 208, 216];
  * Textura mineral: curvas de nivel vectoriales sutiles (decorativas, no
  * cartográficas — no representan relieve real de ningún proyecto).
  */
-export function mineralTexture(doc: jsPDF, x: number, y: number, w: number, h: number, c: RGB = IM_GOLD, opacity = 0.18) {
+export function mineralTexture(
+  doc: jsPDF,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  c: RGB = IM_GOLD,
+  opacity = 0.18,
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- GState is a jsPDF internal, untyped in @types/jspdf
   const G = (doc as any).GState;
   if (G) doc.setGState(new G({ opacity }));
   stroke(doc, c);
   doc.setLineWidth(0.4);
-  const cx = x + w * 0.78, cy = y + h * 0.55;
+  const cx = x + w * 0.78,
+    cy = y + h * 0.55;
   for (let r = 1; r <= 14; r++) {
     const base = r * Math.max(w, h) * 0.045;
     const pts: Array<[number, number]> = [];
@@ -34,8 +44,13 @@ export function mineralTexture(doc: jsPDF, x: number, y: number, w: number, h: n
     }
     const segs = pts.slice(1).map((p, i) => [p[0] - pts[i][0], p[1] - pts[i][1]]);
     doc.saveGraphicsState();
-    doc.rect(x, y, w, h, null as any); (doc as any).clip(); (doc as any).discardPath();
-    doc.lines(segs, pts[0][0], pts[0][1], [1, 1], 'S');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- jsPDF clip style arg is untyped
+    doc.rect(x, y, w, h, null as any);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- clip() is a jsPDF internal, untyped in @types/jspdf
+    (doc as any).clip();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- discardPath() is a jsPDF internal, untyped in @types/jspdf
+    (doc as any).discardPath();
+    doc.lines(segs, pts[0][0], pts[0][1], [1, 1], "S");
     doc.restoreGraphicsState();
   }
   if (G) doc.setGState(new G({ opacity: 1 }));

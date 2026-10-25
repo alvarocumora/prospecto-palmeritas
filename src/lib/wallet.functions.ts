@@ -120,13 +120,20 @@ export const getMyWallet = createServerFn({ method: "GET" })
         .order("created_at", { ascending: false }),
       supabase
         .from("spv_positions")
-        .select("id, spv_id, shares, amount_paid, currency, status, subscribed_on, document_url, is_test")
+        .select(
+          "id, spv_id, shares, amount_paid, currency, status, subscribed_on, document_url, is_test",
+        )
         .eq("investor_user_id", userId),
     ]);
     const tickets: WalletTicket[] = (t ?? []).map((r) => {
       const m = meta(r.spv_id);
       const { is_test, ...rest } = r;
-      return { ...rest, amount: Number(r.amount), project: is_test ? `${m.project} · PRUEBA` : m.project, token: m.token };
+      return {
+        ...rest,
+        amount: Number(r.amount),
+        project: is_test ? `${m.project} · PRUEBA` : m.project,
+        token: m.token,
+      };
     });
     const positions: WalletPosition[] = (pos ?? []).map((r) => {
       const m = meta(r.spv_id);

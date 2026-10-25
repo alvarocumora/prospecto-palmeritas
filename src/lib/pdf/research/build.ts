@@ -29,8 +29,13 @@ export async function buildResearchPdf(model: ResearchDoc) {
   const doc = new JsPDF({ unit: "pt", format: "a4", orientation: "portrait" });
   await ensureBrandFonts(doc);
   await ensureMonoFont(doc);
-  if (model.map && !model.map.imageDataUrl) model.map.imageDataUrl = await toDataUrl(model.map.imageUrl);
-  doc.setProperties({ title: `${model.title} · ${model.projectName}`, subject: model.code, author: "GeoCapitals Research" });
+  if (model.map && !model.map.imageDataUrl)
+    model.map.imageDataUrl = await toDataUrl(model.map.imageUrl);
+  doc.setProperties({
+    title: `${model.title} · ${model.projectName}`,
+    subject: model.code,
+    author: "GeoCapitals Research",
+  });
   const report: RenderReport = renderResearchDoc(doc, model);
   return { doc, report };
 }

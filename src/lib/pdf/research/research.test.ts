@@ -5,7 +5,10 @@ import { findDiscrepancies } from "./discrepancies";
 import { integrityProblems, publicExportBlocked, RS_COLOR, RS_TYPE } from "./model";
 import { renderResearchDoc } from "./render";
 
-function render(family: "memo" | "factsheet" | "technical", project: "cholqui" | "losverdes" = "cholqui") {
+function render(
+  family: "memo" | "factsheet" | "technical",
+  project: "cholqui" | "losverdes" = "cholqui",
+) {
   const model = buildResearchDoc(family, project, "22 de octubre de 2026")!;
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const sizes: number[] = [];
@@ -46,7 +49,9 @@ describe("research documents", () => {
   });
 
   it("16.23 % Cu is presented as a measured maximum of point samples, not a grade", () => {
-    const p = buildResearchDoc("memo", "cholqui")!.params.find((x) => x.label === "Cu total máximo")!;
+    const p = buildResearchDoc("memo", "cholqui")!.params.find(
+      (x) => x.label === "Cu total máximo",
+    )!;
     expect(p.value).toBe("16,23 %");
     expect(p.provenance).toBe("MEDIDO");
     expect(p.note).toMatch(/no es ley media/);
@@ -54,7 +59,10 @@ describe("research documents", () => {
 
   it("placements are declared and every figure has a source", () => {
     const memo = buildResearchDoc("memo", "cholqui")!;
-    expect(memo.terms.find((t) => t.label === "Colocación declarada")).toMatchObject({ value: "47 %", provenance: "DECLARADO" });
+    expect(memo.terms.find((t) => t.label === "Colocación declarada")).toMatchObject({
+      value: "47 %",
+      provenance: "DECLARADO",
+    });
     expect(integrityProblems(memo)).toEqual([]);
   });
 
