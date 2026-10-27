@@ -1,0 +1,324 @@
+{
+  "project": "NHB-REE",
+  "analysis": "Intersección geométrica aproximada entre 1.852 segmentos lineales interpretados del Copernicus DEM 30m y los polígonos Arcillas 1-34",
+  "date": "2026-10-27",
+  "sources": [
+    {
+      "path": "src/data/geo/losalamos_lineamientos.geojson",
+      "sha": "3ae3a67f716124dd57bc98644daecf56a863fd6f",
+      "features": 1852
+    },
+    {
+      "path": "src/data/geo/losalamos_panos_arcillas.geojson",
+      "sha": "6fff28d67a1dff76030af41368ac9b50e1fa3cec",
+      "features": 34
+    }
+  ],
+  "method": "Clip de segmentos a polígonos con interpolación plana lon/lat a metros en latitud -37.64; denominador 300 ha nominales/paño, orientación axial 0-180°; cifras aproximadas para screening",
+  "limitations": "Lineamientos derivados Canny/Hough pueden ser drenajes, caminos u otros artefactos y NO equivalen a fallas geológicas ni señalan REE. Requiere mapeo y validación.",
+  "summary": {
+    "panos": 34,
+    "total_lineaments_input": 1852,
+    "con_interseccion": 34,
+    "top_density": [
+      {
+        "pano": "Arcillas 7",
+        "density": 21.93
+      },
+      {
+        "pano": "Arcillas 24",
+        "density": 19.71
+      },
+      {
+        "pano": "Arcillas 16",
+        "density": 19.44
+      },
+      {
+        "pano": "Arcillas 6",
+        "density": 19.27
+      },
+      {
+        "pano": "Arcillas 20",
+        "density": 19.22
+      },
+      {
+        "pano": "Arcillas 5",
+        "density": 18.47
+      }
+    ]
+  },
+  "by_pano": [
+    {
+      "pano": "Arcillas 1",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 59,
+      "longitud_interna_aprox_km": 46.83,
+      "densidad_aprox_km_por_km2": 15.61,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 2",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 61,
+      "longitud_interna_aprox_km": 46.15,
+      "densidad_aprox_km_por_km2": 15.38,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 3",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 62,
+      "longitud_interna_aprox_km": 48.3,
+      "densidad_aprox_km_por_km2": 16.1,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 4",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 60,
+      "longitud_interna_aprox_km": 44.47,
+      "densidad_aprox_km_por_km2": 14.82,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 5",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 66,
+      "longitud_interna_aprox_km": 55.4,
+      "densidad_aprox_km_por_km2": 18.47,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 6",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 69,
+      "longitud_interna_aprox_km": 57.81,
+      "densidad_aprox_km_por_km2": 19.27,
+      "orientacion_dominante": "NE-SO"
+    },
+    {
+      "pano": "Arcillas 7",
+      "meseta_pct": 0.2,
+      "lineamientos_intersectados": 68,
+      "longitud_interna_aprox_km": 65.78,
+      "densidad_aprox_km_por_km2": 21.93,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 8",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 61,
+      "longitud_interna_aprox_km": 44.02,
+      "densidad_aprox_km_por_km2": 14.67,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 9",
+      "meseta_pct": 0.3,
+      "lineamientos_intersectados": 52,
+      "longitud_interna_aprox_km": 43.11,
+      "densidad_aprox_km_por_km2": 14.37,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 10",
+      "meseta_pct": 0.4,
+      "lineamientos_intersectados": 53,
+      "longitud_interna_aprox_km": 36.02,
+      "densidad_aprox_km_por_km2": 12.01,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 11",
+      "meseta_pct": 1.5,
+      "lineamientos_intersectados": 59,
+      "longitud_interna_aprox_km": 38.38,
+      "densidad_aprox_km_por_km2": 12.79,
+      "orientacion_dominante": "NE-SO"
+    },
+    {
+      "pano": "Arcillas 12",
+      "meseta_pct": 0.9,
+      "lineamientos_intersectados": 65,
+      "longitud_interna_aprox_km": 46.35,
+      "densidad_aprox_km_por_km2": 15.45,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 13",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 58,
+      "longitud_interna_aprox_km": 37.64,
+      "densidad_aprox_km_por_km2": 12.55,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 14",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 57,
+      "longitud_interna_aprox_km": 41.64,
+      "densidad_aprox_km_por_km2": 13.88,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 15",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 51,
+      "longitud_interna_aprox_km": 52.81,
+      "densidad_aprox_km_por_km2": 17.6,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 16",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 65,
+      "longitud_interna_aprox_km": 58.33,
+      "densidad_aprox_km_por_km2": 19.44,
+      "orientacion_dominante": "NE-SO"
+    },
+    {
+      "pano": "Arcillas 17",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 62,
+      "longitud_interna_aprox_km": 40.02,
+      "densidad_aprox_km_por_km2": 13.34,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 18",
+      "meseta_pct": 0.4,
+      "lineamientos_intersectados": 59,
+      "longitud_interna_aprox_km": 51.43,
+      "densidad_aprox_km_por_km2": 17.14,
+      "orientacion_dominante": "NE-SO"
+    },
+    {
+      "pano": "Arcillas 19",
+      "meseta_pct": 1.9,
+      "lineamientos_intersectados": 61,
+      "longitud_interna_aprox_km": 44.64,
+      "densidad_aprox_km_por_km2": 14.88,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 20",
+      "meseta_pct": 0.1,
+      "lineamientos_intersectados": 68,
+      "longitud_interna_aprox_km": 57.67,
+      "densidad_aprox_km_por_km2": 19.22,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 21",
+      "meseta_pct": 3.4,
+      "lineamientos_intersectados": 57,
+      "longitud_interna_aprox_km": 49.39,
+      "densidad_aprox_km_por_km2": 16.46,
+      "orientacion_dominante": "NE-SO"
+    },
+    {
+      "pano": "Arcillas 22",
+      "meseta_pct": 4.4,
+      "lineamientos_intersectados": 66,
+      "longitud_interna_aprox_km": 53.4,
+      "densidad_aprox_km_por_km2": 17.8,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 23",
+      "meseta_pct": 2.5,
+      "lineamientos_intersectados": 60,
+      "longitud_interna_aprox_km": 52.46,
+      "densidad_aprox_km_por_km2": 17.49,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 24",
+      "meseta_pct": 0,
+      "lineamientos_intersectados": 70,
+      "longitud_interna_aprox_km": 59.12,
+      "densidad_aprox_km_por_km2": 19.71,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 25",
+      "meseta_pct": 13.7,
+      "lineamientos_intersectados": 50,
+      "longitud_interna_aprox_km": 47.64,
+      "densidad_aprox_km_por_km2": 15.88,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 26",
+      "meseta_pct": 45.4,
+      "lineamientos_intersectados": 52,
+      "longitud_interna_aprox_km": 38.87,
+      "densidad_aprox_km_por_km2": 12.96,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 27",
+      "meseta_pct": 34.8,
+      "lineamientos_intersectados": 60,
+      "longitud_interna_aprox_km": 46.57,
+      "densidad_aprox_km_por_km2": 15.52,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 28",
+      "meseta_pct": 25.1,
+      "lineamientos_intersectados": 61,
+      "longitud_interna_aprox_km": 47.46,
+      "densidad_aprox_km_por_km2": 15.82,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 29",
+      "meseta_pct": 25.4,
+      "lineamientos_intersectados": 48,
+      "longitud_interna_aprox_km": 42.16,
+      "densidad_aprox_km_por_km2": 14.05,
+      "orientacion_dominante": "NO-SE"
+    },
+    {
+      "pano": "Arcillas 30",
+      "meseta_pct": 26.6,
+      "lineamientos_intersectados": 48,
+      "longitud_interna_aprox_km": 42.53,
+      "densidad_aprox_km_por_km2": 14.18,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 31",
+      "meseta_pct": 39.1,
+      "lineamientos_intersectados": 54,
+      "longitud_interna_aprox_km": 46.06,
+      "densidad_aprox_km_por_km2": 15.35,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 32",
+      "meseta_pct": 22.6,
+      "lineamientos_intersectados": 50,
+      "longitud_interna_aprox_km": 48.51,
+      "densidad_aprox_km_por_km2": 16.17,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 33",
+      "meseta_pct": 33.4,
+      "lineamientos_intersectados": 48,
+      "longitud_interna_aprox_km": 43.88,
+      "densidad_aprox_km_por_km2": 14.63,
+      "orientacion_dominante": "E-O"
+    },
+    {
+      "pano": "Arcillas 34",
+      "meseta_pct": 45.2,
+      "lineamientos_intersectados": 49,
+      "longitud_interna_aprox_km": 42.96,
+      "densidad_aprox_km_por_km2": 14.32,
+      "orientacion_dominante": "NO-SE"
+    }
+  ]
+}

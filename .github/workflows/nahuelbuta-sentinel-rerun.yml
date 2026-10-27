@@ -1,0 +1,42 @@
+name: Nahuelbuta Sentinel-2 polygon rerun
+
+on:
+  pull_request:
+    paths:
+      - 'geocapitals-remote/**'
+      - 'src/data/geo/losalamos_panos_arcillas.geojson'
+      - '.github/workflows/nahuelbuta-sentinel-rerun.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sentinel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install remote-sensing pipeline
+        run: python -m pip install -e ./geocapitals-remote pytest
+      - name: Unit tests - polygon denominator and spectral gate
+        run: python -m pytest -q geocapitals-remote/tests
+      - name: Reprocess Sentinel-2 L2A over 34 original Arcillas polygons
+        run: |
+          python geocapitals-remote/scripts/run_project_targets.py \
+            --aoi src/data/geo/losalamos_panos_arcillas.geojson \
+            --name nahuelbuta \
+            --output-crs EPSG:32718 \
+            --out geocapitals-remote/out/nahuelbuta \
+            --max-scenes 14
+      - name: Upload manifest, per-AOI coverage and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahuelbuta-sentinel-polygon-rerun
+          path: geocapitals-remote/out/nahuelbuta/
+          if-no-files-found: warn
+          retention-days: 30

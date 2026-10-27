@@ -58,7 +58,7 @@ def classify_ndvi(nd, scl, ndvi_threshold: float = 0.25) -> np.ndarray:
     out[scl == 11] = 3
     out[np.isin(scl, [2, 3])] = 2
     out[np.isin(scl, [8, 9, 10])] = 1
-    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl)] = 0
+    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl) | ~np.isfinite(nd)] = 0
     return out
 
 
@@ -75,7 +75,7 @@ def classify(nir, red, scl, ndvi_threshold: float = 0.25) -> np.ndarray:
     out[scl == 11] = 3                 # nieve
     out[np.isin(scl, [2, 3])] = 2      # sombra (topográfica o de nube)
     out[np.isin(scl, [8, 9, 10])] = 1  # nube
-    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl)] = 0  # no-data
+    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl) | ~np.isfinite(nd)] = 0  # no-data
     return out
 
 
@@ -122,11 +122,21 @@ def coverage_fractions(nir, red, scl, ndvi_threshold: float = 0.25,
 
 
 def coverage_fractions_ndvi(nd, scl, ndvi_threshold: float = 0.25,
-                            sensitivity: list[float] | None = None) -> dict:
+                            sensitivity: list[float] | None = None,
+                            area_mask: np.ndarray | None = None) -> dict:
     """coverage_fractions pero sobre un NDVI ya calculado (composición multitemporal)."""
+    if area_mask is not None:
+        area_mask = np.asarray(area_mask, dtype=bool)
+        if area_mask.shape != np.asarray(nd).shape:
+            raise ValueError("máscara AOI incompatible con la grilla NDVI")
+        if not np.any(area_mask):
+            raise ValueError("AOI sin píxeles interiores: revisar CRS/resolución")
+
     def _frac(thr):
         c = classify_ndvi(nd, scl, thr)
-        total = c.size
+        if area_mask is not None:
+            c = np.where(area_mask, c, -1)  # exterior excluido del numerador/denominador
+        total = int(np.count_nonzero(area_mask)) if area_mask is not None else c.size
         valid = total - int(np.count_nonzero(c == 0))
         i = int(np.count_nonzero(c == 6))
         return c, total, valid, i

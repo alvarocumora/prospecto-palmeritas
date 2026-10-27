@@ -89,7 +89,8 @@ def extract_candidates(comp: dict, indices: dict, primary: str = "aloh",
 
 
 def run_candidates(cfg, out_dir, max_scenes: int = 18, percentile: float = 97.0,
-                   min_dist_m: float | None = None, max_n: int = 20) -> dict:
+                   min_dist_m: float | None = None, max_n: int = 20,
+                   polygons_wgs84: list[dict] | None = None) -> dict:
     """Orquesta: busca escenas -> mosaico -> índices -> candidatos -> GeoJSON."""
     import json
     from pathlib import Path
@@ -100,6 +101,7 @@ def run_candidates(cfg, out_dir, max_scenes: int = 18, percentile: float = 97.0,
     from .catalog import PC_STAC
     from .indices import INDEX_META, s2_indices
     from .ingest import load_composite
+    from .aoi_mask import polygon_mask
 
     out = Path(out_dir); out.mkdir(parents=True, exist_ok=True)
     bbox = cfg.aoi.bbox_wgs84()
@@ -114,6 +116,10 @@ def run_candidates(cfg, out_dir, max_scenes: int = 18, percentile: float = 97.0,
     use = items if len(items) <= max_scenes else items[:: max(1, len(items) // max_scenes)][:max_scenes]
 
     comp = load_composite(use, bbox, crs=cfg.output_crs, ndvi_threshold=cfg.masks.ndvi_threshold)
+    if polygons_wgs84 is not None:
+        comp["interpretable"] &= polygon_mask(
+            polygons_wgs84, comp["x"], comp["y"], comp["crs"]
+        )
     idx = s2_indices(comp["refl"])
     fc = extract_candidates(comp, idx, primary="aloh", percentile=percentile,
                             min_dist_m=min_dist_m or cfg.structure.min_lineament_length_m,
