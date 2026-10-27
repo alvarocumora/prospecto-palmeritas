@@ -2,6 +2,7 @@
 import { publicUrl } from "@/lib/publicUrl";
 import { NAHUELBUTA, PANOS_ARCILLAS } from "@/features/nahuelbuta/data/nahuelbuta";
 import panosRaw from "@/data/geo/losalamos_panos_arcillas.geojson?raw";
+import lineamentsRaw from "../../../../reports/nahuelbuta/lineamientos-screening-2026-10-27.json?raw";
 import type { ProjectDoc } from "../model";
 
 export const NAHUELBUTA_DOC_VERSION = "v1.1";
@@ -23,6 +24,17 @@ const n = (x: number) => x.toLocaleString("es-CL");
 
 export function buildNahuelbutaDoc(): ProjectDoc {
   const mesetas = nahuelbutaMesetas();
+  const lineaments = JSON.parse(lineamentsRaw) as {
+    by_pano: Array<{
+      pano: string;
+      lineamientos_intersectados: number;
+      densidad_aprox_km_por_km2: number;
+      orientacion_dominante: string;
+    }>;
+  };
+  const lineamentRanking = [...lineaments.by_pano].sort(
+    (a, b) => b.densidad_aprox_km_por_km2 - a.densidad_aprox_km_por_km2,
+  );
   const byCourt = new Map<string, number>();
   for (const p of PANOS_ARCILLAS) byCourt.set(p.tribunal, (byCourt.get(p.tribunal) ?? 0) + 1);
   return {
@@ -163,6 +175,32 @@ export function buildNahuelbutaDoc(): ProjectDoc {
             title: "Validación previa a decisiones de inversión",
             body: "Confirmar perfiles de meteorización, litología, espesores y mineralogía; muestrear REE totales e intercambiables. Verificar acceso, tenencia, restricciones ambientales y consulta territorial aplicable.",
             priority: "high",
+          },
+        ],
+      },
+      {
+        eyebrow: "Lineamientos DEM",
+        title: "Densidad de trazas interpretadas, no fallas comprobadas",
+        lead: "Cruce espacial nuevo entre 1.852 lineamientos DEM y los 34 polígonos. Longitudes y densidades aproximadas; no es un indicador directo de REE.",
+        blocks: [
+          {
+            kind: "table",
+            head: ["Paño", "Trazas", "km/km2 aprox.", "Dirección"],
+            widths: [0.27, 0.16, 0.29, 0.28],
+            rows: lineamentRanking.slice(0, 8).map((p) => [
+              p.pano,
+              String(p.lineamientos_intersectados),
+              p.densidad_aprox_km_por_km2.toLocaleString("es-CL"),
+              p.orientacion_dominante,
+            ]),
+          },
+          {
+            kind: "finding",
+            title: "Alcance interpretativo",
+            body: "Las trazas derivan de hillshade multiazimutal y Canny/Hough aplicado a Copernicus DEM 30 m. Pueden incluir drenajes, caminos o artefactos; su orientación y densidad no comprueban estructuras mineralizadas ni recursos. Confirmar con imágenes de detalle y mapeo de terreno.",
+            provenance: "INTERPRETED",
+            confidence: "low",
+            source: "reports/nahuelbuta/lineamientos-screening-2026-10-27.json",
           },
         ],
       },
