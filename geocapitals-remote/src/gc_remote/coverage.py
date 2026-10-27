@@ -9,10 +9,11 @@ from .catalog import PC_STAC, build_manifest, write_manifest
 from .config import Config
 from .ingest import dry_season_ndvi, load_stack
 from .masks import coverage_fractions_ndvi, coverage_verdict
+from .aoi_mask import polygon_mask
 
 
 def run_coverage(cfg: Config, out_dir: str | Path, max_scenes: int = 24,
-                 floor: float = 0.15) -> dict:
+                 floor: float = 0.15, polygons_wgs84: list[dict] | None = None) -> dict:
     import planetary_computer as pc
     from pystac_client import Client
 
@@ -41,14 +42,20 @@ def run_coverage(cfg: Config, out_dir: str | Path, max_scenes: int = 24,
 
     ds = load_stack(use, bbox, bands=["B04", "B08", "SCL"], resolution=20, crs=cfg.output_crs)
     driest, typical, rep_scl, n_clear = dry_season_ndvi(ds)
+    area_mask = (
+        polygon_mask(polygons_wgs84, ds["x"].values, ds["y"].values, cfg.output_crs)
+        if polygons_wgs84 is not None else None
+    )
 
     # Dos números, honestos:
     #  - típico (NDVI mediana): exposición de suelo PERSISTENTE -> gate del reporte.
     #  - mejor caso (NDVI mínimo): exposición MÁXIMA de fin de verano -> upside para targeting.
     cov_typical = coverage_fractions_ndvi(typical, rep_scl, cfg.masks.ndvi_threshold,
-                                          sensitivity=cfg.masks.ndvi_sensitivity)
+                                          sensitivity=cfg.masks.ndvi_sensitivity,
+                                          area_mask=area_mask)
     cov_best = coverage_fractions_ndvi(driest, rep_scl, cfg.masks.ndvi_threshold,
-                                       sensitivity=cfg.masks.ndvi_sensitivity)
+                                       sensitivity=cfg.masks.ndvi_sensitivity,
+                                       area_mask=area_mask)
     verdict = coverage_verdict(cov_typical["interpretable_fraction_of_area"], floor=floor)
 
     result = {
@@ -58,6 +65,9 @@ def run_coverage(cfg: Config, out_dir: str | Path, max_scenes: int = 24,
         "output_crs": cfg.output_crs,
         "scenes_candidate": len(items),
         "scenes_used_for_coverage": len(use),
+        "area_basis": "AOI_POLYGONS" if polygons_wgs84 is not None else "BBOX_ONLY",
+        "pixels_inside_aoi": int(area_mask.sum()) if area_mask is not None else int(typical.size),
+        "scenes_used_ids": [item.id for item in use],
         "verdict": verdict,
         "interpretable_typical_frac": cov_typical["interpretable_fraction_of_area"],
         "interpretable_bestcase_frac": cov_best["interpretable_fraction_of_area"],
