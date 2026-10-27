@@ -1,0 +1,18 @@
+{
+ "polygons": 34,
+ "invalid": 0,
+ "overlaps": 0,
+ "area_total_ha": 10200.0,
+ "area_min_ha": 300.0,
+ "area_max_ha": 300.0,
+ "lineaments": 1852,
+ "lineament_duplicates_endpoint_1m": 0,
+ "lineament_len_m": {
+  "min": 1500.0,
+  "median": 2117.3,
+  "max": 12723.7
+ },
+ "scenes_processed": 8,
+ "spectral_targeting": "solo en paños con ≥15 % interpretable en escena favorable",
+ "ranking_integrado": "NO CALCULABLE: sin geoquímica, litología por paño ni observabilidad suficiente en la mayoría"
+}
