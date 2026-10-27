@@ -32,3 +32,12 @@ def test_coverage_denominator_and_gate_inside_polygon_only():
 def test_mask_mismatch_rejected():
     with pytest.raises(ValueError, match="incompatible"):
         coverage_fractions_ndvi(np.zeros((3, 3)), np.ones((3, 3)), area_mask=np.ones((2, 2)))
+
+
+def test_nan_ndvi_is_nodata_not_exposed_soil():
+    nd = np.array([[float("nan"), 0.1], [0.5, 0.1]])
+    scl = np.full((2, 2), 5)
+    result = coverage_fractions_ndvi(nd, scl)
+    assert result["counts"]["nodata"] == 1
+    assert result["counts"]["interpretable"] == 2
+    assert result["interpretable_fraction_of_area"] == pytest.approx(0.5)
