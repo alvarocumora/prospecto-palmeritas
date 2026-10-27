@@ -81,6 +81,8 @@ def _point_in_any(lon, lat, polys, tol_deg=0.0005):
 
 
 def to_lovable_layers(raw_fc, polys, name, dominant_strike, output_crs):
+    if not raw_fc.get("features"):
+        return [], []
     center = {"lat": sum(p[1] for f in raw_fc["features"] for p in [f["geometry"]["coordinates"]]) / len(raw_fc["features"]),
               "lng": sum(p[0] for f in raw_fc["features"] for p in [f["geometry"]["coordinates"]]) / len(raw_fc["features"])}
     to_utm = pyproj.Transformer.from_crs("EPSG:4326", output_crs, always_xy=True)
@@ -146,9 +148,18 @@ def main():
     cfg_path = build_config(args.name, bbox, args.output_crs, out_dir)
     cfg = Config.from_yaml(cfg_path)
 
-    r = cov.run_coverage(cfg, out_dir, max_scenes=18)
-    fc = targets.run_candidates(cfg, out_dir, max_scenes=args.max_scenes, percentile=97.0, max_n=15)
-    anoms, collars = to_lovable_layers(fc, polys, args.name, args.strike, args.output_crs)
+    r = cov.run_coverage(cfg, out_dir, max_scenes=18, polygons_wgs84=polys)
+    # Por debajo del piso de 15% no ejecutar ni publicar anomalías espectrales.
+    if r["verdict"]["spectral_conclusive"]:
+        fc = targets.run_candidates(
+            cfg, out_dir, max_scenes=args.max_scenes, percentile=97.0, max_n=15,
+            polygons_wgs84=polys
+        )
+        anoms, collars = to_lovable_layers(
+            fc, polys, args.name, args.strike, args.output_crs
+        )
+    else:
+        anoms, collars = [], []
 
     Path(out_dir).mkdir(parents=True, exist_ok=True)
     out_a = {"type": "FeatureCollection", "name": f"{args.name}_satellite_anomalies",
@@ -157,7 +168,11 @@ def main():
                           "coverage": {"typical_pct": round(r["interpretable_typical_frac"] * 100, 1),
                                        "bestcase_pct": round(r["interpretable_bestcase_frac"] * 100, 1),
                                        "spectral_conclusive": r["verdict"]["spectral_conclusive"]},
-                          "config_sha256": cfg.config_sha256, "n": len(anoms)},
+                          "config_sha256": cfg.config_sha256,
+                          "area_basis": r["area_basis"],
+                          "pixels_inside_aoi": r["pixels_inside_aoi"],
+                          "scenes_used_ids": r["scenes_used_ids"],
+                          "n": len(anoms)},
              "features": anoms}
     out_c = {"type": "FeatureCollection", "name": f"{args.name}_drill_grid_propuesta",
              "crs": {"type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84"}},
