@@ -122,11 +122,21 @@ def coverage_fractions(nir, red, scl, ndvi_threshold: float = 0.25,
 
 
 def coverage_fractions_ndvi(nd, scl, ndvi_threshold: float = 0.25,
-                            sensitivity: list[float] | None = None) -> dict:
+                            sensitivity: list[float] | None = None,
+                            area_mask: np.ndarray | None = None) -> dict:
     """coverage_fractions pero sobre un NDVI ya calculado (composición multitemporal)."""
+    if area_mask is not None:
+        area_mask = np.asarray(area_mask, dtype=bool)
+        if area_mask.shape != np.asarray(nd).shape:
+            raise ValueError("máscara AOI incompatible con la grilla NDVI")
+        if not np.any(area_mask):
+            raise ValueError("AOI sin píxeles interiores: revisar CRS/resolución")
+
     def _frac(thr):
         c = classify_ndvi(nd, scl, thr)
-        total = c.size
+        if area_mask is not None:
+            c = np.where(area_mask, c, -1)  # exterior excluido del numerador/denominador
+        total = int(np.count_nonzero(area_mask)) if area_mask is not None else c.size
         valid = total - int(np.count_nonzero(c == 0))
         i = int(np.count_nonzero(c == 6))
         return c, total, valid, i
