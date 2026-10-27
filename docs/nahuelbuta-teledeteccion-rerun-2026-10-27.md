@@ -33,6 +33,26 @@ GeoJSON de anomalías (vacío si se activa el gate), y grilla conceptual
 (vacía si no hay cobertura suficiente). Ningún resultado se incorpora como
 anomalía validada al PDF antes de revisar el artefacto y la metodología.
 
+## Segundo reanálisis efectivamente ejecutado: lineamientos DEM
+Se intersectaron geométricamente 1.852 segmentos interpretados a partir de
+Copernicus DEM 30 m con cada uno de los 34 paños (longitudes aproximadas usando
+proyección local). Resultado completo y SHA de los dos GeoJSON en
+`reports/nahuelbuta/lineamientos-screening-2026-10-27.json`.
+Todos los paños presentan segmentos superpuestos; los mayores valores de
+densidad aproximada son Arcillas 7 (21,93), 24 (19,71), 16 (19,44),
+6 (19,27), 20 (19,22) km/km². Estas trazas pueden ser drenajes,
+infraestructura o artefactos del DEM y NO representan fallas confirmadas.
+No unir la densidad automáticamente a la puntuación REE: inspección en
+ortofoto/campo y validación estructural primero.
+
+## Estado de ejecución remota al abrir el PR
+El workflow de GitHub Actions fue iniciado pero falló antes de ejecutar pasos,
+al igual que el CI general; no se dispone de un nuevo `coverage.json` verificado
+ni de escenas Sentinel-2 reprocesadas. No sustituir el 0,53% histórico ni
+publicar anomalías hasta que exista y se revise el artefacto de ejecución.
+En el PR se conserva el workflow para volver a dispararlo cuando el entorno
+de runners funcione.
+
 ## Pendientes para due diligence
 Verificar los 34 paños y las coordenadas de siete polígonos del deal
 `GEO-2026-004` (otra geometría de 49.000 ha, desplazada), corroborar
