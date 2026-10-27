@@ -1,0 +1,46 @@
+{
+ "run_date": "2026-10-27",
+ "generated_utc": "2026-10-27T17:40:27.614765Z",
+ "inputs": {
+  "/dev-server/src/data/geo/losalamos_panos_arcillas.geojson": "7b571b4ba3756ba5f64717aea5aac76c31c0d8d1",
+  "src/data/geo/losalamos_lineamientos.geojson": "a731bfc6d50119268de0cb2a8c62111af3c66af0"
+ },
+ "dem": {
+  "source": "Copernicus DEM GLO-30 (Planetary Computer cop-dem-glo-30)",
+  "items": [
+   "Copernicus_DSM_COG_10_S38_00_W074_00_DEM"
+  ],
+  "resampled": "bilinear a 30 m EPSG:32718",
+  "slope": "gradiente central, grados"
+ },
+ "sentinel2": "ver scene_manifest.json",
+ "processing": {
+  "python": "3.13",
+  "libs": [
+   "rasterio 1.5.2",
+   "shapely",
+   "pyproj",
+   "pystac-client"
+  ]
+ },
+ "heredado": [
+  "meseta_pct (clasificación previa del DEM, no recalculada)",
+  "lineamientos 1.852 Canny/Hough (no recalculados)"
+ ],
+ "nuevo": [
+  "validación geométrica",
+  "cobertura óptica por paño 8 escenas",
+  "estadísticas DEM por paño",
+  "pendiente <5° recalculada",
+  "QA de lineamientos",
+  "índices espectrales sobre píxeles interpretables"
+ ],
+ "no_ejecutado": [
+  "ASTER",
+  "Landsat 8/9",
+  "Sentinel-1",
+  "geoquímica",
+  "mapeo de terreno",
+  "curvatura/TPI"
+ ]
+}

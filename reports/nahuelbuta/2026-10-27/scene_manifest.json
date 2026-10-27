@@ -1,0 +1,102 @@
+{
+ "collection": "sentinel-2-l2a",
+ "selection": "1 escena por año, enero–marzo, nubosidad de escena <10 %, menor nubosidad; tile 18HXD",
+ "scenes": [
+  {
+   "id": "S2B_MSIL2A_20190315T143749_R096_T18HXD_20201007T070723",
+   "datetime": "2019-03-15T14:37:49.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.051281,
+   "processing_baseline": "02.12",
+   "global_interp_ndvi020": 0.03,
+   "global_interp_ndvi025": 0.077,
+   "global_interp_ndvi030": 0.204,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20190315T143749_R096_T18HXD_20201007T070723"
+  },
+  {
+   "id": "S2B_MSIL2A_20200228T143729_R096_T18HXD_20200929T015508",
+   "datetime": "2020-02-28T14:37:29.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.089734,
+   "processing_baseline": "02.12",
+   "global_interp_ndvi020": 0.019,
+   "global_interp_ndvi025": 0.046,
+   "global_interp_ndvi030": 0.105,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20200228T143729_R096_T18HXD_20200929T015508"
+  },
+  {
+   "id": "S2B_MSIL2A_20210317T144729_R139_T18HXD_20210318T222752",
+   "datetime": "2021-03-17T14:47:29.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.111912,
+   "processing_baseline": "02.12",
+   "global_interp_ndvi020": 0.026,
+   "global_interp_ndvi025": 0.046,
+   "global_interp_ndvi030": 0.077,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20210317T144729_R139_T18HXD_20210318T222752"
+  },
+  {
+   "id": "S2B_MSIL2A_20220217T143719_R096_T18HXD_20240515T094901",
+   "datetime": "2022-02-17T14:37:19.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.013958,
+   "processing_baseline": "05.10",
+   "global_interp_ndvi020": 0.056,
+   "global_interp_ndvi025": 0.099,
+   "global_interp_ndvi030": 0.196,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20220217T143719_R096_T18HXD_20240515T094901"
+  },
+  {
+   "id": "S2B_MSIL2A_20230222T143729_R096_T18HXD_20240815T052242",
+   "datetime": "2023-02-22T14:37:29.025000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.00934,
+   "processing_baseline": "05.10",
+   "global_interp_ndvi020": 0.099,
+   "global_interp_ndvi025": 0.22,
+   "global_interp_ndvi030": 0.489,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20230222T143729_R096_T18HXD_20240815T052242"
+  },
+  {
+   "id": "S2B_MSIL2A_20240328T143739_R096_T18HXD_20240330T054920",
+   "datetime": "2024-03-28T14:37:39.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.004865,
+   "processing_baseline": "05.10",
+   "global_interp_ndvi020": 0.236,
+   "global_interp_ndvi025": 0.693,
+   "global_interp_ndvi030": 1.287,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20240328T143739_R096_T18HXD_20240330T054920"
+  },
+  {
+   "id": "S2B_MSIL2A_20250221T143749_R096_T18HXD_20250221T181126",
+   "datetime": "2025-02-21T14:37:49.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.004469,
+   "processing_baseline": "05.11",
+   "global_interp_ndvi020": 1.036,
+   "global_interp_ndvi025": 2.384,
+   "global_interp_ndvi030": 4.245,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20250221T143749_R096_T18HXD_20250221T181126"
+  },
+  {
+   "id": "S2B_MSIL2A_20260311T144729_R139_T18HXD_20260311T200022",
+   "datetime": "2026-03-11T14:47:29.024000+00:00",
+   "mgrs_tile": "18HXD",
+   "cloud_cover_pct": 0.025415,
+   "processing_baseline": "05.12",
+   "global_interp_ndvi020": 0.472,
+   "global_interp_ndvi025": 0.857,
+   "global_interp_ndvi030": 1.563,
+   "source": "Microsoft Planetary Computer STAC · sentinel-2-l2a",
+   "url": "https://planetarycomputer.microsoft.com/api/stac/v1/collections/sentinel-2-l2a/items/S2B_MSIL2A_20260311T144729_R139_T18HXD_20260311T200022"
+  }
+ ]
+}
