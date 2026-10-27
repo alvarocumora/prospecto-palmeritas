@@ -22,6 +22,9 @@ describe("Nahuelbuta preliminary technical PDF", () => {
     const section = doc.sections.find((x) => x.eyebrow === "Priorización geomorfológica");
     expect(section).toBeDefined();
     expect(section?.blocks.some((b) => b.kind === "table" && b.rows[0][0] === "Arcillas 26")).toBe(true);
+    const lineaments = doc.sections.find((x) => x.eyebrow === "Lineamientos DEM");
+    expect(lineaments?.blocks.some((b) => b.kind === "table" && b.rows.length === 8)).toBe(true);
+    expect(lineaments?.blocks.some((b) => b.kind === "finding" && b.confidence === "low")).toBe(true);
     expect(JSON.stringify(section)).not.toMatch(/ppm|TREO\s+[0-9]+/i);
   });
 });
