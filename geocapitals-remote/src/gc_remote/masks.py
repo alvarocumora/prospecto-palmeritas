@@ -58,7 +58,7 @@ def classify_ndvi(nd, scl, ndvi_threshold: float = 0.25) -> np.ndarray:
     out[scl == 11] = 3
     out[np.isin(scl, [2, 3])] = 2
     out[np.isin(scl, [8, 9, 10])] = 1
-    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl)] = 0
+    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl) | ~np.isfinite(nd)] = 0
     return out
 
 
@@ -75,7 +75,7 @@ def classify(nir, red, scl, ndvi_threshold: float = 0.25) -> np.ndarray:
     out[scl == 11] = 3                 # nieve
     out[np.isin(scl, [2, 3])] = 2      # sombra (topográfica o de nube)
     out[np.isin(scl, [8, 9, 10])] = 1  # nube
-    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl)] = 0  # no-data
+    out[np.isin(scl, [0, 1]) | ~np.isfinite(scl) | ~np.isfinite(nd)] = 0  # no-data
     return out
 
 
