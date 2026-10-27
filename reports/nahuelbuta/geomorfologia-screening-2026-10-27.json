@@ -1,0 +1,67 @@
+{
+  "project": "NHB-REE / Arcillas 1-34",
+  "analysis": "Reclasificación y resumen estadístico de porcentaje meseta por paño ya derivado del DEM; no nuevo procesamiento del DEM ni Sentinel-2",
+  "run_date": "2026-10-27",
+  "input_file": "src/data/geo/losalamos_panos_arcillas.geojson",
+  "input_sha": "6fff28d67a1dff76030af41368ac9b50e1fa3cec",
+  "scope": "34 polígonos propuestos, 300 ha nominales cada uno",
+  "n_panos": 34,
+  "ha_nominal": 10200,
+  "meseta_promedio_pct": 9.63,
+  "meseta_superficie_equivalente_ha": 981.9,
+  "n_panos_con_meseta_gte_20": 9,
+  "prioridad_dem": [
+    {
+      "pano": "Arcillas 26",
+      "meseta_pct": 45.4,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 34",
+      "meseta_pct": 45.2,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 31",
+      "meseta_pct": 39.1,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 27",
+      "meseta_pct": 34.8,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 33",
+      "meseta_pct": 33.4,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 30",
+      "meseta_pct": 26.6,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 29",
+      "meseta_pct": 25.4,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 28",
+      "meseta_pct": 25.1,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 32",
+      "meseta_pct": 22.6,
+      "vertical": false
+    },
+    {
+      "pano": "Arcillas 25",
+      "meseta_pct": 13.7,
+      "vertical": false
+    }
+  ],
+  "coverage_sentinel_status": "PENDIENTE_REPROCESO_POLIGONAL",
+  "interpretation": "Proxy geomorfológico; no son anomalías espectrales, muestras, leyes ni recursos REE"
+}
