@@ -10,6 +10,8 @@ import type { CanonicalProjectSlug } from "@/lib/projects/catalog";
 import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
+import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
+import { getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
@@ -135,8 +137,8 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
     const bundle = buildLosVerdesPublicGeoBundle(
       manifest,
       data,
-      mining.data as never,
-      anomalies.data as never,
+      mining.data,
+      anomalies.data,
     );
     const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
     if (emit.length)
@@ -160,7 +162,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         },
       });
     return { project: { id, name: "Los Verdes", center: data.center, bbox: data.bbox }, layers };
-  }, [query.data, emit]);
+  }, [query.data, mining.data, anomalies.data, emit]);
   if (query.isError)
     return (
       <p role="alert" className="p-6 text-content-subtle">
