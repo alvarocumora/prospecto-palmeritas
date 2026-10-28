@@ -42,14 +42,25 @@ function pointFromGeoJSON(g: unknown): [number, number] | null {
   return null;
 }
 
+// El catastro nacional se sincroniza en lotes; 1 h de desfase es aceptable y
+// evita repetir conteos completos y lecturas de 15k filas en cada visita.
+const SNAPSHOT_TTL_MS = 60 * 60 * 1000;
+
 export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).handler(
   async (): Promise<LandingCatastroSnapshot> => {
+    const { memoize } = await import("@/lib/server/memoCache");
+    return memoize("landing-catastro-snapshot", SNAPSHOT_TTL_MS, loadSnapshot);
+  },
+);
+
+async function loadSnapshot(): Promise<LandingCatastroSnapshot> {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const generatedAt = new Date().toISOString();
 
     const [totalRes, groupRes, sampleRes, syncRes] = await Promise.all([
-      supabaseAdmin.from("cadastre_national").select("id", { count: "exact", head: true }),
+      // Conteo estimado del planificador: evita recorrer la tabla completa.
+      supabaseAdmin.from("cadastre_national").select("id", { count: "planned", head: true }),
       supabaseAdmin.from("cadastre_national").select("tipo,status,holder_name").limit(15000),
       supabaseAdmin
         .from("cadastre_national")
