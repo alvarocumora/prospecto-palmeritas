@@ -4,6 +4,7 @@ import nuevosRaw from "@/data/geo/losalamos_panos_arcillas_nuevos.geojson?raw";
 import pedimentosRaw from "@/data/geo/losalamos_pedimentos_nuevos.geojson?raw";
 import catastroRaw from "@/data/geo/losalamos_catastro_sngm.geojson?raw";
 import franjasRaw from "@/data/geo/losalamos_franjas.geojson?raw";
+import lineamientosRaw from "@/data/geo/losalamos_lineamientos.geojson?raw";
 import { ProjectSceneFrame } from "../UnifiedProjectScene";
 import type { ProjectView } from "@/lib/projects/navigation";
 import type { GeoSceneProjectLayer } from "@/components/geoscene/projectLayers";
@@ -28,6 +29,13 @@ const layers: GeoSceneProjectLayer[] = [
     source: "Ampliación declarada 35–56 y pedimentos; no mensura oficial",
   },
   { id: "geology.metallogenic_belts", data: parse(franjasRaw) },
+  {
+    id: "remote_sensing.lineaments",
+    data: parse(lineamientosRaw),
+    defaultVisible: false,
+    source:
+      "Copernicus DEM GLO-30 · Canny/Hough (2026-10-27); lineamientos INTERPRETADOS, no fallas verificadas",
+  },
 ];
 export function NahuelbutaScene({ view }: { view: ProjectView }) {
   return (

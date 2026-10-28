@@ -107,7 +107,15 @@ export function UnifiedProjectScene({
 function LosVerdesScene({ view }: { view: ProjectView }) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
+  const fetchMining = useServerFn(getLosVerdesMining);
+  const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const query = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchData() });
+  // Optional enrichments: veins and lineaments; failures fall back to map data.
+  const mining = useQuery({ queryKey: ["losverdes-mining"], queryFn: () => fetchMining() });
+  const anomalies = useQuery({
+    queryKey: ["losverdes-anomalies"],
+    queryFn: () => fetchAnomalies(),
+  });
   const input = useMemo(() => {
     const data = query.data;
     if (!data) return null;
@@ -117,12 +125,19 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
       [
         "territory.cadastre",
         "remote_sensing.sentinel2_alteration",
+        "remote_sensing.lineaments",
+        "geology.interpreted_structures",
         "geophysics.anomalies",
         "sampling.results",
         "targets.exploration",
       ],
     );
-    const bundle = buildLosVerdesPublicGeoBundle(manifest, data);
+    const bundle = buildLosVerdesPublicGeoBundle(
+      manifest,
+      data,
+      mining.data as never,
+      anomalies.data as never,
+    );
     const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
     if (emit.length)
       layers.push({
