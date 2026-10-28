@@ -134,7 +134,7 @@ s += [Paragraph('Resumen ejecutivo', h1),
       P(f'• <b>Observabilidad óptica muy baja.</b> La superficie interpretable global (NDVI&lt;0,25, sin nube, sombra ni agua) fue '
         f'de {g_min:.2f}–{g_max:.2f} % según escena (mediana {cov["global_tipico_ndvi025"]:.2f} %), muy por debajo del umbral de 15 %.'),
       P(f'• Solo <b>{len(conc)} paños</b> ({", ".join(conc)}) superan 15 % en su mejor escena, en sectores de cosecha forestal. '
-        'En escena típica <b>ningún paño</b> alcanza el umbral. Los otros 30 son <b>NO CONCLUYENTES PARA TARGETING ESPECTRAL</b>.'),
+        f'En escena típica <b>ningún paño</b> alcanza el umbral. Los otros {34-len(conc)} son <b>NO CONCLUYENTES PARA TARGETING ESPECTRAL</b>.'),
       P('• <b>Geomorfología:</b> 8 paños clase A (meseta heredada ≥25 %): Arcillas 26, 34, 31, 27, 33, 30, 29 y 28, en el sector '
         'oriental. La pendiente &lt;5° recalculada es coherente con este orden (confianza media).'),
       P(f'• <b>Lineamientos:</b> {val["lineaments"]} trazas, sin duplicados por extremos; longitud mediana '
@@ -240,7 +240,7 @@ s += [Paragraph('9. Modelo exploratorio de REE', h1),
       fig('fig10_prioridades.png', 'Figura 10. Prioridades relativas de reconocimiento de regolito.', 150), PageBreak()]
 
 s += [Paragraph('11. Riesgos e incertidumbres', h1)] + [P('• ' + x) for x in [
-    'Cobertura forestal: la teledetección óptica no es concluyente en 30 de 34 paños.',
+    'Cobertura forestal: la teledetección óptica no es concluyente en ' + str(34-len(conc)) + ' de 34 paños.',
     'Georreferenciación: datum fuente PSAD56 sin conciliación formal; error posicional no cuantificado.',
     'Catastro: pedimentos en trámite; superposición con terceros y estudio de títulos pendientes.',
     'Sensores: ASTER, Landsat y Sentinel-1 no procesados en esta corrida.',
