@@ -15,62 +15,70 @@
 
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
+import {
+  errorMessage,
+  fetchWithTimeout,
+  mapWithConcurrency,
+  verifyCronSecret,
+} from "@/lib/server/ingest";
+
+const CONCURRENCY = 4;
+const PER_PROJECT_TIMEOUT_MS = 50_000;
+const PAGE = 1000;
 
 export const Route = createFileRoute("/api/public/sync-catastro")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const cronSecret = process.env.CRON_SECRET;
-        const provided = request.headers.get("x-cron-secret");
-        if (!cronSecret || !provided || provided !== cronSecret) {
+        if (!verifyCronSecret(request, process.env.CRON_SECRET)) {
           return new Response("Unauthorized", { status: 401 });
         }
+        const url = process.env.SUPABASE_URL;
+        const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!url || !key) return new Response("server_misconfigured", { status: 500 });
+        const supabase = createClient(url, key, { auth: { persistSession: false } });
 
-        const supabase = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!,
-        );
-
-        // Get all projects that have at least one mining concession
-        const { data: projects, error } = await supabase
-          .from("mining_concessions")
-          .select("project_id")
-          .limit(10000);
-
-        if (error) {
-          return Response.json({ error: error.message }, { status: 500 });
+        // Page through project ids only (narrow projection) instead of one 10k-row read.
+        const ids = new Set<string>();
+        for (let from = 0; ; from += PAGE) {
+          const { data, error } = await supabase
+            .from("mining_concessions")
+            .select("project_id")
+            .not("project_id", "is", null)
+            .order("project_id")
+            .range(from, from + PAGE - 1);
+          if (error) return Response.json({ error: error.message }, { status: 500 });
+          for (const r of data ?? []) ids.add(r.project_id as string);
+          if (!data || data.length < PAGE) break;
         }
+        const projectIds = [...ids];
+        const startedAt = Date.now();
 
-        const uniqueProjectIds = Array.from(
-          new Set((projects ?? []).map((r) => r.project_id as string)),
-        );
-
-        const results: Array<{ projectId: string; ok: boolean; error?: string }> = [];
-
-        for (const projectId of uniqueProjectIds) {
+        // Bounded concurrency + per-project timeout: one slow project can't stall the run.
+        const results = await mapWithConcurrency(projectIds, CONCURRENCY, async (projectId) => {
           try {
-            const res = await fetch(`${process.env.SUPABASE_URL}/functions/v1/sync-catastro`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+            const res = await fetchWithTimeout(
+              `${url}/functions/v1/sync-catastro`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
+                body: JSON.stringify({ projectId }),
               },
-              body: JSON.stringify({ projectId }),
-            });
-            const json = await res.json();
-            results.push({ projectId, ok: res.ok, ...(res.ok ? {} : { error: json.error }) });
+              PER_PROJECT_TIMEOUT_MS,
+            );
+            if (res.ok) return { projectId, ok: true as const };
+            const json = (await res.json().catch(() => ({}))) as { error?: string };
+            return { projectId, ok: false as const, error: json.error ?? `HTTP ${res.status}` };
           } catch (e) {
-            results.push({
-              projectId,
-              ok: false,
-              error: e instanceof Error ? e.message : String(e),
-            });
+            return { projectId, ok: false as const, error: errorMessage(e) };
           }
-        }
+        });
 
         return Response.json({
           ok: true,
-          projects: uniqueProjectIds.length,
+          projects: projectIds.length,
+          failed: results.filter((r) => !r.ok).length,
+          durationMs: Date.now() - startedAt,
           results,
           ranAt: new Date().toISOString(),
         });

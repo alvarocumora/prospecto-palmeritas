@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { parseRemateRows, type RemateRow } from "@/lib/patentRemates";
+import { verifyCronSecret } from "@/lib/server/ingest";
 
 // Ingesta de la nómina anual de remates por patente minera impaga.
 //
@@ -37,9 +38,7 @@ export const Route = createFileRoute("/api/public/ingest-patent-remates")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const cronSecret = process.env.CRON_SECRET;
-        const provided = request.headers.get("x-cron-secret");
-        if (!cronSecret || !provided || provided !== cronSecret) {
+        if (!verifyCronSecret(request, process.env.CRON_SECRET)) {
           return new Response("Unauthorized", { status: 401 });
         }
         const url = process.env.SUPABASE_URL;
