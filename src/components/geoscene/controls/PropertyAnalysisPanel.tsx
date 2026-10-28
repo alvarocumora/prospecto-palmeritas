@@ -32,7 +32,24 @@ export function PropertyAnalysisPanel({
   viewNote: string;
   onClose: () => void;
 }) {
-  const cadastre = layers.find((l) => l.id === "territory.cadastre")?.data;
+  // Official cadastre plus requested/pending pedimentos (status kept per feature).
+  const cadastre = useMemo<FeatureCollection | undefined>(() => {
+    const status: Record<string, string> = {
+      "territory.cadastre": "",
+      "territory.proposed_pedimentos": "Solicitud",
+      "territory.pending_pedimentos": "Pendiente",
+    };
+    const features = layers.flatMap((l) =>
+      l.id in status && l.data
+        ? l.data.features.map((f) =>
+            status[l.id]
+              ? { ...f, properties: { ...f.properties, estado_tenencia: status[l.id] } }
+              : f,
+          )
+        : [],
+    );
+    return features.length ? { type: "FeatureCollection", features } : undefined;
+  }, [layers]);
   const options = useMemo(() => listProperties(cadastre), [cadastre]);
   const [key, setKey] = useState("");
   const [query, setQuery] = useState("");

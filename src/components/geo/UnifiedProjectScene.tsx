@@ -10,6 +10,8 @@ import type { CanonicalProjectSlug } from "@/lib/projects/catalog";
 import { buildPublicGeoManifest } from "@/lib/geospatial/publicGeoContract";
 import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicGeoAdapter";
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
+import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
+import { getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
@@ -107,7 +109,15 @@ export function UnifiedProjectScene({
 function LosVerdesScene({ view }: { view: ProjectView }) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
+  const fetchMining = useServerFn(getLosVerdesMining);
+  const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
   const query = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchData() });
+  // Optional enrichments: veins and lineaments; failures fall back to map data.
+  const mining = useQuery({ queryKey: ["losverdes-mining"], queryFn: () => fetchMining() });
+  const anomalies = useQuery({
+    queryKey: ["losverdes-anomalies"],
+    queryFn: () => fetchAnomalies(),
+  });
   const input = useMemo(() => {
     const data = query.data;
     if (!data) return null;
@@ -117,12 +127,19 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
       [
         "territory.cadastre",
         "remote_sensing.sentinel2_alteration",
+        "remote_sensing.lineaments",
+        "geology.interpreted_structures",
         "geophysics.anomalies",
         "sampling.results",
         "targets.exploration",
       ],
     );
-    const bundle = buildLosVerdesPublicGeoBundle(manifest, data);
+    const bundle = buildLosVerdesPublicGeoBundle(
+      manifest,
+      data,
+      mining.data,
+      anomalies.data,
+    );
     const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
     if (emit.length)
       layers.push({
@@ -145,7 +162,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         },
       });
     return { project: { id, name: "Los Verdes", center: data.center, bbox: data.bbox }, layers };
-  }, [query.data, emit]);
+  }, [query.data, mining.data, anomalies.data, emit]);
   if (query.isError)
     return (
       <p role="alert" className="p-6 text-content-subtle">
