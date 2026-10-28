@@ -40,6 +40,12 @@ async function countTable(supabase: DbClient, table: TableName): Promise<number>
 }
 
 export const getPlatformStats = createServerFn({ method: "GET" }).handler(async () => {
+  const { memoize } = await import("@/lib/server/memoCache");
+  // KPIs agregados: 10 min de desfase evita ~10 conteos completos por visita.
+  return memoize("platform-stats", 10 * 60 * 1000, loadPlatformStats);
+});
+
+async function loadPlatformStats(): Promise<PlatformStats> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
   // `dealsOpen` = operaciones vivas reales: solicitudes de inversión en curso
@@ -52,7 +58,7 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
       (async () => {
         const { count, error } = await supabaseAdmin
           .from("cadastre_national")
-          .select("id", { count: "exact", head: true })
+          .select("id", { count: "planned", head: true })
           .is("archived_at", null);
         return error ? 0 : (count ?? 0);
       })(),
@@ -109,4 +115,4 @@ export const getPlatformStats = createServerFn({ method: "GET" }).handler(async 
   };
 
   return stats;
-});
+}

@@ -54,67 +54,66 @@ export const getLandingCatastroSnapshot = createServerFn({ method: "GET" }).hand
 );
 
 async function loadSnapshot(): Promise<LandingCatastroSnapshot> {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const generatedAt = new Date().toISOString();
+  const generatedAt = new Date().toISOString();
 
-    const [totalRes, groupRes, sampleRes, syncRes] = await Promise.all([
-      // Conteo estimado del planificador: evita recorrer la tabla completa.
-      supabaseAdmin.from("cadastre_national").select("id", { count: "planned", head: true }),
-      supabaseAdmin.from("cadastre_national").select("tipo,status,holder_name").limit(15000),
-      supabaseAdmin
-        .from("cadastre_national")
-        .select("geometry_geojson")
-        .not("geometry_geojson", "is", null)
-        .limit(3000),
-      supabaseAdmin
-        .from("cadastre_sync_runs")
-        .select("finished_at")
-        .not("finished_at", "is", null)
-        .order("finished_at", { ascending: false })
-        .limit(1),
-    ]);
+  const [totalRes, groupRes, sampleRes, syncRes] = await Promise.all([
+    // Conteo estimado del planificador: evita recorrer la tabla completa.
+    supabaseAdmin.from("cadastre_national").select("id", { count: "planned", head: true }),
+    supabaseAdmin.from("cadastre_national").select("tipo,status,holder_name").limit(15000),
+    supabaseAdmin
+      .from("cadastre_national")
+      .select("geometry_geojson")
+      .not("geometry_geojson", "is", null)
+      .limit(3000),
+    supabaseAdmin
+      .from("cadastre_sync_runs")
+      .select("finished_at")
+      .not("finished_at", "is", null)
+      .order("finished_at", { ascending: false })
+      .limit(1),
+  ]);
 
-    const tipoMap = new Map<string, number>();
-    const estadoMap = new Map<string, number>();
-    const holderMap = new Map<string, number>();
-    for (const r of (groupRes.data ?? []) as Array<{
-      tipo: string | null;
-      status: string | null;
-      holder_name: string | null;
-    }>) {
-      if (r.tipo) tipoMap.set(r.tipo, (tipoMap.get(r.tipo) ?? 0) + 1);
-      if (r.status) estadoMap.set(r.status, (estadoMap.get(r.status) ?? 0) + 1);
-      if (r.holder_name) holderMap.set(r.holder_name, (holderMap.get(r.holder_name) ?? 0) + 1);
-    }
-    const toArr = (m: Map<string, number>) =>
-      Array.from(m.entries())
-        .map(([key, count]) => ({ key, count }))
-        .sort((a, b) => b.count - a.count);
-    const porTipo = toArr(tipoMap).slice(0, 6);
-    const porEstado = toArr(estadoMap).slice(0, 6);
-    const topTitulares = toArr(holderMap)
-      .slice(0, 6)
-      .map((x) => ({ name: x.key, count: x.count }));
+  const tipoMap = new Map<string, number>();
+  const estadoMap = new Map<string, number>();
+  const holderMap = new Map<string, number>();
+  for (const r of (groupRes.data ?? []) as Array<{
+    tipo: string | null;
+    status: string | null;
+    holder_name: string | null;
+  }>) {
+    if (r.tipo) tipoMap.set(r.tipo, (tipoMap.get(r.tipo) ?? 0) + 1);
+    if (r.status) estadoMap.set(r.status, (estadoMap.get(r.status) ?? 0) + 1);
+    if (r.holder_name) holderMap.set(r.holder_name, (holderMap.get(r.holder_name) ?? 0) + 1);
+  }
+  const toArr = (m: Map<string, number>) =>
+    Array.from(m.entries())
+      .map(([key, count]) => ({ key, count }))
+      .sort((a, b) => b.count - a.count);
+  const porTipo = toArr(tipoMap).slice(0, 6);
+  const porEstado = toArr(estadoMap).slice(0, 6);
+  const topTitulares = toArr(holderMap)
+    .slice(0, 6)
+    .map((x) => ({ name: x.key, count: x.count }));
 
-    const heatPoints: Array<[number, number]> = [];
-    for (const row of (sampleRes.data ?? []) as Array<{ geometry_geojson: unknown }>) {
-      const p = pointFromGeoJSON(row.geometry_geojson);
-      if (p && p[0] > -80 && p[0] < -66 && p[1] > -56 && p[1] < -17) heatPoints.push(p);
-    }
+  const heatPoints: Array<[number, number]> = [];
+  for (const row of (sampleRes.data ?? []) as Array<{ geometry_geojson: unknown }>) {
+    const p = pointFromGeoJSON(row.geometry_geojson);
+    if (p && p[0] > -80 && p[0] < -66 && p[1] > -56 && p[1] < -17) heatPoints.push(p);
+  }
 
-    const updatedAt =
-      ((syncRes.data as Array<{ finished_at: string }> | null) ?? [])[0]?.finished_at ?? null;
+  const updatedAt =
+    ((syncRes.data as Array<{ finished_at: string }> | null) ?? [])[0]?.finished_at ?? null;
 
-    return {
-      totalNacional: totalRes.count ?? 0,
-      porTipo: porTipo.slice(0, 6),
-      porEstado: porEstado.slice(0, 6),
-      topTitulares: topTitulares.slice(0, 6),
-      heatPoints,
-      sampleSize: heatPoints.length,
-      updatedAt,
-      generatedAt,
-    };
-  },
-);
+  return {
+    totalNacional: totalRes.count ?? 0,
+    porTipo: porTipo.slice(0, 6),
+    porEstado: porEstado.slice(0, 6),
+    topTitulares: topTitulares.slice(0, 6),
+    heatPoints,
+    sampleSize: heatPoints.length,
+    updatedAt,
+    generatedAt,
+  };
+}
