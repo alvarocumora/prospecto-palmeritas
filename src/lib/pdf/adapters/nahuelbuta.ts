@@ -112,7 +112,8 @@ export function buildNahuelbutaDoc(): ProjectDoc {
         status: "DERIVED",
         provenance: "INTERPRETED",
         label: "Cobertura óptica histórica",
-        detail: "0,53% sobre AOI rectangular (~23.500 ha), NO en los 10.200 ha de paños; requiere reproceso.",
+        detail:
+          "0,53% sobre AOI rectangular (~23.500 ha), NO en los 10.200 ha de paños; requiere reproceso.",
         source: "docs/protocolo-analisis-satelital-distritos.md",
         confidence: "low",
       },
@@ -164,11 +165,13 @@ export function buildNahuelbutaDoc(): ProjectDoc {
             kind: "table",
             head: ["Paño", "Meseta DEM", "Interpretación"],
             widths: [0.3, 0.25, 0.45],
-            rows: mesetas.slice(0, 10).map((p) => [
-              p.pano,
-              `${p.pct.toLocaleString("es-CL", { maximumFractionDigits: 1 })}%`,
-              "Reconocimiento condicionado",
-            ]),
+            rows: mesetas
+              .slice(0, 10)
+              .map((p) => [
+                p.pano,
+                `${p.pct.toLocaleString("es-CL", { maximumFractionDigits: 1 })}%`,
+                "Reconocimiento condicionado",
+              ]),
           },
           {
             kind: "recommendation",
@@ -187,12 +190,14 @@ export function buildNahuelbutaDoc(): ProjectDoc {
             kind: "table",
             head: ["Paño", "Trazas", "km/km2 aprox.", "Dirección"],
             widths: [0.27, 0.16, 0.29, 0.28],
-            rows: lineamentRanking.slice(0, 8).map((p) => [
-              p.pano,
-              String(p.lineamientos_intersectados),
-              p.densidad_aprox_km_por_km2.toLocaleString("es-CL"),
-              p.orientacion_dominante,
-            ]),
+            rows: lineamentRanking
+              .slice(0, 8)
+              .map((p) => [
+                p.pano,
+                String(p.lineamientos_intersectados),
+                p.densidad_aprox_km_por_km2.toLocaleString("es-CL"),
+                p.orientacion_dominante,
+              ]),
           },
           {
             kind: "finding",

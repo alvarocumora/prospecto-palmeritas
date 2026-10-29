@@ -30,9 +30,21 @@ describe("memoize", () => {
 
   it("serves the stale value if a refresh fails", async () => {
     let t = 0;
-    await memoize("k", 10, async () => "ok", () => t);
+    await memoize(
+      "k",
+      10,
+      async () => "ok",
+      () => t,
+    );
     t = 100;
-    const v = await memoize("k", 10, async () => { throw new Error("db"); }, () => t);
+    const v = await memoize(
+      "k",
+      10,
+      async () => {
+        throw new Error("db");
+      },
+      () => t,
+    );
     expect(v).toBe("ok");
   });
 });

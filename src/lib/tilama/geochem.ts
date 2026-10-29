@@ -56,7 +56,11 @@ export function median(values: number[]): number | null {
 /** Propiedades multielemento para enriquecer un punto de muestreo por código. */
 const byCode = new Map(TILAMA_SAMPLES.map((s) => [s.Muestra.trim().toUpperCase(), s]));
 export function multiElementProps(code: unknown): Record<string, string | number | null> | null {
-  const s = byCode.get(String(code ?? "").trim().toUpperCase());
+  const s = byCode.get(
+    String(code ?? "")
+      .trim()
+      .toUpperCase(),
+  );
   if (!s) return null;
   const flags = qaFlags(s);
   return {
