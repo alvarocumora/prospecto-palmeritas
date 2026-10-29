@@ -6,6 +6,18 @@ import type {
   PublicGeoFeatureCollection,
   PublicGeoManifest,
 } from "@/lib/geospatial/publicGeoContract";
+import { multiElementProps } from "@/lib/tilama/geochem";
+
+/** Adds Mo/As/Pb/Zn/Au and QA/QC flags from the Tilama CORE CSV, matched by sample code. */
+function withMultiElement(fc: PublicGeoFeatureCollection): PublicGeoFeatureCollection {
+  return {
+    ...fc,
+    features: fc.features.map((f) => {
+      const extra = multiElementProps(f.properties?.sample_code);
+      return extra ? { ...f, properties: { ...f.properties, ...extra } } : f;
+    }),
+  };
+}
 
 function featureCollection(features: MapFeature[]): PublicGeoFeatureCollection {
   return {
@@ -129,7 +141,7 @@ export function buildLosVerdesPublicGeoBundle(
       "remote_sensing.lineaments": lineamentFeatures(anomalies),
       "geology.interpreted_structures": veinFeatures(mining),
       "geophysics.anomalies": magneticFeatures(anomalies, magFallback),
-      "sampling.results": featureCollection(mapData.samples.features),
+      "sampling.results": withMultiElement(featureCollection(mapData.samples.features)),
       "targets.exploration": featureCollection(mapData.targets.features),
     },
   };
