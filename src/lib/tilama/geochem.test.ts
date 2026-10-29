@@ -11,7 +11,7 @@ describe("Tilama geoquímica", () => {
     expect(qaFlags(s)[0]).toMatch(/RE-ENSAYE/);
     expect(topBy("Cu_ppm", 1)[0].Muestra).toBe("TOO-270");
   });
-  it("muestras >1 % Cu son 45", () => {
+  it("muestras ≥1 % Cu son 45", () => {
     expect(cuThresholdCounts().find((c) => c.threshold === 1)?.count).toBe(45);
   });
   it("enriquece por código sin distinguir mayúsculas", () => {

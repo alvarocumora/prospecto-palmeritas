@@ -32,7 +32,7 @@ export function qaFlags(s: TilamaSample): string[] {
 
 export function cuThresholdCounts(samples: TilamaSample[] = TILAMA_SAMPLES) {
   const pct = samples.map((s) => (s.Cu_ppm ?? 0) / 10_000);
-  return [0.5, 1, 2, 5].map((t) => ({ threshold: t, count: pct.filter((v) => v > t).length }));
+  return [0.5, 1, 2, 5].map((t) => ({ threshold: t, count: pct.filter((v) => v >= t).length }));
 }
 
 export function topBy(
