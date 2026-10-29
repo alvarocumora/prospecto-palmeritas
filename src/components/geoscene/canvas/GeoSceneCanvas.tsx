@@ -358,12 +358,16 @@ export function GeoSceneCanvas({
     try {
       const image = await captureView();
       if (!image) toast.message("No se pudo capturar la vista; el mapa sale sin imagen.");
+      const mapCanvas = mapRef.current?.getCanvas();
+      const imageAspect =
+        mapCanvas && mapCanvas.width ? mapCanvas.height / mapCanvas.width : undefined;
       const visibleOnly = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
       const summary = summarizeProjectGeology(visibleOnly, resolvedProjectLayers);
       const { buildGeologicalMapPdf } = await import("@/lib/pdf/geologicalMapPdf");
       const blob = await buildGeologicalMapPdf({
         projectName: project?.name ?? "Proyecto",
         image,
+        imageAspect,
         viewNote: `Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Imagen base: Esri World Imagery.`,
         summary,
       });

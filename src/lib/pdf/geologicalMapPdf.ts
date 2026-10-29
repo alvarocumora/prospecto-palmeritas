@@ -28,6 +28,7 @@ async function sha256(s: string): Promise<string> {
 export async function buildGeologicalMapPdf(o: {
   projectName: string;
   image: string | null;
+  imageAspect?: number;
   viewNote: string;
   summary: GeologyMapSummary;
 }): Promise<Blob> {
@@ -88,7 +89,7 @@ export async function buildGeologicalMapPdf(o: {
 
   if (o.image) {
     y = ensure(y + 6, 220);
-    const ih = cw * 0.56;
+    const ih = cw * Math.min(Math.max(o.imageAspect ?? 0.56, 0.4), 1.1);
     doc.addImage(o.image, "JPEG", f.m, y, cw, ih);
     y += ih + 10;
     font(doc, "body", "normal", 7.2);
@@ -148,7 +149,8 @@ export async function buildGeologicalMapPdf(o: {
   y += noticeLines.length * 10 + 14;
 
   const url = publicUrl("/dashboard");
-  verificationSeal(doc, f, Math.min(y, f.h - 160), {
+  y = ensure(y, 92);
+  verificationSeal(doc, f, y, {
     qr: await brandQr(url),
     title: "Sello de integridad",
     body: `SHA-256 ${hash}`,
