@@ -27,6 +27,7 @@ import { FeatureInspector } from "../controls/FeatureInspector";
 import { AnalysisDock } from "../controls/AnalysisDock";
 import { PropertyAnalysisPanel } from "../controls/PropertyAnalysisPanel";
 import { filterSpectral, unitColor, type SpectralTop, sectionGeology } from "../analysisTools";
+import { summarizeProjectGeology } from "../geologyMapSummary";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import type { FeatureCollection } from "geojson";
@@ -348,6 +349,33 @@ export function GeoSceneCanvas({
       return out.toDataURL("image/jpeg", 0.88);
     } catch {
       return null;
+    }
+  };
+  const [geologyMapBusy, setGeologyMapBusy] = useState(false);
+  const exportGeologyMap = async () => {
+    if (geologyMapBusy) return;
+    setGeologyMapBusy(true);
+    try {
+      const image = await captureView();
+      if (!image) toast.message("No se pudo capturar la vista; el mapa sale sin imagen.");
+      const visibleOnly = resolvedProjectLayers.filter((l) => visibleLayerIds.has(l.id));
+      const summary = summarizeProjectGeology(visibleOnly, resolvedProjectLayers);
+      const { buildGeologicalMapPdf } = await import("@/lib/pdf/geologicalMapPdf");
+      const blob = await buildGeologicalMapPdf({
+        projectName: project?.name ?? "Proyecto",
+        image,
+        viewNote: `Vista ${view === "3d" ? "Perspectiva" : "Planta"} capturada del visor GeoScene3D el ${new Date().toISOString().slice(0, 10)}. Imagen base: Esri World Imagery.`,
+        summary,
+      });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `Mapa-geologico-${(project?.name ?? "proyecto").replace(/[^\w-]+/g, "_")}.pdf`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    } catch (e) {
+      toast.error("Error al generar el mapa: " + (e as Error).message);
+    } finally {
+      setGeologyMapBusy(false);
     }
   };
   const [corridor, setCorridor] = useState(50);
@@ -1014,6 +1042,8 @@ export function GeoSceneCanvas({
         }}
         propertyOn={propertyOpen}
         onProperty={() => setPropertyOpen((v) => !v)}
+        onGeologyMap={exportGeologyMap}
+        geologyMapBusy={geologyMapBusy}
       />
       {propertyOpen && (
         <PropertyAnalysisPanel
