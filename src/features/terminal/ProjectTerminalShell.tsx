@@ -18,6 +18,11 @@ import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { fmtUsd0 } from "@/lib/investor/fichas";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { ProjectOpportunities } from "./ProjectOpportunities";
+const TilamaGeochemPanel = lazy(() =>
+  import("@/features/losverdes/TilamaGeochemPanel").then((m) => ({
+    default: m.TilamaGeochemPanel,
+  })),
+);
 import { TicketPanel } from "./TicketPanel";
 import { spvCodeForSlug } from "@/lib/investor/rounds";
 const TerminalSatellitePanel = lazy(() =>
@@ -374,6 +379,9 @@ function TesisTab({ project }: { project: TerminalProject }) {
         <Suspense fallback={<Loading label="Cargando tenencia y evidencia" />}>
           <div className="mt-6">
             <LosVerdesTenureSummaryPanel />
+          </div>
+          <div className="mt-6">
+            <TilamaGeochemPanel />
           </div>
         </Suspense>
       )}
