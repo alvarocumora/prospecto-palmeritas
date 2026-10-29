@@ -46,14 +46,17 @@ export const requestTicketSignatureUpload = createServerFn({ method: "POST" })
     const sb = await admin();
     const { data: t } = await sb
       .from("investment_tickets")
-      .select("investor_user_id")
+      .select("investor_user_id, status, signed_at")
       .eq("id", data.ticketId)
       .maybeSingle();
     if (!t || t.investor_user_id !== context.userId) throw new Error("Ticket no encontrado");
+    if (t.status !== "contract_pending" || t.signed_at) {
+      throw new Error("La firma solo puede cargarse antes de formalizar el contrato.");
+    }
     await ensureBucket(sb);
     const { data: up, error } = await sb.storage
       .from(BUCKET)
-      .createSignedUploadUrl(path(data.ticketId), { upsert: true });
+      .createSignedUploadUrl(path(data.ticketId), { upsert: false });
     if (error) throw new Error(error.message);
     return { bucket: BUCKET, path: up.path, token: up.token };
   });
