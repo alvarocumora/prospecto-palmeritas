@@ -45,7 +45,10 @@ export function TilamaGeochemPanel() {
       </div>
 
       {stats.flagged.length > 0 && (
-        <div role="alert" className="mt-4 rounded border border-accent-brand/40 bg-accent-brand/5 p-3 text-sm text-content">
+        <div
+          role="alert"
+          className="mt-4 rounded border border-accent-brand/40 bg-accent-brand/5 p-3 text-sm text-content"
+        >
           <strong>QA/QC:</strong>{" "}
           {stats.flagged
             .map((s) => `${s.Muestra} (${fmt((s.Cu_ppm ?? 0) / 10_000, 2)} % Cu)`)

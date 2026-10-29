@@ -134,12 +134,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         "targets.exploration",
       ],
     );
-    const bundle = buildLosVerdesPublicGeoBundle(
-      manifest,
-      data,
-      mining.data,
-      anomalies.data,
-    );
+    const bundle = buildLosVerdesPublicGeoBundle(manifest, data, mining.data, anomalies.data);
     const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
     if (emit.length)
       layers.push({

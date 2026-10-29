@@ -1,8 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { chunk, mapWithConcurrency, verifyCronSecret } from "./ingest";
 
-const req = (h?: string) =>
-  new Request("http://x", { headers: h ? { "x-cron-secret": h } : {} });
+const req = (h?: string) => new Request("http://x", { headers: h ? { "x-cron-secret": h } : {} });
 
 describe("ingest helpers", () => {
   it("rejects missing or wrong cron secret", () => {
