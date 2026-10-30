@@ -7,6 +7,9 @@ import type {
   PublicGeoManifest,
 } from "@/lib/geospatial/publicGeoContract";
 import { multiElementProps } from "@/lib/tilama/geochem";
+import { buildDrillGridFromTargets, dominantStrikeFromVeins } from "@/lib/cholqui/drillGrid";
+
+const LOSVERDES_DRILL_CODE_PREFIX = "LV-DDH";
 
 /** Adds Mo/As/Pb/Zn/Au and QA/QC flags from the Tilama CORE CSV, matched by sample code. */
 function withMultiElement(fc: PublicGeoFeatureCollection): PublicGeoFeatureCollection {
@@ -122,6 +125,70 @@ function lineamentFeatures(
   };
 }
 
+/**
+ * Proposed drill grid from real `exploration_targets` (score, lat/lng,
+ * rationale already in DB — nothing synthesized here). The azimuth needs a
+ * dominant strike: only derived from measured vein strikes, never assumed,
+ * so without veins this returns no proposal rather than guessing one.
+ */
+function proposedDrillingFeatures(
+  mapData: LosVerdesMapData,
+  mining: LosVerdesMining | null | undefined,
+): PublicGeoFeatureCollection {
+  const dominantStrikeDeg = dominantStrikeFromVeins(mining?.veins ?? []);
+  if (dominantStrikeDeg == null) return { type: "FeatureCollection", features: [] };
+
+  const candidates = mapData.targets.features.flatMap((f) => {
+    const geom = f.geometry;
+    if (!geom || geom.type !== "Point") return [];
+    const [lng, lat] = geom.coordinates;
+    const score = f.properties.score;
+    if (lat == null || lng == null || score == null) return [];
+    const rationale = f.properties.rationale;
+    const objective =
+      typeof rationale === "string" && rationale.trim()
+        ? rationale
+        : `Verificar target ${f.properties.target_type ?? "no tipificado"} (${f.properties.commodity ?? "commodity no informado"}) en profundidad`;
+    return [
+      {
+        id: String(f.properties.id ?? f.id),
+        lat: Number(lat),
+        lng: Number(lng),
+        score: Number(score),
+        objective,
+      },
+    ];
+  });
+
+  const collars = buildDrillGridFromTargets(
+    candidates,
+    { lat: mapData.center[1], lng: mapData.center[0] },
+    {
+      codePrefix: LOSVERDES_DRILL_CODE_PREFIX,
+      dominantStrikeDeg,
+    },
+  );
+
+  return {
+    type: "FeatureCollection",
+    features: collars.map((c) => ({
+      type: "Feature" as const,
+      id: c.code,
+      geometry: { type: "Point" as const, coordinates: [c.lng, c.lat] },
+      properties: {
+        code: c.code,
+        target_id: c.anomalyId,
+        azimuth_deg: c.azimuthDeg,
+        dip_deg: c.dipDeg,
+        depth_m: c.depthM,
+        priority: c.priority,
+        objetivo: c.objective,
+        score: c.score,
+      },
+    })),
+  };
+}
+
 export function buildLosVerdesPublicGeoBundle(
   manifest: PublicGeoManifest,
   mapData: LosVerdesMapData,
@@ -143,6 +210,7 @@ export function buildLosVerdesPublicGeoBundle(
       "geophysics.anomalies": magneticFeatures(anomalies, magFallback),
       "sampling.results": withMultiElement(featureCollection(mapData.samples.features)),
       "targets.exploration": featureCollection(mapData.targets.features),
+      "drilling.proposed": proposedDrillingFeatures(mapData, mining),
     },
   };
 }
