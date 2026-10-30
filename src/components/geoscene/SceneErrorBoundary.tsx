@@ -1,10 +1,17 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
+import { isChunkLoadError } from "@/lib/chunkLoadError";
 
 /**
  * ErrorBoundary para visores 3D embebidos: un crash del canvas (geometría
  * malformada, WebGL, datos de un proyecto incompleto) muestra un fallback
  * inline en vez de tumbar la página completa del dashboard.
+ *
+ * Un error de chunk (deploy nuevo invalidó el import lazy de GeoSceneCanvas)
+ * se deja pasar sin atraparlo: React cachea la promesa rechazada del import(),
+ * así que el botón "Reintentar" de este boundary jamás volvería a pedir el
+ * chunk y dejaría el visor roto hasta un reload manual. El auto-reload
+ * guardado por sessionStorage vive en el error boundary raíz del router.
  */
 export class SceneErrorBoundary extends Component<
   { children: ReactNode; label?: string },
@@ -13,6 +20,7 @@ export class SceneErrorBoundary extends Component<
   state = { error: null as Error | null };
 
   static getDerivedStateFromError(error: Error) {
+    if (isChunkLoadError(error)) throw error;
     return { error };
   }
 

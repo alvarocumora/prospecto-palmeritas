@@ -1,19 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createRouter, useRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-
-function isChunkLoadError(error: Error): boolean {
-  const msg = (error?.message || "").toLowerCase();
-  const name = (error?.name || "").toLowerCase();
-  return (
-    msg.includes("importing a module script failed") ||
-    msg.includes("failed to fetch dynamically imported module") ||
-    msg.includes("error loading dynamically imported module") ||
-    msg.includes("loading chunk") ||
-    msg.includes("loading css chunk") ||
-    name === "chunkloaderror"
-  );
-}
+import { isChunkLoadError } from "./lib/chunkLoadError";
 
 function DefaultErrorComponent({ error: rawError, reset }: { error: unknown; reset: () => void }) {
   const error = rawError as Error;
