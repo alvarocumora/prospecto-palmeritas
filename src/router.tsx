@@ -1,23 +1,18 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createRouter, useRouter } from "@tanstack/react-router";
 import { routeTree } from "./routeTree.gen";
-
-function isChunkLoadError(error: Error): boolean {
-  const msg = (error?.message || "").toLowerCase();
-  const name = (error?.name || "").toLowerCase();
-  return (
-    msg.includes("importing a module script failed") ||
-    msg.includes("failed to fetch dynamically imported module") ||
-    msg.includes("error loading dynamically imported module") ||
-    msg.includes("loading chunk") ||
-    msg.includes("loading css chunk") ||
-    name === "chunkloaderror"
-  );
-}
+import { isChunkLoadError } from "./lib/chunkLoadError";
 
 function DefaultErrorComponent({ error: rawError, reset }: { error: unknown; reset: () => void }) {
   const error = rawError as Error;
   const router = useRouter();
+
+  // Siempre registrar el error en consola: en producción el mensaje no se
+  // muestra en la UI (ver más abajo), así que esta es la única pista que
+  // queda para diagnosticar un crash reportado por un usuario.
+  if (typeof window !== "undefined") {
+    console.error("[DefaultErrorComponent] ruta falló:", error);
+  }
 
   // Auto-recovery for stale chunk errors after a new deploy.
   // Reload once (guarded via sessionStorage) to fetch fresh asset manifest.

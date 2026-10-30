@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import type { FeatureCollection } from "geojson";
 import { GeoScene3D } from "@/components/geoscene/GeoScene3D";
+import { SceneErrorBoundary } from "@/components/geoscene/SceneErrorBoundary";
 import { bundleSceneLayers } from "@/components/geoscene/bundleAdapter";
 import type { GeoSceneProject, GeoSceneProjectLayer } from "@/components/geoscene/projectLayers";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -64,14 +65,16 @@ export function ProjectSceneFrame({
   }, [layers, official.data]);
   return (
     <div data-surface="canvas" className="relative h-[620px] w-full overflow-hidden">
-      <GeoScene3D
-        key={project.id}
-        project={project}
-        projectLayers={allLayers}
-        view={view}
-        showModeTabs
-        showCopilot={false}
-      />
+      <SceneErrorBoundary label={project.name} key={project.id}>
+        <GeoScene3D
+          key={project.id}
+          project={project}
+          projectLayers={allLayers}
+          view={view}
+          showModeTabs
+          showCopilot={false}
+        />
+      </SceneErrorBoundary>
       <MiningEvidenceInspector layers={layers} projectName={project.name} />
     </div>
   );
