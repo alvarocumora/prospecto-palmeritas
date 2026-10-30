@@ -953,6 +953,8 @@ export function GeoSceneCanvas({
       drill_intercepts: interceptCount > 0,
       geophysics_anomalies: Boolean(anomaliesLayer),
       geology_wireframes: wireframeCount > 0,
+      geophysics_emag2: emag2Visible,
+      geophysics_wgm2012: wgm2012Visible,
     };
     const rendered = sceneBindingsForMode(mode)
       .filter(
@@ -980,6 +982,8 @@ export function GeoSceneCanvas({
     interceptCount,
     anomaliesLayer,
     wireframeCount,
+    emag2Visible,
+    wgm2012Visible,
   ]);
   const filterManifest = useMemo(
     () => sceneFilterManifest(filters),
