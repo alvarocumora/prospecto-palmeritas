@@ -19,6 +19,13 @@ function DefaultErrorComponent({ error: rawError, reset }: { error: unknown; res
   const error = rawError as Error;
   const router = useRouter();
 
+  // Siempre registrar el error en consola: en producción el mensaje no se
+  // muestra en la UI (ver más abajo), así que esta es la única pista que
+  // queda para diagnosticar un crash reportado por un usuario.
+  if (typeof window !== "undefined") {
+    console.error("[DefaultErrorComponent] ruta falló:", error);
+  }
+
   // Auto-recovery for stale chunk errors after a new deploy.
   // Reload once (guarded via sessionStorage) to fetch fresh asset manifest.
   if (typeof window !== "undefined" && isChunkLoadError(error)) {
