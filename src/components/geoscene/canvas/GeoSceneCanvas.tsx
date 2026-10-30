@@ -685,6 +685,7 @@ export function GeoSceneCanvas({
     const syncSnapshotViewState = () => setSnapshotViewState(mapSnapshotViewState(map));
 
     map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "bottom-left");
+    map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: "metric" }), "bottom-left");
     map.on("load", () => {
       const overlay = new MapboxOverlay({
         interleaved: false,
