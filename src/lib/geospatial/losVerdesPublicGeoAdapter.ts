@@ -7,7 +7,11 @@ import type {
   PublicGeoManifest,
 } from "@/lib/geospatial/publicGeoContract";
 import { multiElementProps } from "@/lib/tilama/geochem";
-import { buildDrillGridFromTargets, dominantStrikeFromVeins } from "@/lib/cholqui/drillGrid";
+import {
+  dominantStrikeFromVeins,
+  optimizeDrillSelection,
+  type ExistingDrillholeLocation,
+} from "@/lib/cholqui/drillGrid";
 
 const LOSVERDES_DRILL_CODE_PREFIX = "LV-DDH";
 
@@ -130,10 +134,15 @@ function lineamentFeatures(
  * rationale already in DB — nothing synthesized here). The azimuth needs a
  * dominant strike: only derived from measured vein strikes, never assumed,
  * so without veins this returns no proposal rather than guessing one.
+ *
+ * Selection prioritizes information gain over already-drilled ground
+ * (`optimizeDrillSelection`): with too few scored targets to fit a
+ * variogram it falls back to a plain top-score ranking on its own.
  */
 function proposedDrillingFeatures(
   mapData: LosVerdesMapData,
   mining: LosVerdesMining | null | undefined,
+  existingHoles: readonly ExistingDrillholeLocation[] = [],
 ): PublicGeoFeatureCollection {
   const dominantStrikeDeg = dominantStrikeFromVeins(mining?.veins ?? []);
   if (dominantStrikeDeg == null) return { type: "FeatureCollection", features: [] };
@@ -160,8 +169,9 @@ function proposedDrillingFeatures(
     ];
   });
 
-  const collars = buildDrillGridFromTargets(
+  const collars = optimizeDrillSelection(
     candidates,
+    existingHoles,
     { lat: mapData.center[1], lng: mapData.center[0] },
     {
       codePrefix: LOSVERDES_DRILL_CODE_PREFIX,
@@ -194,6 +204,7 @@ export function buildLosVerdesPublicGeoBundle(
   mapData: LosVerdesMapData,
   mining?: LosVerdesMining | null,
   anomalies?: LosVerdesAnomalies | null,
+  existingHoles?: readonly ExistingDrillholeLocation[] | null,
 ): PublicGeoBundle {
   const satFallback = featureCollection(mapData.satAnomalies.features);
   const magFallback = featureCollection(mapData.magAnomalies.features);
@@ -210,7 +221,7 @@ export function buildLosVerdesPublicGeoBundle(
       "geophysics.anomalies": magneticFeatures(anomalies, magFallback),
       "sampling.results": withMultiElement(featureCollection(mapData.samples.features)),
       "targets.exploration": featureCollection(mapData.targets.features),
-      "drilling.proposed": proposedDrillingFeatures(mapData, mining),
+      "drilling.proposed": proposedDrillingFeatures(mapData, mining, existingHoles ?? []),
     },
   };
 }

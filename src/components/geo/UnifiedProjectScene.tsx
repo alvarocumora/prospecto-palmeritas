@@ -12,6 +12,7 @@ import { buildLosVerdesPublicGeoBundle } from "@/lib/geospatial/losVerdesPublicG
 import { getLosVerdesMapData } from "@/lib/losverdes-map.functions";
 import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
+import { getExistingDrillholeLocations } from "@/lib/drilling/existingHoles.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
 import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
@@ -106,22 +107,30 @@ export function UnifiedProjectScene({
   );
 }
 
+const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
+
 function LosVerdesScene({ view }: { view: ProjectView }) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
   const fetchMining = useServerFn(getLosVerdesMining);
   const fetchAnomalies = useServerFn(getLosVerdesAnomalies);
+  const fetchExistingHoles = useServerFn(getExistingDrillholeLocations);
   const query = useQuery({ queryKey: ["losverdes-map-data"], queryFn: () => fetchData() });
-  // Optional enrichments: veins and lineaments; failures fall back to map data.
+  // Optional enrichments: veins, lineaments and already-drilled ground;
+  // failures fall back to map data / an empty set, never block the scene.
   const mining = useQuery({ queryKey: ["losverdes-mining"], queryFn: () => fetchMining() });
   const anomalies = useQuery({
     queryKey: ["losverdes-anomalies"],
     queryFn: () => fetchAnomalies(),
   });
+  const existingHoles = useQuery({
+    queryKey: ["losverdes-existing-holes"],
+    queryFn: () => fetchExistingHoles({ data: { projectId: LOSVERDES_PROJECT_ID } }),
+  });
   const input = useMemo(() => {
     const data = query.data;
     if (!data) return null;
-    const id = "7a499b02-ecdf-447b-8956-b106fe4ec087";
+    const id = LOSVERDES_PROJECT_ID;
     const manifest = buildPublicGeoManifest(
       { id, name: "Los Verdes", center_lat: data.center[1], center_lng: data.center[0] },
       [
@@ -135,7 +144,13 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         "drilling.proposed",
       ],
     );
-    const bundle = buildLosVerdesPublicGeoBundle(manifest, data, mining.data, anomalies.data);
+    const bundle = buildLosVerdesPublicGeoBundle(
+      manifest,
+      data,
+      mining.data,
+      anomalies.data,
+      existingHoles.data,
+    );
     const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
     if (emit.length)
       layers.push({
@@ -158,7 +173,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         },
       });
     return { project: { id, name: "Los Verdes", center: data.center, bbox: data.bbox }, layers };
-  }, [query.data, mining.data, anomalies.data, emit]);
+  }, [query.data, mining.data, anomalies.data, existingHoles.data, emit]);
   if (query.isError)
     return (
       <p role="alert" className="p-6 text-content-subtle">

@@ -379,7 +379,7 @@ export type ExistingDrillholeLocation = { lat: number; lng: number };
  */
 export function optimizeDrillSelection(
   targets: DrillTargetCandidate[],
-  existingHoles: ExistingDrillholeLocation[],
+  existingHoles: readonly ExistingDrillholeLocation[],
   center: { lat: number; lng: number },
   project: ProjectDrillConfig,
   opts: {
