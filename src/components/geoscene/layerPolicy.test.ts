@@ -35,4 +35,13 @@ describe("GeoScene3D canonical layer policy", () => {
     expect(sceneLayerEnabled(enabled, "drillholes_completed")).toBe(true);
     expect(sceneLayerEnabled(enabled, "drillholes_proposed")).toBe(true);
   });
+
+  it("binds regional geophysics (EMAG2/WGM2012) in both surface and subsurface", () => {
+    expect(
+      sceneBindingsForMode("surface").some((binding) => binding.key === "geophysics_emag2"),
+    ).toBe(true);
+    expect(
+      sceneBindingsForMode("subsurface").some((binding) => binding.key === "geophysics_wgm2012"),
+    ).toBe(true);
+  });
 });

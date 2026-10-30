@@ -16,7 +16,9 @@ export type GeoSceneBindingKey =
   | "drill_intercepts"
   | "geophysics_anomalies"
   | "geology_wireframes"
-  | "resource_blocks";
+  | "resource_blocks"
+  | "geophysics_emag2"
+  | "geophysics_wgm2012";
 
 export type GeoSceneLayerBinding = {
   key: GeoSceneBindingKey;
@@ -61,6 +63,16 @@ export const GEOSCENE_LAYER_BINDINGS: readonly GeoSceneLayerBinding[] = [
     key: "resource_blocks",
     canonicalId: "models.resource_blocks",
     modes: ["resource"],
+  },
+  {
+    key: "geophysics_emag2",
+    canonicalId: "geophysics.emag2",
+    modes: ["surface", "subsurface"],
+  },
+  {
+    key: "geophysics_wgm2012",
+    canonicalId: "geophysics.wgm2012",
+    modes: ["surface", "subsurface"],
   },
 ];
 
