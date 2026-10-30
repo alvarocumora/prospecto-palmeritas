@@ -26,6 +26,16 @@ const BG: Record<Evidence, string> = {
   CONTEXTO: "#b45309",
 };
 
+const DESCRIPTION: Record<Evidence, string> = {
+  OFICIAL: "Fuente oficial (SERNAGEOMIN, catastro, franjas, DEM)",
+  MEDIDO: "Dato medido en terreno o laboratorio (geoquímica, estaciones)",
+  CERTIFICADO: "Ensaye o análisis certificado",
+  DERIVADO: "Derivado de sensores (satélite, geofísica regional)",
+  INTERPRETADO: "Interpolado o modelado (IDW, superficies)",
+  PROPUESTO: "Propuesta o borrador (pedimento, sondaje, target)",
+  CONTEXTO: "Contexto regional; verificar antes de usar como detalle",
+};
+
 export function EvidenceBadge({
   kind,
   scale,
@@ -39,7 +49,7 @@ export function EvidenceBadge({
   size?: "xs" | "sm";
 }) {
   return (
-    <span className={cn("inline-flex items-center gap-1", className)}>
+    <span className={cn("inline-flex items-center gap-1", className)} title={DESCRIPTION[kind]}>
       <span
         className={cn(
           "rounded font-bold uppercase leading-tight text-white",
