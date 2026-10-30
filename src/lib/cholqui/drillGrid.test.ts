@@ -155,4 +155,15 @@ describe("optimizeDrillSelection", () => {
     );
     expect(optimized[0]?.anomalyId).toBe("farAway");
   });
+
+  it("does not blow the call stack with a large target inventory", () => {
+    const many = Array.from({ length: 600 }, (_, i) => ({
+      id: `t${i}`,
+      lat: -30 + (i % 30) * 0.001,
+      lng: -71 + Math.floor(i / 30) * 0.001,
+      score: 55 + (i % 40),
+      objective: "x",
+    }));
+    expect(() => optimizeDrillSelection(many, [], center, project)).not.toThrow();
+  });
 });

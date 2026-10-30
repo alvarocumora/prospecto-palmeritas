@@ -323,7 +323,7 @@ export function computeExperimentalVariogram(
   }
   if (pairs.length === 0) return [];
 
-  const maxDist = Math.max(...pairs.map((p) => p.dist));
+  const maxDist = pairs.reduce((m, p) => (p.dist > m ? p.dist : m), 0);
   if (maxDist === 0) return [];
   const binWidth = maxDist / nBins;
   const bins: Array<{ lag: number; gamma: number }> = [];
