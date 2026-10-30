@@ -52,6 +52,7 @@ import { useWireframesLayer } from "./useWireframesLayer";
 import { findAnchor } from "./anchorRegistry";
 import { SCENE_FOCUS_EVENT, type SceneFocusDetail } from "../anchors";
 import { sceneBindingsForMode, sceneLayerEnabled } from "../layerPolicy";
+import { REGIONAL_GEOPHYSICS_SOURCES } from "../regionalGeophysics";
 import type { GeoSceneFilters, GeoSceneMode } from "../types";
 import { sceneFilterManifest } from "../filterPolicy";
 import {
@@ -172,6 +173,8 @@ export function GeoSceneCanvas({
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geophysics_anomalies");
   const wireframesVisible =
     subsurfaceMode && sceneLayerEnabled(visibleLayerIds, "geology_wireframes");
+  const emag2Visible = sceneLayerEnabled(visibleLayerIds, "geophysics_emag2");
+  const wgm2012Visible = sceneLayerEnabled(visibleLayerIds, "geophysics_wgm2012");
   // Public bundles supply public evidence; private scene hooks stay session-scoped.
   const privateProjectId = user ? (active?.id ?? null) : null;
   const hasProjectLayer = (id: string) => projectLayers?.some((layer) => layer.id === id) ?? false;
@@ -815,6 +818,43 @@ export function GeoSceneCanvas({
       }
     }
   }, [ready, terrainVisible, cadTerrain, view]);
+
+  // Geofísica regional pública (EMAG2/WGM2012): fuentes raster WMS que se
+  // agregan/quitan del estilo de MapLibre según su toggle, igual que el
+  // terreno. Contexto regional, no reemplaza geofísica de detalle del
+  // prospecto — ver caution en el registro de capas.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!ready || !map) return;
+    const visibility: Record<string, boolean> = {
+      "geophysics.emag2": emag2Visible,
+      "geophysics.wgm2012": wgm2012Visible,
+    };
+    for (const source of REGIONAL_GEOPHYSICS_SOURCES) {
+      const layerId = source.sourceId;
+      const wantsVisible = visibility[source.id];
+      const hasLayer = map.getLayer(layerId);
+      if (wantsVisible && !hasLayer) {
+        if (!map.getSource(source.sourceId)) {
+          map.addSource(source.sourceId, {
+            type: "raster",
+            tiles: source.tiles,
+            tileSize: 256,
+            attribution: source.attribution,
+          });
+        }
+        map.addLayer({
+          id: layerId,
+          type: "raster",
+          source: source.sourceId,
+          paint: { "raster-opacity": 0.55 },
+        });
+      } else if (!wantsVisible && hasLayer) {
+        map.removeLayer(layerId);
+        if (map.getSource(source.sourceId)) map.removeSource(source.sourceId);
+      }
+    }
+  }, [ready, emag2Visible, wgm2012Visible]);
 
   useEffect(() => {
     if (project?.bbox) return;
