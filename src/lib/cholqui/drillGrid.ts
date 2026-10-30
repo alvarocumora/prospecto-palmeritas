@@ -49,6 +49,25 @@ export const CHOLQUI_STRIKES_DEG = [350, 20, 352, 45, 15, 55, 50, 295, 250] as c
 /** Rumbo dominante del distrito: manto y vetas de La Maza (N20E / N10W). */
 export const DOMINANT_STRIKE_DEG = 20;
 
+/**
+ * Configuración por proyecto para proponer una malla de sondaje. El rumbo
+ * dominante solo aplica a mineralización tabular (vetas/mantos): perforar
+ * perpendicular a la estructura solo tiene sentido ahí. Para depósitos sin
+ * control estructural dominante (p. ej. arcillas lateríticas/REE) este
+ * modelo NO corresponde — ver advertencia en `buildDrillGrid`.
+ */
+export type ProjectDrillConfig = {
+  /** Prefijo del código de collar, p. ej. "CHQ-DDH". */
+  codePrefix: string;
+  /** Rumbo dominante de la estructura objetivo (grados desde el norte). */
+  dominantStrikeDeg: number;
+};
+
+export const CHOLQUI_DRILL_CONFIG: ProjectDrillConfig = {
+  codePrefix: "CHQ-DDH",
+  dominantStrikeDeg: DOMINANT_STRIKE_DEG,
+};
+
 export const INDEX_LABEL: Record<string, string> = {
   IRON_OXIDE: "Óxidos de hierro (razón B4/B2)",
   CLAY_MINERALS: "Arcillas / Al-OH (razón SWIR B11/B12)",
@@ -138,9 +157,14 @@ function angularGap(a: number, b: number): number {
  * apunta hacia el eje del distrito, para cortar el cuerpo interpretado y no
  * seguirlo.
  */
-function azimuthFor(lat: number, lng: number, center: { lat: number; lng: number }): number {
-  const perpendicular = (DOMINANT_STRIKE_DEG + 90) % 360; // 110 grados
-  const opposite = (perpendicular + 180) % 360; // 290 grados
+function azimuthFor(
+  lat: number,
+  lng: number,
+  center: { lat: number; lng: number },
+  dominantStrikeDeg: number,
+): number {
+  const perpendicular = (dominantStrikeDeg + 90) % 360;
+  const opposite = (perpendicular + 180) % 360;
   const toCenter = bearingDeg(lat, lng, center.lat, center.lng);
   return angularGap(perpendicular, toCenter) <= angularGap(opposite, toCenter)
     ? perpendicular
@@ -156,10 +180,11 @@ function depthFor(score: number): number {
 export function buildDrillGrid(
   anomalies: SatelliteAnomaly[],
   center: { lat: number; lng: number },
-  opts: { maxCollars?: number; minScore?: number } = {},
+  opts: { maxCollars?: number; minScore?: number; project?: ProjectDrillConfig } = {},
 ): ProposedCollar[] {
   const maxCollars = opts.maxCollars ?? MAX_COLLARS;
   const minScore = opts.minScore ?? MIN_SCORE;
+  const project = opts.project ?? CHOLQUI_DRILL_CONFIG;
 
   return (
     anomalies
@@ -173,12 +198,12 @@ export function buildDrillGrid(
       .map((a, i) => {
         const score = a.score ?? 0;
         return {
-          code: `CHQ-DDH-${String(i + 1).padStart(2, "0")}`,
+          code: `${project.codePrefix}-${String(i + 1).padStart(2, "0")}`,
           anomalyId: a.id,
           indexCode: a.indexCode,
           lat: a.lat,
           lng: a.lng,
-          azimuthDeg: azimuthFor(a.lat, a.lng, center),
+          azimuthDeg: azimuthFor(a.lat, a.lng, center, project.dominantStrikeDeg),
           dipDeg: -60,
           depthM: depthFor(score),
           priority: priorityOf(score),
