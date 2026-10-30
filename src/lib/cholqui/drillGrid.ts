@@ -218,6 +218,78 @@ export function totalMeters(collars: ProposedCollar[]): number {
   return collars.reduce((sum, c) => sum + c.depthM, 0);
 }
 
+/**
+ * Rumbo dominante (grados desde el norte, 0-180) de un set de vetas medidas,
+ * como promedio circular de líneas (no vectores): un rumbo de 10° y uno de
+ * 190° son la misma línea, así que se dobla el ángulo antes de promediar.
+ * Devuelve null si no hay rumbos medidos — nunca se asume un rumbo.
+ */
+export function dominantStrikeFromVeins(
+  veins: Array<{ strike_deg: number | null }>,
+): number | null {
+  const angles = veins.map((v) => v.strike_deg).filter((d): d is number => d != null);
+  if (!angles.length) return null;
+  let sumSin = 0;
+  let sumCos = 0;
+  for (const deg of angles) {
+    const rad = (deg * 2 * Math.PI) / 180;
+    sumSin += Math.sin(rad);
+    sumCos += Math.cos(rad);
+  }
+  const meanDeg = (Math.atan2(sumSin, sumCos) * 180) / Math.PI / 2;
+  return ((meanDeg % 180) + 180) % 180;
+}
+
+/** A proposable point with its own evidence (target, not a spectral index). */
+export type DrillTargetCandidate = {
+  id: string;
+  lat: number;
+  lng: number;
+  /** 0-100 scale, as stored in `exploration_targets.score`. */
+  score: number;
+  objective: string;
+  withinTenure?: boolean;
+};
+
+/**
+ * Same proposal logic as `buildDrillGrid`, but for real exploration targets
+ * (DB-backed, with their own rationale) instead of spectral-index anomalies.
+ * `score` is 0-100 here, not 0-1, so it is normalized before reusing the
+ * shared depth/priority curve.
+ */
+export function buildDrillGridFromTargets(
+  targets: DrillTargetCandidate[],
+  center: { lat: number; lng: number },
+  project: ProjectDrillConfig,
+  opts: { maxCollars?: number; minScorePct?: number } = {},
+): ProposedCollar[] {
+  const maxCollars = opts.maxCollars ?? MAX_COLLARS;
+  const minScorePct = opts.minScorePct ?? MIN_SCORE * 100;
+
+  return targets
+    .filter((t) => t.withinTenure !== false)
+    .filter((t) => t.score >= minScorePct)
+    .slice()
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
+    .slice(0, maxCollars)
+    .map((t, i) => {
+      const score = Math.min(1, Math.max(0, t.score / 100));
+      return {
+        code: `${project.codePrefix}-${String(i + 1).padStart(2, "0")}`,
+        anomalyId: t.id,
+        indexCode: "TARGET",
+        lat: t.lat,
+        lng: t.lng,
+        azimuthDeg: azimuthFor(t.lat, t.lng, center, project.dominantStrikeDeg),
+        dipDeg: -60,
+        depthM: depthFor(score),
+        priority: priorityOf(score),
+        objective: t.objective,
+        score,
+      };
+    });
+}
+
 /** The published file provides no anomaly IDs; preserve that absence explicitly. */
 export type PublishedCollar = Omit<ProposedCollar, "anomalyId"> & { anomalyId: null };
 

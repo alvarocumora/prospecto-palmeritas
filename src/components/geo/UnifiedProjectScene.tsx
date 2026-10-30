@@ -132,6 +132,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         "geophysics.anomalies",
         "sampling.results",
         "targets.exploration",
+        "drilling.proposed",
       ],
     );
     const bundle = buildLosVerdesPublicGeoBundle(manifest, data, mining.data, anomalies.data);
