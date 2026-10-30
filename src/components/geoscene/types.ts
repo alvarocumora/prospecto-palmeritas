@@ -10,9 +10,9 @@ export type GeoSceneMode = "surface" | "subsurface" | "resource";
 export type GeoSceneVariant = "default" | "mag";
 
 export const MODE_LABELS: Record<GeoSceneMode, { label: string; sub: string }> = {
-  surface: { label: "Surface", sub: "DEM · Sentinel · targets" },
-  subsurface: { label: "Subsurface", sub: "Sondajes · interceptos · modelos · anomalías" },
-  resource: { label: "Resource", sub: "Bloques · clasificación · pit shells" },
+  surface: { label: "Superficie", sub: "DEM · Sentinel · targets" },
+  subsurface: { label: "Subsuelo", sub: "Sondajes · interceptos · modelos · anomalías" },
+  resource: { label: "Recursos", sub: "Bloques · clasificación · pit shells" },
 };
 
 export type GeoSceneEngine = "deckgl";
