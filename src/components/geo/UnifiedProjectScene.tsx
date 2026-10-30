@@ -106,6 +106,8 @@ export function UnifiedProjectScene({
   );
 }
 
+const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
+
 function LosVerdesScene({ view }: { view: ProjectView }) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
@@ -121,7 +123,7 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
   const input = useMemo(() => {
     const data = query.data;
     if (!data) return null;
-    const id = "7a499b02-ecdf-447b-8956-b106fe4ec087";
+    const id = LOSVERDES_PROJECT_ID;
     const manifest = buildPublicGeoManifest(
       { id, name: "Los Verdes", center_lat: data.center[1], center_lng: data.center[0] },
       [
