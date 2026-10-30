@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { SPECTRAL_LAYER_IDS, legendClasses } from "./spectralStyle";
 import { BrandButton } from "@/components/brand";
-import { Loader2, Sparkles, Crosshair, X, Layers3 } from "lucide-react";
+import { Loader2, Sparkles, Crosshair, X, Layers3, Box } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
@@ -48,7 +48,7 @@ export function GeoScene3D({
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
-  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
+  const [layerPanelOpen, setLayerPanelOpen] = useState(true);
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
     const ids = initialGeoSceneLayerIds(initialPreset);
     for (const layer of projectLayers ?? []) {
@@ -295,17 +295,19 @@ function SceneLoading() {
 function ResourceModeStub() {
   return (
     <div className="absolute inset-0 flex items-center justify-center bg-bg-panel p-6">
-      <div className="max-w-sm text-center space-y-2">
+      <div className="max-w-sm text-center space-y-3">
+        <Box className="mx-auto h-6 w-6 text-gold" />
         <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
-          Resource mode
+          Modo recursos
         </div>
         <div className="text-sm text-foreground">
-          Selecciona un modelo de recursos desde Estimación para visualizar bloques, leyes y pit
-          shells aquí.
+          Bloques, leyes y pit shells se trabajan en el módulo de Estimación, con sus propios
+          visores 3D (modelo de bloques, pit shells, wireframes). No es un error: este modo te lleva
+          directo a esa herramienta.
         </div>
         <a
           href="/dashboard/estimation"
-          className="inline-block mt-2 text-xs font-mono text-gold hover:underline"
+          className="inline-block mt-2 rounded border border-gold/50 px-3 py-1.5 text-xs font-mono text-gold hover:bg-gold/10"
         >
           Abrir Estimación →
         </a>

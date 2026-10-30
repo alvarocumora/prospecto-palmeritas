@@ -49,6 +49,25 @@ export const CHOLQUI_STRIKES_DEG = [350, 20, 352, 45, 15, 55, 50, 295, 250] as c
 /** Rumbo dominante del distrito: manto y vetas de La Maza (N20E / N10W). */
 export const DOMINANT_STRIKE_DEG = 20;
 
+/**
+ * Configuración por proyecto para proponer una malla de sondaje. El rumbo
+ * dominante solo aplica a mineralización tabular (vetas/mantos): perforar
+ * perpendicular a la estructura solo tiene sentido ahí. Para depósitos sin
+ * control estructural dominante (p. ej. arcillas lateríticas/REE) este
+ * modelo NO corresponde — ver advertencia en `buildDrillGrid`.
+ */
+export type ProjectDrillConfig = {
+  /** Prefijo del código de collar, p. ej. "CHQ-DDH". */
+  codePrefix: string;
+  /** Rumbo dominante de la estructura objetivo (grados desde el norte). */
+  dominantStrikeDeg: number;
+};
+
+export const CHOLQUI_DRILL_CONFIG: ProjectDrillConfig = {
+  codePrefix: "CHQ-DDH",
+  dominantStrikeDeg: DOMINANT_STRIKE_DEG,
+};
+
 export const INDEX_LABEL: Record<string, string> = {
   IRON_OXIDE: "Óxidos de hierro (razón B4/B2)",
   CLAY_MINERALS: "Arcillas / Al-OH (razón SWIR B11/B12)",
@@ -138,9 +157,14 @@ function angularGap(a: number, b: number): number {
  * apunta hacia el eje del distrito, para cortar el cuerpo interpretado y no
  * seguirlo.
  */
-function azimuthFor(lat: number, lng: number, center: { lat: number; lng: number }): number {
-  const perpendicular = (DOMINANT_STRIKE_DEG + 90) % 360; // 110 grados
-  const opposite = (perpendicular + 180) % 360; // 290 grados
+function azimuthFor(
+  lat: number,
+  lng: number,
+  center: { lat: number; lng: number },
+  dominantStrikeDeg: number,
+): number {
+  const perpendicular = (dominantStrikeDeg + 90) % 360;
+  const opposite = (perpendicular + 180) % 360;
   const toCenter = bearingDeg(lat, lng, center.lat, center.lng);
   return angularGap(perpendicular, toCenter) <= angularGap(opposite, toCenter)
     ? perpendicular
@@ -156,10 +180,11 @@ function depthFor(score: number): number {
 export function buildDrillGrid(
   anomalies: SatelliteAnomaly[],
   center: { lat: number; lng: number },
-  opts: { maxCollars?: number; minScore?: number } = {},
+  opts: { maxCollars?: number; minScore?: number; project?: ProjectDrillConfig } = {},
 ): ProposedCollar[] {
   const maxCollars = opts.maxCollars ?? MAX_COLLARS;
   const minScore = opts.minScore ?? MIN_SCORE;
+  const project = opts.project ?? CHOLQUI_DRILL_CONFIG;
 
   return (
     anomalies
@@ -173,12 +198,12 @@ export function buildDrillGrid(
       .map((a, i) => {
         const score = a.score ?? 0;
         return {
-          code: `CHQ-DDH-${String(i + 1).padStart(2, "0")}`,
+          code: `${project.codePrefix}-${String(i + 1).padStart(2, "0")}`,
           anomalyId: a.id,
           indexCode: a.indexCode,
           lat: a.lat,
           lng: a.lng,
-          azimuthDeg: azimuthFor(a.lat, a.lng, center),
+          azimuthDeg: azimuthFor(a.lat, a.lng, center, project.dominantStrikeDeg),
           dipDeg: -60,
           depthM: depthFor(score),
           priority: priorityOf(score),
@@ -191,6 +216,256 @@ export function buildDrillGrid(
 
 export function totalMeters(collars: ProposedCollar[]): number {
   return collars.reduce((sum, c) => sum + c.depthM, 0);
+}
+
+/**
+ * Rumbo dominante (grados desde el norte, 0-180) de un set de vetas medidas,
+ * como promedio circular de líneas (no vectores): un rumbo de 10° y uno de
+ * 190° son la misma línea, así que se dobla el ángulo antes de promediar.
+ * Devuelve null si no hay rumbos medidos — nunca se asume un rumbo.
+ */
+export function dominantStrikeFromVeins(
+  veins: Array<{ strike_deg: number | null }>,
+): number | null {
+  const angles = veins.map((v) => v.strike_deg).filter((d): d is number => d != null);
+  if (!angles.length) return null;
+  let sumSin = 0;
+  let sumCos = 0;
+  for (const deg of angles) {
+    const rad = (deg * 2 * Math.PI) / 180;
+    sumSin += Math.sin(rad);
+    sumCos += Math.cos(rad);
+  }
+  const meanDeg = (Math.atan2(sumSin, sumCos) * 180) / Math.PI / 2;
+  return ((meanDeg % 180) + 180) % 180;
+}
+
+/** A proposable point with its own evidence (target, not a spectral index). */
+export type DrillTargetCandidate = {
+  id: string;
+  lat: number;
+  lng: number;
+  /** 0-100 scale, as stored in `exploration_targets.score`. */
+  score: number;
+  objective: string;
+  withinTenure?: boolean;
+};
+
+/**
+ * Same proposal logic as `buildDrillGrid`, but for real exploration targets
+ * (DB-backed, with their own rationale) instead of spectral-index anomalies.
+ * `score` is 0-100 here, not 0-1, so it is normalized before reusing the
+ * shared depth/priority curve.
+ */
+export function buildDrillGridFromTargets(
+  targets: DrillTargetCandidate[],
+  center: { lat: number; lng: number },
+  project: ProjectDrillConfig,
+  opts: { maxCollars?: number; minScorePct?: number } = {},
+): ProposedCollar[] {
+  const maxCollars = opts.maxCollars ?? MAX_COLLARS;
+  const minScorePct = opts.minScorePct ?? MIN_SCORE * 100;
+
+  return targets
+    .filter((t) => t.withinTenure !== false)
+    .filter((t) => t.score >= minScorePct)
+    .slice()
+    .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
+    .slice(0, maxCollars)
+    .map((t, i) => {
+      const score = Math.min(1, Math.max(0, t.score / 100));
+      return {
+        code: `${project.codePrefix}-${String(i + 1).padStart(2, "0")}`,
+        anomalyId: t.id,
+        indexCode: "TARGET",
+        lat: t.lat,
+        lng: t.lng,
+        azimuthDeg: azimuthFor(t.lat, t.lng, center, project.dominantStrikeDeg),
+        dipDeg: -60,
+        depthM: depthFor(score),
+        priority: priorityOf(score),
+        objective: t.objective,
+        score,
+      };
+    });
+}
+
+// ============ Selección geoestadística (variograma + ganancia de información) ============
+//
+// Alternativa a "ordenar por puntaje y tomar los N mejores": prioriza también
+// targets lejos de sondajes ya ejecutados (ganancia de información real, vía
+// varianza de kriging aproximada con un variograma esférico ajustado a los
+// puntajes medidos). Igual que el resto de este archivo, es determinista: la
+// geometría final (azimut/profundidad/prioridad) sale de azimuthFor/depthFor/
+// priorityOf — nunca de un número aleatorio.
+
+export type VariogramModel = { nugget: number; sill: number; range: number };
+
+/** Proyección equirectangular local (metros) centrada en el promedio de los puntos. */
+function toLocalMeters(lat: number, lng: number, refLat: number): { x: number; y: number } {
+  return {
+    x: lng * 111_320 * Math.cos((refLat * Math.PI) / 180),
+    y: lat * 110_540,
+  };
+}
+
+/** Variograma experimental: semivarianza promedio por bins de distancia. */
+export function computeExperimentalVariogram(
+  points: Array<{ x: number; y: number; value: number }>,
+  nBins = 10,
+): Array<{ lag: number; gamma: number }> {
+  const pairs: Array<{ dist: number; diff2: number }> = [];
+  for (let i = 0; i < points.length; i++) {
+    for (let j = i + 1; j < points.length; j++) {
+      const dist = Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y);
+      pairs.push({ dist, diff2: (points[i].value - points[j].value) ** 2 });
+    }
+  }
+  if (pairs.length === 0) return [];
+
+  const maxDist = pairs.reduce((m, p) => (p.dist > m ? p.dist : m), 0);
+  if (maxDist === 0) return [];
+  const binWidth = maxDist / nBins;
+  const bins: Array<{ lag: number; gamma: number }> = [];
+  for (let b = 0; b < nBins; b++) {
+    const lo = b * binWidth;
+    const hi = (b + 1) * binWidth;
+    const inBin = pairs.filter((p) => p.dist >= lo && p.dist < hi);
+    if (inBin.length > 1) {
+      bins.push({
+        lag: (lo + hi) / 2,
+        gamma: inBin.reduce((s, p) => s + p.diff2, 0) / (2 * inBin.length),
+      });
+    }
+  }
+  return bins;
+}
+
+/** Ajuste simple de un modelo esférico al variograma experimental. */
+export function fitSphericalVariogram(
+  bins: Array<{ lag: number; gamma: number }>,
+): VariogramModel | null {
+  if (bins.length < 3) return null;
+  const sill = Math.max(...bins.map((b) => b.gamma));
+  if (sill <= 0) return null;
+  const nugget = bins[0].gamma * 0.3;
+  let range = bins[bins.length - 1].lag;
+  for (const b of bins) {
+    if (b.gamma >= sill * 0.95) {
+      range = b.lag;
+      break;
+    }
+  }
+  return { nugget, sill, range: range > 0 ? range : bins[bins.length - 1].lag };
+}
+
+/** Semivarianza de un modelo esférico a distancia h. */
+export function sphericalVariogram(h: number, model: VariogramModel): number {
+  if (h <= 0) return 0;
+  if (h >= model.range) return model.sill;
+  const hr = h / model.range;
+  return model.nugget + (model.sill - model.nugget) * (1.5 * hr - 0.5 * hr ** 3);
+}
+
+export type ExistingDrillholeLocation = { lat: number; lng: number };
+
+/**
+ * Selecciona cuáles targets perforar combinando puntaje (prospectividad) con
+ * ganancia de información respecto a sondajes ya ejecutados: un target de
+ * puntaje medio lejos de toda la malla existente puede valer más que uno de
+ * puntaje alto pegado a un sondaje ya hecho. Sin suficientes puntos para
+ * ajustar un variograma (< 4 targets con puntaje), cae de vuelta a
+ * `buildDrillGridFromTargets` — nunca inventa un rango de variograma.
+ */
+export function optimizeDrillSelection(
+  targets: DrillTargetCandidate[],
+  existingHoles: readonly ExistingDrillholeLocation[],
+  center: { lat: number; lng: number },
+  project: ProjectDrillConfig,
+  opts: {
+    maxCollars?: number;
+    minScorePct?: number;
+    strategy?: "infill" | "stepout" | "combined";
+  } = {},
+): ProposedCollar[] {
+  const maxCollars = opts.maxCollars ?? MAX_COLLARS;
+  const minScorePct = opts.minScorePct ?? MIN_SCORE * 100;
+  const strategy = opts.strategy ?? "combined";
+
+  const eligible = targets
+    .filter((t) => t.withinTenure !== false)
+    .filter((t) => t.score >= minScorePct);
+
+  const refLat = eligible.length
+    ? eligible.reduce((s, t) => s + t.lat, 0) / eligible.length
+    : center.lat;
+  const points = eligible.map((t) => {
+    const { x, y } = toLocalMeters(t.lat, t.lng, refLat);
+    return { x, y, value: Math.min(1, Math.max(0, t.score / 100)) };
+  });
+  const model = fitSphericalVariogram(computeExperimentalVariogram(points));
+
+  // Sin datos suficientes para un variograma confiable: no se inventa un
+  // rango de influencia, se usa el criterio simple de puntaje.
+  if (!model) {
+    return buildDrillGridFromTargets(targets, center, project, { maxCollars, minScorePct });
+  }
+
+  const placed: ExistingDrillholeLocation[] = [...existingHoles];
+  const minSpacingM = model.range * 0.3;
+
+  const scored = eligible
+    .map((t) => {
+      const prosp = Math.min(1, Math.max(0, t.score / 100));
+      let minDistExisting = Infinity;
+      for (const h of placed) {
+        const d = distanceM(t.lat, t.lng, h.lat, h.lng);
+        if (d < minDistExisting) minDistExisting = d;
+      }
+      const krigingVar =
+        minDistExisting === Infinity || minDistExisting >= model.range
+          ? model.sill
+          : sphericalVariogram(minDistExisting, model);
+      const infoGain = krigingVar / model.sill;
+
+      let score: number;
+      if (strategy === "infill") score = prosp * 0.6 + infoGain * 0.4;
+      else if (strategy === "stepout") {
+        const edgeBonus = prosp > 0.3 && prosp < 0.7 ? 0.3 : 0;
+        score = prosp * 0.3 + infoGain * 0.4 + edgeBonus;
+      } else score = prosp * 0.5 + infoGain * 0.5;
+
+      return { target: t, prosp, score };
+    })
+    .sort((a, b) => b.score - a.score || a.target.id.localeCompare(b.target.id));
+
+  const chosen: DrillTargetCandidate[] = [];
+  for (const candidate of scored) {
+    if (chosen.length >= maxCollars) break;
+    const tooClose = placed.some(
+      (h) => distanceM(candidate.target.lat, candidate.target.lng, h.lat, h.lng) < minSpacingM,
+    );
+    if (tooClose) continue;
+    chosen.push(candidate.target);
+    placed.push({ lat: candidate.target.lat, lng: candidate.target.lng });
+  }
+
+  return chosen.map((t, i) => {
+    const score = Math.min(1, Math.max(0, t.score / 100));
+    return {
+      code: `${project.codePrefix}-${String(i + 1).padStart(2, "0")}`,
+      anomalyId: t.id,
+      indexCode: "TARGET",
+      lat: t.lat,
+      lng: t.lng,
+      azimuthDeg: azimuthFor(t.lat, t.lng, center, project.dominantStrikeDeg),
+      dipDeg: -60,
+      depthM: depthFor(score),
+      priority: priorityOf(score),
+      objective: t.objective,
+      score,
+    };
+  });
 }
 
 /** The published file provides no anomaly IDs; preserve that absence explicitly. */

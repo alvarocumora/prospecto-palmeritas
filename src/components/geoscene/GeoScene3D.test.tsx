@@ -30,7 +30,7 @@ vi.mock("./canvas/GeoSceneCanvas", () => ({
 describe("GeoScene3D", () => {
   it("renders canonical deck.gl mode by default", async () => {
     render(<GeoScene3D mode="surface" />);
-    expect(screen.getByTitle(/DEM/i)).toBeInTheDocument();
+    expect(screen.getByTitle("DEM · Sentinel · targets")).toBeInTheDocument();
     expect(screen.getByTitle(/Capas 3D canónicas/i)).toBeInTheDocument();
     expect(screen.queryByText(/legacy/i)).not.toBeInTheDocument();
     expect(await screen.findByTestId("deckgl-surface")).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe("GeoScene3D", () => {
 
   it("renders resource stub when mode=resource", () => {
     render(<GeoScene3D mode="resource" />);
-    expect(screen.getByText(/Resource mode/i)).toBeInTheDocument();
+    expect(screen.getByText(/Modo recursos/i)).toBeInTheDocument();
   });
   it("keeps the same canvas and layer selection when switching planta/perspectiva", async () => {
     const props = {
@@ -57,7 +57,6 @@ describe("GeoScene3D", () => {
     };
     const { rerender } = render(<GeoScene3D {...props} view="2d" />);
     const canvas = await screen.findByTestId("deckgl-surface");
-    fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
     fireEvent.click(screen.getByRole("button", { name: /Catastro SERNAGEOMIN/ }));
     const layers = canvas.getAttribute("data-layers");
     expect(layers).not.toContain("territory.cadastre");
@@ -72,7 +71,6 @@ describe("GeoScene3D", () => {
       <GeoScene3D projectLayers={[{ id: "territory.cadastre", data }]} />,
     );
     const canvas = await screen.findByTestId("deckgl-surface");
-    fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
     fireEvent.click(screen.getByRole("button", { name: /Catastro SERNAGEOMIN/ }));
     rerender(
       <GeoScene3D
@@ -99,7 +97,6 @@ describe("GeoScene3D", () => {
     );
     const canvas = await screen.findByTestId("deckgl-surface");
     expect(canvas.getAttribute("data-layers")).not.toContain("remote_sensing.hyperspectral");
-    fireEvent.click(screen.getByRole("button", { name: "Capas del proyecto" }));
     fireEvent.click(screen.getByRole("button", { name: /Productos hiperespectrales/ }));
     expect(canvas.getAttribute("data-layers")).toContain("remote_sensing.hyperspectral");
   });
