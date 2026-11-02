@@ -57,7 +57,13 @@ export function TilamaEnamiPanel() {
       mineCostClpPerT: showCosts ? cost(mineCost) : null,
       freightClpPerT: showCosts ? cost(freight) : null,
       adjustmentsClpPerT: showCosts ? cost(adjustments) : null,
-      draftRoyaltyPct: showCosts ? (royalty === "pending" ? null : royalty === "draft10" ? 10 : 0) : null,
+      draftRoyaltyPct: showCosts
+        ? royalty === "pending"
+          ? null
+          : royalty === "draft10"
+            ? 10
+            : 0
+        : null,
     });
   } catch {
     // Las entradas inválidas no generan cifras; no se inventan tarifas.
@@ -69,14 +75,12 @@ export function TilamaEnamiPanel() {
         <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-accent-brand">
           Tilama · venta de mineral · escenario no certificado
         </div>
-        <h2 className="font-display text-2xl text-content mt-1">
-          Simulación tarifaria ENAMI
-        </h2>
+        <h2 className="font-display text-2xl text-content mt-1">Simulación tarifaria ENAMI</h2>
         <p className="mt-2 text-sm text-content-subtle max-w-3xl leading-relaxed">
-          Mismo método tarifario de Cholqui, con la {TILAMA_ENAMI_REFERENCE.tariffSource}.
-          Es una referencia histórica, <strong>no una cotización vigente</strong> ni aceptación de
-          mineral de Tilama. El volumen ingresado es hipotético: no acredita recursos, reservas,
-          producción ni ventas futuras.
+          Mismo método tarifario de Cholqui, con la {TILAMA_ENAMI_REFERENCE.tariffSource}. Es una
+          referencia histórica, <strong>no una cotización vigente</strong> ni aceptación de mineral
+          de Tilama. El volumen ingresado es hipotético: no acredita recursos, reservas, producción
+          ni ventas futuras.
         </p>
       </header>
 
@@ -128,19 +132,25 @@ export function TilamaEnamiPanel() {
         {scenario ? (
           <div className="mt-5 grid sm:grid-cols-3 gap-3" aria-live="polite">
             <div className="rounded-lg bg-surface-2 p-4">
-              <div className="text-[11px] text-content-subtle uppercase">Tarifa histórica por tms</div>
+              <div className="text-[11px] text-content-subtle uppercase">
+                Tarifa histórica por tms
+              </div>
               <div className="font-display text-xl text-content mt-1">
                 {money(scenario.tariffClpPerT)}
               </div>
             </div>
             <div className="rounded-lg bg-surface-2 p-4">
-              <div className="text-[11px] text-content-subtle uppercase">Ingreso bruto ilustrativo</div>
+              <div className="text-[11px] text-content-subtle uppercase">
+                Ingreso bruto ilustrativo
+              </div>
               <div className="font-display text-xl text-content mt-1">
                 {money(scenario.grossClp)}
               </div>
             </div>
             <div className="rounded-lg bg-surface-2 p-4">
-              <div className="text-[11px] text-content-subtle uppercase">Cobre contenido teórico</div>
+              <div className="text-[11px] text-content-subtle uppercase">
+                Cobre contenido teórico
+              </div>
               <div className="font-display text-xl text-content mt-1">
                 {integer(scenario.copperContainedTonnes)} t
               </div>
@@ -151,8 +161,8 @@ export function TilamaEnamiPanel() {
           </div>
         ) : (
           <p role="alert" className="mt-4 text-sm text-red-700">
-            Revise tonelaje y leyes: Cu soluble entre 1 y 3 %, sin superar Cu total.
-            No se calcula una tarifa fuera del intervalo de sensibilidad.
+            Revise tonelaje y leyes: Cu soluble entre 1 y 3 %, sin superar Cu total. No se calcula
+            una tarifa fuera del intervalo de sensibilidad.
           </p>
         )}
 
@@ -169,9 +179,9 @@ export function TilamaEnamiPanel() {
         {showCosts && (
           <div className="mt-4 rounded-xl border border-hairline p-4">
             <p className="text-xs text-content-subtle mb-4">
-              No se copian automáticamente costos de Cholqui: ingrese cotizaciones o supuestos
-              de Tilama y documente su procedencia. Cero equivale a un supuesto explícito,
-              no a un costo conocido.
+              No se copian automáticamente costos de Cholqui: ingrese cotizaciones o supuestos de
+              Tilama y documente su procedencia. Cero equivale a un supuesto explícito, no a un
+              costo conocido.
             </p>
             <div className="grid sm:grid-cols-3 gap-3">
               <CostInput
@@ -197,7 +207,9 @@ export function TilamaEnamiPanel() {
               >
                 <option value="pending">No definido — no calcular netback</option>
                 <option value="zero">0 % — sensibilidad sin renta</option>
-                <option value="draft10">10 % sobre venta — borrador de arriendo, no acreditado</option>
+                <option value="draft10">
+                  10 % sobre venta — borrador de arriendo, no acreditado
+                </option>
               </select>
             </label>
             {scenario?.scenarioNetClp != null ? (
@@ -222,11 +234,11 @@ export function TilamaEnamiPanel() {
         )}
 
         <p className="text-xs text-content-subtle mt-5 leading-relaxed border-t border-hairline pt-4">
-          <strong>Bloqueo de due diligence:</strong> sin inventario explotable validado,
-          metalurgia, aceptación de ENAMI, distancia, cotización de flete y condiciones de
-          liquidación vigentes, estas cifras no son aptas para decisiones de inversión.
-          El potencial conceptual histórico de ~3,75 millones de toneladas no puede
-          presentarse como reservas. Se requiere revisión de una Persona Competente.
+          <strong>Bloqueo de due diligence:</strong> sin inventario explotable validado, metalurgia,
+          aceptación de ENAMI, distancia, cotización de flete y condiciones de liquidación vigentes,
+          estas cifras no son aptas para decisiones de inversión. El potencial conceptual histórico
+          de ~3,75 millones de toneladas no puede presentarse como reservas. Se requiere revisión de
+          una Persona Competente.
         </p>
       </div>
     </section>
