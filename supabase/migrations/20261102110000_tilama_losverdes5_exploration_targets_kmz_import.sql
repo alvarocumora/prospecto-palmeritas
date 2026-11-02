@@ -11,8 +11,14 @@
 -- Todos los targets quedan en stage='generated' (candidatos, sin validar en terreno),
 -- consistente con report_readiness(): nunca se cuentan como "medido".
 --
--- created_by se resuelve por email en vez de hardcodear un UUID, para no depender
--- de conocer de antemano el id de auth.users de Alvy.
+-- created_by se resuelve por email (con fallback al primer usuario de auth.users),
+-- igual que 20260722001500_seed_ree_trento_marketplace.sql; si no hay ningún
+-- usuario la migración no aborta el resto del deploy, solo deja un aviso.
+--
+-- Nota: los 4 clusters GCF-TIL-CD56-* traían en el KMZ original un % de Cu mal
+-- calculado (off por 100x respecto al ppm acompañante, p.ej. "213.129% (≈21313
+-- ppm)" cuando 21313 ppm es 2.1313%). Se corrige aquí antes de persistir, para
+-- no exponer leyes físicamente imposibles (>100% Cu) en el informe/paneles.
 
 DO $$
 DECLARE
@@ -20,14 +26,19 @@ DECLARE
 BEGIN
   SELECT id INTO v_owner FROM auth.users WHERE email = 'alvaro.cumora@gmail.com' LIMIT 1;
   IF v_owner IS NULL THEN
-    RAISE EXCEPTION 'No se encontró un usuario con email alvaro.cumora@gmail.com en auth.users; ajustar OWNER_EMAIL antes de aplicar esta migración.';
+    SELECT id INTO v_owner FROM auth.users ORDER BY created_at LIMIT 1;
+  END IF;
+  IF v_owner IS NULL THEN
+    RAISE NOTICE 'Sin usuarios en auth.users; no se cargaron los targets de exploración de Tilama.';
+    RETURN;
   END IF;
 
   INSERT INTO public.exploration_targets
     (project_id, created_by, code, name, target_type, commodity, stage, priority,
      score, confidence_pct, elevation_m, rationale, lat, lng)
   SELECT '7a499b02-ecdf-447b-8956-b106fe4ec087', v_owner, v.code, v.name, v.target_type, v.commodity, v.stage, v.priority,
-         v.score, v.confidence_pct, v.elevation_m, v.rationale, v.lat, v.lng
+         v.score::numeric, v.confidence_pct::numeric, v.elevation_m::numeric, v.rationale,
+         v.lat::numeric, v.lng::numeric
   FROM (
     VALUES
     ('ANOM-TIL-TOO-270', 'Anomalía TOO-270 - Cu 45.57%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'critical', 98.0, NULL, NULL, 'Cu=455700 ppm (45.57%), Mo=486, Ag=0.15, Au=1.0 ppb. Cu=455700ppm   Mo=486ppm   As=180ppm', -32.0302642, -71.0752084),
@@ -61,10 +72,10 @@ BEGIN
     ('ANOM-TIL-TOO-203', 'Anomalía TOO-203 - Cu 2.531%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 85.0, NULL, NULL, 'Cu=25310 ppm (2.531%), Mo=20, Ag=0.15, Au=1.0 ppb. Cu=25310ppm', -32.0527357, -71.1022753),
     ('ANOM-TIL-TOO-262', 'Anomalía TOO-262 - Cu 2.483%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 88.0, NULL, NULL, 'Cu=24830 ppm (2.483%), Mo=121, Ag=0.15, Au=1.0 ppb. Cu=24830ppm   Mo=121ppm', -32.0575136, -71.0898666),
     ('ANOM-TIL-TOO-148', 'Anomalía TOO-148 - Cu 2.418%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 88.0, NULL, NULL, 'Cu=24180 ppm (2.418%), Mo=58, Ag=5.9, Au=4.0 ppb. Cu=24180ppm   Ag=5.9ppm', -32.0554381, -71.1138593),
-    ('GCF-TIL-CD56-0', 'Cluster geoquímico #1 – Tilama Kofu (48 muestras)', 'porphyry', NULL, 'generated', 'low', 32.5153125, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 3.692% (≈369 ppm), Ag: 0.15 g/t.', -32.044347878644516, -71.10850041520511),
-    ('GCF-TIL-CD56-1', 'Cluster geoquímico #2 – Tilama Kofu (43 muestras)', 'porphyry', NULL, 'generated', 'high', 100.0, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 213.129% (≈21313 ppm), Ag: 0.15 g/t.', -32.035415772998824, -71.08210590187606),
-    ('GCF-TIL-CD56-2', 'Cluster geoquímico #3 – Tilama Kofu (55 muestras)', 'porphyry', NULL, 'generated', 'high', 85.82323636363635, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 92.484% (≈9248 ppm), Ag: 0.17 g/t.', -32.04809382023049, -71.10427125176707),
-    ('GCF-TIL-CD56-3', 'Cluster geoquímico #4 – Tilama Kofu (44 muestras)', 'porphyry', NULL, 'generated', 'high', 100.0, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 113.082% (≈11308 ppm), Ag: 6.48 g/t.', -32.045913756159194, -71.11042889640164),
+    ('GCF-TIL-CD56-0', 'Cluster geoquímico #1 – Tilama Kofu (48 muestras)', 'porphyry', NULL, 'generated', 'low', 32.5153125, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 0.0369% (≈369 ppm), Ag: 0.15 g/t.', -32.044347878644516, -71.10850041520511),
+    ('GCF-TIL-CD56-1', 'Cluster geoquímico #2 – Tilama Kofu (43 muestras)', 'porphyry', NULL, 'generated', 'high', 100.0, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 2.1313% (≈21313 ppm), Ag: 0.15 g/t.', -32.035415772998824, -71.08210590187606),
+    ('GCF-TIL-CD56-2', 'Cluster geoquímico #3 – Tilama Kofu (55 muestras)', 'porphyry', NULL, 'generated', 'high', 85.82323636363635, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 0.9248% (≈9248 ppm), Ag: 0.17 g/t.', -32.04809382023049, -71.10427125176707),
+    ('GCF-TIL-CD56-3', 'Cluster geoquímico #4 – Tilama Kofu (44 muestras)', 'porphyry', NULL, 'generated', 'high', 100.0, 30.0, NULL, 'Geochemical Fingerprint sobre 190 muestras Kofu. Firma proyecto: Pórfido Cu-Mo ± Au. Cu medio del cluster: 1.1308% (≈11308 ppm), Ag: 6.48 g/t.', -32.045913756159194, -71.11042889640164),
     ('ANOM-TIL-TOO-234', 'Anomalía TOO-234 - Cu 2.397%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 85.0, NULL, NULL, 'Cu=23970 ppm (2.397%), Mo=29, Ag=0.15, Au=1.0 ppb. Cu=23970ppm', -32.0552729, -71.0961169),
     ('ANOM-TIL-TOO-156', 'Anomalía TOO-156 - Cu 2.2%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 88.0, NULL, NULL, 'Cu=22000 ppm (2.2%), Mo=75, Ag=25.6, Au=1.0 ppb. Cu=22000ppm   Ag=25.6ppm', -32.0453235, -71.1135738),
     ('ANOM-TIL-TOO-272', 'Anomalía TOO-272 - Cu 2.198%', 'porphyry', 'Cu-Mo-Ag', 'generated', 'high', 85.0, NULL, NULL, 'Cu=21980 ppm (2.198%), Mo=85, Ag=0.15, Au=1.0 ppb. Cu=21980ppm', -32.0228087, -71.0854468),
