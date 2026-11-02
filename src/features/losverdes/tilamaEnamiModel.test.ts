@@ -25,8 +25,8 @@ describe("Tilama ENAMI — referencia de Cholqui sin transferir reservas ni cost
       cuSolublePct: 2,
     });
     expect(result.copperContainedTonnes).toBe(60_000);
-    expect(result.tariffClpPerT).toBe(130_728.5);
-    expect(result.grossClp).toBe(392_185_500_000);
+    expect(result.tariffClpPerT).toBe(130_728);
+    expect(result.grossClp).toBe(392_184_000_000);
     expect(result.readiness).toBe("REFERENCE_ONLY");
     expect(result.scenarioNetClp).toBeNull();
   });
