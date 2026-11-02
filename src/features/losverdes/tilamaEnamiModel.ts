@@ -97,14 +97,11 @@ export function calculateTilamaEnami(input: TilamaEnamiInput): TilamaEnamiResult
 
   const complete = missing.length === 0;
   const deductionsClp = complete
-    ? dryTonnes *
-      (input.mineCostClpPerT! + input.freightClpPerT! + input.adjustmentsClpPerT!)
+    ? dryTonnes * (input.mineCostClpPerT! + input.freightClpPerT! + input.adjustmentsClpPerT!)
     : null;
   const royaltyClp = complete ? grossClp * (input.draftRoyaltyPct! / 100) : null;
   const scenarioNetClp =
-    deductionsClp != null && royaltyClp != null
-      ? grossClp - deductionsClp - royaltyClp
-      : null;
+    deductionsClp != null && royaltyClp != null ? grossClp - deductionsClp - royaltyClp : null;
 
   return {
     dryTonnes,
