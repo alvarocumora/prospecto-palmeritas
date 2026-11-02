@@ -6,7 +6,7 @@
  * ENAMI acepte el producto de Tilama o respete esta tarifa en el futuro.
  * No se heredan los costos, tonelajes ni retornos de Cholqui.
  */
-import { CHOLQUI_ENAMI } from "@/features/franco/data/cholqui";
+import { CHOLQUI_ENAMI, CHOLQUI_SCENARIOS } from "@/features/franco/data/cholqui";
 import { tariffForGrade } from "@/features/franco/data/minePlan";
 
 export const TILAMA_ENAMI_REFERENCE = {
@@ -83,7 +83,10 @@ export function calculateTilamaEnami(input: TilamaEnamiInput): TilamaEnamiResult
     throw new Error("INVALID_DRAFT_ROYALTY");
   }
 
-  const tariffClpPerT = tariffForGrade(cuSolublePct);
+  // Igualar los puntos exactos publicados por Cholqui evita diferencias de
+  // redondeo de un peso entre la tabla documental y la interpolación.
+  const documented = CHOLQUI_SCENARIOS.find((s) => s.grade === cuSolublePct);
+  const tariffClpPerT = documented?.tariffClpTms ?? Math.round(tariffForGrade(cuSolublePct));
   if (tariffClpPerT <= 0) throw new Error("NO_POSITIVE_REFERENCE_TARIFF");
   const grossClp = dryTonnes * tariffClpPerT;
   const missing: string[] = [];
