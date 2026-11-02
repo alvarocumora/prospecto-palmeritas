@@ -71,6 +71,11 @@ const CholquiMinePlanPanel = lazy(() =>
     default: m.CholquiMinePlanPanel,
   })),
 );
+const TilamaEnamiPanel = lazy(() =>
+  import("@/features/losverdes/TilamaEnamiPanel").then((m) => ({
+    default: m.TilamaEnamiPanel,
+  })),
+);
 const CholquiRoundPanel = lazy(() =>
   import("@/features/franco/components/CholquiRoundPanel").then((m) => ({
     default: m.CholquiRoundPanel,
@@ -403,6 +408,13 @@ function SimuladorTab({ project }: { project: TerminalProject }) {
           <div className="mt-6 space-y-6">
             <CholquiScenariosPanel />
             <CholquiMinePlanPanel />
+          </div>
+        </Suspense>
+      )}
+      {project.slug === "losverdes" && (
+        <Suspense fallback={<Loading label="Cargando escenario ENAMI" />}>
+          <div className="mt-6">
+            <TilamaEnamiPanel />
           </div>
         </Suspense>
       )}
