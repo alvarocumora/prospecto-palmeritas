@@ -166,6 +166,18 @@ export function MiningInvestShowcase() {
                   const r = rounds.find((x) => x.slug === p.slug);
                   return r ? <RoundProgress round={r} compact /> : null;
                 })()}
+                <button
+                  type="button"
+                  disabled={!hydrated}
+                  onClick={() => {
+                    setSlug(p.slug);
+                    if (amount < minTicket) setAmount(ROUND.minTicket);
+                    setCheckout(true);
+                  }}
+                  className="mt-4 mr-4 inline-flex min-h-11 items-center gap-2 bg-accent-brand px-4 text-sm font-semibold text-accent-brand-contrast hover:opacity-90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand disabled:opacity-40"
+                >
+                  Invertir en {p.name} <ArrowRight className="w-3.5 h-3.5" />
+                </button>
                 <Link
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
