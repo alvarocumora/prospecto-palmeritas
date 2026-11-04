@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { getPublicRounds, type PublicRound } from "@/lib/wallet.functions";
 import { RoundProgress } from "@/features/investor/RoundProgress";
@@ -29,7 +29,6 @@ const STEPS = [
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
 
 export function MiningInvestShowcase() {
-  const navigate = useNavigate();
   // SSR markup is visible before handlers hydrate: prevent clicks that would be lost.
   const [hydrated, setHydrated] = useState(false);
   useEffect(() => setHydrated(true), []);
