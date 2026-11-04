@@ -66,7 +66,7 @@ export function InvestmentCheckout({
           <ol className="mt-4 grid grid-cols-4 gap-2" aria-label="Pasos">
             {STEPS.map((s, i) => {
               const done = i < step;
-              const active = i === step || (step >= 2 && i === 3 && false);
+              const active = i === step;
               return (
                 <li key={s} aria-current={active ? "step" : undefined}>
                   <div
