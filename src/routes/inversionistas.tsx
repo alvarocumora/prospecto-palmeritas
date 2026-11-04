@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BookMeetingButton } from "@/features/investor/MeetingBooking";
 import {
   CheckCircle2,
   ShieldCheck,
