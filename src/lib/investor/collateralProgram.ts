@@ -11,7 +11,7 @@ export const COLLATERAL_DOC_VERSION = "v1.0";
 
 export const COLLATERAL_TERMS = {
   minTicketClp: 15_000_000,
-  annualRatePct: 12,
+  annualRatePct: 25,
   indexation: "UF",
   interestPayment: "Mensual",
   reinvestEveryMonths: 12,
@@ -115,7 +115,7 @@ export const COLLATERAL_STEPS: Array<{ title: string; body: string }> = [
   },
   {
     title: "5. Pago mensual de intereses",
-    body: "Liquidación mensual del interés (UF + 12 % anual) directo a la cuenta del inversionista.",
+    body: "Liquidación mensual del interés (UF + 25 % anual) directo a la cuenta del inversionista.",
   },
   {
     title: "6. Renovación o salida",
@@ -125,7 +125,7 @@ export const COLLATERAL_STEPS: Array<{ title: string; body: string }> = [
 
 export const COLLATERAL_DISCLAIMERS = [
   "Documento informativo. No constituye oferta pública de valores ni asesoría financiera, legal o tributaria.",
-  "La tasa UF + 12 % anual es la tasa ofrecida por contrato; no es una proyección de resultados de los proyectos mineros.",
+  "La tasa UF + 25 % anual es la tasa ofrecida por contrato; no es una proyección de resultados de los proyectos mineros.",
   "Los proyectos mineros del portafolio no tienen recursos ni reservas certificados (CH 20235, NI 43-101 o JORC).",
   "La figura legal de la garantía, la tasación y el rol de cada parcela se definen y verifican en el contrato definitivo, ante notario.",
   "Toda inversión está sujeta a due diligence, validación KYC y firma de documentación definitiva.",
@@ -164,10 +164,10 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
     location: "Chile · colateral en Hualañé y Licantén, Maule",
     liveUrl: publicUrl("/proyectos"),
     docVersion: COLLATERAL_DOC_VERSION,
-    tags: ["UF + 12 % anual", "Interés mensual", "Desde $15 MM", "Parcela en garantía"],
+    tags: ["UF + 25 % anual", "Interés mensual", "Desde $15 MM", "Parcela en garantía"],
     kpis: [
       { label: "Inversión mínima", value: "$15 MM", note: "Pesos chilenos" },
-      { label: "Tasa", value: "UF + 12 %", note: "Anual, capital reajustable en UF" },
+      { label: "Tasa", value: "UF + 25 %", note: "Anual, capital reajustable en UF" },
       {
         label: "Pago de intereses",
         value: "Mensual",
@@ -177,7 +177,7 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
     ],
     thesis: [
       "Tu capital financia proyectos de pequeña y mediana minería en Chile del portafolio Geocapitals.",
-      "Recibes intereses todos los meses: UF + 12 % anual, liquidados mensualmente a tu cuenta.",
+      "Recibes intereses todos los meses: UF + 25 % anual, liquidados mensualmente a tu cuenta.",
       "Tu inversión queda respaldada por un activo real: una parcela con rol individual en la Región del Maule.",
       "Cada 12 meses decides: reinviertes o retiras tu capital.",
     ],
@@ -221,7 +221,7 @@ export function buildCollateralDeck(img: CollateralDeckImages = {}): ProjectDoc 
             kind: "kv",
             items: [
               ["Monto mínimo", fmtClp(t.minTicketClp)],
-              ["Tasa", "UF + 12 % anual"],
+              ["Tasa", "UF + 25 % anual"],
               ["Liquidación de intereses", "Mensual, al inversionista"],
               ["Ejemplo sobre el mínimo", `${fmtClp(example)} al mes, más reajuste UF del capital`],
               ["Reinversión", "Opcional, cada 12 meses"],

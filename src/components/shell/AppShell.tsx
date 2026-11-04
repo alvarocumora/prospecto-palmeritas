@@ -38,7 +38,7 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
       {
         to: "/inversion-colateral",
         label: "Renta fija con colateral",
-        desc: "UF + 12 % con parcela en garantía",
+        desc: "UF + 25 % con parcela en garantía",
       },
     ],
   },

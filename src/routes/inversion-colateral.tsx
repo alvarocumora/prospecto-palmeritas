@@ -21,12 +21,12 @@ export const Route = createFileRoute("/inversion-colateral")({
       {
         name: "description",
         content:
-          "Invierte desde $15 MM a UF + 12 % anual con interés mensual, respaldado por una parcela en el Maule.",
+          "Invierte desde $15 MM a UF + 25 % anual con interés mensual, respaldado por una parcela en el Maule.",
       },
       { property: "og:title", content: "Inversión minera con parcela en garantía · Geocapitals" },
       {
         property: "og:description",
-        content: "UF + 12 % anual, pago mensual y parcela en Hualañé o Licantén como garantía.",
+        content: "UF + 25 % anual, pago mensual y parcela en Hualañé o Licantén como garantía.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -37,7 +37,7 @@ export const Route = createFileRoute("/inversion-colateral")({
 
 const HIGHLIGHTS = [
   { icon: Landmark, label: "Inversión mínima", value: "$15 MM" },
-  { icon: CalendarClock, label: "Tasa, pago mensual", value: "UF + 12 %" },
+  { icon: CalendarClock, label: "Tasa, pago mensual", value: "UF + 25 %" },
   { icon: ShieldCheck, label: "Garantía", value: "5.000 m² a 1 ha" },
   { icon: Repeat, label: "Renovación", value: "Cada 12 meses" },
 ];
@@ -63,7 +63,7 @@ function PublicCollateralPage() {
               Invierte en minería chilena, respaldado por una parcela real.
             </h1>
             <p className="mt-5 max-w-2xl text-content-subtle text-lg">
-              Tu capital financia el portafolio minero Geocapitals. Recibes UF + 12 % anual con pago
+              Tu capital financia el portafolio minero Geocapitals. Recibes UF + 25 % anual con pago
               mensual y una parcela con rol individual en el Maule queda en garantía.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">

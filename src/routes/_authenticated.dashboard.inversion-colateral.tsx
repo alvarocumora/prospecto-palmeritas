@@ -57,12 +57,12 @@ export const Route = createFileRoute("/_authenticated/dashboard/inversion-colate
       {
         name: "description",
         content:
-          "Invierte en minería con UF + 12 % anual e interés mensual, respaldado por una parcela en garantía.",
+          "Invierte en minería con UF + 25 % anual e interés mensual, respaldado por una parcela en garantía.",
       },
       { property: "og:title", content: "Inversión con colateral inmobiliario — Geocapitals" },
       {
         property: "og:description",
-        content: "UF + 12 % anual, interés mensual y parcela en garantía en el Maule.",
+        content: "UF + 25 % anual, interés mensual y parcela en garantía en el Maule.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -106,7 +106,7 @@ function CollateralPage() {
 
   const highlights = [
     { icon: Landmark, label: "Inversión mínima", value: "$15 MM" },
-    { icon: CalendarClock, label: "Tasa · pago mensual", value: "UF + 12 %" },
+    { icon: CalendarClock, label: "Tasa · pago mensual", value: "UF + 25 %" },
     { icon: ShieldCheck, label: "Colateral", value: "5.000 m² – 1 ha" },
     { icon: Repeat, label: "Reinversión", value: "Cada 12 meses" },
   ];
@@ -254,7 +254,7 @@ function CollateralPage() {
             </div>
             <div className="font-mono text-2xl mt-1">{fmtClp(monthly)}</div>
             <div className="text-xs text-content-subtle">
-              12 % anual / 12, más el reajuste UF del capital. {fmtClp(monthly * 12)} al año.
+              25 % anual / 12, más el reajuste UF del capital. {fmtClp(monthly * 12)} al año.
             </div>
           </div>
         </div>
