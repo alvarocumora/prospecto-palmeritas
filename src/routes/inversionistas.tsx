@@ -181,6 +181,9 @@ function InvPage() {
             </Link>
           ))}
         </div>
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-content-muted">
+          ¿Prefieres conversarlo antes de invertir? <BookMeetingButton />
+        </div>
       </div>
 
       {/* Deal flow — oportunidades publicadas (datos reales) */}
