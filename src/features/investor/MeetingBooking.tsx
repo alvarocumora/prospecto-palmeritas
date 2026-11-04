@@ -3,7 +3,11 @@ import { useMemo, useState, type ReactNode } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CalendarDays, Check } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { requestMeeting, MEETING_TOPICS, type MeetingTopic } from "@/lib/investor/meeting.functions";
+import {
+  requestMeeting,
+  MEETING_TOPICS,
+  type MeetingTopic,
+} from "@/lib/investor/meeting.functions";
 
 const SLOTS = ["09:30", "11:00", "12:30", "15:00", "16:30", "18:00"];
 
@@ -48,7 +52,9 @@ export function MeetingBooking({
   async function submit() {
     setState("sending");
     try {
-      await send({ data: { name, email, phone: phone || null, topic, date, slot, message: message || null } });
+      await send({
+        data: { name, email, phone: phone || null, topic, date, slot, message: message || null },
+      });
       setState("done");
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Error");
@@ -82,7 +88,9 @@ export function MeetingBooking({
         ) : (
           <div className="min-w-0 space-y-5">
             <fieldset className="min-w-0">
-              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Tema</legend>
+              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">
+                Tema
+              </legend>
               <div className="grid gap-2 sm:grid-cols-2">
                 {(Object.keys(MEETING_TOPICS) as MeetingTopic[]).map((k) => (
                   <button
@@ -97,7 +105,9 @@ export function MeetingBooking({
               </div>
             </fieldset>
             <fieldset className="min-w-0">
-              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Día</legend>
+              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">
+                Día
+              </legend>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {days.map((d) => (
                   <button
@@ -106,14 +116,18 @@ export function MeetingBooking({
                     onClick={() => setDate(iso(d))}
                     className={`min-h-14 min-w-16 shrink-0 rounded-sm border px-2 text-center text-xs ${date === iso(d) ? "border-accent-brand bg-accent-brand/10" : "border-hairline"}`}
                   >
-                    <span className="block capitalize">{d.toLocaleDateString("es-CL", { weekday: "short" })}</span>
+                    <span className="block capitalize">
+                      {d.toLocaleDateString("es-CL", { weekday: "short" })}
+                    </span>
                     <span className="block font-display text-lg">{d.getDate()}</span>
                   </button>
                 ))}
               </div>
             </fieldset>
             <fieldset className="min-w-0">
-              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Hora</legend>
+              <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">
+                Hora
+              </legend>
               <div className="grid grid-cols-3 gap-2">
                 {SLOTS.map((s) => (
                   <button
@@ -128,9 +142,28 @@ export function MeetingBooking({
               </div>
             </fieldset>
             <div className="grid gap-3 sm:grid-cols-2">
-              <input className={input} placeholder="Nombre" value={name} onChange={(e) => setName(e.target.value)} aria-label="Nombre" />
-              <input className={input} type="email" placeholder="Correo" value={email} onChange={(e) => setEmail(e.target.value)} aria-label="Correo" />
-              <input className={`${input} sm:col-span-2`} placeholder="Teléfono (opcional)" value={phone} onChange={(e) => setPhone(e.target.value)} aria-label="Teléfono" />
+              <input
+                className={input}
+                placeholder="Nombre"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                aria-label="Nombre"
+              />
+              <input
+                className={input}
+                type="email"
+                placeholder="Correo"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                aria-label="Correo"
+              />
+              <input
+                className={`${input} sm:col-span-2`}
+                placeholder="Teléfono (opcional)"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                aria-label="Teléfono"
+              />
               <textarea
                 className={`${input} h-20 py-2 sm:col-span-2`}
                 placeholder="¿Qué te gustaría revisar? (opcional)"
