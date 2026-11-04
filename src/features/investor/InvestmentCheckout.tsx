@@ -61,19 +61,19 @@ export function InvestmentCheckout({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0 text-content">
-        <header className="bg-surface-inverse px-6 py-5 text-content-inverse">
-          <DialogTitle className="font-serif text-2xl text-content-inverse">Invertir en una ronda</DialogTitle>
-          <DialogDescription className="mt-1 text-xs text-content-inverse opacity-75">
+        <header className="bg-surface-inverse px-6 py-5 text-accent-brand-contrast">
+          <DialogTitle className="font-serif text-2xl text-accent-brand-contrast">Invertir en una ronda</DialogTitle>
+          <DialogDescription className="mt-1 text-xs text-accent-brand-contrast opacity-75">
             Acciones de la SPV emisora Valle Escondido SpA · contrato con hash y firma en pantalla
           </DialogDescription>
-          <ol className="mt-4 grid grid-cols-4 gap-2 text-content-inverse" aria-label="Pasos">
+          <ol className="mt-4 grid grid-cols-4 gap-2 text-accent-brand-contrast" aria-label="Pasos">
             {STEPS.map((s, i) => {
               const done = i < step;
               const active = i === step;
               return (
                 <li key={s} aria-current={active ? "step" : undefined}>
                   <div
-                    className={`h-1 rounded ${i <= step ? "bg-im-gold" : "bg-content-inverse/20"}`}
+                    className={`h-1 rounded ${i <= step ? "bg-im-gold" : "bg-accent-brand-contrast/20"}`}
                   />
                   <div className="mt-1.5 flex items-center gap-1 font-mono text-[10px] uppercase tracking-[0.14em]">
                     {done ? <Check className="h-3 w-3 text-im-gold" /> : `0${i + 1}`} {s}
