@@ -69,10 +69,10 @@ export function PublicTerminalOverview() {
               <Link
                 to="/terminal/$slug"
                 params={{ slug }}
-                search={{ tab: "tesis" }}
+                search={{ tab: "simulador" }}
                 className="text-sm text-muted-foreground hover:text-foreground"
               >
-                Revisar tesis
+                Simular e invertir
               </Link>
             </div>
           </article>
