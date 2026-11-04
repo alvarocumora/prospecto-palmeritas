@@ -58,7 +58,7 @@ export function MeetingBooking({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] max-w-xl overflow-y-auto bg-surface text-content">
+      <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-xl overflow-y-auto overflow-x-hidden [&>*]:min-w-0 bg-surface text-content">
         <DialogTitle className="font-display text-2xl">Agendar reunión</DialogTitle>
         <DialogDescription className="text-sm text-content-muted">
           Equipo de estructuración · Valle Escondido SpA. Hora de Santiago; confirmamos por correo.
@@ -80,8 +80,8 @@ export function MeetingBooking({
             </button>
           </div>
         ) : (
-          <div className="space-y-5">
-            <fieldset>
+          <div className="min-w-0 space-y-5">
+            <fieldset className="min-w-0">
               <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Tema</legend>
               <div className="grid gap-2 sm:grid-cols-2">
                 {(Object.keys(MEETING_TOPICS) as MeetingTopic[]).map((k) => (
@@ -96,7 +96,7 @@ export function MeetingBooking({
                 ))}
               </div>
             </fieldset>
-            <fieldset>
+            <fieldset className="min-w-0">
               <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Día</legend>
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {days.map((d) => (
@@ -112,7 +112,7 @@ export function MeetingBooking({
                 ))}
               </div>
             </fieldset>
-            <fieldset>
+            <fieldset className="min-w-0">
               <legend className="mb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-content-muted">Hora</legend>
               <div className="grid grid-cols-3 gap-2">
                 {SLOTS.map((s) => (
