@@ -7,6 +7,7 @@ import { getTerminalProject } from "@/features/terminal/terminalProjects";
 import { Eyebrow } from "@/components/brand";
 import { ROUND } from "@/features/investor/pendingTicket";
 import { InvestmentCheckout } from "@/features/investor/InvestmentCheckout";
+import { BookMeetingButton } from "@/features/investor/MeetingBooking";
 import {
   PROJECT_TERMS,
   REFERENCE_VALUATION_USD,
@@ -186,6 +187,9 @@ export function MiningInvestShowcase() {
                 >
                   Ver ficha y visor 3D <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                <div className="mt-3">
+                  <BookMeetingButton topic={p.slug === "losverdes" ? "losverdes" : "cholqui"} />
+                </div>
               </article>
             ))}
           </div>

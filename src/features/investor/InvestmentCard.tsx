@@ -4,6 +4,7 @@ import { ArrowRight, Box, MapPin } from "lucide-react";
 import { BrandButton } from "@/components/brand";
 import { ProjectCover } from "@/features/marketing/ProjectCover";
 import type { CanonicalProjectSlug } from "@/lib/projects/catalog";
+import { InvestNowButton } from "./InvestmentCheckout";
 
 /** One editorial card for catalog listings and investment rounds. */
 export function InvestmentCard({
@@ -73,11 +74,20 @@ export function InvestmentCard({
         <div className="mt-auto flex flex-col gap-2 border-t border-hairline pt-4 sm:flex-row">
           {slug ? (
             <>
-              <BrandButton asChild size="md" className="min-w-0 flex-1">
-                <Link to="/terminal/$slug" params={{ slug }} search={{ tab: "tesis" }}>
-                  Ver proyecto <ArrowRight className="size-4" />
-                </Link>
-              </BrandButton>
+              {slug === "cholqui" || slug === "losverdes" ? (
+                <InvestNowButton
+                  slug={slug}
+                  className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-sm bg-im-gold px-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-surface-inverse hover:opacity-90"
+                >
+                  Invertir <ArrowRight className="size-4" />
+                </InvestNowButton>
+              ) : (
+                <BrandButton asChild size="md" className="min-w-0 flex-1">
+                  <Link to="/terminal/$slug" params={{ slug }} search={{ tab: "simulador" }}>
+                    Ver proyecto <ArrowRight className="size-4" />
+                  </Link>
+                </BrandButton>
+              )}
               <BrandButton asChild variant="outline" size="md" className="flex-1">
                 <Link to="/terminal/$slug" params={{ slug }} search={{ tab: "mapa" }}>
                   <Box className="size-4" />

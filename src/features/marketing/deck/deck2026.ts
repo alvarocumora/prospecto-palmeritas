@@ -240,7 +240,7 @@ export const DECK_SLIDES: InvestorVisualSlide[] = [
     stats: [
       { label: "Tasa contractual", value: "UF + 25%" },
       { label: "Desde", value: "CLP 15 M" },
-      { label: "Renta mensual", value: "CLP 150.000" },
+      { label: "Renta mensual", value: "CLP 312.500" },
     ],
     items: [
       {

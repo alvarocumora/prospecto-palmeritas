@@ -12,6 +12,7 @@ import { TicketPanel } from "@/features/terminal/TicketPanel";
 import { INVESTABLE_PROJECTS } from "@/lib/investor/rounds";
 import { ROUND, savePendingTicket } from "@/features/investor/pendingTicket";
 import { checkoutQuote, PRESETS, type CheckoutSlug } from "./checkoutQuote";
+import { BookMeetingButton } from "./MeetingBooking";
 
 const STEPS = ["Simulación", "Identidad", "Contrato", "Fondos"] as const;
 const usd = (n: number) => `USD ${n.toLocaleString("en-US", { maximumFractionDigits: 0 })}`;
@@ -148,7 +149,10 @@ export function InvestmentCheckout({
                 </Link>
                 .
               </p>
-              <div className="flex justify-end">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <BookMeetingButton topic={project.slug === "losverdes" ? "losverdes" : "cholqui"}>
+                  Prefiero una reunión
+                </BookMeetingButton>
                 <Primary disabled={!q.valid || loading} onClick={continueToIdentity}>
                   Continuar <ArrowRight className="h-4 w-4" />
                 </Primary>
@@ -189,6 +193,7 @@ export function InvestmentCheckout({
               <div className="mt-4 text-right">
                 <Link
                   to="/dashboard/investments"
+                  search={{ vista: "wallet" } as never}
                   onClick={() => onOpenChange(false)}
                   className="text-sm text-accent-brand underline"
                 >
