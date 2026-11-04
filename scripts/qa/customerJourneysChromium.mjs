@@ -159,10 +159,10 @@ for (const width of [390, 1440]) {
 
     const cholqui = page.getByRole("button", { name: /Cholqui/i }).first();
     await cholqui.click();
-    assert.equal(await cholqui.getAttribute("aria-pressed"), "true");
     await page.getByRole("heading", { level: 2, name: /Cholqui/i }).waitFor({
       timeout: 20000,
     });
+    assert.equal(await cholqui.getAttribute("aria-pressed"), "true");
     const terminalLink = page.getByRole("link", { name: /Abrir terminal/i });
     const href = await terminalLink.getAttribute("href");
     assert.ok(href?.includes("/terminal/cholqui"), "Atlas must link to canonical terminal");
