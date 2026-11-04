@@ -1,15 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { ArrowRight, Compass, Layers, LocateFixed, Mountain } from "lucide-react";
 import type { FeatureCollection } from "geojson";
 import type { GeoJSONSource, Map as MLMap, StyleSpecification } from "maplibre-gl";
-import { UnifiedProjectScene } from "@/components/geo/UnifiedProjectScene";
+
 import { getTerminalProject } from "@/features/terminal/terminalProjects";
 import { getProjectFacts } from "@/lib/projectFacts.functions";
 import type { ProjectView } from "@/lib/projects/navigation";
 import { validAtlasCentroid, type AtlasProject, type AtlasSlug } from "./atlasPoints";
+
+const UnifiedProjectScene = lazy(() =>
+  import("@/components/geo/UnifiedProjectScene").then((module) => ({
+    default: module.UnifiedProjectScene,
+  })),
+);
 
 const SPOTLIGHT = (["cholqui", "losverdes"] as const).flatMap((slug) => {
   const project = getTerminalProject(slug);
@@ -367,7 +373,15 @@ export function ExplorationAtlas() {
               </Link>
             </div>
           </div>
-          <UnifiedProjectScene slug={active.slug} view={view} />
+          <Suspense
+            fallback={
+              <div role="status" className="p-8 text-sm text-content-subtle">
+                Cargando capas y visor geocientífico…
+              </div>
+            }
+          >
+            <UnifiedProjectScene slug={active.slug} view={view} />
+          </Suspense>
           <p className="text-xs text-content-subtle">
             Capas y atributos según procedencia. Anomalías y targets interpretados no son reservas
             certificadas. La información pública puede estar incompleta o sujeta a verificación.
