@@ -28,7 +28,7 @@ export const PROJECT_TERMS: Record<ProjectTerms["slug"], ProjectTerms> = {
     series: "Acciones Serie Preferente · SPV Tilama (Los Verdes)",
     hectares: {
       direct: 1963,
-      district: 2600,
+      district: 2690,
       detail: "17 pertenencias catastradas + 637 ha en anexos",
     },
     delivery: ["Poder de compra ENAMI Cabildo / Illapel", "Planta de beneficio regional (Choapa)"],

@@ -128,7 +128,7 @@ export const DECK_SLIDES: InvestorVisualSlide[] = [
     image: losverdesPert.url,
     imageLabel: pertLv,
     stats: [
-      { label: "Superficie integrada", value: "3.303 ha" },
+      { label: "Superficie declarada", value: "~2.690 ha" },
       { label: "Valorización", value: "USD 8–12 M" },
       { label: "Horizonte", value: "5 años" },
     ],

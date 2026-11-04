@@ -43,7 +43,7 @@ export function MiningInvestShowcase() {
   const shares = Math.floor(amount / sharePrice);
   const pct = (shares / totalShares) * 100;
   const valid = amount >= minTicket && amount <= target;
-  const [rate, setRate] = useState(15);
+  const [rate, setRate] = useState(25);
   useEffect(() => {
     getPublicRounds()
       .then(setRounds)
@@ -239,7 +239,7 @@ export function MiningInvestShowcase() {
               <input
                 type="range"
                 min={15}
-                max={20}
+                max={25}
                 step={1}
                 value={rate}
                 onChange={(e) => setRate(Number(e.target.value))}
