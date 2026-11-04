@@ -60,7 +60,7 @@ export function InvestmentCheckout({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0">
+      <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0 text-content">
         <header className="bg-surface-inverse px-6 py-5 text-content-inverse">
           <DialogTitle className="font-serif text-2xl">Invertir en una ronda</DialogTitle>
           <DialogDescription className="mt-1 text-xs opacity-75">
@@ -158,7 +158,7 @@ export function InvestmentCheckout({
 
           {step === 1 && !user && (
             <div className="space-y-4">
-              <h3 className="font-serif text-xl">Crea tu acceso de inversionista</h3>
+              <h3 className="font-serif text-xl text-content">Crea tu acceso de inversionista</h3>
               <p className="text-sm text-content-muted">
                 Guardamos tu selección ({project.name}, {usd(amount)} · {q.shares} acciones). Al
                 registrarte completas tu perfil (RUT o pasaporte y declaración) y retomas el ticket
@@ -247,7 +247,7 @@ function Choice({
       type="button"
       aria-pressed={on}
       onClick={onClick}
-      className={`min-h-11 rounded-md border text-left ${compact ? "px-4 font-mono text-sm" : "p-3"} ${
+      className={`min-h-11 rounded-md border text-left text-content ${compact ? "px-4 font-mono text-sm" : "p-3"} ${
         on ? "border-accent-brand bg-accent-brand/5" : "border-hairline hover:border-content-subtle"
       }`}
     >
