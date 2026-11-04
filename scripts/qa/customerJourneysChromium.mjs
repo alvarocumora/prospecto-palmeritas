@@ -169,10 +169,18 @@ for (const width of [390, 1440]) {
 
     const topo = page.getByRole("button", { name: "Topográfico", exact: true });
     await topo.click();
+    await page
+      .locator('button[aria-pressed="true"]')
+      .filter({ hasText: "Topográfico" })
+      .waitFor({ timeout: 15000 });
     assert.equal(await topo.getAttribute("aria-pressed"), "true");
 
     const perspective = page.getByRole("button", { name: "3D", exact: true });
     await perspective.click({ noWaitAfter: true });
+    await page
+      .locator('button[aria-pressed="true"]')
+      .filter({ hasText: /^3D$/ })
+      .waitFor({ timeout: 15000 });
     assert.equal(await perspective.getAttribute("aria-pressed"), "true");
     await snapshot(page, prefix + "-exploration-atlas");
   });
