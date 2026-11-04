@@ -14,13 +14,15 @@ import { validAtlasCentroid, type AtlasProject, type AtlasSlug } from "./atlasPo
 const SPOTLIGHT = (["cholqui", "losverdes"] as const).flatMap((slug) => {
   const project = getTerminalProject(slug);
   if (!project?.projectId) return [];
-  return [{
-    slug,
-    projectId: project.projectId,
-    name: project.name,
-    commodity: project.ficha.commodity,
-    region: project.ficha.region,
-  }];
+  return [
+    {
+      slug,
+      projectId: project.projectId,
+      name: project.name,
+      commodity: project.ficha.commodity,
+      region: project.ficha.region,
+    },
+  ];
 });
 
 const STYLE: StyleSpecification = {
@@ -28,20 +30,29 @@ const STYLE: StyleSpecification = {
   sources: {
     "atlas-esri": {
       type: "raster",
-      tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"],
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      ],
       tileSize: 256,
       attribution: "Esri World Imagery",
     },
     "atlas-topographic": {
       type: "raster",
-      tiles: ["https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"],
+      tiles: [
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+      ],
       tileSize: 256,
       attribution: "Esri World Topographic Map",
     },
   },
   layers: [
     { id: "atlas-satellite", type: "raster", source: "atlas-esri" },
-    { id: "atlas-topo", type: "raster", source: "atlas-topographic", layout: { visibility: "none" } },
+    {
+      id: "atlas-topo",
+      type: "raster",
+      source: "atlas-topographic",
+      layout: { visibility: "none" },
+    },
   ],
 };
 
@@ -55,7 +66,10 @@ function fitAtlasBounds(map: MLMap, projects: AtlasProject[]) {
   const lngs = located.map((item) => item.centroid![0]);
   const lats = located.map((item) => item.centroid![1]);
   map.fitBounds(
-    [[Math.min(...lngs), Math.min(...lats)], [Math.max(...lngs), Math.max(...lats)]],
+    [
+      [Math.min(...lngs), Math.min(...lats)],
+      [Math.max(...lngs), Math.max(...lats)],
+    ],
     { padding: 65, maxZoom: 9, duration: 700 },
   );
 }
@@ -65,11 +79,13 @@ function toFeatures(projects: AtlasProject[]): FeatureCollection {
     type: "FeatureCollection",
     features: projects.flatMap((project) =>
       project.centroid
-        ? [{
-            type: "Feature" as const,
-            geometry: { type: "Point" as const, coordinates: project.centroid },
-            properties: { slug: project.slug, name: project.name },
-          }]
+        ? [
+            {
+              type: "Feature" as const,
+              geometry: { type: "Point" as const, coordinates: project.centroid },
+              properties: { slug: project.slug, name: project.name },
+            },
+          ]
         : [],
     ),
   };
@@ -88,16 +104,18 @@ export function ExplorationAtlas() {
   const fetchFacts = useServerFn(getProjectFacts);
   const query = useQuery({
     queryKey: ["exploration-atlas", SPOTLIGHT.map((project) => project.projectId).join(",")],
-    queryFn: () => Promise.all(SPOTLIGHT.map((project) =>
-      fetchFacts({ data: { projectId: project.projectId } }),
-    )),
+    queryFn: () =>
+      Promise.all(
+        SPOTLIGHT.map((project) => fetchFacts({ data: { projectId: project.projectId } })),
+      ),
     staleTime: 5 * 60_000,
   });
   const projects = useMemo<AtlasProject[]>(
-    () => SPOTLIGHT.map((project, index) => ({
-      ...project,
-      centroid: validAtlasCentroid(query.data?.[index]?.centroid),
-    })),
+    () =>
+      SPOTLIGHT.map((project, index) => ({
+        ...project,
+        centroid: validAtlasCentroid(query.data?.[index]?.centroid),
+      })),
     [query.data],
   );
 
@@ -164,8 +182,12 @@ export function ExplorationAtlas() {
         const slug = event.features?.[0]?.properties?.slug;
         if (slug === "cholqui" || slug === "losverdes") setSelected(slug);
       });
-      map.on("mouseenter", "atlas-pins", () => { map.getCanvas().style.cursor = "pointer"; });
-      map.on("mouseleave", "atlas-pins", () => { map.getCanvas().style.cursor = ""; });
+      map.on("mouseenter", "atlas-pins", () => {
+        map.getCanvas().style.cursor = "pointer";
+      });
+      map.on("mouseleave", "atlas-pins", () => {
+        map.getCanvas().style.cursor = "";
+      });
     }
     if (!fitted.current && !query.isLoading && !query.isError) {
       fitAtlasBounds(map, projects);
@@ -176,7 +198,11 @@ export function ExplorationAtlas() {
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !mapReady) return;
-    map.setLayoutProperty("atlas-satellite", "visibility", basemap === "satellite" ? "visible" : "none");
+    map.setLayoutProperty(
+      "atlas-satellite",
+      "visibility",
+      basemap === "satellite" ? "visible" : "none",
+    );
     map.setLayoutProperty("atlas-topo", "visibility", basemap === "topo" ? "visible" : "none");
   }, [basemap, mapReady]);
 
@@ -185,7 +211,8 @@ export function ExplorationAtlas() {
     if (!map || !mapReady || !map.getLayer("atlas-selected")) return;
     map.setFilter("atlas-selected", ["==", ["get", "slug"], selected ?? ""]);
     const point = projects.find((project) => project.slug === selected);
-    if (point?.centroid) map.flyTo({ center: point.centroid, zoom: 10, duration: 900, essential: true });
+    if (point?.centroid)
+      map.flyTo({ center: point.centroid, zoom: 10, duration: 900, essential: true });
   }, [selected, projects, mapReady]);
 
   const active = projects.find((project) => project.slug === selected);
@@ -218,18 +245,26 @@ export function ExplorationAtlas() {
               </span>
             </button>
           ))}
-          {query.isLoading && <p role="status" className="text-sm text-content-subtle">Consultando coordenadas públicas…</p>}
+          {query.isLoading && (
+            <p role="status" className="text-sm text-content-subtle">
+              Consultando coordenadas públicas…
+            </p>
+          )}
           {query.isError && (
             <div role="alert" className="text-sm text-content-subtle">
               No fue posible cargar los centros georreferenciados.
-              <button type="button" className="ml-2 underline text-accent-brand" onClick={() => void query.refetch()}>
+              <button
+                type="button"
+                className="ml-2 underline text-accent-brand"
+                onClick={() => void query.refetch()}
+              >
                 Reintentar
               </button>
             </div>
           )}
           <p className="text-[11px] text-content-subtle">
-            Solo se muestran ubicaciones presentes en los hechos públicos del proyecto.
-            Sin marcadores regionales aproximados.
+            Solo se muestran ubicaciones presentes en los hechos públicos del proyecto. Sin
+            marcadores regionales aproximados.
           </p>
         </aside>
         <div className="border border-hairline bg-surface overflow-hidden">
@@ -238,32 +273,56 @@ export function ExplorationAtlas() {
               <Mountain className="h-4 w-4 text-accent-brand" /> Chile · Atlas interactivo
             </span>
             <div className="flex flex-wrap gap-2">
-              <button type="button" aria-pressed={basemap === "satellite"} onClick={() => setBasemap("satellite")}
-                className={`px-3 py-2 text-xs border ${basemap === "satellite" ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}>
+              <button
+                type="button"
+                aria-pressed={basemap === "satellite"}
+                onClick={() => setBasemap("satellite")}
+                className={`px-3 py-2 text-xs border ${basemap === "satellite" ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}
+              >
                 Satélite
               </button>
-              <button type="button" aria-pressed={basemap === "topo"} onClick={() => setBasemap("topo")}
-                className={`px-3 py-2 text-xs border ${basemap === "topo" ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}>
+              <button
+                type="button"
+                aria-pressed={basemap === "topo"}
+                onClick={() => setBasemap("topo")}
+                className={`px-3 py-2 text-xs border ${basemap === "topo" ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}
+              >
                 Topográfico
               </button>
-              <button type="button" onClick={() => {
-                const map = mapRef.current;
-                if (map) fitAtlasBounds(map, projects);
-                setSelected(null);
-              }} className="inline-flex items-center gap-1 px-3 py-2 text-xs border border-hairline text-content-subtle">
+              <button
+                type="button"
+                onClick={() => {
+                  const map = mapRef.current;
+                  if (map) fitAtlasBounds(map, projects);
+                  setSelected(null);
+                }}
+                className="inline-flex items-center gap-1 px-3 py-2 text-xs border border-hairline text-content-subtle"
+              >
                 <LocateFixed className="h-3.5 w-3.5" /> Vista general
               </button>
             </div>
           </div>
           <div className="relative h-[440px] sm:h-[550px]">
-            <div ref={mapContainer} role="region" aria-label="Mapa geográfico interactivo de proyectos mineros en Chile" className="absolute inset-0" />
+            <div
+              ref={mapContainer}
+              role="region"
+              aria-label="Mapa geográfico interactivo de proyectos mineros en Chile"
+              className="absolute inset-0"
+            />
             {mapError && (
-              <div role="alert" className="absolute inset-0 grid place-items-center bg-surface p-6 text-center text-content-subtle">
-                El mapa no pudo inicializarse. Puedes explorar las fichas de proyecto desde las tarjetas.
+              <div
+                role="alert"
+                className="absolute inset-0 grid place-items-center bg-surface p-6 text-center text-content-subtle"
+              >
+                El mapa no pudo inicializarse. Puedes explorar las fichas de proyecto desde las
+                tarjetas.
               </div>
             )}
             {!mapReady && !mapError && (
-              <div role="status" className="pointer-events-none absolute inset-0 grid place-items-center bg-surface/90 text-sm text-content-subtle">
+              <div
+                role="status"
+                className="pointer-events-none absolute inset-0 grid place-items-center bg-surface/90 text-sm text-content-subtle"
+              >
                 Cargando cartografía…
               </div>
             )}
@@ -272,30 +331,46 @@ export function ExplorationAtlas() {
       </section>
 
       {active && (
-        <section aria-label={`Exploración técnica: ${active.name}`} className="space-y-4 border-t border-hairline pt-8">
+        <section
+          aria-label={`Exploración técnica: ${active.name}`}
+          className="space-y-4 border-t border-hairline pt-8"
+        >
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand">Exploración del proyecto</p>
+              <p className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand">
+                Exploración del proyecto
+              </p>
               <h2 className="mt-2 font-display text-2xl text-content">{active.name}</h2>
-              <p className="text-sm text-content-subtle">{active.commodity} · {active.region}</p>
+              <p className="text-sm text-content-subtle">
+                {active.commodity} · {active.region}
+              </p>
             </div>
             <div className="flex gap-2">
               {(["2d", "3d"] as const).map((mode) => (
-                <button key={mode} type="button" aria-pressed={view === mode} onClick={() => setView(mode)}
-                  className={`inline-flex items-center gap-1 px-4 py-2 text-xs border ${view === mode ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}>
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={view === mode}
+                  onClick={() => setView(mode)}
+                  className={`inline-flex items-center gap-1 px-4 py-2 text-xs border ${view === mode ? "border-accent-brand text-accent-brand" : "border-hairline text-content-subtle"}`}
+                >
                   <Layers className="h-3.5 w-3.5" /> {mode.toUpperCase()}
                 </button>
               ))}
-              <Link to="/terminal/$slug" params={{ slug: active.slug }} search={{ tab: "mapa", view }}
-                className="inline-flex items-center gap-1 px-4 py-2 bg-surface-inverse text-white text-xs">
+              <Link
+                to="/terminal/$slug"
+                params={{ slug: active.slug }}
+                search={{ tab: "mapa", view }}
+                className="inline-flex items-center gap-1 px-4 py-2 bg-surface-inverse text-white text-xs"
+              >
                 Abrir terminal <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           </div>
           <UnifiedProjectScene slug={active.slug} view={view} />
           <p className="text-xs text-content-subtle">
-            Capas y atributos según procedencia. Anomalías y targets interpretados no son reservas certificadas.
-            La información pública puede estar incompleta o sujeta a verificación.
+            Capas y atributos según procedencia. Anomalías y targets interpretados no son reservas
+            certificadas. La información pública puede estar incompleta o sujeta a verificación.
           </p>
         </section>
       )}
