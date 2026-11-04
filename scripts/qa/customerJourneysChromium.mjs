@@ -149,6 +149,34 @@ for (const width of [390, 1440]) {
     await snapshot(page, prefix + "-perspective");
   });
 
+  await scenario(page, prefix + "-exploration-atlas-project-navigation", async () => {
+    await startAt(page, "/exploracion");
+    await page
+      .getByRole("heading", { level: 1, name: /Explora el territorio/i })
+      .waitFor({ timeout: 15000 });
+    const map = page.getByRole("region", { name: /Mapa geográfico interactivo/i });
+    assert.ok(await map.isVisible(), "public Atlas map must be present");
+
+    const cholqui = page.getByRole("button", { name: /Cholqui/i }).first();
+    await cholqui.click();
+    assert.equal(await cholqui.getAttribute("aria-pressed"), "true");
+    await page.getByRole("heading", { level: 2, name: /Cholqui/i }).waitFor({
+      timeout: 20000,
+    });
+    const terminalLink = page.getByRole("link", { name: /Abrir terminal/i });
+    const href = await terminalLink.getAttribute("href");
+    assert.ok(href?.includes("/terminal/cholqui"), "Atlas must link to canonical terminal");
+
+    const topo = page.getByRole("button", { name: "Topográfico", exact: true });
+    await topo.click();
+    assert.equal(await topo.getAttribute("aria-pressed"), "true");
+
+    const perspective = page.getByRole("button", { name: "3D", exact: true });
+    await perspective.click({ noWaitAfter: true });
+    assert.equal(await perspective.getAttribute("aria-pressed"), "true");
+    await snapshot(page, prefix + "-exploration-atlas");
+  });
+
   await scenario(page, prefix + "-guest-cannot-access-portfolio", async () => {
     await startAt(page, "/dashboard/investments");
     await page.waitForURL(/\/auth(?:\?|$)/, { timeout: 12000 });
