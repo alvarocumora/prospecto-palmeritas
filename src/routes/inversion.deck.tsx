@@ -5,6 +5,7 @@ import { BrandButton } from "@/components/brand/Button";
 import { DECK_SLIDES, deckSlideIndex } from "@/features/marketing/deck/deck2026";
 import { DeckSlide, ScaledDeckSlide } from "@/features/marketing/deck/DeckSlide";
 import { DeckDownload } from "@/features/marketing/deck/DeckDownload";
+import { InvestNowButton } from "@/features/investor/InvestmentCheckout";
 export const Route = createFileRoute("/inversion/deck")({
   validateSearch: (search: Record<string, unknown>) => ({
     slide: deckSlideIndex(search.slide),
@@ -92,6 +93,7 @@ function InvestorDeck() {
           </Link>
         </BrandButton>
         <span className="font-mono text-xs text-content-muted flex-1">INVESTOR DECK 2026</span>
+        <InvestNowButton className="inline-flex h-9 items-center rounded-sm bg-accent-brand px-3 text-xs font-semibold text-accent-brand-contrast" />
         <DeckDownload />
         <BrandButton variant="ghost" title="Versión imprimible" asChild>
           <Link

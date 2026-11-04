@@ -30,7 +30,9 @@ import {
 } from "@/lib/investor/rounds";
 import { SignaturePad, saveSignatureImage, loadSignatureImage } from "./SignaturePad";
 
-export function TicketPanel({ spvCode, projectName }: { spvCode: string; projectName: string }) {
+type PanelProps = { spvCode: string; projectName: string; initialAmount?: number };
+
+export function TicketPanel({ spvCode, projectName, initialAmount }: PanelProps) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (!user) {
@@ -45,7 +47,9 @@ export function TicketPanel({ spvCode, projectName }: { spvCode: string; project
       </Shell>
     );
   }
-  return <TicketPanelInner spvCode={spvCode} projectName={projectName} />;
+  return (
+    <TicketPanelInner spvCode={spvCode} projectName={projectName} initialAmount={initialAmount} />
+  );
 }
 
 const JOURNEY = [
@@ -77,7 +81,7 @@ function Shell({ children }: { children: React.ReactNode }) {
   );
 }
 
-function TicketPanelInner({ spvCode, projectName }: { spvCode: string; projectName: string }) {
+function TicketPanelInner({ spvCode, projectName, initialAmount }: PanelProps) {
   const qc = useQueryClient();
   const getFn = useServerFn(getProjectRound);
   const createFn = useServerFn(createTicket);
@@ -86,7 +90,7 @@ function TicketPanelInner({ spvCode, projectName }: { spvCode: string; projectNa
     queryKey: key,
     queryFn: () => getFn({ data: { projectCode: spvCode } }),
   });
-  const [amount, setAmount] = useState("");
+  const [amount, setAmount] = useState(initialAmount ? String(initialAmount) : "");
   const [risk, setRisk] = useState(false);
 
   const create = useMutation({
