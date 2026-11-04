@@ -60,7 +60,7 @@ export function InvestmentCheckout({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0 text-content">
+      <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0 text-content [&>button:last-child]:text-accent-brand-contrast">
         <header className="bg-surface-inverse px-6 py-5 text-accent-brand-contrast">
           <DialogTitle className="font-serif text-2xl text-accent-brand-contrast">Invertir en una ronda</DialogTitle>
           <DialogDescription className="mt-1 text-xs text-accent-brand-contrast opacity-75">
