@@ -88,7 +88,7 @@ export function MarketingLanding() {
             </ol>
             <div className="mt-6 grid grid-cols-3 gap-px bg-hairline border border-hairline">
               {[
-                { v: "UF + 12 %", l: "Tasa anual" },
+                { v: "UF + 25 %", l: "Tasa anual" },
                 { v: "$150.000", l: "Interés/mes por $15 MM" },
                 { v: "Maule", l: "Hualañé · Licantén" },
               ].map((k) => (

@@ -233,11 +233,11 @@ export const DECK_SLIDES: InvestorVisualSlide[] = [
   {
     title: "Renta fija con garantía real.",
     kicker: "08 / Alternativa con colateral",
-    lead: "Mutuo UF + 12% anual con intereses mensuales, garantizado con una parcela inscrita a tu favor.",
+    lead: "Mutuo UF + 25% anual con intereses mensuales, garantizado con una parcela inscrita a tu favor.",
     image: hualane,
     imageLabel: "Imagen satelital · Hualañé",
     stats: [
-      { label: "Tasa contractual", value: "UF + 12%" },
+      { label: "Tasa contractual", value: "UF + 25%" },
       { label: "Desde", value: "CLP 15 M" },
       { label: "Renta mensual", value: "CLP 150.000" },
     ],
