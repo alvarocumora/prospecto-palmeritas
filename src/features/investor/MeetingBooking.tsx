@@ -58,7 +58,7 @@ export function MeetingBooking({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-xl overflow-y-auto overflow-x-hidden [&>*]:min-w-0 bg-surface text-content">
+      <DialogContent className="max-h-[92vh] w-[calc(100vw-2rem)] max-w-xl overflow-y-auto overflow-x-hidden !block space-y-3 bg-surface text-content">
         <DialogTitle className="font-display text-2xl">Agendar reunión</DialogTitle>
         <DialogDescription className="text-sm text-content-muted">
           Equipo de estructuración · Valle Escondido SpA. Hora de Santiago; confirmamos por correo.
