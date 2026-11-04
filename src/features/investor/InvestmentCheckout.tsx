@@ -62,11 +62,11 @@ export function InvestmentCheckout({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-h-[92dvh] max-w-3xl overflow-y-auto border-hairline bg-surface p-0 text-content">
         <header className="bg-surface-inverse px-6 py-5 text-content-inverse">
-          <DialogTitle className="font-serif text-2xl">Invertir en una ronda</DialogTitle>
-          <DialogDescription className="mt-1 text-xs opacity-75">
+          <DialogTitle className="font-serif text-2xl text-content-inverse">Invertir en una ronda</DialogTitle>
+          <DialogDescription className="mt-1 text-xs text-content-inverse opacity-75">
             Acciones de la SPV emisora Valle Escondido SpA · contrato con hash y firma en pantalla
           </DialogDescription>
-          <ol className="mt-4 grid grid-cols-4 gap-2" aria-label="Pasos">
+          <ol className="mt-4 grid grid-cols-4 gap-2 text-content-inverse" aria-label="Pasos">
             {STEPS.map((s, i) => {
               const done = i < step;
               const active = i === step;
