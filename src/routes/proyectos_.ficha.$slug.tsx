@@ -10,7 +10,7 @@ export const Route = createFileRoute("/proyectos_/ficha/$slug")({
     throw redirect({
       to: "/terminal/$slug",
       params: { slug: canonical ?? params.slug },
-      search: { tab: "tesis" as const },
+      search: { tab: "simulador" as const },
       replace: true,
       statusCode: 301,
     });

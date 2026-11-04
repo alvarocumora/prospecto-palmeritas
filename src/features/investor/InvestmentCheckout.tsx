@@ -189,6 +189,7 @@ export function InvestmentCheckout({
               <div className="mt-4 text-right">
                 <Link
                   to="/dashboard/investments"
+                  search={{ vista: "wallet" } as never}
                   onClick={() => onOpenChange(false)}
                   className="text-sm text-accent-brand underline"
                 >
