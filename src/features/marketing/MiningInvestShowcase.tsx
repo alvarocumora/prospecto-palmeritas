@@ -5,7 +5,8 @@ import { RoundProgress } from "@/features/investor/RoundProgress";
 import { ArrowRight, Calculator, Check } from "lucide-react";
 import { getTerminalProject } from "@/features/terminal/terminalProjects";
 import { Eyebrow } from "@/components/brand";
-import { savePendingTicket, ROUND } from "@/features/investor/pendingTicket";
+import { ROUND } from "@/features/investor/pendingTicket";
+import { InvestmentCheckout } from "@/features/investor/InvestmentCheckout";
 import {
   PROJECT_TERMS,
   REFERENCE_VALUATION_USD,
@@ -51,17 +52,19 @@ export function MiningInvestShowcase() {
   }, []);
   const yearly = (amount * rate) / 100;
 
+  const [checkout, setCheckout] = useState(false);
   const emit = () => {
-    if (!valid) return;
-    savePendingTicket({ slug, amount, shares });
-    navigate({
-      to: "/auth",
-      search: { intent: "investor", mode: "signup", next: "/dashboard/investments" } as never,
-    });
+    if (valid) setCheckout(true);
   };
 
   return (
     <section id="invertir" className="border-b border-hairline">
+      <InvestmentCheckout
+        open={checkout}
+        onOpenChange={setCheckout}
+        initialSlug={slug}
+        initialAmount={amount}
+      />
       <div className="max-w-6xl mx-auto px-5 py-16 sm:py-20">
         <Eyebrow className="mb-3">Proyectos en explotación</Eyebrow>
         <h2 className="font-serif text-3xl md:text-4xl leading-tight max-w-2xl">
@@ -266,7 +269,7 @@ export function MiningInvestShowcase() {
               onClick={emit}
               className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 bg-accent-brand px-4 py-3 text-sm font-semibold text-accent-brand-contrast transition-colors hover:bg-im-cobalt-deep focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-brand disabled:cursor-not-allowed disabled:opacity-40"
             >
-              Emitir ticket <ArrowRight className="w-4 h-4" />
+              Invertir ahora <ArrowRight className="w-4 h-4" />
             </button>
             <p className="mt-3 text-[11px] text-content-muted leading-relaxed">
               Simulación referencial: escenario objetivo, no rentabilidad garantizada. No constituye

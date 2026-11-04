@@ -20,10 +20,12 @@ export function InvestmentCheckout({
   open,
   onOpenChange,
   initialSlug = "cholqui",
+  initialAmount,
 }: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   initialSlug?: CheckoutSlug;
+  initialAmount?: number;
 }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -33,9 +35,10 @@ export function InvestmentCheckout({
   useEffect(() => {
     if (open) {
       setSlug(initialSlug);
+      if (initialAmount) setAmount(initialAmount);
       setStep(0);
     }
-  }, [open, initialSlug]);
+  }, [open, initialSlug, initialAmount]);
 
   const q = checkoutQuote(amount);
   const project = INVESTABLE_PROJECTS.find((p) => p.slug === slug)!;

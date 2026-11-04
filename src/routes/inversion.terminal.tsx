@@ -1,3 +1,4 @@
+import { InvestNowButton } from "@/features/investor/InvestmentCheckout";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { queryOptions, useQuery } from "@tanstack/react-query";
 import { ArrowRight, Compass, FileSearch, Landmark, LineChart, ShieldCheck } from "lucide-react";
@@ -98,6 +99,7 @@ function InvestorTerminal() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
+            <InvestNowButton />
             <Link
               to="/auth"
               className="inline-flex h-11 items-center gap-2 rounded-sm bg-accent-brand px-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-brand-contrast hover:bg-im-cobalt-deep"
