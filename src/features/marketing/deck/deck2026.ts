@@ -42,12 +42,13 @@ export const DECK_SLIDES: InvestorVisualSlide[] = [
       { label: "Ronda por proyecto", value: "USD 1,5 M" },
       { label: "Ticket de entrada", value: "USD 15.000" },
       { label: "Producción por proyecto", value: "5–15 kt/mes" },
+      { label: "Retorno objetivo anual*", value: "UF + 25 %" },
     ],
     items: [
       { title: "Cholqui", body: "Cu–Au–Ag · Melipilla, Región Metropolitana" },
       { title: "Los Verdes – Tilama", body: "Cu–Mo · Los Vilos, Choapa, Región de Coquimbo" },
     ],
-    note: `Emisor: Valle Escondido SpA · RUT 78.524.757-4. ${fn} Documento comercial, no constituye oferta pública de valores.`,
+    note: `Emisor: Valle Escondido SpA · RUT 78.524.757-4. *Retorno objetivo referencial sobre flujos de explotación, no garantizado; en el mutuo con colateral, UF + 25 % es la tasa contractual. ${fn} Documento comercial, no constituye oferta pública de valores.`,
   },
   {
     title: "El momento del cobre.",

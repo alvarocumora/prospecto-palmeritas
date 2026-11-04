@@ -39,3 +39,10 @@ describe("reference investment simulation", () => {
     ).toEqual({ amount: 50000, years: 5, scenario: "base" });
   });
 });
+
+import { COLLATERAL_TERMS as __CT, monthlyInterestClp as __mi } from "./collateralProgram";
+import { describe as __d, it as __it, expect as __e } from "vitest";
+__d("tasa UF + 25 % anual", () => {
+  __it("la tasa contractual es 25 %", () => __e(__CT.annualRatePct).toBe(25));
+  __it("CLP 15 MM rinde CLP 312.500 al mes", () => __e(__mi(15_000_000)).toBe(312_500));
+});
