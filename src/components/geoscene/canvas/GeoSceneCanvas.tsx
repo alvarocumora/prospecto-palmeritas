@@ -31,6 +31,13 @@ import { summarizeProjectGeology } from "../geologyMapSummary";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import { gradeColorFor, gradeValue, type GradeCommodity } from "../sampleGradeStyle";
+import {
+  CLIP_THICKNESS_DEFAULT_M,
+  representativePoint,
+  withinClipCorridor,
+  type ClipAxis,
+} from "../clipPlane";
+import { ClipPlanePanel } from "../controls/ClipPlanePanel";
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -391,6 +398,34 @@ export function GeoSceneCanvas({
   const [corridor, setCorridor] = useState(50);
   const sectionRef = useRef(sectionOn);
   sectionRef.current = sectionOn;
+
+  // Corte 3D (franja perpendicular a un eje): Los Verdes no tiene malla de
+  // terreno CAD, así que no hay geometría deck.gl que recortar por shader;
+  // en vez de eso se oculta la evidencia vectorial fuera de la franja.
+  const [clipOn, setClipOn] = useState(false);
+  const [clipAxis, setClipAxis] = useState<ClipAxis>("ns");
+  const [clipCenter, setClipCenter] = useState<[number, number] | null>(null);
+  const [clipThicknessM, setClipThicknessM] = useState(CLIP_THICKNESS_DEFAULT_M);
+  const clipRef = useRef(clipOn);
+  clipRef.current = clipOn;
+  const dominantStrikeAzimuth = useMemo(() => {
+    const structures = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data as
+      FeatureCollection | undefined;
+    const azimuths = (structures?.features ?? [])
+      .map((f) => planeFromProperties(f.properties as Record<string, unknown>)?.strikeDeg)
+      .filter((v): v is number => typeof v === "number");
+    if (!azimuths.length) return 0;
+    return azimuths.reduce((a, b) => a + b, 0) / azimuths.length;
+  }, [resolvedProjectLayers]);
+  const clipState = useMemo(
+    () => ({
+      axis: clipAxis,
+      center: clipOn ? clipCenter : null,
+      azimuthDeg: dominantStrikeAzimuth,
+      thicknessM: clipThicknessM,
+    }),
+    [clipAxis, clipOn, clipCenter, dominantStrikeAzimuth, clipThicknessM],
+  );
   const section = useMemo(() => {
     if (sectionPts.length < 2) return null;
     const [a, b] = sectionPts;
@@ -535,12 +570,24 @@ export function GeoSceneCanvas({
               }),
             }
           : source;
+        // El corte 3D no recorta la malla de terreno (no existe para Los Verdes),
+        // oculta en cambio la evidencia fuera de la franja. La tenencia se deja
+        // completa como referencia geográfica.
+        const clipped =
+          clipState.center && layer.id !== "territory.cadastre"
+            ? {
+                ...graded,
+                features: graded.features.filter((f) =>
+                  withinClipCorridor(clipState, representativePoint(f.geometry)),
+                ),
+              }
+            : graded;
         const data = drape
-          ? drapeFeatureCollection(graded, drape.sample, {
+          ? drapeFeatureCollection(clipped, drape.sample, {
               fallback: drape.fallback,
               offsetM: 8,
             })
-          : graded;
+          : clipped;
         return new GeoJsonLayer({
           id: `project:${layer.id}`,
           data: data as never,
@@ -618,6 +665,7 @@ export function GeoSceneCanvas({
     spectralTop,
     includeOxides,
     sampleGradeFilter,
+    clipState,
   ]);
   const planes = useMemo(() => {
     const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;
@@ -778,7 +826,7 @@ export function GeoSceneCanvas({
           layer?: { props?: Record<string, unknown> } | null;
           object?: { properties?: Record<string, unknown> } | null;
         }) => {
-          if (sectionRef.current || measureRef.current) return false;
+          if (sectionRef.current || measureRef.current || clipRef.current) return false;
           const projectLayer = info.layer?.props?.geoProjectLayer as
             ResolvedProjectLayer | undefined;
           if (!projectLayer || !info.object) return false;
@@ -805,6 +853,10 @@ export function GeoSceneCanvas({
     map.on("click", (e) => {
       if (measureRef.current) {
         setMeasurePts((prev) => [...prev, [e.lngLat.lng, e.lngLat.lat]]);
+        return;
+      }
+      if (clipRef.current) {
+        setClipCenter([e.lngLat.lng, e.lngLat.lat]);
         return;
       }
       if (!sectionRef.current) return;
@@ -1131,6 +1183,15 @@ export function GeoSceneCanvas({
           setSectionPts([]);
           setMeasuring(false);
         }}
+        clipOn={clipOn}
+        clipLabel={
+          clipOn ? (clipCenter ? "Corte 3D activo" : "Corte 3D: toca el mapa") : "Corte 3D"
+        }
+        onClip={() => {
+          setClipOn((v) => !v);
+          setSectionOn(false);
+          setMeasuring(false);
+        }}
         propertyOn={propertyOpen}
         onProperty={() => setPropertyOpen((v) => !v)}
         onGeologyMap={exportGeologyMap}
@@ -1214,6 +1275,21 @@ export function GeoSceneCanvas({
           onClose={() => {
             setSectionOn(false);
             setSectionPts([]);
+          }}
+        />
+      )}
+      {clipOn && (
+        <ClipPlanePanel
+          axis={clipAxis}
+          onAxis={setClipAxis}
+          strikeAzimuth={dominantStrikeAzimuth}
+          thicknessM={clipThicknessM}
+          onThickness={setClipThicknessM}
+          hasCenter={Boolean(clipCenter)}
+          onClearCenter={() => setClipCenter(null)}
+          onClose={() => {
+            setClipOn(false);
+            setClipCenter(null);
           }}
         />
       )}
