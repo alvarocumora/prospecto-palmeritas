@@ -17,6 +17,12 @@ import {
   indexRange,
   type ProcessedIndex,
 } from "./processedSceneStyle";
+import {
+  GRADE_COMMODITY_LABEL,
+  GRADE_CUTOFF_DEFAULT,
+  gradeLegendCounts,
+  type GradeCommodity,
+} from "./sampleGradeStyle";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -62,16 +68,35 @@ export function GeoScene3D({
     const added = (projectLayers ?? []).filter((layer) => !seenProjectLayers.current.has(layer.id));
     if (!added.length) return;
     for (const layer of added) seenProjectLayers.current.add(layer.id);
-    setEnabledLayerIds(
-      (current) =>
-        new Set([
-          ...current,
-          ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id),
-        ]),
-    );
+    setEnabledLayerIds((current) => {
+      const next = new Set(current);
+      // Una capa que recién llega con datos (p.ej. sondajes propuestos, que
+      // dependen de una query separada de veta/mining) puede corresponder a
+      // un id ya habilitado por el preset inicial aunque aún no tuviera
+      // features. defaultVisible:false debe apagarla igual, no solo evitar
+      // agregarla.
+      for (const layer of added) {
+        if (layer.defaultVisible === false) next.delete(layer.id);
+        else next.add(layer.id);
+      }
+      return next;
+    });
   }, [projectLayers]);
 
   const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
+  const [sampleCommodity, setSampleCommodity] = useState<GradeCommodity>("cu_pct");
+  const [sampleCutoff, setSampleCutoff] = useState(0);
+  const sampleLayer = projectLayers?.find((layer) => layer.id === "sampling.results");
+  const sampleLegend = useMemo(
+    () =>
+      sampleLayer && enabledLayerIds.has("sampling.results")
+        ? gradeLegendCounts(sampleLayer.data.features, sampleCommodity)
+        : null,
+    [sampleLayer, enabledLayerIds, sampleCommodity],
+  );
+  useEffect(() => {
+    setSampleCutoff(0);
+  }, [sampleCommodity]);
   const { active: activeProject } = useProjects();
   const processedQuery = useSentinelRasterPreview(project?.id ?? activeProject?.id);
   const processedData = processedQuery.data ?? null;
@@ -154,6 +179,9 @@ export function GeoScene3D({
               projectLayers={projectLayers}
               layerOpacity={layerOpacity}
               processedScene={processedScene}
+              sampleGradeFilter={
+                sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
+              }
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
@@ -252,6 +280,64 @@ export function GeoScene3D({
           <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
             MODELADO · índice derivado de reflectancia real. No identifica minerales ni reemplaza
             ensayes.
+          </p>
+        </div>
+      )}
+
+      {sampleLegend && (
+        <div
+          className="absolute top-16 right-3 z-20 w-[14.5rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          aria-label="Ley de muestras"
+        >
+          <div className="mb-1.5 flex items-center justify-between uppercase tracking-wider text-muted-foreground">
+            <span>Ley de muestras</span>
+            <div className="flex gap-1">
+              {(Object.keys(GRADE_COMMODITY_LABEL) as GradeCommodity[]).map((c) => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setSampleCommodity(c)}
+                  className={`rounded px-1.5 py-0.5 ${
+                    sampleCommodity === c
+                      ? "bg-gold/80 text-background"
+                      : "border border-border text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {GRADE_COMMODITY_LABEL[c]}
+                </button>
+              ))}
+            </div>
+          </div>
+          <label className="mb-1.5 flex items-center gap-2 text-muted-foreground">
+            Corte
+            <input
+              type="range"
+              min={0}
+              max={GRADE_CUTOFF_DEFAULT[sampleCommodity].max}
+              step={GRADE_CUTOFF_DEFAULT[sampleCommodity].step}
+              value={sampleCutoff}
+              onChange={(e) => setSampleCutoff(Number(e.target.value))}
+              className="flex-1"
+            />
+            <span className="w-12 shrink-0 text-right text-foreground">
+              {sampleCutoff}
+              {sampleCommodity === "cu_pct" ? "%" : " ppm"}
+            </span>
+          </label>
+          <ul className="space-y-1">
+            {sampleLegend.map((item) => (
+              <li key={item.label} className="flex items-center gap-2 text-foreground">
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                  style={{ backgroundColor: `rgb(${item.color.join(",")})` }}
+                />
+                <span className="flex-1 truncate">{item.label}</span>
+                <span className="text-muted-foreground">{item.count}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
+            Bajo el corte se oculta (gris = sin dato). Ensayes puntuales, no define recurso.
           </p>
         </div>
       )}
