@@ -32,8 +32,9 @@ import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
 import { gradeColorFor, gradeValue, type GradeCommodity } from "../sampleGradeStyle";
 import {
+  axialMeanDeg,
   CLIP_THICKNESS_DEFAULT_M,
-  representativePoint,
+  geometryWithinClipCorridor,
   withinClipCorridor,
   type ClipAxis,
 } from "../clipPlane";
@@ -414,8 +415,7 @@ export function GeoSceneCanvas({
     const azimuths = (structures?.features ?? [])
       .map((f) => planeFromProperties(f.properties as Record<string, unknown>)?.strikeDeg)
       .filter((v): v is number => typeof v === "number");
-    if (!azimuths.length) return 0;
-    return azimuths.reduce((a, b) => a + b, 0) / azimuths.length;
+    return axialMeanDeg(azimuths);
   }, [resolvedProjectLayers]);
   const clipState = useMemo(
     () => ({
@@ -426,6 +426,33 @@ export function GeoSceneCanvas({
     }),
     [clipAxis, clipOn, clipCenter, dominantStrikeAzimuth, clipThicknessM],
   );
+  // targets/anomalías privadas (sondajes activos) no pasan por projectGeoLayers,
+  // así que el corte 3D se les aplica aparte, clonando la capa ya construida
+  // con sus puntos filtrados por el mismo corredor.
+  const clippedTargetsLayer = useMemo(() => {
+    if (!targetsLayer || !clipState.center) return targetsLayer;
+    type P = { lng: number; lat: number };
+    const data = ((targetsLayer as Layer).props.data as P[]).filter((p) =>
+      withinClipCorridor(clipState, [p.lng, p.lat]),
+    );
+    return (targetsLayer as Layer).clone({ data } as never);
+  }, [targetsLayer, clipState]);
+  const clippedAnomaliesLayer = useMemo(() => {
+    if (!anomaliesLayer || !clipState.center) return anomaliesLayer;
+    type P = { lng: number; lat: number };
+    const data = ((anomaliesLayer as Layer).props.data as P[]).filter((p) =>
+      withinClipCorridor(clipState, [p.lng, p.lat]),
+    );
+    return (anomaliesLayer as Layer).clone({ data } as never);
+  }, [anomaliesLayer, clipState]);
+  const clippedSatAnomaliesLayer = useMemo(() => {
+    if (!satAnomaliesLayer || !clipState.center) return satAnomaliesLayer;
+    type P = { centroidLng: number; centroidLat: number };
+    const data = ((satAnomaliesLayer as Layer).props.data as P[]).filter((p) =>
+      withinClipCorridor(clipState, [p.centroidLng, p.centroidLat]),
+    );
+    return (satAnomaliesLayer as Layer).clone({ data } as never);
+  }, [satAnomaliesLayer, clipState]);
   const section = useMemo(() => {
     if (sectionPts.length < 2) return null;
     const [a, b] = sectionPts;
@@ -578,7 +605,7 @@ export function GeoSceneCanvas({
             ? {
                 ...graded,
                 features: graded.features.filter((f) =>
-                  withinClipCorridor(clipState, representativePoint(f.geometry)),
+                  geometryWithinClipCorridor(clipState, f.geometry),
                 ),
               }
             : graded;
@@ -722,6 +749,7 @@ export function GeoSceneCanvas({
       const c = f.geometry.coordinates;
       const lng = (c[0][0] + c[c.length - 1][0]) / 2;
       const lat = (c[0][1] + c[c.length - 1][1]) / 2;
+      if (clipState.center && !withinClipCorridor(clipState, [lng, lat])) continue;
       const z = (drape?.sample(lng, lat) ?? drape?.fallback ?? 0) + 4;
       discs.push({
         code: plane.code,
@@ -744,20 +772,20 @@ export function GeoSceneCanvas({
       pickable: true,
       parameters: { depthTest: false } as never,
     });
-  }, [mode, view, visibleLayerIds, resolvedProjectLayers, drape]);
+  }, [mode, view, visibleLayerIds, resolvedProjectLayers, drape, clipState]);
 
   // Anomalías extruidas: la base se apoya en el relieve, no en cota 0.
   const drapedSatLayer = useMemo(() => {
-    if (!satAnomaliesLayer || !drape) return satAnomaliesLayer;
+    if (!clippedSatAnomaliesLayer || !drape) return clippedSatAnomaliesLayer;
     type P = { rings: number[][][]; centroidLng: number; centroidLat: number };
-    return (satAnomaliesLayer as Layer).clone({
+    return (clippedSatAnomaliesLayer as Layer).clone({
       getPolygon: (d: P) => {
         const z = drape.sample(d.centroidLng, d.centroidLat) ?? drape.fallback;
         return d.rings.map((r) => r.map((p) => [p[0], p[1], z]));
       },
       updateTriggers: { getPolygon: [drape] },
     } as never);
-  }, [satAnomaliesLayer, drape]);
+  }, [clippedSatAnomaliesLayer, drape]);
 
   // Escena Sentinel-2 procesada por el pipeline del proyecto (índices reales,
   // malla de visualización). Se drapea sobre DEM/CAD sin test de profundidad.
@@ -1001,12 +1029,12 @@ export function GeoSceneCanvas({
       processedLayer,
       ...projectGeoLayers,
       structurePlaneLayer,
-      targetsLayer,
+      clippedTargetsLayer,
       drapedSatLayer,
       ...holeColumnLayers,
       ...trajectoryLayers,
       ...wireframeLayers,
-      anomaliesLayer,
+      clippedAnomaliesLayer,
       sectionLayer,
       measureLayer,
     ].filter(Boolean);
@@ -1017,12 +1045,12 @@ export function GeoSceneCanvas({
     processedLayer,
     projectGeoLayers,
     structurePlaneLayer,
-    targetsLayer,
+    clippedTargetsLayer,
     drapedSatLayer,
     holeColumnLayers,
     trajectoryLayers,
     wireframeLayers,
-    anomaliesLayer,
+    clippedAnomaliesLayer,
     sectionLayer,
     measureLayer,
   ]);
@@ -1163,7 +1191,10 @@ export function GeoSceneCanvas({
         onMeasuring={(v) => {
           setMeasuring(v);
           setMeasurePts([]);
-          if (v) setSectionOn(false);
+          if (v) {
+            setSectionOn(false);
+            setClipOn(false);
+          }
         }}
         measurePts={measurePts}
         elevations={measurePts.map((p) => drape?.sample(p[0], p[1]) ?? null)}
@@ -1182,6 +1213,7 @@ export function GeoSceneCanvas({
           setSectionOn((v) => !v);
           setSectionPts([]);
           setMeasuring(false);
+          setClipOn(false);
         }}
         clipOn={clipOn}
         clipLabel={

@@ -52,29 +52,33 @@ export function perpendicularDistanceM(
   return dxM * nx + dyM * ny;
 }
 
-/** Punto representativo de una geometry GeoJSON, para probar pertenencia al corredor. */
+type GeoJsonGeometryLike = { type: string; coordinates?: unknown; geometries?: unknown };
+
+/** Punto representativo (primer vértice) de una geometry GeoJSON. */
 export function representativePoint(
-  geometry: { type: string; coordinates?: unknown; geometries?: unknown } | null | undefined,
+  geometry: GeoJsonGeometryLike | null | undefined,
 ): [number, number] | null {
-  if (!geometry) return null;
-  const firstNumericPair = (c: unknown): [number, number] | null => {
-    if (!Array.isArray(c)) return null;
-    if (typeof c[0] === "number" && typeof c[1] === "number")
-      return [c[0] as number, c[1] as number];
-    for (const item of c) {
-      const found = firstNumericPair(item);
-      if (found) return found;
+  const pts = allVertices(geometry);
+  return pts.length ? pts[0] : null;
+}
+
+/** Todos los vértices [lng, lat] de una geometry GeoJSON (Point..MultiPolygon y GeometryCollection). */
+export function allVertices(geometry: GeoJsonGeometryLike | null | undefined): [number, number][] {
+  if (!geometry) return [];
+  const out: [number, number][] = [];
+  const walk = (c: unknown): void => {
+    if (!Array.isArray(c)) return;
+    if (typeof c[0] === "number" && typeof c[1] === "number") {
+      out.push([c[0] as number, c[1] as number]);
+      return;
     }
-    return null;
+    for (const item of c) walk(item);
   };
-  if ("coordinates" in geometry) return firstNumericPair(geometry.coordinates);
-  if (Array.isArray(geometry.geometries)) {
-    for (const g of geometry.geometries) {
-      const found = representativePoint(g as typeof geometry);
-      if (found) return found;
-    }
+  if ("coordinates" in geometry) walk(geometry.coordinates);
+  else if (Array.isArray(geometry.geometries)) {
+    for (const g of geometry.geometries) out.push(...allVertices(g as GeoJsonGeometryLike));
   }
-  return null;
+  return out;
 }
 
 export function withinClipCorridor(
@@ -85,4 +89,41 @@ export function withinClipCorridor(
   const normal = clipAxisAzimuth(clip.axis, clip.azimuthDeg);
   const d = perpendicularDistanceM(clip.center, normal, point);
   return Math.abs(d) <= clip.thicknessM / 2;
+}
+
+/**
+ * Pertenencia de una geometry completa al corredor: alcanza con que algún
+ * vértice caiga dentro. Evita el sesgo de probar solo el primer vértice
+ * (donde invertir el orden de una línea, o un polígono grande, cambiaría el
+ * resultado arbitrariamente) a costa de no cubrir el caso de un polígono que
+ * contiene todo el corredor sin tener ningún vértice propio dentro de él.
+ */
+export function geometryWithinClipCorridor(
+  clip: Pick<ClipPlaneState, "center" | "azimuthDeg" | "thicknessM"> & { axis: ClipAxis },
+  geometry: GeoJsonGeometryLike | null | undefined,
+): boolean {
+  if (!clip.center) return true;
+  const vertices = allVertices(geometry);
+  if (!vertices.length) return true;
+  return vertices.some((p) => withinClipCorridor(clip, p));
+}
+
+/**
+ * Media circular axial de un conjunto de rumbos (grados, eje sin sentido:
+ * 10° y 190° describen el mismo eje). Promediar grados directamente falla en
+ * ese caso (daría 100°, perpendicular a ambas medidas); en cambio se duplica
+ * cada ángulo antes de promediar sus componentes seno/coseno y se vuelve a
+ * dividir por 2.
+ */
+export function axialMeanDeg(samplesDeg: readonly number[]): number {
+  if (!samplesDeg.length) return 0;
+  let sx = 0;
+  let sy = 0;
+  for (const deg of samplesDeg) {
+    const rad2 = (2 * deg * Math.PI) / 180;
+    sx += Math.cos(rad2);
+    sy += Math.sin(rad2);
+  }
+  const meanDoubled = (Math.atan2(sy, sx) * 180) / Math.PI;
+  return (((meanDoubled / 2) % 180) + 180) % 180;
 }

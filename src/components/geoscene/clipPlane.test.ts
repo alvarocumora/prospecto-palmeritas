@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  axialMeanDeg,
   clipAxisAzimuth,
+  geometryWithinClipCorridor,
   perpendicularDistanceM,
   representativePoint,
   withinClipCorridor,
@@ -67,5 +69,38 @@ describe("clipPlane", () => {
         ],
       }),
     ).toEqual([-71, -32]);
+  });
+
+  it("includes a geometry when any of its vertices falls inside the corridor, regardless of order", () => {
+    const center: [number, number] = [-71.0, -32.0];
+    const base = { axis: "ns" as const, azimuthDeg: 0, thicknessM: 20, center };
+    const mPerDegLng = 111_320 * Math.cos((-32 * Math.PI) / 180);
+    const near: [number, number] = [-71.0 + 5 / mPerDegLng, -32.0];
+    const far: [number, number] = [-71.0 + 50 / mPerDegLng, -32.0];
+    // A line whose far endpoint is listed first still counts, because at
+    // least one vertex (the near one) falls inside the corridor.
+    expect(geometryWithinClipCorridor(base, { type: "LineString", coordinates: [far, near] })).toBe(
+      true,
+    );
+    expect(geometryWithinClipCorridor(base, { type: "LineString", coordinates: [near, far] })).toBe(
+      true,
+    );
+    expect(geometryWithinClipCorridor(base, { type: "LineString", coordinates: [far, far] })).toBe(
+      false,
+    );
+  });
+
+  it("treats a missing clip center as always within the corridor for a geometry", () => {
+    const base = { axis: "ns" as const, azimuthDeg: 0, thicknessM: 20, center: null };
+    expect(geometryWithinClipCorridor(base, { type: "Point", coordinates: [-71, -32] })).toBe(true);
+  });
+
+  it("computes an axial circular mean, treating opposite strikes as the same axis", () => {
+    expect(axialMeanDeg([])).toBe(0);
+    expect(axialMeanDeg([10, 190])).toBeCloseTo(10, 5);
+    // The naive arithmetic mean of 10 and 190 is 100, which would be wrong
+    // (perpendicular to the real axis); the axial mean must not land there.
+    expect(axialMeanDeg([10, 190])).not.toBeCloseTo(100, 5);
+    expect(axialMeanDeg([45])).toBeCloseTo(45, 5);
   });
 });
