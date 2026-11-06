@@ -143,7 +143,7 @@ export const getLosVerdesMapData = createServerFn({ method: "GET" }).handler(
     const integrated = JSON.parse(integratedRaw) as {
       features: Array<{ geometry: GeoJSON.Geometry; properties: Record<string, PropValue> }>;
     };
-    const tenure = { ownHa: 0, ownCount: 0, neighborHa: 0, neighborCount: 0, targetHa: 2600 };
+    const tenure = { ownHa: 0, ownCount: 0, neighborHa: 0, neighborCount: 0, targetHa: 2690 };
     integrated.features.forEach((f, i) => {
       const p = f.properties;
       const own = p.grupo === "proyecto";

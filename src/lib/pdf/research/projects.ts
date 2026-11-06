@@ -344,7 +344,7 @@ function losVerdesDoc(family: ResearchFamily, issued: string): ResearchDoc {
       { label: "Ubicación", value: lv.region, provenance: "DECLARADO", sourceId: "dossier" },
       {
         label: "Superficie integrada",
-        value: "3.303 ha",
+        value: "~2.690 ha",
         provenance: "DECLARADO",
         sourceId: "catastro",
       },

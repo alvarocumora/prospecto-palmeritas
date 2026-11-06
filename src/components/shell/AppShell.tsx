@@ -38,7 +38,7 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
       {
         to: "/inversion-colateral",
         label: "Renta fija con colateral",
-        desc: "UF + 12 % con parcela en garantía",
+        desc: "UF + 25 % con parcela en garantía",
       },
     ],
   },
@@ -183,7 +183,7 @@ export function MarketingHeader() {
           Acceso clientes
         </Link>
         <BrandButton asChild size="sm" className="hidden sm:inline-flex">
-          <Link to="/inversion-colateral">
+          <Link to="/" hash="invertir">
             Simular inversión <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </BrandButton>
@@ -230,7 +230,7 @@ export function MarketingHeader() {
                 Acceso clientes
               </Link>
               <BrandButton asChild size="sm">
-                <Link to="/inversion-colateral" onClick={() => setMenuOpen(false)}>
+                <Link to="/" hash="invertir" onClick={() => setMenuOpen(false)}>
                   Simular inversión <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </BrandButton>

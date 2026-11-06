@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { BookMeetingButton } from "@/features/investor/MeetingBooking";
 import {
   CheckCircle2,
   ShieldCheck,
@@ -127,7 +128,7 @@ function InvPage() {
         <div>
           <Eyebrow className="mb-1">Nuevo · Inversión con colateral</Eyebrow>
           <div className="brand-display text-xl text-content">
-            UF + 12 % anual con pago mensual y una parcela en garantía en el Maule.
+            UF + 25 % anual con pago mensual y una parcela en garantía en el Maule.
           </div>
         </div>
         <span className="text-sm text-accent-brand inline-flex items-center gap-1.5 font-medium">
@@ -180,6 +181,9 @@ function InvPage() {
               </div>
             </Link>
           ))}
+        </div>
+        <div className="mt-6 flex flex-wrap items-center gap-3 text-sm text-content-muted">
+          ¿Prefieres conversarlo antes de invertir? <BookMeetingButton />
         </div>
       </div>
 
