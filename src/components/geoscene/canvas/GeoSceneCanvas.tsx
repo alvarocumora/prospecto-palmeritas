@@ -30,6 +30,7 @@ import { filterSpectral, unitColor, type SpectralTop, sectionGeology } from "../
 import { summarizeProjectGeology } from "../geologyMapSummary";
 import { SPECTRAL_LAYER_IDS, spectralFill } from "../spectralStyle";
 import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneStyle";
+import { gradeColorFor, gradeValue, type GradeCommodity } from "../sampleGradeStyle";
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -81,6 +82,7 @@ interface Props {
   projectLayers?: GeoSceneProjectLayer[];
   layerOpacity?: Readonly<Record<string, number>>;
   processedScene?: ProcessedSceneOverlay | null;
+  sampleGradeFilter?: { commodity: GradeCommodity; cutoff: number } | null;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -143,6 +145,7 @@ export function GeoSceneCanvas({
   projectLayers,
   layerOpacity,
   processedScene,
+  sampleGradeFilter,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -520,12 +523,24 @@ export function GeoSceneCanvas({
             ? filterSpectral(layer.data as FeatureCollection, spectralTop, includeOxides)
             : (layer.data as FeatureCollection);
         const units = layer.id === "geology.official_map_units";
+        const grades = layer.id === "sampling.results" && sampleGradeFilter;
+        const graded = grades
+          ? {
+              ...source,
+              features: source.features.filter((f) => {
+                const v = gradeValue(f.properties, sampleGradeFilter.commodity);
+                return sampleGradeFilter.cutoff <= 0
+                  ? true
+                  : v != null && v >= sampleGradeFilter.cutoff;
+              }),
+            }
+          : source;
         const data = drape
-          ? drapeFeatureCollection(source, drape.sample, {
+          ? drapeFeatureCollection(graded, drape.sample, {
               fallback: drape.fallback,
               offsetM: 8,
             })
-          : source;
+          : graded;
         return new GeoJsonLayer({
           id: `project:${layer.id}`,
           data: data as never,
@@ -538,31 +553,45 @@ export function GeoSceneCanvas({
                 ...unitColor(f.properties?.codigo ?? f.properties?.nombre),
                 110,
               ]
-            : layer.id === "territory.cadastre"
-              ? [color[0], color[1], color[2], 0]
-              : spectral
-                ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-                : [color[0], color[1], color[2], dashed ? 6 : 12],
-          getLineColor: spectral
-            ? (f: { properties?: Record<string, unknown> }) => {
-                const c = spectralFill(f.properties, rgb);
-                return [c[0], c[1], c[2], 230];
-              }
-            : layer.id === "territory.cadastre"
-              ? [color[0], color[1], color[2], 150]
-              : color,
+            : grades
+              ? (f: { properties?: Record<string, unknown> }) => [
+                  ...gradeColorFor(gradeValue(f.properties, sampleGradeFilter.commodity), sampleGradeFilter.commodity),
+                  220,
+                ]
+              : layer.id === "territory.cadastre"
+                ? [color[0], color[1], color[2], 0]
+                : spectral
+                  ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
+                  : [color[0], color[1], color[2], dashed ? 6 : 12],
+          getLineColor: grades
+            ? (f: { properties?: Record<string, unknown> }) => [
+                ...gradeColorFor(gradeValue(f.properties, sampleGradeFilter.commodity), sampleGradeFilter.commodity),
+                255,
+              ]
+            : spectral
+              ? (f: { properties?: Record<string, unknown> }) => {
+                  const c = spectralFill(f.properties, rgb);
+                  return [c[0], c[1], c[2], 230];
+                }
+              : layer.id === "territory.cadastre"
+                ? [color[0], color[1], color[2], 150]
+                : color,
           getLineWidth: layer.id === "territory.cadastre" ? 1 : dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",
           // Píxel satelital a escala real (EMIT ~60 m, ASTER ~90 m) en 3D;
-          // en Planta se mantiene legible en píxeles.
-          getPointRadius: spectral && view === "3d" ? (layer.id.includes("aster") ? 45 : 30) : 6,
-          pointRadiusUnits: spectral && view === "3d" ? "meters" : "pixels",
-          pointRadiusMinPixels: spectral && view === "3d" ? 1 : 4,
-          pointRadiusMaxPixels: 14,
+          // muestras: símbolo compacto a escala real que se clampa en píxeles
+          // al alejar, en vez de un disco gigante fijo.
+          getPointRadius: grades ? 18 : spectral && view === "3d" ? (layer.id.includes("aster") ? 45 : 30) : 6,
+          pointRadiusUnits: grades || (spectral && view === "3d") ? "meters" : "pixels",
+          pointRadiusMinPixels: grades ? 2.5 : spectral && view === "3d" ? 1 : 4,
+          pointRadiusMaxPixels: grades ? 7 : 14,
           // El relieve del primer plano oculta lo que está detrás.
           parameters: { depthTest: view === "3d" } as never,
-          updateTriggers: { getLineColor: layer.definition.evidence },
+          updateTriggers: {
+            getLineColor: [layer.definition.evidence, sampleGradeFilter?.commodity],
+            getFillColor: [sampleGradeFilter?.commodity],
+          },
           // keep a reference for tooltips
           ...({ geoProjectLayer: layer } as Record<string, unknown>),
         });
@@ -576,6 +605,7 @@ export function GeoSceneCanvas({
     drape,
     spectralTop,
     includeOxides,
+    sampleGradeFilter,
   ]);
   const planes = useMemo(() => {
     const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;

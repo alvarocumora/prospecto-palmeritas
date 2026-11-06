@@ -111,6 +111,17 @@ export function UnifiedProjectScene({
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
+// Capas derivadas/propuestas que saturan la vista inicial (aros satelitales,
+// lineamientos, anomalías geofísicas interpretadas, sondajes conceptuales):
+// quedan disponibles desde el panel de capas pero apagadas por defecto, para
+// que el mapa arranque mostrando tenencia + muestras + targets.
+const LOSVERDES_DEFAULT_HIDDEN = new Set<string>([
+  "remote_sensing.sentinel2_alteration",
+  "remote_sensing.lineaments",
+  "geophysics.anomalies",
+  "drilling.proposed",
+]);
+
 function LosVerdesScene({ view }: { view: ProjectView }) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
@@ -141,7 +152,9 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
       ],
     );
     const bundle = buildLosVerdesPublicGeoBundle(manifest, data, mining.data, anomalies.data);
-    const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle);
+    const layers: GeoSceneProjectLayer[] = bundleSceneLayers(bundle).map((layer) =>
+      LOSVERDES_DEFAULT_HIDDEN.has(layer.id) ? { ...layer, defaultVisible: false } : layer,
+    );
     if (emit.length)
       layers.push({
         id: "remote_sensing.hyperspectral",
