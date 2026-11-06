@@ -555,7 +555,10 @@ export function GeoSceneCanvas({
               ]
             : grades
               ? (f: { properties?: Record<string, unknown> }) => [
-                  ...gradeColorFor(gradeValue(f.properties, sampleGradeFilter.commodity), sampleGradeFilter.commodity),
+                  ...gradeColorFor(
+                    gradeValue(f.properties, sampleGradeFilter.commodity),
+                    sampleGradeFilter.commodity,
+                  ),
                   220,
                 ]
               : layer.id === "territory.cadastre"
@@ -565,7 +568,10 @@ export function GeoSceneCanvas({
                   : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: grades
             ? (f: { properties?: Record<string, unknown> }) => [
-                ...gradeColorFor(gradeValue(f.properties, sampleGradeFilter.commodity), sampleGradeFilter.commodity),
+                ...gradeColorFor(
+                  gradeValue(f.properties, sampleGradeFilter.commodity),
+                  sampleGradeFilter.commodity,
+                ),
                 255,
               ]
             : spectral
@@ -582,7 +588,13 @@ export function GeoSceneCanvas({
           // Píxel satelital a escala real (EMIT ~60 m, ASTER ~90 m) en 3D;
           // muestras: símbolo compacto a escala real que se clampa en píxeles
           // al alejar, en vez de un disco gigante fijo.
-          getPointRadius: grades ? 18 : spectral && view === "3d" ? (layer.id.includes("aster") ? 45 : 30) : 6,
+          getPointRadius: grades
+            ? 18
+            : spectral && view === "3d"
+              ? layer.id.includes("aster")
+                ? 45
+                : 30
+              : 6,
           pointRadiusUnits: grades || (spectral && view === "3d") ? "meters" : "pixels",
           pointRadiusMinPixels: grades ? 2.5 : spectral && view === "3d" ? 1 : 4,
           pointRadiusMaxPixels: grades ? 7 : 14,

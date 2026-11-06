@@ -179,7 +179,9 @@ export function GeoScene3D({
               projectLayers={projectLayers}
               layerOpacity={layerOpacity}
               processedScene={processedScene}
-              sampleGradeFilter={sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null}
+              sampleGradeFilter={
+                sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
+              }
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
