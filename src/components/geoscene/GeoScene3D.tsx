@@ -68,13 +68,19 @@ export function GeoScene3D({
     const added = (projectLayers ?? []).filter((layer) => !seenProjectLayers.current.has(layer.id));
     if (!added.length) return;
     for (const layer of added) seenProjectLayers.current.add(layer.id);
-    setEnabledLayerIds(
-      (current) =>
-        new Set([
-          ...current,
-          ...added.filter((layer) => layer.defaultVisible !== false).map((layer) => layer.id),
-        ]),
-    );
+    setEnabledLayerIds((current) => {
+      const next = new Set(current);
+      // Una capa que recién llega con datos (p.ej. sondajes propuestos, que
+      // dependen de una query separada de veta/mining) puede corresponder a
+      // un id ya habilitado por el preset inicial aunque aún no tuviera
+      // features. defaultVisible:false debe apagarla igual, no solo evitar
+      // agregarla.
+      for (const layer of added) {
+        if (layer.defaultVisible === false) next.delete(layer.id);
+        else next.add(layer.id);
+      }
+      return next;
+    });
   }, [projectLayers]);
 
   const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
@@ -278,7 +284,7 @@ export function GeoScene3D({
 
       {sampleLegend && (
         <div
-          className="absolute top-14 left-3 z-20 w-[14.5rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
+          className="absolute top-16 right-3 z-20 w-[14.5rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
           aria-label="Ley de muestras"
         >
           <div className="mb-1.5 flex items-center justify-between uppercase tracking-wider text-muted-foreground">
