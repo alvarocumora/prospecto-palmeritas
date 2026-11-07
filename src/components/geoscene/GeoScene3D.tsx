@@ -182,6 +182,7 @@ export function GeoScene3D({
               sampleGradeFilter={
                 sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
               }
+              commodity={sampleCommodity}
             />
           )}
           {mode === "resource" && <ResourceModeStub />}

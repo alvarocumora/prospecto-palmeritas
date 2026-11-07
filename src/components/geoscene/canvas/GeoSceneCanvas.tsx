@@ -91,6 +91,10 @@ interface Props {
   layerOpacity?: Readonly<Record<string, number>>;
   processedScene?: ProcessedSceneOverlay | null;
   sampleGradeFilter?: { commodity: GradeCommodity; cutoff: number } | null;
+  /** Selector Cu%/Au de Tesis, independiente de si la capa de muestras de
+   * superficie está encendida — así ocultar esa capa para aislar los
+   * sondajes no revierte silenciosamente su color/filtro a Au. */
+  commodity?: GradeCommodity;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -154,6 +158,7 @@ export function GeoSceneCanvas({
   layerOpacity,
   processedScene,
   sampleGradeFilter,
+  commodity,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -226,10 +231,10 @@ export function GeoSceneCanvas({
       intercepts: interceptsVisible,
     },
     filters,
-    // Sigue el mismo selector Cu%/Mo ppm de las muestras de superficie
-    // (Fase 1) cuando está en Cu — Mo no tiene columna en drill_core_logs
-    // todavía, así que para Mo (o sin selector) se mantiene el color por Au.
-    sampleGradeFilter?.commodity === "cu_pct" ? "cu_pct" : "au_gpt",
+    // Sigue el mismo selector Cu%/Mo ppm de Tesis (Fase 1), independiente de
+    // si la capa de muestras de superficie está encendida. Mo no tiene
+    // columna en drill_core_logs todavía, así que para Mo se mantiene Au.
+    commodity === "cu_pct" ? "cu_pct" : "au_gpt",
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
