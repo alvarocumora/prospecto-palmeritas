@@ -116,6 +116,15 @@ export function UnifiedProjectScene({
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
 
+/** Centro aproximado de Tilama — placeholder mientras carga la consulta real,
+ * para que la cabecera (Planta/Perspectiva, Capas) no dependa de la carga de
+ * datos y aparezca de inmediato, igual que en las demás escenas. */
+const LOSVERDES_FALLBACK_PROJECT: GeoSceneProject = {
+  id: LOSVERDES_PROJECT_ID,
+  name: "Los Verdes",
+  center: [-71, -32],
+};
+
 // Capas derivadas/propuestas que saturan la vista inicial (aros satelitales,
 // lineamientos, anomalías geofísicas interpretadas, sondajes conceptuales):
 // quedan disponibles desde el panel de capas pero apagadas por defecto, para
@@ -194,13 +203,14 @@ function LosVerdesScene({
         No fue posible cargar las capas de Los Verdes.
       </p>
     );
-  if (!input)
-    return (
-      <div className="h-[620px] grid place-items-center text-content-subtle">
-        Cargando capas de Los Verdes…
-      </div>
-    );
-  return <ProjectSceneFrame {...input} view={view} onViewChange={onViewChange} />;
+  return (
+    <ProjectSceneFrame
+      project={input?.project ?? LOSVERDES_FALLBACK_PROJECT}
+      layers={input?.layers ?? []}
+      view={view}
+      onViewChange={onViewChange}
+    />
+  );
 }
 
 function PalmerasScene({
