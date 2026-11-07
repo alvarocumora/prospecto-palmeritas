@@ -49,7 +49,7 @@ import {
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
-import { projectCamera } from "../cameraPolicy";
+import { miningViewCamera, projectCamera, type MiningViewPreset } from "../cameraPolicy";
 import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -98,6 +98,10 @@ interface Props {
   layerOpacity?: Readonly<Record<string, number>>;
   processedScene?: ProcessedSceneOverlay | null;
   sampleGradeFilter?: { commodity: GradeCommodity; cutoff: number } | null;
+  /** Selector Cu%/Au de Tesis, independiente de si la capa de muestras de
+   * superficie está encendida — así ocultar esa capa para aislar los
+   * sondajes no revierte silenciosamente su color/filtro a Au. */
+  commodity?: GradeCommodity;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -169,6 +173,7 @@ export function GeoSceneCanvas({
   layerOpacity,
   processedScene,
   sampleGradeFilter,
+  commodity,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -241,6 +246,10 @@ export function GeoSceneCanvas({
       intercepts: interceptsVisible,
     },
     filters,
+    // Sigue el mismo selector Cu%/Mo ppm de Tesis (Fase 1), independiente de
+    // si la capa de muestras de superficie está encendida. Mo no tiene
+    // columna en drill_core_logs todavía, así que para Mo se mantiene Au.
+    commodity === "cu_pct" ? "cu_pct" : "au_gpt",
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
@@ -1234,6 +1243,13 @@ export function GeoSceneCanvas({
         }}
         measurePts={measurePts}
         elevations={measurePts.map((p) => drape?.sample(p[0], p[1]) ?? null)}
+        onViewPreset={
+          view === "3d"
+            ? (preset: MiningViewPreset) => {
+                mapRef.current?.easeTo({ ...miningViewCamera(preset), duration: 700 });
+              }
+            : undefined
+        }
         stereoOpen={stereoOpen}
         onStereo={setStereoOpen}
         planes={planes}

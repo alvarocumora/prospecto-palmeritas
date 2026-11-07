@@ -10,14 +10,21 @@ import { sceneDefinitionsForMode } from "../layerPolicy";
 import type { GeoSceneMode } from "../types";
 import { BrandButton } from "@/components/brand";
 
-const DOMAIN_LABEL: Partial<Record<GeoLayerDomain, string>> = {
-  territory: "Tenencia minera",
-  remote_sensing: "Relieve y teledetección",
-  geology: "Geología estructural",
-  geophysics: "Geofísica y espectral",
-  sampling: "Muestreo",
-  targets: "Targets",
-  drilling: "Sondajes",
+/**
+ * Árbol de proyecto estilo Leapfrog: agrupa los 8 dominios canónicos del
+ * registro geoespacial en 5 carpetas de más alto nivel, solo para mostrar
+ * este panel. El `domain` de cada capa no cambia en ningún otro lugar.
+ */
+const PROJECT_TREE_FOLDER: Record<GeoLayerDomain, string> = {
+  basemap: "Superficie",
+  territory: "Superficie",
+  remote_sensing: "Superficie",
+  geology: "Estructuras",
+  geochemistry: "Geoquímica",
+  sampling: "Geoquímica",
+  targets: "Geoquímica",
+  drilling: "Sondajes & Geofísica",
+  geophysics: "Sondajes & Geofísica",
   models: "Modelos",
 };
 
@@ -52,7 +59,9 @@ export function SceneLayerPanel({
           .map((id) => getGeoLayer(id))
           .filter((d): d is GeoLayerDefinition => d != null && !base.some((b) => b.id === d.id));
   const definitions = [...extras, ...base];
-  const domains = Array.from(new Set(definitions.map((definition) => definition.domain)));
+  const folders = Array.from(
+    new Set(definitions.map((definition) => PROJECT_TREE_FOLDER[definition.domain])),
+  );
 
   return (
     <div
@@ -82,19 +91,19 @@ export function SceneLayerPanel({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-2">
-        {domains.map((domain) => (
+        {folders.map((folder) => (
           <details
-            key={domain}
+            key={folder}
             open
             className="group mb-2 border-b border-hairline pb-2 last:border-0"
           >
             <summary className="flex min-h-9 cursor-pointer list-none items-center justify-between font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-              {DOMAIN_LABEL[domain] ?? domain}
+              {folder}
               <span className="transition-transform group-open:rotate-90">›</span>
             </summary>
             <div className="space-y-2">
               {definitions
-                .filter((definition) => definition.domain === domain)
+                .filter((definition) => PROJECT_TREE_FOLDER[definition.domain] === folder)
                 .map((definition) => {
                   const active = enabled.has(definition.id);
                   return (
