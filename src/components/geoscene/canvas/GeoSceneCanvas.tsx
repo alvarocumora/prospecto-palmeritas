@@ -39,13 +39,14 @@ import {
   type ClipAxis,
 } from "../clipPlane";
 import { ClipPlanePanel } from "../controls/ClipPlanePanel";
-import { PriorityPanel } from "../controls/PriorityPanel";
 import {
   PRIORITIES,
   filterByPriority,
   normalizePriority,
   type ExplorationPriority,
 } from "../priority";
+
+const DEFAULT_ACTIVE_PRIORITIES = new Set(PRIORITIES);
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -102,6 +103,9 @@ interface Props {
    * superficie está encendida — así ocultar esa capa para aislar los
    * sondajes no revierte silenciosamente su color/filtro a Au. */
   commodity?: GradeCommodity;
+  /** Filtro P1/P2/P3 — vive en GeoScene3D para poder mostrarse dentro del
+   * árbol de capas en vez de en una tarjeta flotante aparte. */
+  activePriorities?: ReadonlySet<ExplorationPriority>;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -174,6 +178,7 @@ export function GeoSceneCanvas({
   processedScene,
   sampleGradeFilter,
   commodity,
+  activePriorities: activePrioritiesProp,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -595,18 +600,7 @@ export function GeoSceneCanvas({
       parameters: { depthTest: false } as never,
     });
   }, [sectionOn, sectionPts, drape]);
-  const [activePriorities, setActivePriorities] = useState<ReadonlySet<ExplorationPriority>>(
-    () => new Set(PRIORITIES),
-  );
-  const prioritizedLayers = useMemo(
-    () =>
-      resolvedProjectLayers.filter((l) =>
-        (l.data as FeatureCollection | undefined)?.features?.some((f) =>
-          normalizePriority(f.properties as Record<string, unknown>),
-        ),
-      ),
-    [resolvedProjectLayers],
-  );
+  const activePriorities = activePrioritiesProp ?? DEFAULT_ACTIVE_PRIORITIES;
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
     return resolvedProjectLayers
@@ -679,8 +673,9 @@ export function GeoSceneCanvas({
                   ? (f: { properties?: Record<string, unknown> }) =>
                       priorityHalo(f.properties?.prioridad, 1)
                   : spectral
-                  ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-                  : [color[0], color[1], color[2], dashed ? 6 : 12],
+                    ? (f: { properties?: Record<string, unknown> }) =>
+                        spectralFill(f.properties, rgb)
+                    : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: grades
             ? (f: { properties?: Record<string, unknown> }) => [
                 ...gradeColorFor(
@@ -1302,13 +1297,6 @@ export function GeoSceneCanvas({
               .join(", ") || "ninguna"
           }. Imagen base: Esri World Imagery.`}
           onClose={() => setPropertyOpen(false)}
-        />
-      )}
-      {mode !== "resource" && prioritizedLayers.some((l) => visibleLayerIds.has(l.id)) && (
-        <PriorityPanel
-          layers={prioritizedLayers.filter((l) => visibleLayerIds.has(l.id))}
-          active={activePriorities}
-          onChange={setActivePriorities}
         />
       )}
       {(() => {

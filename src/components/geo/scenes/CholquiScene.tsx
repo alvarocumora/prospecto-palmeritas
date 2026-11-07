@@ -8,7 +8,13 @@ import type { ProjectView } from "@/lib/projects/navigation";
 import { CHOLQUI_STRUCTURES_GEOJSON } from "@/features/franco/data/cholquiStructures";
 import { correlateVeins, correlationLayer, haloSummary } from "@/lib/cholqui/structuralCorrelation";
 
-export function CholquiScene({ view }: { view: ProjectView }) {
+export function CholquiScene({
+  view,
+  onViewChange,
+}: {
+  view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
+}) {
   const input = useMemo(buildCholquiSceneInput, []);
   const emit = useEmitMineralogyLayers("cholqui");
   const radar = useAsterS1Layers();
@@ -99,5 +105,12 @@ export function CholquiScene({ view }: { view: ProjectView }) {
         : []),
     ];
   }, [input, emit, radar, correlated]);
-  return <ProjectSceneFrame project={input.project} layers={layers} view={view} />;
+  return (
+    <ProjectSceneFrame
+      project={input.project}
+      layers={layers}
+      view={view}
+      onViewChange={onViewChange}
+    />
+  );
 }
