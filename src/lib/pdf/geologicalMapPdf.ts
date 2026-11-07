@@ -144,7 +144,13 @@ export async function buildGeologicalMapPdf(o: {
     y = section(doc, f, y, "04", "Interpretación · halos y zonas de prioridad");
     if (belts.length) y = kvRow(doc, f, y, "Franja metalogénica", `${belts.join(" · ")} · OFICIAL`);
     if (lin)
-      y = kvRow(doc, f, y, "Lineamientos", `${lin} trazas DEM · INTERPRETADO (no fallas verificadas)`);
+      y = kvRow(
+        doc,
+        f,
+        y,
+        "Lineamientos",
+        `${lin} trazas DEM · INTERPRETADO (no fallas verificadas)`,
+      );
     // Resumen por prioridad: recuento, superficie y programa de muestreo sugerido.
     const tiers = (["P1", "P2", "P3"] as const).map((p) => {
       const zs = zones.filter((z) => z.priority === p);
@@ -181,7 +187,14 @@ export async function buildGeologicalMapPdf(o: {
       doc.setFillColor(r, g, b);
       doc.rect(f.m, y - 8, 9, 9, "F");
       const ha = z.ha > 0 ? ` · ${Math.round(z.ha)} ha` : "";
-      y = kvRow(doc, f, y, z.name.split(" · ")[0], `${z.priority}${ha}${z.comment ? ` · ${z.comment}` : ""}`, 70);
+      y = kvRow(
+        doc,
+        f,
+        y,
+        z.name.split(" · ")[0],
+        `${z.priority}${ha}${z.comment ? ` · ${z.comment}` : ""}`,
+        70,
+      );
     }
     font(doc, "body", "normal", 7.4);
     ink(doc, GC_COLOR.slate);

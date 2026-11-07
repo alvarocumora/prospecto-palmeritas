@@ -42,10 +42,14 @@ export function parseRanking(csv: string): PanoRank[] {
 export function panoComment(r: PanoRank): string {
   const parts: string[] = [];
   if (r.slopeLt5Pct >= 15)
-    parts.push(`${r.slopeLt5Pct.toFixed(1)} % del paño con pendiente <5°: superficie apta para retención de saprolito`);
+    parts.push(
+      `${r.slopeLt5Pct.toFixed(1)} % del paño con pendiente <5°: superficie apta para retención de saprolito`,
+    );
   else parts.push(`solo ${r.slopeLt5Pct.toFixed(1)} % con pendiente <5°: relieve más erosivo`);
   if (r.lineamentDensity >= 17)
-    parts.push(`densidad de trazas alta (${r.lineamentDensity.toFixed(1)} km/km²), posible fracturamiento a verificar`);
+    parts.push(
+      `densidad de trazas alta (${r.lineamentDensity.toFixed(1)} km/km²), posible fracturamiento a verificar`,
+    );
   parts.push(
     r.observabilityPct >= 15
       ? `observabilidad óptica ${r.observabilityPct.toFixed(1)} %: permite índices de arcillas`
@@ -54,7 +58,10 @@ export function panoComment(r: PanoRank): string {
   return parts.join("; ") + ".";
 }
 
-export function buildPriorityZones(panos: FeatureCollection, ranking: PanoRank[]): FeatureCollection {
+export function buildPriorityZones(
+  panos: FeatureCollection,
+  ranking: PanoRank[],
+): FeatureCollection {
   const byName = new Map(ranking.map((r) => [r.pano, r]));
   const features: Feature[] = [];
   for (const f of panos.features) {
@@ -81,6 +88,7 @@ export function buildPriorityZones(panos: FeatureCollection, ranking: PanoRank[]
 }
 
 export function summarizeZones(ranking: PanoRank[]) {
-  const by = (p: PanoRank["priority"]) => ranking.filter((r) => r.priority === p).map((r) => r.pano);
+  const by = (p: PanoRank["priority"]) =>
+    ranking.filter((r) => r.priority === p).map((r) => r.pano);
   return { A: by("A"), B: by("B"), C: by("C") };
 }

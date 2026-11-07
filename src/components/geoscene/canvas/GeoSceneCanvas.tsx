@@ -679,8 +679,9 @@ export function GeoSceneCanvas({
                   ? (f: { properties?: Record<string, unknown> }) =>
                       priorityHalo(f.properties?.prioridad, 1)
                   : spectral
-                  ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-                  : [color[0], color[1], color[2], dashed ? 6 : 12],
+                    ? (f: { properties?: Record<string, unknown> }) =>
+                        spectralFill(f.properties, rgb)
+                    : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: grades
             ? (f: { properties?: Record<string, unknown> }) => [
                 ...gradeColorFor(
