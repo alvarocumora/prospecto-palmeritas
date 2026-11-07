@@ -16,6 +16,7 @@ import {
 import { GC_COLOR } from "./brand/tokens";
 import { publicUrl } from "@/lib/publicUrl";
 import { unitColor } from "@/components/geoscene/analysisTools";
+import { PRIORITY_LABEL, suggestedSamplePoints } from "@/components/geoscene/priority";
 import type { GeologyMapSummary } from "@/components/geoscene/geologyMapSummary";
 
 async function sha256(s: string): Promise<string> {
@@ -135,8 +136,79 @@ export async function buildGeologicalMapPdf(o: {
     y += bullets(doc, f.m, y + 8, s.gaps, cw, 8.5) + 6;
   }
 
+  const lin = s.lineamentsCount ?? 0;
+  const zones = s.zones ?? [];
+  const belts = s.belts ?? [];
+  if (lin || zones.length || belts.length) {
+    y = ensure(y + 6, 80);
+    y = section(doc, f, y, "04", "Interpretación · halos y zonas de prioridad");
+    if (belts.length) y = kvRow(doc, f, y, "Franja metalogénica", `${belts.join(" · ")} · OFICIAL`);
+    if (lin)
+      y = kvRow(
+        doc,
+        f,
+        y,
+        "Lineamientos",
+        `${lin} trazas DEM · INTERPRETADO (no fallas verificadas)`,
+      );
+    // Resumen por prioridad: recuento, superficie y programa de muestreo sugerido.
+    const tiers = (["P1", "P2", "P3"] as const).map((p) => {
+      const zs = zones.filter((z) => z.priority === p);
+      return { p, n: zs.length, ha: zs.reduce((s, z) => s + z.ha, 0) };
+    });
+    if (zones.length) {
+      y = ensure(y + 4, 70);
+      font(doc, "body", "bold", 8);
+      ink(doc, IM_NAVY);
+      const cols = [f.m, f.m + 90, f.m + 160, f.m + 260];
+      ["Prioridad", "Zonas", "Superficie", "Malla 200 m sugerida"].forEach((h, i) =>
+        doc.text(h, cols[i], y),
+      );
+      y += 4;
+      doc.setDrawColor(200, 200, 200);
+      doc.line(f.m, y, f.m + cw, y);
+      font(doc, "body", "normal", 8);
+      for (const t of tiers) {
+        y += 12;
+        doc.text(`${t.p} · ${PRIORITY_LABEL[t.p]}`, cols[0], y);
+        doc.text(String(t.n), cols[1], y);
+        doc.text(t.ha > 0 ? `${Math.round(t.ha).toLocaleString("es-CL")} ha` : "—", cols[2], y);
+        doc.text(
+          t.p === "P3" || t.ha <= 0 ? "—" : `~${suggestedSamplePoints(t.ha)} puntos`,
+          cols[3],
+          y,
+        );
+      }
+      y += 14;
+    }
+    for (const z of zones.filter((z) => z.priority !== "P3")) {
+      y = ensure(y, 34);
+      const [r, g, b] = z.priority === "P1" ? [196, 106, 52] : [201, 162, 74];
+      doc.setFillColor(r, g, b);
+      doc.rect(f.m, y - 8, 9, 9, "F");
+      const ha = z.ha > 0 ? ` · ${Math.round(z.ha)} ha` : "";
+      y = kvRow(
+        doc,
+        f,
+        y,
+        z.name.split(" · ")[0],
+        `${z.priority}${ha}${z.comment ? ` · ${z.comment}` : ""}`,
+        70,
+      );
+    }
+    font(doc, "body", "normal", 7.4);
+    ink(doc, GC_COLOR.slate);
+    const note = doc.splitTextToSize(
+      "Prioridades INTERPRETADAS a partir de la evidencia cargada en el visor (morfología, estructuras, teledetección, geoquímica según el proyecto). Ordenan el trabajo de terreno; la malla de muestreo es una propuesta y no constituye anomalía de ley, recurso ni reserva.",
+      cw,
+    ) as string[];
+    y = ensure(y + 4, note.length * 9 + 6);
+    doc.text(note, f.m, y + 6);
+    y += note.length * 9 + 10;
+  }
+
   y = ensure(y + 6, 70);
-  y = section(doc, f, y, "04", "Aviso de alcance");
+  y = section(doc, f, y, "05", "Aviso de alcance");
   font(doc, "body", "normal", 7.6);
   ink(doc, GC_COLOR.inkSoft);
   const notice = [

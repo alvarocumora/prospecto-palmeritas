@@ -5,8 +5,13 @@ import { PathLayer } from "@deck.gl/layers";
 import { supabase } from "@/integrations/supabase/client";
 import { registerAnchors, type AnchorEntry } from "./anchorRegistry";
 import type { GeoSceneFilters } from "../types";
-import { sceneHolePassesTime, sceneInterceptPassesGrade } from "../filterPolicy";
+import {
+  sceneHolePassesTime,
+  sceneInterceptPassesGrade,
+  type DownholeCommodity,
+} from "../filterPolicy";
 import { desurvey, sliceByDepth, type TrajectoryPoint } from "../drillGeometry";
+import { gradeColorFor } from "../sampleGradeStyle";
 
 type Hole = {
   id?: string;
@@ -27,17 +32,25 @@ type Log = {
   depth_from: number | null;
   depth_to: number | null;
   au_gpt: number | null;
+  cu_pct: number | null;
 };
 
 type Vec3 = [number, number, number];
 
 const M_PER_DEG_LAT = 111320;
 
-function auColor(au: number): [number, number, number] {
-  if (au >= 3) return [220, 38, 38];
-  if (au >= 1) return [249, 115, 22];
-  if (au >= 0.3) return [234, 179, 8];
-  if (au > 0) return [34, 197, 94];
+// Rampa propia para Au (5 tramos, calibrados para oro); Cu% reusa la misma
+// rampa de sampleGradeStyle que ya ve el usuario en las muestras de
+// superficie, para que el color signifique lo mismo en toda la escena.
+// Mo no tiene columna en drill_core_logs todavía: sin sondajes que la
+// reporten, no hay nada que colorear por Mo acá.
+function downholeColor(value: number, commodity: DownholeCommodity): [number, number, number] {
+  if (commodity === "cu_pct")
+    return [...gradeColorFor(value, "cu_pct")] as [number, number, number];
+  if (value >= 3) return [220, 38, 38];
+  if (value >= 1) return [249, 115, 22];
+  if (value >= 0.3) return [234, 179, 8];
+  if (value > 0) return [34, 197, 94];
   return [120, 120, 120];
 }
 
@@ -103,6 +116,7 @@ export function useDrillTrajectoriesLayer(
   centerLat: number,
   visibility: DrillTrajectoryVisibility,
   filters?: GeoSceneFilters,
+  commodity: DownholeCommodity = "au_gpt",
 ) {
   const [holes, setHoles] = useState<Hole[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
@@ -128,9 +142,9 @@ export function useDrillTrajectoriesLayer(
           .eq("project_id", projectId),
         supabase
           .from("drill_core_logs")
-          .select("hole_id,depth_from,depth_to,au_gpt")
+          .select("hole_id,depth_from,depth_to,au_gpt,cu_pct")
           .eq("project_id", projectId)
-          .gt("au_gpt", 0),
+          .gt(commodity, 0),
       ]);
       if (cancelled) return;
 
@@ -166,7 +180,7 @@ export function useDrillTrajectoriesLayer(
     return () => {
       cancelled = true;
     };
-  }, [projectId, anyVisible, filters?.timeCursor]);
+  }, [projectId, anyVisible, filters?.timeCursor, commodity]);
 
   function realPath(points: RealTrajectory["points"]): Vec3[] {
     const mPerDegLng = M_PER_DEG_LAT * Math.cos((centerLat * Math.PI) / 180);
@@ -226,6 +240,7 @@ export function useDrillTrajectoriesLayer(
         total,
       );
     };
+    const valueOf = (log: Log) => (commodity === "cu_pct" ? log.cu_pct : log.au_gpt);
     const paths = new Map<string, TrajectoryPoint[]>();
     return logs
       .filter(
@@ -233,7 +248,7 @@ export function useDrillTrajectoriesLayer(
           log.depth_from != null &&
           log.depth_to != null &&
           byHole.has(log.hole_id) &&
-          sceneInterceptPassesGrade(log.au_gpt, filters?.highGradeOnly),
+          sceneInterceptPassesGrade(valueOf(log), filters?.highGradeOnly, commodity),
       )
       .map((log, index) => {
         const hole = byHole.get(log.hole_id)!;
@@ -248,11 +263,11 @@ export function useDrillTrajectoriesLayer(
           path: seg.map(
             (p) => [centerLng + p.x / mPerDegLng, centerLat + p.y / M_PER_DEG_LAT, p.z] as Vec3,
           ),
-          au: Number(log.au_gpt ?? 0),
+          value: Number(valueOf(log) ?? 0),
         };
       })
       .filter((intercept) => intercept.path.length >= 2);
-  }, [holes, logs, real, centerLng, centerLat, filters?.highGradeOnly]);
+  }, [holes, logs, real, centerLng, centerLat, filters?.highGradeOnly, commodity]);
 
   useEffect(() => {
     const entries: AnchorEntry[] = trajectories.map((trajectory) => ({
@@ -305,8 +320,9 @@ export function useDrillTrajectoriesLayer(
           widthUnits: "pixels",
           getPath: (intercept: (typeof intercepts)[number]) => intercept.path,
           getColor: (intercept: (typeof intercepts)[number]) =>
-            [...auColor(intercept.au), 240] as [number, number, number, number],
+            [...downholeColor(intercept.value, commodity), 240] as [number, number, number, number],
           getWidth: 6,
+          updateTriggers: { getColor: [commodity] },
         }),
       );
     }
@@ -319,6 +335,7 @@ export function useDrillTrajectoriesLayer(
     completedTrajectories,
     proposedTrajectories,
     intercepts,
+    commodity,
   ]);
 
   return {

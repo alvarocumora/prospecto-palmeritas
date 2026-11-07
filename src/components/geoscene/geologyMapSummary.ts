@@ -2,6 +2,7 @@
 // para el export "Mapa geológico PDF". Solo lee capas ya resueltas en el
 // visor; no agrega ni interpola datos.
 import type { FeatureCollection } from "geojson";
+import { geometryHectares, normalizePriority, type ExplorationPriority } from "./priority";
 
 const str = (v: unknown) => (v == null || v === "" ? null : String(v));
 
@@ -19,6 +20,11 @@ export type GeologyMapSummary = {
   structuresWithDip: number;
   sheets: string[];
   gaps: string[];
+  /** Lineamientos interpretados visibles (DEM), no fallas verificadas. */
+  lineamentsCount?: number;
+  belts?: string[];
+  /** Zonas de prioridad interpretadas, con comentario determinístico. */
+  zones?: Array<{ name: string; priority: ExplorationPriority; comment: string; ha: number }>;
 };
 
 /**
@@ -90,5 +96,29 @@ export function summarizeProjectGeology(
     structuresWithDip: withDip,
     sheets: [...sheets].sort(),
     gaps,
+    lineamentsCount: get("remote_sensing.lineaments").length,
+    belts: [
+      ...new Set(
+        get("geology.metallogenic_belts")
+          .map((f) => str((f.properties as Record<string, unknown> | null)?.franja))
+          .filter((v): v is string => !!v),
+      ),
+    ],
+    zones: visibleLayers
+      .flatMap((l) => l.data?.features ?? [])
+      .flatMap((f) => {
+        const p = (f.properties ?? {}) as Record<string, unknown>;
+        const priority = normalizePriority(p);
+        if (!priority) return [];
+        return [
+          {
+            name: str(p.nombre) ?? str(p.pano) ?? str(p.target_code) ?? "Zona",
+            priority,
+            comment: str(p.comentario) ?? str(p.descripcion) ?? "",
+            ha: geometryHectares(f.geometry),
+          },
+        ];
+      })
+      .sort((a, b) => a.priority.localeCompare(b.priority)),
   };
 }

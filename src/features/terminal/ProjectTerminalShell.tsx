@@ -3,16 +3,8 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { getTilamaReport } from "@/lib/tilama.functions";
-import {
-  Box,
-  FileText,
-  Landmark,
-  Loader2,
-  Map as MapIcon,
-  MapPin,
-  ShieldCheck,
-} from "lucide-react";
-import { Eyebrow, BrandButton } from "@/components/brand";
+import { FileText, Landmark, Loader2, MapPin, ShieldCheck } from "lucide-react";
+import { Eyebrow } from "@/components/brand";
 import { UnifiedProjectScene } from "@/components/geo/UnifiedProjectScene";
 import { ProjectDocsMenu } from "@/components/documents/ProjectDocsMenu";
 import { fmtUsd0 } from "@/lib/investor/fichas";
@@ -261,8 +253,7 @@ function MapaTab({
   return (
     <>
       <div className="relative">
-        <UnifiedProjectScene slug={project.slug} view={view} />
-        <ViewToggle view={view} onChange={setView} />
+        <UnifiedProjectScene slug={project.slug} view={view} onViewChange={setView} />
       </div>
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando programa" />}>
@@ -285,36 +276,6 @@ function MapaTab({
         </Suspense>
       )}
     </>
-  );
-}
-
-function ViewToggle({ view, onChange }: { view: ProjectView; onChange: (v: ProjectView) => void }) {
-  return (
-    <div className="pointer-events-none absolute left-1/2 top-3 z-30 -translate-x-1/2">
-      <div
-        role="group"
-        aria-label="Vista del proyecto"
-        className="pointer-events-auto inline-flex gap-1 rounded border border-hairline bg-surface/95 p-1 shadow-lg backdrop-blur"
-      >
-        {(["2d", "3d"] as const).map((key) => {
-          const Icon = key === "2d" ? MapIcon : Box;
-          return (
-            <BrandButton
-              key={key}
-              type="button"
-              size="sm"
-              variant={view === key ? "primary" : "ghost"}
-              aria-pressed={view === key}
-              onClick={() => onChange(key)}
-              className="inline-flex min-h-11 items-center justify-center gap-2 px-3 focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-brand"
-            >
-              <Icon />
-              {key === "2d" ? "Planta" : "Perspectiva"}
-            </BrandButton>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 

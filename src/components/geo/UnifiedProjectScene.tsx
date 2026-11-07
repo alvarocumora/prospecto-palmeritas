@@ -29,10 +29,12 @@ export function ProjectSceneFrame({
   project,
   layers,
   view,
+  onViewChange,
 }: {
   project: GeoSceneProject;
   layers: GeoSceneProjectLayer[];
   view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
 }) {
   const official = useOfficialGeology(project.center, project.bbox);
   const allLayers = useMemo<GeoSceneProjectLayer[]>(() => {
@@ -71,6 +73,7 @@ export function ProjectSceneFrame({
           project={project}
           projectLayers={allLayers}
           view={view}
+          onViewChange={onViewChange}
           showModeTabs
           showCopilot={false}
         />
@@ -84,9 +87,11 @@ export function ProjectSceneFrame({
 export function UnifiedProjectScene({
   slug,
   view,
+  onViewChange,
 }: {
   slug: CanonicalProjectSlug;
   view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
 }) {
   return (
     <Suspense
@@ -97,19 +102,28 @@ export function UnifiedProjectScene({
       }
     >
       {slug === "cholqui" ? (
-        <CholquiScene view={view} />
+        <CholquiScene view={view} onViewChange={onViewChange} />
       ) : slug === "losverdes" ? (
-        <LosVerdesScene view={view} />
+        <LosVerdesScene view={view} onViewChange={onViewChange} />
       ) : slug === "nahuelbuta" ? (
-        <NahuelbutaScene view={view} />
+        <NahuelbutaScene view={view} onViewChange={onViewChange} />
       ) : (
-        <PalmerasScene view={view} />
+        <PalmerasScene view={view} onViewChange={onViewChange} />
       )}
     </Suspense>
   );
 }
 
 const LOSVERDES_PROJECT_ID = "7a499b02-ecdf-447b-8956-b106fe4ec087";
+
+/** Centro aproximado de Tilama — placeholder mientras carga la consulta real,
+ * para que la cabecera (Planta/Perspectiva, Capas) no dependa de la carga de
+ * datos y aparezca de inmediato, igual que en las demás escenas. */
+const LOSVERDES_FALLBACK_PROJECT: GeoSceneProject = {
+  id: LOSVERDES_PROJECT_ID,
+  name: "Los Verdes",
+  center: [-71, -32],
+};
 
 // Capas derivadas/propuestas que saturan la vista inicial (aros satelitales,
 // lineamientos, anomalías geofísicas interpretadas, sondajes conceptuales):
@@ -122,7 +136,13 @@ const LOSVERDES_DEFAULT_HIDDEN = new Set<string>([
   "drilling.proposed",
 ]);
 
-function LosVerdesScene({ view }: { view: ProjectView }) {
+function LosVerdesScene({
+  view,
+  onViewChange,
+}: {
+  view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
+}) {
   const emit = useEmitMineralogyLayers("losverdes");
   const fetchData = useServerFn(getLosVerdesMapData);
   const fetchMining = useServerFn(getLosVerdesMining);
@@ -183,16 +203,23 @@ function LosVerdesScene({ view }: { view: ProjectView }) {
         No fue posible cargar las capas de Los Verdes.
       </p>
     );
-  if (!input)
-    return (
-      <div className="h-[620px] grid place-items-center text-content-subtle">
-        Cargando capas de Los Verdes…
-      </div>
-    );
-  return <ProjectSceneFrame {...input} view={view} />;
+  return (
+    <ProjectSceneFrame
+      project={input?.project ?? LOSVERDES_FALLBACK_PROJECT}
+      layers={input?.layers ?? []}
+      view={view}
+      onViewChange={onViewChange}
+    />
+  );
 }
 
-function PalmerasScene({ view }: { view: ProjectView }) {
+function PalmerasScene({
+  view,
+  onViewChange,
+}: {
+  view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
+}) {
   const { concessions, anomalies, drillGrid, tenureNotice, projectId } = usePalmerasLayers();
   const layers = useMemo<GeoSceneProjectLayer[]>(
     () => [
@@ -213,6 +240,7 @@ function PalmerasScene({ view }: { view: ProjectView }) {
         project={{ id: projectId, name: "Las Palmeras", center: [-71.115471, -33.898438] }}
         layers={layers}
         view={view}
+        onViewChange={onViewChange}
       />
     </>
   );

@@ -41,10 +41,18 @@ import {
   type LngLatBBox,
 } from "../clipPlane";
 import { ClipPlanePanel } from "../controls/ClipPlanePanel";
+import {
+  PRIORITIES,
+  filterByPriority,
+  normalizePriority,
+  type ExplorationPriority,
+} from "../priority";
+
+const DEFAULT_ACTIVE_PRIORITIES = new Set(PRIORITIES);
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
-import { projectCamera } from "../cameraPolicy";
+import { miningViewCamera, projectCamera, type MiningViewPreset } from "../cameraPolicy";
 import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -93,6 +101,13 @@ interface Props {
   layerOpacity?: Readonly<Record<string, number>>;
   processedScene?: ProcessedSceneOverlay | null;
   sampleGradeFilter?: { commodity: GradeCommodity; cutoff: number } | null;
+  /** Selector Cu%/Au de Tesis, independiente de si la capa de muestras de
+   * superficie está encendida — así ocultar esa capa para aislar los
+   * sondajes no revierte silenciosamente su color/filtro a Au. */
+  commodity?: GradeCommodity;
+  /** Filtro P1/P2/P3 — vive en GeoScene3D para poder mostrarse dentro del
+   * árbol de capas en vez de en una tarjeta flotante aparte. */
+  activePriorities?: ReadonlySet<ExplorationPriority>;
 }
 
 // Base MapLibre + DEM Terrarium servido por proxy propio.
@@ -129,6 +144,14 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
   },
 };
 
+/** Halo por prioridad de reconocimiento (A cobre intenso, B oro, C tenue). */
+function priorityHalo(raw: unknown, fill: 0 | 1): [number, number, number, number] {
+  const p = normalizePriority({ prioridad: raw });
+  if (p === "P1") return fill ? [196, 106, 52, 95] : [196, 106, 52, 255];
+  if (p === "P2") return fill ? [201, 162, 74, 60] : [201, 162, 74, 220];
+  return fill ? [120, 130, 150, 14] : [120, 130, 150, 120];
+}
+
 function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
   const center = map.getCenter();
   const bounds = map.getBounds();
@@ -156,6 +179,8 @@ export function GeoSceneCanvas({
   layerOpacity,
   processedScene,
   sampleGradeFilter,
+  commodity,
+  activePriorities: activePrioritiesProp,
 }: Props) {
   const { active: activeProject } = useProjects();
   const { user } = useAuth();
@@ -228,6 +253,10 @@ export function GeoSceneCanvas({
       intercepts: interceptsVisible,
     },
     filters,
+    // Sigue el mismo selector Cu%/Mo ppm de Tesis (Fase 1), independiente de
+    // si la capa de muestras de superficie está encendida. Mo no tiene
+    // columna en drill_core_logs todavía, así que para Mo se mantiene Au.
+    commodity === "cu_pct" ? "cu_pct" : "au_gpt",
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
@@ -586,6 +615,7 @@ export function GeoSceneCanvas({
       parameters: { depthTest: false } as never,
     });
   }, [sectionOn, sectionPts, drape]);
+  const activePriorities = activePrioritiesProp ?? DEFAULT_ACTIVE_PRIORITIES;
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
     return resolvedProjectLayers
@@ -595,10 +625,12 @@ export function GeoSceneCanvas({
         const dashed = isDashedEvidence(layer.definition.evidence);
         const spectral = SPECTRAL_LAYER_IDS.has(layer.id);
         const rgb: [number, number, number] = [color[0], color[1], color[2]];
-        const source =
+        const source = filterByPriority(
           layer.id === "remote_sensing.hyperspectral"
             ? filterSpectral(layer.data as FeatureCollection, spectralTop, includeOxides)
-            : (layer.data as FeatureCollection);
+            : (layer.data as FeatureCollection),
+          activePriorities,
+        );
         const units = layer.id === "geology.official_map_units";
         const grades = layer.id === "sampling.results" && sampleGradeFilter;
         const graded = grades
@@ -652,9 +684,13 @@ export function GeoSceneCanvas({
                 ]
               : layer.id === "territory.cadastre"
                 ? [color[0], color[1], color[2], 0]
-                : spectral
-                  ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
-                  : [color[0], color[1], color[2], dashed ? 6 : 12],
+                : layer.id === "targets.exploration"
+                  ? (f: { properties?: Record<string, unknown> }) =>
+                      priorityHalo(f.properties?.prioridad, 1)
+                  : spectral
+                    ? (f: { properties?: Record<string, unknown> }) =>
+                        spectralFill(f.properties, rgb)
+                    : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: grades
             ? (f: { properties?: Record<string, unknown> }) => [
                 ...gradeColorFor(
@@ -670,7 +706,10 @@ export function GeoSceneCanvas({
                 }
               : layer.id === "territory.cadastre"
                 ? [color[0], color[1], color[2], 150]
-                : color,
+                : layer.id === "targets.exploration"
+                  ? (f: { properties?: Record<string, unknown> }) =>
+                      priorityHalo(f.properties?.prioridad, 0)
+                  : color,
           getLineWidth: layer.id === "territory.cadastre" ? 1 : dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",
@@ -708,6 +747,7 @@ export function GeoSceneCanvas({
     includeOxides,
     sampleGradeFilter,
     clipState,
+    activePriorities,
   ]);
   const planes = useMemo(() => {
     const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;
@@ -1213,6 +1253,13 @@ export function GeoSceneCanvas({
         }}
         measurePts={measurePts}
         elevations={measurePts.map((p) => drape?.sample(p[0], p[1]) ?? null)}
+        onViewPreset={
+          view === "3d"
+            ? (preset: MiningViewPreset) => {
+                mapRef.current?.easeTo({ ...miningViewCamera(preset), duration: 700 });
+              }
+            : undefined
+        }
         stereoOpen={stereoOpen}
         onStereo={setStereoOpen}
         planes={planes}
