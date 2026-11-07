@@ -25,6 +25,7 @@ export function ViewTabs({
             type="button"
             onClick={() => onChange(v)}
             aria-pressed={active}
+            aria-label={LABEL[v]}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[11px] font-mono transition-colors border-l border-border first:border-l-0 ${
               active ? "bg-gold text-background" : "text-foreground hover:bg-accent"
             }`}
