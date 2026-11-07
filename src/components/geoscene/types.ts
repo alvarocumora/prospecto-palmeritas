@@ -28,6 +28,9 @@ export type GeoSceneFilters = {
 
 export type GeoSceneProps = {
   view?: ProjectView;
+  /** Muestra Planta/Perspectiva en la cabecera propia del visor en vez de un
+   * control flotante aparte (evita que ambos se monten uno sobre otro). */
+  onViewChange?: (view: ProjectView) => void;
   showCopilot?: boolean;
   mode?: GeoSceneMode;
   variant?: GeoSceneVariant;

@@ -45,12 +45,19 @@ const layers: GeoSceneProjectLayer[] = [
       "Ranking geomorfológico 2026-10-27 (pendiente <5°, mesetas, densidad de trazas, observabilidad S2) · INTERPRETADO",
   },
 ];
-export function NahuelbutaScene({ view }: { view: ProjectView }) {
+export function NahuelbutaScene({
+  view,
+  onViewChange,
+}: {
+  view: ProjectView;
+  onViewChange?: (view: ProjectView) => void;
+}) {
   return (
     <ProjectSceneFrame
       project={{ id: "nahuelbuta", name: "Nahuelbuta", center: [-73.2, -37.64] }}
       layers={layers}
       view={view}
+      onViewChange={onViewChange}
     />
   );
 }

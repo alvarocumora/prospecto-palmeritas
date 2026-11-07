@@ -3,14 +3,19 @@ import { SPECTRAL_LAYER_IDS, legendClasses } from "./spectralStyle";
 import { BrandButton } from "@/components/brand";
 import { Loader2, Sparkles, Crosshair, X, Layers3, Box } from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
+import { ViewTabs } from "./controls/ViewTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
 import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchors";
 import { SceneLayerPanel } from "./controls/SceneLayerPanel";
 import { initialGeoSceneLayerIds } from "./layerPolicy";
 import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
+import { resolveProjectLayers } from "./projectLayers";
+import { PRIORITIES, normalizePriority, type ExplorationPriority } from "./priority";
+import type { FeatureCollection } from "geojson";
 import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   PROCESSED_INDICES,
   RAMP_CSS,
@@ -40,6 +45,7 @@ const GeoSceneCanvas = lazy(() =>
  */
 export function GeoScene3D({
   view = "3d",
+  onViewChange,
   showCopilot = true,
   mode: modeProp,
   variant = "default",
@@ -54,7 +60,15 @@ export function GeoScene3D({
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
+  const isMobile = useIsMobile();
   const [layerPanelOpen, setLayerPanelOpen] = useState(true);
+  // El panel de capas (izquierda) y la cabecera (derecha) comparten la misma
+  // franja superior; en mobile el panel, casi tan ancho como la pantalla,
+  // termina tapando los botones Planta/Perspectiva/Capas. Se cierra por
+  // defecto solo ahí, el usuario lo reabre con el botón "Capas".
+  useEffect(() => {
+    if (isMobile) setLayerPanelOpen(false);
+  }, [isMobile]);
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
     const ids = initialGeoSceneLayerIds(initialPreset);
     for (const layer of projectLayers ?? []) {
@@ -84,6 +98,21 @@ export function GeoScene3D({
   }, [projectLayers]);
 
   const [layerOpacity, setLayerOpacity] = useState<Record<string, number>>({});
+  const [activePriorities, setActivePriorities] = useState<ReadonlySet<ExplorationPriority>>(
+    () => new Set(PRIORITIES),
+  );
+  const resolvedForPriority = useMemo(() => resolveProjectLayers(projectLayers), [projectLayers]);
+  const prioritizedLayers = useMemo(
+    () =>
+      resolvedForPriority.filter(
+        (l) =>
+          enabledLayerIds.has(l.id) &&
+          (l.data as FeatureCollection | undefined)?.features?.some((f) =>
+            normalizePriority(f.properties as Record<string, unknown>),
+          ),
+      ),
+    [resolvedForPriority, enabledLayerIds],
+  );
   const [sampleCommodity, setSampleCommodity] = useState<GradeCommodity>("cu_pct");
   const [sampleCutoff, setSampleCutoff] = useState(0);
   const sampleLayer = projectLayers?.find((layer) => layer.id === "sampling.results");
@@ -162,6 +191,7 @@ export function GeoScene3D({
               <Layers3 className="h-3.5 w-3.5" /> Capas · {enabledLayerIds.size}
             </BrandButton>
           }
+          {onViewChange && <ViewTabs view={view} onChange={onViewChange} />}
           {showModeTabs && <ModeTabs mode={mode} onChange={setInternalMode} />}
         </div>
       }
@@ -183,6 +213,7 @@ export function GeoScene3D({
                 sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
               }
               commodity={sampleCommodity}
+              activePriorities={activePriorities}
             />
           )}
           {mode === "resource" && <ResourceModeStub />}
@@ -202,33 +233,12 @@ export function GeoScene3D({
           )}
           opacity={layerOpacity}
           onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
+          priorityLayers={prioritizedLayers}
+          activePriorities={activePriorities}
+          onPriorityChange={setActivePriorities}
+          spectralLegend={spectralLegend}
         />
       }
-
-      {spectralLegend.length > 0 && (
-        <div
-          className="absolute bottom-10 right-3 z-20 max-w-[16rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
-          aria-label="Leyenda espectral"
-        >
-          <div className="mb-1.5 uppercase tracking-wider text-muted-foreground">
-            Firmas espectrales · modeladas
-          </div>
-          <ul className="space-y-1">
-            {spectralLegend.map((item) => (
-              <li key={item.label} className="flex items-center gap-2 text-foreground">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                  style={{ backgroundColor: `rgb(${item.color.join(",")})` }}
-                />
-                {item.label}
-              </li>
-            ))}
-          </ul>
-          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
-            Intensidad = opacidad del polígono. Hipótesis de priorización, no ensayes ni recursos.
-          </p>
-        </div>
-      )}
 
       {processedData && processedData.features.length > 0 && mode !== "resource" && (
         <div
