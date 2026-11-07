@@ -15,6 +15,7 @@ import { PRIORITIES, normalizePriority, type ExplorationPriority } from "./prior
 import type { FeatureCollection } from "geojson";
 import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
+import { useIsMobile } from "@/hooks/use-mobile";
 import {
   PROCESSED_INDICES,
   RAMP_CSS,
@@ -59,7 +60,15 @@ export function GeoScene3D({
   const mode = modeProp ?? internalMode;
   const meta = MODE_LABELS[mode];
   const [focus, setFocus] = useState<SceneFocusDetail | null>(null);
+  const isMobile = useIsMobile();
   const [layerPanelOpen, setLayerPanelOpen] = useState(true);
+  // El panel de capas (izquierda) y la cabecera (derecha) comparten la misma
+  // franja superior; en mobile el panel, casi tan ancho como la pantalla,
+  // termina tapando los botones Planta/Perspectiva/Capas. Se cierra por
+  // defecto solo ahí, el usuario lo reabre con el botón "Capas".
+  useEffect(() => {
+    if (isMobile) setLayerPanelOpen(false);
+  }, [isMobile]);
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
     const ids = initialGeoSceneLayerIds(initialPreset);
     for (const layer of projectLayers ?? []) {
