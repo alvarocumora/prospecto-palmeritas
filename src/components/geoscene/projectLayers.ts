@@ -110,6 +110,10 @@ export function projectLayerTooltip(
     "delta_angular_deg",
     "distancia_m",
     "halo_emit_300m",
+    "pendiente_lt5_pct",
+    "densidad_trazas_km_km2",
+    "observabilidad_pct",
+    "comentario",
   ]) {
     const value = properties?.[key];
     if (value != null && value !== "") lines.push(`${key}: ${String(value)}`);

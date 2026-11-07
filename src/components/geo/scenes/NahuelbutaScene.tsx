@@ -5,6 +5,8 @@ import pedimentosRaw from "@/data/geo/losalamos_pedimentos_nuevos.geojson?raw";
 import catastroRaw from "@/data/geo/losalamos_catastro_sngm.geojson?raw";
 import franjasRaw from "@/data/geo/losalamos_franjas.geojson?raw";
 import lineamientosRaw from "@/data/geo/losalamos_lineamientos.geojson?raw";
+import rankingCsv from "../../../../reports/nahuelbuta/2026-10-27/ranking_by_pano.csv?raw";
+import { buildPriorityZones, parseRanking } from "@/lib/nahuelbuta/prospectivity";
 import { ProjectSceneFrame } from "../UnifiedProjectScene";
 import type { ProjectView } from "@/lib/projects/navigation";
 import type { GeoSceneProjectLayer } from "@/components/geoscene/projectLayers";
@@ -32,9 +34,14 @@ const layers: GeoSceneProjectLayer[] = [
   {
     id: "remote_sensing.lineaments",
     data: parse(lineamientosRaw),
-    defaultVisible: false,
     source:
       "Copernicus DEM GLO-30 · Canny/Hough (2026-10-27); lineamientos INTERPRETADOS, no fallas verificadas",
+  },
+  {
+    id: "targets.exploration",
+    data: buildPriorityZones(parse(panosRaw), parseRanking(rankingCsv)),
+    source:
+      "Ranking geomorfológico 2026-10-27 (pendiente <5°, mesetas, densidad de trazas, observabilidad S2) · INTERPRETADO",
   },
 ];
 export function NahuelbutaScene({ view }: { view: ProjectView }) {

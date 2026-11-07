@@ -127,6 +127,13 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
   },
 };
 
+/** Halo por prioridad de reconocimiento (A cobre intenso, B oro, C tenue). */
+function priorityHalo(p: unknown, fill: 0 | 1): [number, number, number, number] {
+  if (p === "A") return fill ? [196, 106, 52, 95] : [196, 106, 52, 255];
+  if (p === "B") return fill ? [201, 162, 74, 60] : [201, 162, 74, 220];
+  return fill ? [120, 130, 150, 14] : [120, 130, 150, 120];
+}
+
 function mapSnapshotViewState(map: MapLibreMap): GeoSnapshotViewState {
   const center = map.getCenter();
   const bounds = map.getBounds();
@@ -637,7 +644,10 @@ export function GeoSceneCanvas({
                 ]
               : layer.id === "territory.cadastre"
                 ? [color[0], color[1], color[2], 0]
-                : spectral
+                : layer.id === "targets.exploration"
+                  ? (f: { properties?: Record<string, unknown> }) =>
+                      priorityHalo(f.properties?.prioridad, 1)
+                  : spectral
                   ? (f: { properties?: Record<string, unknown> }) => spectralFill(f.properties, rgb)
                   : [color[0], color[1], color[2], dashed ? 6 : 12],
           getLineColor: grades
@@ -655,7 +665,10 @@ export function GeoSceneCanvas({
                 }
               : layer.id === "territory.cadastre"
                 ? [color[0], color[1], color[2], 150]
-                : color,
+                : layer.id === "targets.exploration"
+                  ? (f: { properties?: Record<string, unknown> }) =>
+                      priorityHalo(f.properties?.prioridad, 0)
+                  : color,
           getLineWidth: layer.id === "territory.cadastre" ? 1 : dashed ? 1.25 : 1.75,
           lineWidthUnits: "pixels",
           pointType: "circle",

@@ -19,6 +19,11 @@ export type GeologyMapSummary = {
   structuresWithDip: number;
   sheets: string[];
   gaps: string[];
+  /** Lineamientos interpretados visibles (DEM), no fallas verificadas. */
+  lineamentsCount?: number;
+  belts?: string[];
+  /** Zonas de prioridad interpretadas, con comentario determinístico. */
+  zones?: Array<{ name: string; priority: string; comment: string }>;
 };
 
 /**
@@ -90,5 +95,24 @@ export function summarizeProjectGeology(
     structuresWithDip: withDip,
     sheets: [...sheets].sort(),
     gaps,
+    lineamentsCount: get("remote_sensing.lineaments").length,
+    belts: [
+      ...new Set(
+        get("geology.metallogenic_belts")
+          .map((f) => str((f.properties as Record<string, unknown> | null)?.franja))
+          .filter((v): v is string => !!v),
+      ),
+    ],
+    zones: get("targets.exploration")
+      .map((f) => {
+        const p = (f.properties ?? {}) as Record<string, unknown>;
+        return {
+          name: str(p.nombre) ?? "Zona",
+          priority: str(p.prioridad) ?? "",
+          comment: str(p.comentario) ?? "",
+        };
+      })
+      .filter((z) => z.priority && z.priority !== "C")
+      .sort((a, b) => a.priority.localeCompare(b.priority)),
   };
 }

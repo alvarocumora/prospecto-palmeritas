@@ -135,8 +135,35 @@ export async function buildGeologicalMapPdf(o: {
     y += bullets(doc, f.m, y + 8, s.gaps, cw, 8.5) + 6;
   }
 
+  const lin = s.lineamentsCount ?? 0;
+  const zones = s.zones ?? [];
+  const belts = s.belts ?? [];
+  if (lin || zones.length || belts.length) {
+    y = ensure(y + 6, 80);
+    y = section(doc, f, y, "04", "Interpretación · halos y zonas de prioridad");
+    if (belts.length) y = kvRow(doc, f, y, "Franja metalogénica", `${belts.join(" · ")} · OFICIAL`);
+    if (lin)
+      y = kvRow(doc, f, y, "Lineamientos", `${lin} trazas DEM · INTERPRETADO (no fallas verificadas)`);
+    for (const z of zones) {
+      y = ensure(y, 34);
+      const [r, g, b] = z.priority === "A" ? [196, 106, 52] : [201, 162, 74];
+      doc.setFillColor(r, g, b);
+      doc.rect(f.m, y - 8, 9, 9, "F");
+      y = kvRow(doc, f, y, z.name.split(" · ")[0], `Prioridad ${z.priority} · ${z.comment}`, 70);
+    }
+    font(doc, "body", "normal", 7.4);
+    ink(doc, GC_COLOR.slate);
+    const note = doc.splitTextToSize(
+      "Halos derivados de pendiente, mesetas, densidad de trazas y observabilidad Sentinel-2 (ranking 2026-10-27). Priorizan terreno para muestreo de saprolito; no son anomalías de ley ni recursos.",
+      cw,
+    ) as string[];
+    y = ensure(y + 4, note.length * 9 + 6);
+    doc.text(note, f.m, y + 6);
+    y += note.length * 9 + 10;
+  }
+
   y = ensure(y + 6, 70);
-  y = section(doc, f, y, "04", "Aviso de alcance");
+  y = section(doc, f, y, "05", "Aviso de alcance");
   font(doc, "body", "normal", 7.6);
   ink(doc, GC_COLOR.inkSoft);
   const notice = [
