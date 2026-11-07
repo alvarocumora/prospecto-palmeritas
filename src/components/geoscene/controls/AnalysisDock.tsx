@@ -33,6 +33,9 @@ export function AnalysisDock({
   sectionOn,
   sectionLabel,
   onSection,
+  clipOn,
+  clipLabel,
+  onClip,
   propertyOn = false,
   onProperty,
   onGeologyMap,
@@ -56,6 +59,9 @@ export function AnalysisDock({
   sectionOn: boolean;
   sectionLabel: string;
   onSection: () => void;
+  clipOn?: boolean;
+  clipLabel?: string;
+  onClip?: () => void;
   propertyOn?: boolean;
   onProperty?: () => void;
   onGeologyMap?: () => void;
@@ -137,6 +143,16 @@ export function AnalysisDock({
         >
           {sectionLabel}
         </button>
+        {onClip && (
+          <button
+            type="button"
+            aria-pressed={Boolean(clipOn)}
+            onClick={onClip}
+            className={btn(Boolean(clipOn))}
+          >
+            {clipLabel ?? "Corte 3D"}
+          </button>
+        )}
         {onProperty && (
           <button
             type="button"
