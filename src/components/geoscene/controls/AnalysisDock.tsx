@@ -1,6 +1,7 @@
 import type { SpectralTop } from "../analysisTools";
 import { pathLength, polygonArea, schmidtPole } from "../analysisTools";
 import type { StructurePlane } from "../structuralPlanes";
+import { MINING_VIEW_LABEL, type MiningViewPreset } from "../cameraPolicy";
 
 type LngLat = [number, number];
 
@@ -40,6 +41,7 @@ export function AnalysisDock({
   onProperty,
   onGeologyMap,
   geologyMapBusy = false,
+  onViewPreset,
 }: {
   spectralTop: SpectralTop;
   onSpectralTop: (v: SpectralTop) => void;
@@ -66,6 +68,8 @@ export function AnalysisDock({
   onProperty?: () => void;
   onGeologyMap?: () => void;
   geologyMapBusy?: boolean;
+  /** Cubo de orientación minero: Planta / Isométrica / Sección N / Sección E. */
+  onViewPreset?: (preset: MiningViewPreset) => void;
 }) {
   const len = pathLength(measurePts);
   const area = polygonArea(measurePts);
@@ -212,6 +216,26 @@ export function AnalysisDock({
               Óxidos
             </label>
           </>
+        )}
+        {onViewPreset && (
+          <select
+            aria-label="Vista de cámara"
+            defaultValue=""
+            onChange={(e) => {
+              if (e.target.value) onViewPreset(e.target.value as MiningViewPreset);
+              e.target.value = "";
+            }}
+            className="min-h-9 rounded border border-hairline bg-surface px-2 font-mono text-[10px] text-content"
+          >
+            <option value="" disabled>
+              Vista…
+            </option>
+            {(Object.keys(MINING_VIEW_LABEL) as MiningViewPreset[]).map((p) => (
+              <option key={p} value={p}>
+                {MINING_VIEW_LABEL[p]}
+              </option>
+            ))}
+          </select>
         )}
         {hasTerrain && (
           <label className="flex min-h-9 items-center gap-1.5 px-1 font-mono text-[10px] text-content">

@@ -42,7 +42,7 @@ import { ClipPlanePanel } from "../controls/ClipPlanePanel";
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
-import { projectCamera } from "../cameraPolicy";
+import { miningViewCamera, projectCamera, type MiningViewPreset } from "../cameraPolicy";
 import { useAuth } from "@/hooks/useAuth";
 import "maplibre-gl/dist/maplibre-gl.css";
 
@@ -226,6 +226,10 @@ export function GeoSceneCanvas({
       intercepts: interceptsVisible,
     },
     filters,
+    // Sigue el mismo selector Cu%/Mo ppm de las muestras de superficie
+    // (Fase 1) cuando está en Cu — Mo no tiene columna en drill_core_logs
+    // todavía, así que para Mo (o sin selector) se mantiene el color por Au.
+    sampleGradeFilter?.commodity === "cu_pct" ? "cu_pct" : "au_gpt",
   );
 
   const { layer: anomaliesLayer, count: anomaliesCount } = useGeophysAnomaliesLayer(
@@ -1198,6 +1202,13 @@ export function GeoSceneCanvas({
         }}
         measurePts={measurePts}
         elevations={measurePts.map((p) => drape?.sample(p[0], p[1]) ?? null)}
+        onViewPreset={
+          view === "3d"
+            ? (preset: MiningViewPreset) => {
+                mapRef.current?.easeTo({ ...miningViewCamera(preset), duration: 700 });
+              }
+            : undefined
+        }
         stereoOpen={stereoOpen}
         onStereo={setStereoOpen}
         planes={planes}

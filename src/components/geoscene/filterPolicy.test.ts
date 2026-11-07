@@ -27,6 +27,12 @@ describe("GeoScene3D filter policy", () => {
     expect(sceneInterceptPassesGrade(0.2, false)).toBe(true);
   });
 
+  it("applies a per-commodity high-grade threshold", () => {
+    expect(sceneInterceptPassesGrade(1.0, true, "cu_pct")).toBe(true);
+    expect(sceneInterceptPassesGrade(0.99, true, "cu_pct")).toBe(false);
+    expect(sceneInterceptPassesGrade(1.0, true, "au_gpt")).toBe(true);
+  });
+
   it("produces a deterministic snapshot-ready filter manifest", () => {
     expect(
       sceneFilterManifest({
