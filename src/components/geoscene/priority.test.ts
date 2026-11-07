@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { filterByPriority, geometryHectares, normalizePriority, suggestedSamplePoints } from "./priority";
+import {
+  filterByPriority,
+  geometryHectares,
+  normalizePriority,
+  suggestedSamplePoints,
+} from "./priority";
 
 describe("prioridad de exploración", () => {
   it("normaliza A/B/C y P1–P3", () => {
@@ -12,7 +17,15 @@ describe("prioridad de exploración", () => {
     const d = 1000 / 111320;
     const ha = geometryHectares({
       type: "Polygon",
-      coordinates: [[[0, 0], [d, 0], [d, d], [0, d], [0, 0]]],
+      coordinates: [
+        [
+          [0, 0],
+          [d, 0],
+          [d, d],
+          [0, d],
+          [0, 0],
+        ],
+      ],
     });
     expect(ha).toBeGreaterThan(98);
     expect(ha).toBeLessThan(102);
