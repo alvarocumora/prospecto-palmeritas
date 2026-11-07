@@ -76,7 +76,21 @@ export function resolveProjectLayers(
   });
 }
 
-const NAME_KEYS = ["nombre", "name", "NOMBRE", "code", "codigo", "concesion", "id"];
+const NAME_KEYS = [
+  "nombre",
+  "name",
+  "NOMBRE",
+  "pano",
+  "target_code",
+  "sample_id",
+  "sample_code",
+  "code",
+  "codigo",
+  "concesion",
+  "rol",
+  "veta",
+  "id",
+];
 
 export function featureLabel(properties: Record<string, unknown> | null | undefined): string {
   if (!properties) return "Elemento";

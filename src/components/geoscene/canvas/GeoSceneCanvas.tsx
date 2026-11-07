@@ -39,6 +39,13 @@ import {
   type ClipAxis,
 } from "../clipPlane";
 import { ClipPlanePanel } from "../controls/ClipPlanePanel";
+import { PriorityPanel } from "../controls/PriorityPanel";
+import {
+  PRIORITIES,
+  filterByPriority,
+  normalizePriority,
+  type ExplorationPriority,
+} from "../priority";
 import type { FeatureCollection } from "geojson";
 import { Loader2 } from "lucide-react";
 import type { ProjectView } from "@/lib/projects/navigation";
@@ -128,9 +135,10 @@ const MAP_STYLE: maplibregl.StyleSpecification = {
 };
 
 /** Halo por prioridad de reconocimiento (A cobre intenso, B oro, C tenue). */
-function priorityHalo(p: unknown, fill: 0 | 1): [number, number, number, number] {
-  if (p === "A") return fill ? [196, 106, 52, 95] : [196, 106, 52, 255];
-  if (p === "B") return fill ? [201, 162, 74, 60] : [201, 162, 74, 220];
+function priorityHalo(raw: unknown, fill: 0 | 1): [number, number, number, number] {
+  const p = normalizePriority({ prioridad: raw });
+  if (p === "P1") return fill ? [196, 106, 52, 95] : [196, 106, 52, 255];
+  if (p === "P2") return fill ? [201, 162, 74, 60] : [201, 162, 74, 220];
   return fill ? [120, 130, 150, 14] : [120, 130, 150, 120];
 }
 
@@ -578,6 +586,18 @@ export function GeoSceneCanvas({
       parameters: { depthTest: false } as never,
     });
   }, [sectionOn, sectionPts, drape]);
+  const [activePriorities, setActivePriorities] = useState<ReadonlySet<ExplorationPriority>>(
+    () => new Set(PRIORITIES),
+  );
+  const prioritizedLayers = useMemo(
+    () =>
+      resolvedProjectLayers.filter((l) =>
+        (l.data as FeatureCollection | undefined)?.features?.some((f) =>
+          normalizePriority(f.properties as Record<string, unknown>),
+        ),
+      ),
+    [resolvedProjectLayers],
+  );
   const projectGeoLayers = useMemo(() => {
     if (mode === "resource") return [];
     return resolvedProjectLayers
@@ -587,10 +607,12 @@ export function GeoSceneCanvas({
         const dashed = isDashedEvidence(layer.definition.evidence);
         const spectral = SPECTRAL_LAYER_IDS.has(layer.id);
         const rgb: [number, number, number] = [color[0], color[1], color[2]];
-        const source =
+        const source = filterByPriority(
           layer.id === "remote_sensing.hyperspectral"
             ? filterSpectral(layer.data as FeatureCollection, spectralTop, includeOxides)
-            : (layer.data as FeatureCollection);
+            : (layer.data as FeatureCollection),
+          activePriorities,
+        );
         const units = layer.id === "geology.official_map_units";
         const grades = layer.id === "sampling.results" && sampleGradeFilter;
         const graded = grades
@@ -706,6 +728,7 @@ export function GeoSceneCanvas({
     includeOxides,
     sampleGradeFilter,
     clipState,
+    activePriorities,
   ]);
   const planes = useMemo(() => {
     const fc = resolvedProjectLayers.find((l) => l.id === "geology.structures")?.data;
@@ -1263,6 +1286,13 @@ export function GeoSceneCanvas({
               .join(", ") || "ninguna"
           }. Imagen base: Esri World Imagery.`}
           onClose={() => setPropertyOpen(false)}
+        />
+      )}
+      {mode !== "resource" && prioritizedLayers.some((l) => visibleLayerIds.has(l.id)) && (
+        <PriorityPanel
+          layers={prioritizedLayers.filter((l) => visibleLayerIds.has(l.id))}
+          active={activePriorities}
+          onChange={setActivePriorities}
         />
       )}
       {(() => {

@@ -2,6 +2,7 @@
 // para el export "Mapa geológico PDF". Solo lee capas ya resueltas en el
 // visor; no agrega ni interpola datos.
 import type { FeatureCollection } from "geojson";
+import { geometryHectares, normalizePriority, type ExplorationPriority } from "./priority";
 
 const str = (v: unknown) => (v == null || v === "" ? null : String(v));
 
@@ -23,7 +24,7 @@ export type GeologyMapSummary = {
   lineamentsCount?: number;
   belts?: string[];
   /** Zonas de prioridad interpretadas, con comentario determinístico. */
-  zones?: Array<{ name: string; priority: string; comment: string }>;
+  zones?: Array<{ name: string; priority: ExplorationPriority; comment: string; ha: number }>;
 };
 
 /**
@@ -103,16 +104,21 @@ export function summarizeProjectGeology(
           .filter((v): v is string => !!v),
       ),
     ],
-    zones: get("targets.exploration")
-      .map((f) => {
+    zones: visibleLayers
+      .flatMap((l) => l.data?.features ?? [])
+      .flatMap((f) => {
         const p = (f.properties ?? {}) as Record<string, unknown>;
-        return {
-          name: str(p.nombre) ?? "Zona",
-          priority: str(p.prioridad) ?? "",
-          comment: str(p.comentario) ?? "",
-        };
+        const priority = normalizePriority(p);
+        if (!priority) return [];
+        return [
+          {
+            name: str(p.nombre) ?? str(p.pano) ?? str(p.target_code) ?? "Zona",
+            priority,
+            comment: str(p.comentario) ?? str(p.descripcion) ?? "",
+            ha: geometryHectares(f.geometry),
+          },
+        ];
       })
-      .filter((z) => z.priority && z.priority !== "C")
       .sort((a, b) => a.priority.localeCompare(b.priority)),
   };
 }

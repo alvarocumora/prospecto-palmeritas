@@ -34,6 +34,7 @@ const layers: GeoSceneProjectLayer[] = [
   {
     id: "remote_sensing.lineaments",
     data: parse(lineamientosRaw),
+    defaultVisible: false,
     source:
       "Copernicus DEM GLO-30 · Canny/Hough (2026-10-27); lineamientos INTERPRETADOS, no fallas verificadas",
   },
