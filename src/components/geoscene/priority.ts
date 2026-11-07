@@ -57,7 +57,11 @@ export function geometryHectares(g: Geometry | null | undefined): number {
 export type PriorityStats = Record<ExplorationPriority, { count: number; ha: number }>;
 
 export function priorityStats(fc: FeatureCollection | undefined): PriorityStats {
-  const s: PriorityStats = { P1: { count: 0, ha: 0 }, P2: { count: 0, ha: 0 }, P3: { count: 0, ha: 0 } };
+  const s: PriorityStats = {
+    P1: { count: 0, ha: 0 },
+    P2: { count: 0, ha: 0 },
+    P3: { count: 0, ha: 0 },
+  };
   for (const f of fc?.features ?? []) {
     const p = normalizePriority(f.properties as Record<string, unknown>);
     if (!p) continue;
