@@ -62,7 +62,23 @@ export function useWireframesLayer(
           indices: { value: indices, size: 1 },
         };
         const color = COMMODITY_COLOR[(w.commodity ?? "").toLowerCase()] ?? COMMODITY_COLOR.default;
-        return { id: w.id, name: w.name, mesh, color };
+        // Bounding box en lng/lat: permite al corte 3D (clipPlane) decidir si
+        // esta malla cruza el corredor, sin tener que probar cada vértice. Un
+        // solo centroide no alcanza: un cuerpo extendido puede cruzar el
+        // corredor aunque su centroide caiga fuera de él.
+        let minLng = Infinity;
+        let maxLng = -Infinity;
+        let minLat = Infinity;
+        let maxLat = -Infinity;
+        for (let i = 0; i < verts.length; i++) {
+          const lng = positions[i * 3];
+          const lat = positions[i * 3 + 1];
+          if (lng < minLng) minLng = lng;
+          if (lng > maxLng) maxLng = lng;
+          if (lat < minLat) minLat = lat;
+          if (lat > maxLat) maxLat = lat;
+        }
+        return { id: w.id, name: w.name, mesh, color, bbox: { minLng, maxLng, minLat, maxLat } };
       });
   }, [wireframes, centerLng, centerLat, visible]);
 
@@ -79,6 +95,8 @@ export function useWireframesLayer(
             getColor: [...m.color, 180] as [number, number, number, number],
             wireframe: false,
             pickable: true,
+            // Lo consume el corte 3D para decidir si esta malla cruza el corredor.
+            ...({ geoMeshBBox: m.bbox } as Record<string, unknown>),
           }),
       ),
     [meshes],
