@@ -62,7 +62,22 @@ export function useWireframesLayer(
           indices: { value: indices, size: 1 },
         };
         const color = COMMODITY_COLOR[(w.commodity ?? "").toLowerCase()] ?? COMMODITY_COLOR.default;
-        return { id: w.id, name: w.name, mesh, color };
+        // Centroide en lng/lat: permite al corte 3D (clipPlane) decidir si esta
+        // malla cae dentro del corredor, sin tener que probar cada vértice.
+        let sumLng = 0;
+        let sumLat = 0;
+        for (let i = 0; i < verts.length; i++) {
+          sumLng += positions[i * 3];
+          sumLat += positions[i * 3 + 1];
+        }
+        return {
+          id: w.id,
+          name: w.name,
+          mesh,
+          color,
+          centroidLng: sumLng / verts.length,
+          centroidLat: sumLat / verts.length,
+        };
       });
   }, [wireframes, centerLng, centerLat, visible]);
 
@@ -79,6 +94,8 @@ export function useWireframesLayer(
             getColor: [...m.color, 180] as [number, number, number, number],
             wireframe: false,
             pickable: true,
+            // Lo consume el corte 3D para decidir si esta malla cae en el corredor.
+            ...({ geoMeshCentroid: [m.centroidLng, m.centroidLat] } as Record<string, unknown>),
           }),
       ),
     [meshes],

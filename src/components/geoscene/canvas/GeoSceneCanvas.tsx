@@ -453,6 +453,17 @@ export function GeoSceneCanvas({
     );
     return (satAnomaliesLayer as Layer).clone({ data } as never);
   }, [satAnomaliesLayer, clipState]);
+  // Modelo 3D (wireframes RBF): cada malla se filtra por el centroide que
+  // useWireframesLayer calculó, no por el corredor de projectGeoLayers (son
+  // mallas de sesión privada, no FeatureCollections).
+  const clippedWireframeLayers = useMemo(() => {
+    if (!clipState.center) return wireframeLayers;
+    return wireframeLayers.filter((l) => {
+      const centroid = (l.props as Record<string, unknown>).geoMeshCentroid as
+        [number, number] | undefined;
+      return !centroid || withinClipCorridor(clipState, centroid);
+    });
+  }, [wireframeLayers, clipState]);
   const section = useMemo(() => {
     if (sectionPts.length < 2) return null;
     const [a, b] = sectionPts;
@@ -1033,7 +1044,7 @@ export function GeoSceneCanvas({
       drapedSatLayer,
       ...holeColumnLayers,
       ...trajectoryLayers,
-      ...wireframeLayers,
+      ...clippedWireframeLayers,
       clippedAnomaliesLayer,
       sectionLayer,
       measureLayer,
@@ -1049,7 +1060,7 @@ export function GeoSceneCanvas({
     drapedSatLayer,
     holeColumnLayers,
     trajectoryLayers,
-    wireframeLayers,
+    clippedWireframeLayers,
     clippedAnomaliesLayer,
     sectionLayer,
     measureLayer,
