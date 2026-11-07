@@ -33,10 +33,12 @@ import { indexRange, rampColor, type ProcessedIndex } from "../processedSceneSty
 import { gradeColorFor, gradeValue, type GradeCommodity } from "../sampleGradeStyle";
 import {
   axialMeanDeg,
+  bboxWithinClipCorridor,
   CLIP_THICKNESS_DEFAULT_M,
   geometryWithinClipCorridor,
   withinClipCorridor,
   type ClipAxis,
+  type LngLatBBox,
 } from "../clipPlane";
 import { ClipPlanePanel } from "../controls/ClipPlanePanel";
 import type { FeatureCollection } from "geojson";
@@ -456,12 +458,14 @@ export function GeoSceneCanvas({
   // Modelo 3D (wireframes RBF): cada malla se filtra por el centroide que
   // useWireframesLayer calculó, no por el corredor de projectGeoLayers (son
   // mallas de sesión privada, no FeatureCollections).
+  // Se filtra por el bounding box que useWireframesLayer calculó (no un solo
+  // centroide, para no descartar un cuerpo extendido que cruza el corredor
+  // sin tener su centroide adentro).
   const clippedWireframeLayers = useMemo(() => {
     if (!clipState.center) return wireframeLayers;
     return wireframeLayers.filter((l) => {
-      const centroid = (l.props as Record<string, unknown>).geoMeshCentroid as
-        [number, number] | undefined;
-      return !centroid || withinClipCorridor(clipState, centroid);
+      const bbox = (l.props as Record<string, unknown>).geoMeshBBox as LngLatBBox | undefined;
+      return !bbox || bboxWithinClipCorridor(clipState, bbox);
     });
   }, [wireframeLayers, clipState]);
   const section = useMemo(() => {

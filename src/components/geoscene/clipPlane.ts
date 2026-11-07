@@ -108,6 +108,36 @@ export function geometryWithinClipCorridor(
   return vertices.some((p) => withinClipCorridor(clip, p));
 }
 
+export type LngLatBBox = { minLng: number; maxLng: number; minLat: number; maxLat: number };
+
+/**
+ * Pertenencia de un cuerpo extendido (p.ej. una malla RBF) al corredor,
+ * probada contra su bounding box en vez de un solo punto (centroide): una
+ * malla cuyo centroide cae fuera del corredor puede igual atravesarlo (un
+ * cuerpo que va de -40 a +160 m de un corte de 50 m de espesor centrado en 0
+ * lo cruza, aunque su centroide esté a +60 m). Se proyectan las 4 esquinas
+ * del bbox sobre la normal del corredor y se revisa que ese intervalo se
+ * solape con la franja [-espesor/2, +espesor/2].
+ */
+export function bboxWithinClipCorridor(
+  clip: Pick<ClipPlaneState, "center" | "azimuthDeg" | "thicknessM"> & { axis: ClipAxis },
+  bbox: LngLatBBox | null | undefined,
+): boolean {
+  if (!clip.center || !bbox) return true;
+  const normal = clipAxisAzimuth(clip.axis, clip.azimuthDeg);
+  const corners: [number, number][] = [
+    [bbox.minLng, bbox.minLat],
+    [bbox.minLng, bbox.maxLat],
+    [bbox.maxLng, bbox.minLat],
+    [bbox.maxLng, bbox.maxLat],
+  ];
+  const projected = corners.map((c) => perpendicularDistanceM(clip.center!, normal, c));
+  const lo = Math.min(...projected);
+  const hi = Math.max(...projected);
+  const half = clip.thicknessM / 2;
+  return hi >= -half && lo <= half;
+}
+
 /**
  * Media circular axial de un conjunto de rumbos (grados, eje sin sentido:
  * 10° y 190° describen el mismo eje). Promediar grados directamente falla en

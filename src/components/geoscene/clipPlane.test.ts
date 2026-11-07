@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   axialMeanDeg,
+  bboxWithinClipCorridor,
   clipAxisAzimuth,
   geometryWithinClipCorridor,
   perpendicularDistanceM,
@@ -93,6 +94,37 @@ describe("clipPlane", () => {
   it("treats a missing clip center as always within the corridor for a geometry", () => {
     const base = { axis: "ns" as const, azimuthDeg: 0, thicknessM: 20, center: null };
     expect(geometryWithinClipCorridor(base, { type: "Point", coordinates: [-71, -32] })).toBe(true);
+  });
+
+  it("keeps a bbox that crosses the corridor even when its centroid falls outside it", () => {
+    const center: [number, number] = [-71.0, -32.0];
+    const mPerDegLng = 111_320 * Math.cos((-32 * Math.PI) / 180);
+    const base = { axis: "ns" as const, azimuthDeg: 0, thicknessM: 50, center };
+    // "ns" axis's normal is east-west. A body spanning -40m to +160m east of
+    // the cut (centroid at +60m, outside a ±25m corridor) still crosses it.
+    const wideBBox = {
+      minLng: -71.0 - 40 / mPerDegLng,
+      maxLng: -71.0 + 160 / mPerDegLng,
+      minLat: -32.001,
+      maxLat: -31.999,
+    };
+    expect(bboxWithinClipCorridor(base, wideBBox)).toBe(true);
+    // A bbox entirely beyond the corridor (100m to 160m east) does not cross it.
+    const farBBox = {
+      minLng: -71.0 + 100 / mPerDegLng,
+      maxLng: -71.0 + 160 / mPerDegLng,
+      minLat: -32.001,
+      maxLat: -31.999,
+    };
+    expect(bboxWithinClipCorridor(base, farBBox)).toBe(false);
+  });
+
+  it("treats a missing clip center or bbox as always within the corridor", () => {
+    const base = { axis: "ns" as const, azimuthDeg: 0, thicknessM: 50, center: null };
+    expect(
+      bboxWithinClipCorridor(base, { minLng: -71.1, maxLng: -71, minLat: -32.1, maxLat: -32 }),
+    ).toBe(true);
+    expect(bboxWithinClipCorridor({ ...base, center: [-71, -32] }, null)).toBe(true);
   });
 
   it("computes an axial circular mean, treating opposite strikes as the same axis", () => {
