@@ -1,13 +1,25 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { SPECTRAL_LAYER_IDS, legendClasses } from "./spectralStyle";
 import { BrandButton } from "@/components/brand";
-import { Loader2, Sparkles, Crosshair, X, Layers3, Box } from "lucide-react";
+import {
+  Loader2,
+  Sparkles,
+  Crosshair,
+  X,
+  Layers3,
+  PanelRight,
+  Box,
+  Maximize,
+  Minimize,
+} from "lucide-react";
 import { ModeTabs } from "./controls/ModeTabs";
 import { ViewTabs } from "./controls/ViewTabs";
 import { SceneCopilot } from "./SceneCopilot";
 import { MODE_LABELS, type GeoSceneMode, type GeoSceneProps } from "./types";
 import { ANCHOR_LABEL, SCENE_FOCUS_EVENT, type SceneFocusDetail } from "./anchors";
 import { SceneLayerPanel } from "./controls/SceneLayerPanel";
+import { SceneInspectorPanel } from "./controls/SceneInspectorPanel";
+import { MiningEvidenceInspector } from "@/components/geo/MiningEvidenceInspector";
 import { initialGeoSceneLayerIds } from "./layerPolicy";
 import type { CanonicalGeoLayerId } from "@/lib/geospatial/layerRegistry";
 import { resolveProjectLayers } from "./projectLayers";
@@ -16,18 +28,8 @@ import type { FeatureCollection } from "geojson";
 import { useSentinelRasterPreview } from "@/hooks/useSentinelRasterPreview";
 import { useProjects } from "@/hooks/useProjects";
 import { useIsMobile } from "@/hooks/use-mobile";
-import {
-  PROCESSED_INDICES,
-  RAMP_CSS,
-  indexRange,
-  type ProcessedIndex,
-} from "./processedSceneStyle";
-import {
-  GRADE_COMMODITY_LABEL,
-  GRADE_CUTOFF_DEFAULT,
-  gradeLegendCounts,
-  type GradeCommodity,
-} from "./sampleGradeStyle";
+import { indexRange, type ProcessedIndex } from "./processedSceneStyle";
+import { gradeLegendCounts, type GradeCommodity } from "./sampleGradeStyle";
 
 const GeoSceneCanvas = lazy(() =>
   import("./canvas/GeoSceneCanvas").then((m) => ({ default: m.GeoSceneCanvas })),
@@ -69,6 +71,21 @@ export function GeoScene3D({
   useEffect(() => {
     if (isMobile) setLayerPanelOpen(false);
   }, [isMobile]);
+  const [inspectorOpen, setInspectorOpen] = useState(true);
+  useEffect(() => {
+    if (isMobile) setInspectorOpen(false);
+  }, [isMobile]);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    const handler = () => setIsFullscreen(document.fullscreenElement === rootRef.current);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
+  }, []);
+  const toggleFullscreen = () => {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else rootRef.current?.requestFullscreen();
+  };
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
     const ids = initialGeoSceneLayerIds(initialPreset);
     for (const layer of projectLayers ?? []) {
@@ -168,212 +185,160 @@ export function GeoScene3D({
   }, []);
 
   return (
-    <div className={`relative h-full w-full bg-bg-panel ${className}`}>
-      {/* Top bar */}
-      {
+    <div ref={rootRef} className={`flex h-full w-full bg-bg-panel ${className}`}>
+      <SceneLayerPanel
+        mode={mode}
+        enabled={enabledLayerIds}
+        open={layerPanelOpen}
+        onClose={() => setLayerPanelOpen(false)}
+        onToggle={toggleCanonicalLayer}
+        extraLayerIds={projectLayers?.map((layer) => layer.id)}
+        counts={Object.fromEntries(
+          (projectLayers ?? []).map((l) => [l.id, l.data.features.length]),
+        )}
+        opacity={layerOpacity}
+        onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
+        priorityLayers={prioritizedLayers}
+        activePriorities={activePriorities}
+        onPriorityChange={setActivePriorities}
+        spectralLegend={spectralLegend}
+      />
+
+      <div className="relative min-w-0 flex-1">
+        {/* Top bar */}
         <div className="absolute top-3 right-3 z-20 flex max-w-[calc(100%-1.5rem)] flex-wrap justify-end items-center gap-2">
           <div className="hidden md:flex items-center gap-1.5 text-[10px] font-mono uppercase text-muted-foreground bg-bg-secondary/95 backdrop-blur border border-border rounded px-2 py-1">
             <Sparkles className="w-3 h-3 text-gold" />
             GeoScene3D · {meta.sub}
           </div>
-          {
-            <BrandButton
-              type="button"
-              size="sm"
-              variant="outline"
-              data-theme="im-light"
-              onClick={() => setLayerPanelOpen((value) => !value)}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
-              title="Capas 3D canónicas"
-              aria-label="Capas del proyecto"
-              aria-expanded={layerPanelOpen}
-            >
-              <Layers3 className="h-3.5 w-3.5" /> Capas · {enabledLayerIds.size}
-            </BrandButton>
-          }
+          <BrandButton
+            type="button"
+            size="sm"
+            variant="outline"
+            data-theme="im-light"
+            onClick={() => setLayerPanelOpen((value) => !value)}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
+            title="Capas 3D canónicas"
+            aria-label="Capas del proyecto"
+            aria-expanded={layerPanelOpen}
+          >
+            <Layers3 className="h-3.5 w-3.5" /> Capas · {enabledLayerIds.size}
+          </BrandButton>
           {onViewChange && <ViewTabs view={view} onChange={onViewChange} />}
           {showModeTabs && <ModeTabs mode={mode} onChange={setInternalMode} />}
+          <BrandButton
+            type="button"
+            size="sm"
+            variant="outline"
+            data-theme="im-light"
+            onClick={toggleFullscreen}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
+            title={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+            aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+          >
+            {isFullscreen ? (
+              <Minimize className="h-3.5 w-3.5" />
+            ) : (
+              <Maximize className="h-3.5 w-3.5" />
+            )}
+          </BrandButton>
+          {!inspectorOpen &&
+            (sampleLegend || (processedData && processedData.features.length > 0)) && (
+              <BrandButton
+                type="button"
+                size="sm"
+                variant="outline"
+                data-theme="im-light"
+                onClick={() => setInspectorOpen(true)}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
+                title="Inspector contextual"
+                aria-label="Mostrar inspector"
+                aria-expanded={inspectorOpen}
+              >
+                <PanelRight className="h-3.5 w-3.5" /> Inspector
+              </BrandButton>
+            )}
         </div>
-      }
 
-      {/* Scene */}
-      <div className="absolute inset-0">
-        <Suspense fallback={<SceneLoading />}>
-          {mode !== "resource" && (
-            <GeoSceneCanvas
-              view={view}
-              mode={mode}
-              visibleLayerIds={enabledLayerIds}
-              filters={filters}
-              project={project}
-              projectLayers={projectLayers}
-              layerOpacity={layerOpacity}
-              processedScene={processedScene}
-              sampleGradeFilter={
-                sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
-              }
-              commodity={sampleCommodity}
-              activePriorities={activePriorities}
-            />
-          )}
-          {mode === "resource" && <ResourceModeStub />}
-        </Suspense>
+        {/* Scene */}
+        <div className="absolute inset-0">
+          <Suspense fallback={<SceneLoading />}>
+            {mode !== "resource" && (
+              <GeoSceneCanvas
+                view={view}
+                mode={mode}
+                visibleLayerIds={enabledLayerIds}
+                filters={filters}
+                project={project}
+                projectLayers={projectLayers}
+                layerOpacity={layerOpacity}
+                processedScene={processedScene}
+                sampleGradeFilter={
+                  sampleLegend ? { commodity: sampleCommodity, cutoff: sampleCutoff } : null
+                }
+                commodity={sampleCommodity}
+                activePriorities={activePriorities}
+              />
+            )}
+            {mode === "resource" && <ResourceModeStub />}
+          </Suspense>
+        </div>
+
+        {/* Focus banner: chip clicado en el copilot */}
+        {focus && (
+          <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-bg-secondary/95 backdrop-blur border border-gold/60 rounded px-2.5 py-1.5 shadow-lg">
+            <Crosshair className="w-3.5 h-3.5 text-gold animate-pulse" />
+            <div className="text-[11px] font-mono">
+              <span className="text-muted-foreground uppercase mr-1">
+                {ANCHOR_LABEL[focus.kind]}
+              </span>
+              <span className="text-gold font-semibold">{focus.code}</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setFocus(null)}
+              className="text-muted-foreground hover:text-foreground"
+              aria-label="Quitar foco"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        )}
+
+        <MiningEvidenceInspector layers={projectLayers ?? []} projectName={project?.name} />
+
+        {/* Contextual AI copilot */}
+        {showCopilot && <SceneCopilot mode={mode} variant={variant} />}
       </div>
 
-      {
-        <SceneLayerPanel
-          mode={mode}
-          enabled={enabledLayerIds}
-          open={layerPanelOpen}
-          onClose={() => setLayerPanelOpen(false)}
-          onToggle={toggleCanonicalLayer}
-          extraLayerIds={projectLayers?.map((layer) => layer.id)}
-          counts={Object.fromEntries(
-            (projectLayers ?? []).map((l) => [l.id, l.data.features.length]),
-          )}
-          opacity={layerOpacity}
-          onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
-          priorityLayers={prioritizedLayers}
-          activePriorities={activePriorities}
-          onPriorityChange={setActivePriorities}
-          spectralLegend={spectralLegend}
-        />
-      }
-
-      {processedData && processedData.features.length > 0 && mode !== "resource" && (
-        <div
-          className="absolute bottom-10 left-14 z-20 w-[15rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
-          aria-label="Escena Sentinel-2 procesada"
-        >
-          <label className="flex items-center gap-2 uppercase tracking-wider text-foreground">
-            <input
-              type="checkbox"
-              checked={processedOn}
-              onChange={(e) => setProcessedOn(e.target.checked)}
-            />
-            Sentinel-2 L2A procesada
-          </label>
-          {processedOn && (
-            <div className="mt-2 space-y-2">
-              <select
-                value={processedIndex}
-                onChange={(e) => setProcessedIndex(e.target.value as ProcessedIndex)}
-                className="w-full rounded border border-border bg-background px-1.5 py-1 text-[10px] text-foreground"
-                aria-label="Índice espectral"
-              >
-                {PROCESSED_INDICES.map((i) => (
-                  <option key={i.key} value={i.key}>
-                    {i.label}
-                  </option>
-                ))}
-              </select>
-              <div>
-                <div className="h-2 w-full rounded-sm" style={{ background: RAMP_CSS }} />
-                <div className="mt-0.5 flex justify-between text-muted-foreground">
-                  <span>{processedRange[0].toFixed(3)}</span>
-                  <span>{processedRange[1].toFixed(3)}</span>
-                </div>
-              </div>
-              <label className="flex items-center gap-2 text-muted-foreground">
-                Opacidad
-                <input
-                  type="range"
-                  min={0}
-                  max={1}
-                  step={0.05}
-                  value={processedOpacity}
-                  onChange={(e) => setProcessedOpacity(Number(e.target.value))}
-                  className="flex-1"
-                />
-              </label>
-            </div>
-          )}
-          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
-            MODELADO · índice derivado de reflectancia real. No identifica minerales ni reemplaza
-            ensayes.
-          </p>
-        </div>
-      )}
-
-      {sampleLegend && (
-        <div
-          className="absolute top-16 right-3 z-20 w-[14.5rem] rounded border border-border bg-bg-secondary/95 p-2.5 font-mono text-[10px] shadow-lg backdrop-blur"
-          aria-label="Ley de muestras"
-        >
-          <div className="mb-1.5 flex items-center justify-between uppercase tracking-wider text-muted-foreground">
-            <span>Ley de muestras</span>
-            <div className="flex gap-1">
-              {(Object.keys(GRADE_COMMODITY_LABEL) as GradeCommodity[]).map((c) => (
-                <button
-                  key={c}
-                  type="button"
-                  onClick={() => setSampleCommodity(c)}
-                  className={`rounded px-1.5 py-0.5 ${
-                    sampleCommodity === c
-                      ? "bg-gold/80 text-background"
-                      : "border border-border text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {GRADE_COMMODITY_LABEL[c]}
-                </button>
-              ))}
-            </div>
-          </div>
-          <label className="mb-1.5 flex items-center gap-2 text-muted-foreground">
-            Corte
-            <input
-              type="range"
-              min={0}
-              max={GRADE_CUTOFF_DEFAULT[sampleCommodity].max}
-              step={GRADE_CUTOFF_DEFAULT[sampleCommodity].step}
-              value={sampleCutoff}
-              onChange={(e) => setSampleCutoff(Number(e.target.value))}
-              className="flex-1"
-            />
-            <span className="w-12 shrink-0 text-right text-foreground">
-              {sampleCutoff}
-              {sampleCommodity === "cu_pct" ? "%" : " ppm"}
-            </span>
-          </label>
-          <ul className="space-y-1">
-            {sampleLegend.map((item) => (
-              <li key={item.label} className="flex items-center gap-2 text-foreground">
-                <span
-                  className="h-2.5 w-2.5 shrink-0 rounded-sm"
-                  style={{ backgroundColor: `rgb(${item.color.join(",")})` }}
-                />
-                <span className="flex-1 truncate">{item.label}</span>
-                <span className="text-muted-foreground">{item.count}</span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-1.5 text-[9px] leading-snug text-muted-foreground">
-            Bajo el corte se oculta (gris = sin dato). Ensayes puntuales, no define recurso.
-          </p>
-        </div>
-      )}
-
-      {/* Focus banner: chip clicado en el copilot */}
-      {focus && (
-        <div className="absolute top-3 left-3 z-20 flex items-center gap-2 bg-bg-secondary/95 backdrop-blur border border-gold/60 rounded px-2.5 py-1.5 shadow-lg">
-          <Crosshair className="w-3.5 h-3.5 text-gold animate-pulse" />
-          <div className="text-[11px] font-mono">
-            <span className="text-muted-foreground uppercase mr-1">{ANCHOR_LABEL[focus.kind]}</span>
-            <span className="text-gold font-semibold">{focus.code}</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setFocus(null)}
-            className="text-muted-foreground hover:text-foreground"
-            aria-label="Quitar foco"
-          >
-            <X className="w-3 h-3" />
-          </button>
-        </div>
-      )}
-
-      {/* Contextual AI copilot */}
-      {showCopilot && <SceneCopilot mode={mode} variant={variant} />}
+      <SceneInspectorPanel
+        open={inspectorOpen}
+        onClose={() => setInspectorOpen(false)}
+        sentinel={
+          processedData && processedData.features.length > 0 && mode !== "resource"
+            ? {
+                on: processedOn,
+                onToggle: setProcessedOn,
+                index: processedIndex,
+                onIndex: setProcessedIndex,
+                range: processedRange,
+                opacity: processedOpacity,
+                onOpacity: setProcessedOpacity,
+              }
+            : undefined
+        }
+        sampleGrade={
+          sampleLegend
+            ? {
+                commodity: sampleCommodity,
+                onCommodity: setSampleCommodity,
+                cutoff: sampleCutoff,
+                onCutoff: setSampleCutoff,
+                legend: sampleLegend,
+              }
+            : undefined
+        }
+      />
     </div>
   );
 }
