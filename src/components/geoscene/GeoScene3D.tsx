@@ -86,6 +86,14 @@ export function GeoScene3D({
     if (document.fullscreenElement) document.exitFullscreen();
     else rootRef.current?.requestFullscreen();
   };
+  const openLayerPanel = (open: boolean) => {
+    setLayerPanelOpen(open);
+    if (open && isMobile) setInspectorOpen(false);
+  };
+  const openInspector = (open: boolean) => {
+    setInspectorOpen(open);
+    if (open && isMobile) setLayerPanelOpen(false);
+  };
   const [enabledLayerIds, setEnabledLayerIds] = useState<Set<CanonicalGeoLayerId>>(() => {
     const ids = initialGeoSceneLayerIds(initialPreset);
     for (const layer of projectLayers ?? []) {
@@ -185,24 +193,29 @@ export function GeoScene3D({
   }, []);
 
   return (
-    <div ref={rootRef} className={`flex h-full w-full bg-bg-panel ${className}`}>
-      <SceneLayerPanel
-        mode={mode}
-        enabled={enabledLayerIds}
-        open={layerPanelOpen}
-        onClose={() => setLayerPanelOpen(false)}
-        onToggle={toggleCanonicalLayer}
-        extraLayerIds={projectLayers?.map((layer) => layer.id)}
-        counts={Object.fromEntries(
-          (projectLayers ?? []).map((l) => [l.id, l.data.features.length]),
-        )}
-        opacity={layerOpacity}
-        onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
-        priorityLayers={prioritizedLayers}
-        activePriorities={activePriorities}
-        onPriorityChange={setActivePriorities}
-        spectralLegend={spectralLegend}
-      />
+    <div ref={rootRef} className={`relative flex h-full w-full bg-bg-panel ${className}`}>
+      {/* En mobile los paneles salen del flujo flex (absolute) para no reducir
+          el lienzo a 0px si ambos se reabren a la vez; además se abren de a
+          uno (ver openLayerPanel/openInspector) para no superponerse. */}
+      <div className={isMobile ? "absolute inset-y-0 left-0 z-30 max-w-[85vw] shadow-xl" : ""}>
+        <SceneLayerPanel
+          mode={mode}
+          enabled={enabledLayerIds}
+          open={layerPanelOpen}
+          onClose={() => setLayerPanelOpen(false)}
+          onToggle={toggleCanonicalLayer}
+          extraLayerIds={projectLayers?.map((layer) => layer.id)}
+          counts={Object.fromEntries(
+            (projectLayers ?? []).map((l) => [l.id, l.data.features.length]),
+          )}
+          opacity={layerOpacity}
+          onOpacity={(id, value) => setLayerOpacity((current) => ({ ...current, [id]: value }))}
+          priorityLayers={prioritizedLayers}
+          activePriorities={activePriorities}
+          onPriorityChange={setActivePriorities}
+          spectralLegend={spectralLegend}
+        />
+      </div>
 
       <div className="relative min-w-0 flex-1">
         {/* Top bar */}
@@ -216,7 +229,7 @@ export function GeoScene3D({
             size="sm"
             variant="outline"
             data-theme="im-light"
-            onClick={() => setLayerPanelOpen((value) => !value)}
+            onClick={() => openLayerPanel(!layerPanelOpen)}
             className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
             title="Capas 3D canónicas"
             aria-label="Capas del proyecto"
@@ -249,7 +262,7 @@ export function GeoScene3D({
                 size="sm"
                 variant="outline"
                 data-theme="im-light"
-                onClick={() => setInspectorOpen(true)}
+                onClick={() => openInspector(true)}
                 className="inline-flex min-h-9 items-center gap-1.5 rounded border border-accent-brand/60 bg-surface px-3 py-1 font-mono text-[11px] uppercase text-foreground backdrop-blur hover:bg-accent"
                 title="Inspector contextual"
                 aria-label="Mostrar inspector"
@@ -311,34 +324,36 @@ export function GeoScene3D({
         {showCopilot && <SceneCopilot mode={mode} variant={variant} />}
       </div>
 
-      <SceneInspectorPanel
-        open={inspectorOpen}
-        onClose={() => setInspectorOpen(false)}
-        sentinel={
-          processedData && processedData.features.length > 0 && mode !== "resource"
-            ? {
-                on: processedOn,
-                onToggle: setProcessedOn,
-                index: processedIndex,
-                onIndex: setProcessedIndex,
-                range: processedRange,
-                opacity: processedOpacity,
-                onOpacity: setProcessedOpacity,
-              }
-            : undefined
-        }
-        sampleGrade={
-          sampleLegend
-            ? {
-                commodity: sampleCommodity,
-                onCommodity: setSampleCommodity,
-                cutoff: sampleCutoff,
-                onCutoff: setSampleCutoff,
-                legend: sampleLegend,
-              }
-            : undefined
-        }
-      />
+      <div className={isMobile ? "absolute inset-y-0 right-0 z-30 max-w-[85vw] shadow-xl" : ""}>
+        <SceneInspectorPanel
+          open={inspectorOpen}
+          onClose={() => setInspectorOpen(false)}
+          sentinel={
+            processedData && processedData.features.length > 0 && mode !== "resource"
+              ? {
+                  on: processedOn,
+                  onToggle: setProcessedOn,
+                  index: processedIndex,
+                  onIndex: setProcessedIndex,
+                  range: processedRange,
+                  opacity: processedOpacity,
+                  onOpacity: setProcessedOpacity,
+                }
+              : undefined
+          }
+          sampleGrade={
+            sampleLegend
+              ? {
+                  commodity: sampleCommodity,
+                  onCommodity: setSampleCommodity,
+                  cutoff: sampleCutoff,
+                  onCutoff: setSampleCutoff,
+                  legend: sampleLegend,
+                }
+              : undefined
+          }
+        />
+      </div>
     </div>
   );
 }
