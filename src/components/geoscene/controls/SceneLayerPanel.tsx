@@ -1,4 +1,4 @@
-import { Layers3, X } from "lucide-react";
+import { ChevronLeft, Layers3 } from "lucide-react";
 import { EvidenceBadge } from "@/components/ui-system";
 import {
   getGeoLayer,
@@ -98,7 +98,7 @@ export function SceneLayerPanel({
   return (
     <div
       data-theme="im-light"
-      className="absolute left-3 top-3 z-30 flex max-h-[calc(100%-5rem)] w-[min(20rem,calc(100%-1.5rem))] flex-col overflow-hidden rounded border border-hairline bg-surface/95 text-xs text-content shadow-lg backdrop-blur"
+      className="relative z-10 flex h-full w-64 shrink-0 flex-col overflow-hidden border-r border-hairline bg-surface text-xs text-content"
     >
       <div className="flex shrink-0 items-start justify-between gap-2 border-b border-hairline px-3 py-2.5">
         <div>
@@ -115,10 +115,11 @@ export function SceneLayerPanel({
           size="sm"
           type="button"
           onClick={onClose}
-          className="text-muted-foreground hover:text-foreground"
-          aria-label="Cerrar capas 3D"
+          className="shrink-0 text-muted-foreground hover:text-foreground"
+          aria-label="Ocultar panel de capas"
+          title="Ocultar"
         >
-          <X className="h-3.5 w-3.5" />
+          <ChevronLeft className="h-3.5 w-3.5" />
         </BrandButton>
       </div>
 

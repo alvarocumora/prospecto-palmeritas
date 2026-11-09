@@ -15,7 +15,6 @@ import { getLosVerdesMining } from "@/lib/losverdes-veins.functions";
 import { getLosVerdesAnomalies } from "@/lib/livemap-public.functions";
 import { usePalmerasLayers } from "@/features/palmeras/usePalmerasLayers";
 import { useEmitMineralogyLayers } from "@/lib/cholqui/emitMineralogy";
-import { MiningEvidenceInspector } from "./MiningEvidenceInspector";
 import { useOfficialGeology } from "@/lib/geology/officialGeologicalMap";
 
 const CholquiScene = lazy(() =>
@@ -66,7 +65,10 @@ export function ProjectSceneFrame({
     ];
   }, [layers, official.data]);
   return (
-    <div data-surface="canvas" className="relative h-[620px] w-full overflow-hidden">
+    <div
+      data-surface="canvas"
+      className="relative h-[min(78vh,900px)] min-h-[520px] w-full overflow-hidden"
+    >
       <SceneErrorBoundary label={project.name} key={project.id}>
         <GeoScene3D
           key={project.id}
@@ -78,7 +80,6 @@ export function ProjectSceneFrame({
           showCopilot={false}
         />
       </SceneErrorBoundary>
-      <MiningEvidenceInspector layers={layers} projectName={project.name} />
     </div>
   );
 }
