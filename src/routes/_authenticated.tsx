@@ -20,6 +20,7 @@ import { WORKSPACE_NAV } from "@/lib/workspace";
 import { WorkspaceTabs } from "@/components/ops/WorkspaceTabs";
 import { privateProjectSearch, workspaceProjectId } from "@/lib/projects/navigation";
 import { cn } from "@/lib/utils";
+import { CHOLQUI_PILOT_PATH } from "@/lib/investor/cholquiPilot";
 
 export const Route = createFileRoute("/_authenticated")({
   validateSearch: privateProjectSearch,
@@ -49,8 +50,16 @@ function AuthenticatedLayout() {
 
   useEffect(() => {
     if (!mounted || loading) return;
-    if (!user) navigate({ to: "/auth" });
-  }, [mounted, loading, user, navigate]);
+    if (!user) {
+      navigate({
+        to: "/auth",
+        search:
+          location.pathname === CHOLQUI_PILOT_PATH
+            ? { intent: "investor", mode: "login", next: CHOLQUI_PILOT_PATH }
+            : {},
+      });
+    }
+  }, [mounted, loading, user, navigate, location.pathname]);
 
   useEffect(() => {
     if (!projectsLoading && requestedMember && active?.id !== requestedProject) {
