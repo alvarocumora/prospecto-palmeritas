@@ -95,3 +95,18 @@ describe("Cholqui reports share published evidence", () => {
     expect(buildCholquiInvestmentDoc(true).docVersion).not.toBe(doc.docVersion);
   });
 });
+
+import { cholquiExplorationZones } from "./cholquiTargets";
+describe("Cholqui exploration zones", () => {
+  it("gives P3 to weak isolated evidence", () => {
+    const zones = cholquiExplorationZones({
+      anomalies: [{ id: "X-1", lat: -10, lng: -10, score: 0.5 }] as never,
+      collars: [],
+    });
+    expect(zones[0].priority).toBe("P3");
+  });
+  it("ranks the stored sample data", () => {
+    const zones = cholquiExplorationZones(data);
+    expect(zones.length).toBeGreaterThan(0);
+  });
+});

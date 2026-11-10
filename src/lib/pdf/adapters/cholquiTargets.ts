@@ -114,7 +114,79 @@ export function tenureAt(
 
 export type AgentNote = { label: string; note: string };
 
-export const CHOLQUI_TARGETS_DOC_VERSION = "v1.2";
+export const CHOLQUI_TARGETS_DOC_VERSION = "v1.3";
+
+export type ExplorationZone = {
+  zone: string;
+  priority: "P1" | "P2" | "P3";
+  own: boolean;
+  anomalies: string[];
+  collars: string[];
+  samples: string[];
+  maxScore: number | null;
+  rationale: string;
+};
+
+function kmBetween(aLat: number, aLng: number, bLat: number, bLng: number): number {
+  const dLat = (aLat - bLat) * 111.32;
+  const dLng = (aLng - bLng) * 111.32 * Math.cos((aLat * Math.PI) / 180);
+  return Math.sqrt(dLat * dLat + dLng * dLng);
+}
+
+/**
+ * Zonas de exploración agrupadas por concesión del catastro cargado.
+ * Regla determinística (interpretación, no recurso):
+ *  P1 = punto de observación medido a ≤1 km + anomalía o collar.
+ *  P2 = anomalía puntaje ≥0,8 o collar propuesto.
+ *  La tenencia no sube la prioridad: se informa aparte como bandera.
+ *  P3 = resto (contexto regional o evidencia débil).
+ */
+export function cholquiExplorationZones(
+  data: Pick<CholquiSatelliteTargets, "anomalies" | "collars">,
+): ExplorationZone[] {
+  const zones = new Map<string, ExplorationZone & { pts: Array<[number, number]> }>();
+  const get = (lat: number, lng: number) => {
+    const t = tenureAt(lat, lng);
+    const key = t.concession ?? "Fuera del catastro cargado";
+    let z = zones.get(key);
+    if (!z) {
+      z = { zone: key, priority: "P3", own: t.own, anomalies: [], collars: [], samples: [], maxScore: null, rationale: "", pts: [] };
+      zones.set(key, z);
+    }
+    z.pts.push([lat, lng]);
+    return z;
+  };
+  for (const a of data.anomalies) {
+    const z = get(a.lat, a.lng);
+    z.anomalies.push(a.id);
+    if (a.score != null) z.maxScore = Math.max(z.maxScore ?? 0, a.score);
+  }
+  for (const c of data.collars) get(c.lat, c.lng).collars.push(c.code);
+  const out: ExplorationZone[] = [];
+  for (const z of zones.values()) {
+    z.samples = CHOLQUI_POINTS.filter((p) =>
+      z.pts.some(([lat, lng]) => kmBetween(lat, lng, p.lat, p.lng) <= 1),
+    ).map((p) => p.code);
+    const hasEvidence = z.anomalies.length > 0 || z.collars.length > 0;
+    if (z.samples.length && hasEvidence) {
+      z.priority = "P1";
+      z.rationale = `Observaciones de terreno (${z.samples.join(", ")}) a ≤1 km de anomalías/collares.${z.own ? "" : " Tenencia por verificar en catastro."}`;
+    } else if ((z.maxScore ?? 0) >= 0.8 || z.collars.length) {
+      z.priority = "P2";
+      z.rationale = `Anomalía de puntaje ≥0,8 o collar propuesto; sin observación de terreno cercana.${z.own ? "" : " Tenencia por verificar."}`;
+    } else {
+      z.rationale = z.own
+        ? "Dentro de la tenencia con evidencia espectral débil; requiere mapeo."
+        : "Contexto regional: concesión de tercero o sin concesión; verificar tenencia antes de cualquier trabajo.";
+    }
+    const { pts: _pts, ...rest } = z;
+    out.push(rest);
+  }
+  const rank = { P1: 0, P2: 1, P3: 2 };
+  return out.sort(
+    (a, b) => rank[a.priority] - rank[b.priority] || (b.maxScore ?? 0) - (a.maxScore ?? 0),
+  );
+}
 
 function num(value: number, digits = 0): string {
   return value.toLocaleString("es-CL", {
@@ -154,12 +226,13 @@ export function buildCholquiTargetsDoc(
   const top = anomalies.slice(0, 12);
   const azimuths = [...new Set(collars.map((collar) => collar.azimuthDeg))].sort((a, b) => a - b);
   const dips = [...new Set(collars.map((collar) => collar.dipDeg))].sort((a, b) => a - b);
+  const zones = cholquiExplorationZones(data);
 
   return {
     reportProfile: "targeting",
     code: `${CHOLQUI.code}-SAT`,
     name: `${CHOLQUI.name} — Targets satelitales`,
-    subtitle: "Anomalías espectrales y malla de sondajes propuesta",
+    subtitle: "Zonas de exploración, anomalías espectrales y malla de sondajes propuesta",
     commodity: CHOLQUI.commodity,
     stage: "Exploración · screening satelital Nivel 0",
     location: CHOLQUI.location,
@@ -305,6 +378,28 @@ export function buildCholquiTargetsDoc(
       },
     ],
     sections: [
+      {
+        eyebrow: "Zonas de exploración",
+        title: "Zonas prioritarias P1 · P2 · P3",
+        lead: "Agrupación por concesión del catastro cargado con regla determinística: P1 combina observación de terreno a ≤1 km con anomalía o collar; P2 anomalía ≥0,8 o collar; P3 contexto. La tenencia se informa aparte y debe verificarse en catastro. Es INTERPRETACIÓN para priorizar trabajo de campo; no es mineralización, recurso ni reserva.",
+        blocks: [
+          {
+            kind: "table" as const,
+            head: ["Prioridad", "Zona / concesión", "Tenencia", "Anomalías", "Collares", "Obs. terreno", "Puntaje máx.", "Justificación"],
+            widths: [0.07, 0.19, 0.09, 0.08, 0.11, 0.1, 0.08, 0.28],
+            rows: zones.map((z) => [
+              z.priority,
+              z.zone,
+              z.own ? "Analizada" : "Verificar",
+              String(z.anomalies.length),
+              z.collars.join(", ") || "—",
+              z.samples.join(", ") || "—",
+              z.maxScore != null ? z.maxScore.toFixed(2).replace(".", ",") : "s/d",
+              z.rationale,
+            ]),
+          },
+        ],
+      },
       ...cholquiGeoscienceSections().map((section) => ({
         ...section,
         blocks: section.blocks.filter(
