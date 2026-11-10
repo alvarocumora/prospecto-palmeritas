@@ -244,7 +244,7 @@ function InvPage() {
 
           <div className="mt-8 flex flex-wrap items-center gap-3">
             <BrandButton asChild>
-              <Link to="/auth" search={{ intent: "investor" } as never}>
+              <Link to="/auth" search={{ intent: "investor", mode: "signup" }}>
                 Crear cuenta de inversionista <ArrowRight className="w-4 h-4" />
               </Link>
             </BrandButton>
