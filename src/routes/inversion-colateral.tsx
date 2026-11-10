@@ -1,3 +1,9 @@
+import { useAuth } from "@/hooks/useAuth";
+import {
+  collateralSearch,
+  investmentAmount,
+  investmentHref,
+} from "@/lib/investor/investmentIntent";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { ArrowRight, CalendarClock, Landmark, Repeat, ShieldCheck } from "lucide-react";
@@ -8,13 +14,37 @@ import { CollateralOneClickPack } from "@/features/investor/CollateralOneClickPa
 import {
   COLLATERAL_DISCLAIMERS,
   COLLATERAL_PROJECTS,
+  COLLATERAL_SIMULATION_MAX,
+  COLLATERAL_SIMULATION_STEP,
   COLLATERAL_STEPS,
+  COLLATERAL_TERMS,
 } from "@/lib/investor/collateralProgram";
 import coverImg from "@/assets/colateral/cover-maule.jpg";
 import hualanePlan from "@/assets/colateral/hualane-og.png";
 import velValle from "@/assets/colateral/vel-valle.jpg";
 
 export const Route = createFileRoute("/inversion-colateral")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): {
+    amount?: number;
+    months?: number;
+    currency?: "CLP";
+    instrument?: "colateral-inmobiliario";
+  } => {
+    if (search.currency !== "CLP" || search.instrument !== "colateral-inmobiliario") return {};
+    const amount = investmentAmount(search.amount, COLLATERAL_SIMULATION_MAX);
+    if (
+      !amount ||
+      amount < COLLATERAL_TERMS.minTicketClp ||
+      (amount - COLLATERAL_TERMS.minTicketClp) % COLLATERAL_SIMULATION_STEP !== 0
+    )
+      return {};
+    return collateralSearch(
+      amount,
+      search.months === 24 || search.months === 36 ? search.months : 12,
+    );
+  },
   head: () => ({
     meta: [
       { title: "Inversión minera con parcela en garantía · Geocapitals" },
@@ -43,7 +73,15 @@ const HIGHLIGHTS = [
 ];
 
 function PublicCollateralPage() {
-  const [sim, setSim] = useState({ amount: 15_000_000, months: 12 });
+  const { amount = COLLATERAL_TERMS.minTicketClp, months = 12 } = Route.useSearch();
+  return <CollateralPage key={`${amount}-${months}`} initial={{ amount, months }} />;
+}
+
+function CollateralPage({ initial }: { initial: { amount: number; months: number } }) {
+  const [sim, setSim] = useState(initial);
+  const { user, loading } = useAuth();
+  const next =
+    investmentHref("/inversion-colateral", collateralSearch(sim.amount, sim.months)) + "#contacto";
 
   return (
     <div className="brand-light min-h-screen">
@@ -151,7 +189,11 @@ function PublicCollateralPage() {
             className="mt-16 grid gap-6 md:grid-cols-[1.1fr_1fr] scroll-mt-20"
           >
             <div className="space-y-3">
-              <CollateralSimulator onChange={(amount, months) => setSim({ amount, months })} />
+              <CollateralSimulator
+                initialAmount={initial.amount}
+                initialMonths={initial.months}
+                onChange={(amount, months) => setSim({ amount, months })}
+              />
               <CollateralOneClickPack amount={sim.amount} months={sim.months} />
             </div>
             <div className="border border-hairline p-6 bg-surface">
@@ -177,13 +219,15 @@ function PublicCollateralPage() {
                 Te enviamos el deck completo, revisamos tu perfil y te mostramos las parcelas
                 disponibles. La solicitud incluye el monto y plazo que simulaste.
               </p>
-              <Link
-                to="/auth"
-                search={{ intent: "investor", mode: "signup" } as never}
-                className="mt-5 inline-flex items-center gap-2 text-sm text-accent-brand"
-              >
-                O crea tu cuenta de inversionista <ArrowRight className="w-4 h-4" />
-              </Link>
+              {!loading && !user && (
+                <Link
+                  to="/auth"
+                  search={{ intent: "investor", next }}
+                  className="mt-5 inline-flex items-center gap-2 text-sm text-accent-brand"
+                >
+                  Retomar esta simulación con mi cuenta <ArrowRight className="w-4 h-4" />
+                </Link>
+              )}
             </div>
             <CollateralLeadForm amount={sim.amount} months={sim.months} />
           </section>

@@ -49,8 +49,8 @@ function AuthenticatedLayout() {
 
   useEffect(() => {
     if (!mounted || loading) return;
-    if (!user) navigate({ to: "/auth" });
-  }, [mounted, loading, user, navigate]);
+    if (!user) navigate({ to: "/auth", search: { next: location.href }, replace: true });
+  }, [mounted, loading, user, navigate, location.href]);
 
   useEffect(() => {
     if (!projectsLoading && requestedMember && active?.id !== requestedProject) {

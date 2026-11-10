@@ -27,15 +27,19 @@ export function ListingDetailDrawer({
   listingId,
   onClose,
   onMutated,
+  initialInquiry,
 }: {
   listingId: string | null;
   onClose: () => void;
   onMutated: () => void;
+  initialInquiry?: string;
 }) {
   const { user } = useAuth();
   const { listing, files, inquiry, loading, refresh } = usePropertyListing(listingId);
-  const [tab, setTab] = useState<"overview" | "valuation" | "dataroom" | "inquiry">("overview");
-  const [message, setMessage] = useState("");
+  const [tab, setTab] = useState<"overview" | "valuation" | "dataroom" | "inquiry">(
+    initialInquiry ? "inquiry" : "overview",
+  );
+  const [message, setMessage] = useState(initialInquiry ?? "");
   const [sending, setSending] = useState(false);
   const [signing, setSigning] = useState(false);
 

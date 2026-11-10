@@ -8,6 +8,8 @@ import { publicUrl } from "@/lib/publicUrl";
 import type { ProjectDoc } from "@/lib/pdf/model";
 
 export const COLLATERAL_DOC_VERSION = "v1.0";
+export const COLLATERAL_SIMULATION_MAX = 250_000_000;
+export const COLLATERAL_SIMULATION_STEP = 1_000_000;
 
 export const COLLATERAL_TERMS = {
   minTicketClp: 15_000_000,
