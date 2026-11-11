@@ -150,7 +150,17 @@ export function cholquiExplorationZones(
     const key = t.concession ?? "Fuera del catastro cargado";
     let z = zones.get(key);
     if (!z) {
-      z = { zone: key, priority: "P3", own: t.own, anomalies: [], collars: [], samples: [], maxScore: null, rationale: "", pts: [] };
+      z = {
+        zone: key,
+        priority: "P3",
+        own: t.own,
+        anomalies: [],
+        collars: [],
+        samples: [],
+        maxScore: null,
+        rationale: "",
+        pts: [],
+      };
       zones.set(key, z);
     }
     z.pts.push([lat, lng]);
@@ -385,7 +395,16 @@ export function buildCholquiTargetsDoc(
         blocks: [
           {
             kind: "table" as const,
-            head: ["Prioridad", "Zona / concesión", "Tenencia", "Anomalías", "Collares", "Obs. terreno", "Puntaje máx.", "Justificación"],
+            head: [
+              "Prioridad",
+              "Zona / concesión",
+              "Tenencia",
+              "Anomalías",
+              "Collares",
+              "Obs. terreno",
+              "Puntaje máx.",
+              "Justificación",
+            ],
             widths: [0.07, 0.19, 0.09, 0.08, 0.11, 0.1, 0.08, 0.28],
             rows: zones.map((z) => [
               z.priority,
