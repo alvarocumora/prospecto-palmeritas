@@ -45,6 +45,7 @@ function AuthPage() {
 function AuthForm({ search }: { search: z.infer<typeof authSearch> }) {
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
+  const [hydrated, setHydrated] = useState(false);
   const [mode, setMode] = useState<Mode>(search.mode ?? "login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,6 +63,10 @@ function AuthForm({ search }: { search: z.infer<typeof authSearch> }) {
     form?: string;
   }>({});
   const pwStrength = evaluatePassword(password);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   useEffect(() => {
     if (!authLoading && user) {
       navigate({ href: safeAuthNext(search.next), replace: true });
@@ -196,7 +201,7 @@ function AuthForm({ search }: { search: z.infer<typeof authSearch> }) {
     }
   };
 
-  const busy = loading || resending || resetting;
+  const busy = !hydrated || loading || resending || resetting;
   const signingUp = mode === "signup";
 
   return (
@@ -315,6 +320,7 @@ function AuthForm({ search }: { search: z.infer<typeof authSearch> }) {
                   />
                   <button
                     type="button"
+                    disabled={!hydrated}
                     aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                     onClick={() => setShowPassword((visible) => !visible)}
                     className="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-content-subtle hover:text-accent-brand"
