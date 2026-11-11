@@ -2,23 +2,29 @@ import { PUBLIC_PROJECTS, canonicalProjectSlug } from "@/lib/projects/catalog";
 import type { CanonicalProjectSlug } from "@/lib/projects/catalog";
 import { getFicha, type ProjectFicha } from "@/lib/investor/fichas";
 
-/**
- * Configuración del Terminal de inversión: una sola shell por proyecto con
- * pestañas ejecutivas (mapa, tesis, simulador, data room). Reemplaza la cadena
- * portada → drawer → ficha → live map.
- */
-export type TerminalTabKey = "mapa" | "satelital" | "tesis" | "simulador" | "dataroom";
+export type TerminalTabKey = "mapa" | "explotacion" | "simulador" | "satelital" | "dataroom";
 
-export const TERMINAL_TABS: Array<{ key: TerminalTabKey; label: string; short: string }> = [
-  { key: "mapa", label: "Mapa & Exploración", short: "Mapa" },
+const TERMINAL_TABS: ReadonlyArray<{ key: TerminalTabKey; label: string; short: string }> = [
+  { key: "mapa", label: "Geología y evidencias", short: "Geología" },
+  { key: "explotacion", label: "Plan minero y explotación", short: "Explotación" },
+  { key: "simulador", label: "Tesis económica y simulador", short: "Inversión" },
   { key: "satelital", label: "Análisis satelital", short: "Satelital" },
-  { key: "tesis", label: "Tesis & Ensayes", short: "Tesis" },
-  { key: "simulador", label: "Simulador & Modelo", short: "Simulador" },
-  { key: "dataroom", label: "Documentos & Data Room", short: "Data room" },
+  { key: "dataroom", label: "Data room", short: "Data room" },
 ];
+
+export function terminalTabsForProject(slug: CanonicalProjectSlug) {
+  return TERMINAL_TABS.filter(({ key }) => key !== "explotacion" || slug === "cholqui");
+}
 
 export function isTerminalTab(value: unknown): value is TerminalTabKey {
   return TERMINAL_TABS.some((tab) => tab.key === value);
+}
+
+export function terminalTabForProject(value: unknown, slug: CanonicalProjectSlug): TerminalTabKey {
+  if (value === "tesis") return "simulador";
+  return isTerminalTab(value) && terminalTabsForProject(slug).some(({ key }) => key === value)
+    ? value
+    : "mapa";
 }
 
 export type TerminalProject = {

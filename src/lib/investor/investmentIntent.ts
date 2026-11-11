@@ -38,5 +38,7 @@ export function safeAuthNext(next?: string) {
   if (!next?.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) {
     return "/dashboard";
   }
+  const { pathname } = new URL(next, "https://geocapitals.invalid");
+  if (pathname === "/auth" || pathname === "/auth/") return "/dashboard";
   return next;
 }

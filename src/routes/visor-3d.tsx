@@ -19,6 +19,9 @@ const SatelliteProjectScene = lazy(() =>
 export const Route = createFileRoute("/visor-3d")({
   validateSearch: satelliteSelection,
   beforeLoad: ({ search }) => {
+    if (!search.project && !search.anomaly && !search.insar) {
+      throw redirect({ to: "/terminal", replace: true, statusCode: 301 });
+    }
     const target = satelliteTerminalRedirect(search);
     if (target) {
       throw redirect({
@@ -26,6 +29,7 @@ export const Route = createFileRoute("/visor-3d")({
         params: { slug: target.slug },
         search: target.search,
         replace: true,
+        statusCode: 301,
       });
     }
   },

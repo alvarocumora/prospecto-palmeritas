@@ -61,4 +61,8 @@ describe("retorno de la simulación después de autenticarse", () => {
     "descarta el destino externo %j",
     (target) => expect(safeAuthNext(target)).toBe("/dashboard"),
   );
+  it.each(["/auth?next=%2Fdashboard", "/auth/", "/terminal/../auth"])(
+    "evita volver a la pantalla de acceso desde %j",
+    (target) => expect(safeAuthNext(target)).toBe("/dashboard"),
+  );
 });

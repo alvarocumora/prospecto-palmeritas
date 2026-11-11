@@ -4,6 +4,7 @@ import { canonicalProjectSlug } from "@/lib/projects/catalog";
 import {
   getTerminalProject,
   isTerminalTab,
+  terminalTabForProject,
   type TerminalTabKey,
 } from "@/features/terminal/terminalProjects";
 import { ProjectTerminalShell } from "@/features/terminal/ProjectTerminalShell";
@@ -14,7 +15,7 @@ export const Route = createFileRoute("/terminal_/$slug")({
   validateSearch: (
     search: Record<string, unknown>,
   ): {
-    tab: TerminalTabKey;
+    tab: TerminalTabKey | "tesis";
     view?: ProjectView;
     amount?: number;
     currency?: "USD";
@@ -23,17 +24,19 @@ export const Route = createFileRoute("/terminal_/$slug")({
     const amount = equityAmount(search);
     return {
       ...(amount ? equitySearch(amount) : {}),
-      tab: isTerminalTab(search.tab) ? search.tab : "mapa",
+      tab: isTerminalTab(search.tab) || search.tab === "tesis" ? search.tab : "mapa",
       view: search.view == null ? undefined : projectView(search.view),
     };
   },
   beforeLoad: ({ params, search }) => {
     const canonical = canonicalProjectSlug(params.slug);
-    if (canonical && canonical !== params.slug) {
+    if (!canonical) return;
+    const tab = terminalTabForProject(search.tab, canonical);
+    if (canonical !== params.slug || tab !== search.tab) {
       throw redirect({
         to: "/terminal/$slug",
         params: { slug: canonical },
-        search,
+        search: { ...search, tab },
         replace: true,
         statusCode: 301,
       });
@@ -86,8 +89,8 @@ function TerminalPage() {
     <ProjectTerminalShell
       key={project.slug}
       project={project}
-      tab={tab}
-      view={projectView(view)}
+      tab={terminalTabForProject(tab, project.slug)}
+      view={view ?? (tab === "explotacion" ? "3d" : "2d")}
       amount={amount}
     />
   );

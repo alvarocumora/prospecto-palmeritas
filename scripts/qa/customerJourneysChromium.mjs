@@ -129,7 +129,7 @@ for (const width of [390, 1440]) {
 
   await scenario(page, prefix + "-project-map-perspective", async () => {
     const tabs = page.getByRole("navigation", { name: "Secciones del proyecto" });
-    await tabs.getByRole("link", { name: /Mapa/i }).click();
+    await tabs.getByRole("link", { name: "Geología y evidencias" }).click();
     await page.waitForURL(/tab=mapa/, { timeout: 20000 });
     const perspective = page.getByRole("button", { name: /Perspectiva/i }).first();
     await perspective.waitFor({ timeout: 20000 });
@@ -152,21 +152,21 @@ for (const width of [390, 1440]) {
   await scenario(page, prefix + "-guest-cannot-access-portfolio", async () => {
     await startAt(page, "/dashboard/investments");
     await page.waitForURL(/\/auth(?:\?|$)/, { timeout: 12000 });
-    assert.ok(
-      !page.url().includes("/dashboard/investments"),
-      "private portfolio must redirect unauthenticated visitors",
-    );
+    assert.equal(new URL(page.url()).pathname, "/auth");
+    assert.equal(new URL(page.url()).searchParams.get("next"), "/dashboard/investments");
     await snapshot(page, prefix + "-auth-gate");
   });
 
   await scenario(page, prefix + "-investor-registration-context", async () => {
-    await startAt(page, "/auth?intent=investor&mode=signup&next=%2Fdashboard%2Finvestments");
-    await page
-      .getByRole("heading", { name: /Crea tu cuenta de inversión/i })
-      .waitFor({ timeout: 15000 });
-    assert.ok(await page.getByText(/Verificación de identidad requerida/i).isVisible());
-    assert.ok(await page.getByRole("button", { name: "Crear cuenta" }).isVisible());
+    const next = "/terminal/cholqui?tab=simulador&amount=15000&currency=USD&instrument=equity";
+    await startAt(page, "/auth?intent=investor&mode=signup&next=" + encodeURIComponent(next));
+    await page.getByRole("heading", { name: "Crea tu cuenta" }).waitFor({ timeout: 15000 });
+    assert.ok(await page.getByText("Accede para retomar tu simulación de inversión.").isVisible());
+    assert.ok(await page.getByRole("button", { name: "Crear cuenta", exact: true }).isVisible());
     await snapshot(page, prefix + "-investor-registration");
+    await page.getByRole("button", { name: "Inicia sesión", exact: true }).click();
+    await page.getByRole("heading", { name: "Inicia sesión" }).waitFor();
+    assert.equal(new URL(page.url()).searchParams.get("next"), next);
   });
 
   await scenario(page, prefix + "-prospecting-customer-entry", async () => {
