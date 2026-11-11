@@ -1,3 +1,4 @@
+import { equitySearch } from "@/lib/investor/investmentIntent";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
@@ -25,7 +26,8 @@ const TerminalSimulator = lazy(() =>
 );
 
 import {
-  TERMINAL_TABS,
+  terminalTabForProject,
+  terminalTabsForProject,
   listTerminalProjects,
   type TerminalProject,
   type TerminalTabKey,
@@ -118,15 +120,17 @@ export function ProjectTerminalShell({
   const projects = listTerminalProjects();
   const { ficha } = project;
   const navigate = useNavigate();
-  const [mapVisited, setMapVisited] = useState(tab === "mapa");
+  const showScene = tab === "mapa" || tab === "explotacion";
+  const [mapVisited, setMapVisited] = useState(showScene);
+  const simulationSearch = amount ? equitySearch(amount) : {};
   useEffect(() => {
-    if (tab === "mapa") setMapVisited(true);
-  }, [tab]);
+    if (showScene) setMapVisited(true);
+  }, [showScene]);
   const setView = (nextView: ProjectView) => {
     void navigate({
       to: "/terminal/$slug",
       params: { slug: project.slug },
-      search: { tab, view: nextView },
+      search: { ...simulationSearch, tab, view: nextView },
       replace: true,
     });
   };
@@ -167,7 +171,7 @@ export function ProjectTerminalShell({
                   key={p.slug}
                   to="/terminal/$slug"
                   params={{ slug: p.slug }}
-                  search={{ tab, view }}
+                  search={{ tab: terminalTabForProject(tab, p.slug), view }}
                   aria-current={p.slug === project.slug ? "page" : undefined}
                   className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap px-3 py-2 rounded-full text-xs font-mono uppercase tracking-wider border transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
                     p.slug === project.slug
@@ -197,18 +201,23 @@ export function ProjectTerminalShell({
 
           {/* Pestañas ejecutivas: misma pantalla, sin recarga */}
           <nav aria-label="Secciones del proyecto" className="flex gap-1 overflow-x-auto -mb-px">
-            {TERMINAL_TABS.map((t) => (
+            {terminalTabsForProject(project.slug).map((t) => (
               <Link
                 key={t.key}
                 to="/terminal/$slug"
                 params={{ slug: project.slug }}
-                search={{ tab: t.key, view }}
+                search={{
+                  ...simulationSearch,
+                  tab: t.key,
+                  view: t.key === "explotacion" && tab !== t.key ? "3d" : view,
+                }}
+                aria-label={t.label}
                 aria-current={t.key === tab ? "page" : undefined}
                 className={`inline-flex min-h-11 items-center whitespace-nowrap px-4 py-2.5 text-[12px] font-mono uppercase tracking-wider border-b-2 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-white ${
                   t.key === tab
                     ? "border-white text-white"
                     : "border-transparent text-white/55 hover:text-white"
-                }`}
+                } ${t.key === "satelital" ? "ml-2 border-l border-l-white/20 sm:ml-auto" : ""}`}
               >
                 <span className="hidden sm:inline">{t.label}</span>
                 <span className="sm:hidden">{t.short}</span>
@@ -218,45 +227,41 @@ export function ProjectTerminalShell({
         </div>
       </header>
 
-      <main className="max-w-[1320px] mx-auto px-4 md:px-6 py-6 space-y-6">
-        {mapVisited && (
-          <div hidden={tab !== "mapa"}>
-            <MapaTab project={project} view={view} setView={setView} />
+      <main className="py-6 space-y-6">
+        {(mapVisited || showScene) && (
+          <div hidden={!showScene}>
+            <UnifiedProjectScene slug={project.slug} view={view} onViewChange={setView} />
           </div>
         )}
-        {tab === "satelital" && (
-          <Suspense fallback={<Loading label="Cargando análisis satelital" />}>
-            <TerminalSatellitePanel project={project} />
-          </Suspense>
-        )}
-        {tab === "tesis" && <TesisTab project={project} />}
-        {tab === "simulador" && <SimuladorTab project={project} amount={amount} />}
-        {tab === "dataroom" && <DataRoomTab project={project} />}
+        <div className="max-w-[1320px] mx-auto px-4 md:px-6 space-y-6">
+          {tab === "mapa" && <GeologyEvidence project={project} />}
+          {tab === "explotacion" && (
+            <Suspense fallback={<Loading label="Cargando plan minero" />}>
+              <CholquiMinePlanPanel />
+            </Suspense>
+          )}
+          {tab === "satelital" && (
+            <Suspense fallback={<Loading label="Cargando análisis satelital" />}>
+              <TerminalSatellitePanel project={project} />
+            </Suspense>
+          )}
+          {tab === "simulador" && <SimuladorTab project={project} amount={amount} />}
+          {tab === "dataroom" && <DataRoomTab project={project} />}
 
-        <footer className="text-[11px] text-content-subtle pb-10">
-          {ficha.name} ({ficha.code}) · Operado por Geocapitals. Documento informativo: no
-          constituye oferta pública de valores. Sin recursos ni reservas certificadas bajo estándar
-          reconocido.
-        </footer>
+          <footer className="text-[11px] text-content-subtle pb-10">
+            {ficha.name} ({ficha.code}) · Operado por Geocapitals. Documento informativo: no
+            constituye oferta pública de valores. Sin recursos ni reservas certificadas bajo
+            estándar reconocido.
+          </footer>
+        </div>
       </main>
     </div>
   );
 }
 
-function MapaTab({
-  project,
-  view,
-  setView,
-}: {
-  project: TerminalProject;
-  view: ProjectView;
-  setView: (view: ProjectView) => void;
-}) {
+function GeologyEvidence({ project }: { project: TerminalProject }) {
   return (
     <>
-      <div className="relative">
-        <UnifiedProjectScene slug={project.slug} view={view} onViewChange={setView} />
-      </div>
       {project.slug === "cholqui" && (
         <Suspense fallback={<Loading label="Cargando programa" />}>
           <div className="mt-6 space-y-6">
@@ -265,6 +270,7 @@ function MapaTab({
               build={async () => (await import("@/lib/pdf/adapters/cholqui")).buildCholquiDoc()}
             />
             <CholquiTargetsSummary />
+            <CholquiEvidencePanel />
             <CholquiFieldProgramPanel />
           </div>
         </Suspense>
@@ -277,11 +283,21 @@ function MapaTab({
           </div>
         </Suspense>
       )}
+      {project.slug === "losverdes" && (
+        <Suspense fallback={<Loading label="Cargando tenencia y evidencia" />}>
+          <div className="mt-6">
+            <LosVerdesTenureSummaryPanel />
+          </div>
+          <div className="mt-6">
+            <TilamaGeochemPanel />
+          </div>
+        </Suspense>
+      )}
     </>
   );
 }
 
-function TesisTab({ project }: { project: TerminalProject }) {
+function EconomicThesis({ project }: { project: TerminalProject }) {
   const { ficha } = project;
   return (
     <>
@@ -336,23 +352,6 @@ function TesisTab({ project }: { project: TerminalProject }) {
           </div>
         </Suspense>
       )}
-      {project.slug === "cholqui" && (
-        <Suspense fallback={<Loading label="Cargando ensayes" />}>
-          <div className="mt-6">
-            <CholquiEvidencePanel />
-          </div>
-        </Suspense>
-      )}
-      {project.slug === "losverdes" && (
-        <Suspense fallback={<Loading label="Cargando tenencia y evidencia" />}>
-          <div className="mt-6">
-            <LosVerdesTenureSummaryPanel />
-          </div>
-          <div className="mt-6">
-            <TilamaGeochemPanel />
-          </div>
-        </Suspense>
-      )}
     </>
   );
 }
@@ -360,6 +359,7 @@ function TesisTab({ project }: { project: TerminalProject }) {
 function SimuladorTab({ project, amount }: { project: TerminalProject; amount?: number }) {
   return (
     <>
+      <EconomicThesis project={project} />
       <Suspense fallback={<Loading label="Cargando simulador" />}>
         <TerminalSimulator
           key={amount}
@@ -375,7 +375,6 @@ function SimuladorTab({ project, amount }: { project: TerminalProject; amount?: 
         <Suspense fallback={<Loading label="Cargando escenarios" />}>
           <div className="mt-6 space-y-6">
             <CholquiScenariosPanel />
-            <CholquiMinePlanPanel />
           </div>
         </Suspense>
       )}
