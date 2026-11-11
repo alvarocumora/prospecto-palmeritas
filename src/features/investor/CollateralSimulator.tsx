@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {
   COLLATERAL_PROJECTS,
+  COLLATERAL_SIMULATION_MAX,
+  COLLATERAL_SIMULATION_STEP,
   COLLATERAL_TERMS,
   fmtClp,
   monthlyInterestClp,
@@ -8,7 +10,6 @@ import {
 
 const TERMS = [12, 24, 36] as const;
 const QUICK = [15_000_000, 25_000_000, 50_000_000, 100_000_000];
-const MAX = 250_000_000;
 
 /** Precio lista mínimo publicado de cada valle (CLP), para orientar el colateral. */
 const MIN_LIST: Record<string, number> = { hualane: 12_990_000, "valle-escondido": 19_990_000 };
@@ -16,14 +17,18 @@ const MIN_LIST: Record<string, number> = { hualane: 12_990_000, "valle-escondido
 /** Simulador del programa con colateral: solo la tasa pactada, sin proyecciones mineras. */
 export function CollateralSimulator({
   onChange,
+  initialAmount = COLLATERAL_TERMS.minTicketClp,
+  initialMonths = 12,
 }: {
+  initialAmount?: number;
+  initialMonths?: number;
   onChange?: (amount: number, months: number) => void;
 }) {
-  const [amount, setAmount] = useState<number>(COLLATERAL_TERMS.minTicketClp);
-  const [months, setMonths] = useState<number>(12);
+  const [amount, setAmount] = useState(initialAmount);
+  const [months, setMonths] = useState(initialMonths);
   const monthly = monthlyInterestClp(amount);
   const update = (a: number, m: number) => {
-    const clamped = Math.min(MAX, Math.max(COLLATERAL_TERMS.minTicketClp, a));
+    const clamped = Math.min(COLLATERAL_SIMULATION_MAX, Math.max(COLLATERAL_TERMS.minTicketClp, a));
     setAmount(clamped);
     setMonths(m);
     onChange?.(clamped, m);
@@ -44,8 +49,8 @@ export function CollateralSimulator({
         id="sim-amount"
         type="range"
         min={COLLATERAL_TERMS.minTicketClp}
-        max={MAX}
-        step={1_000_000}
+        max={COLLATERAL_SIMULATION_MAX}
+        step={COLLATERAL_SIMULATION_STEP}
         value={amount}
         onChange={(e) => update(Number(e.target.value), months)}
         className="w-full mt-2 accent-current text-accent-brand"

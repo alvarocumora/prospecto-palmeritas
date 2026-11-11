@@ -108,10 +108,12 @@ export function ProjectTerminalShell({
   project,
   tab,
   view = "2d",
+  amount,
 }: {
   project: TerminalProject;
   tab: TerminalTabKey;
   view?: ProjectView;
+  amount?: number;
 }) {
   const projects = listTerminalProjects();
   const { ficha } = project;
@@ -228,7 +230,7 @@ export function ProjectTerminalShell({
           </Suspense>
         )}
         {tab === "tesis" && <TesisTab project={project} />}
-        {tab === "simulador" && <SimuladorTab project={project} />}
+        {tab === "simulador" && <SimuladorTab project={project} amount={amount} />}
         {tab === "dataroom" && <DataRoomTab project={project} />}
 
         <footer className="text-[11px] text-content-subtle pb-10">
@@ -355,11 +357,16 @@ function TesisTab({ project }: { project: TerminalProject }) {
   );
 }
 
-function SimuladorTab({ project }: { project: TerminalProject }) {
+function SimuladorTab({ project, amount }: { project: TerminalProject; amount?: number }) {
   return (
     <>
       <Suspense fallback={<Loading label="Cargando simulador" />}>
-        <TerminalSimulator ficha={project.ficha} />
+        <TerminalSimulator
+          key={amount}
+          ficha={project.ficha}
+          initialAmount={amount}
+          projectId={project.projectId}
+        />
       </Suspense>
       {spvCodeForSlug(project.slug) && (
         <TicketPanel spvCode={spvCodeForSlug(project.slug)!} projectName={project.name} />

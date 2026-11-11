@@ -154,8 +154,9 @@ function InvPage() {
           {Object.values(FICHAS).map((f) => (
             <Link
               key={f.slug}
-              to="/proyectos/ficha/$slug"
+              to="/terminal/$slug"
               params={{ slug: f.slug }}
+              search={{ tab: "simulador" }}
               className="group rounded-xl border border-hairline bg-white p-5 hover:border-accent-brand hover:shadow-[0_16px_36px_-24px_rgba(11,42,91,0.35)] transition block"
             >
               <div className="flex items-center justify-between text-[10px] font-mono uppercase tracking-wider">

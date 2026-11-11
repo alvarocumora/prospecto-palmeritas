@@ -1,3 +1,4 @@
+import { equityAmount, equitySearch } from "@/lib/investor/investmentIntent";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { canonicalProjectSlug } from "@/lib/projects/catalog";
 import {
@@ -12,10 +13,20 @@ import { MarketingPage } from "@/features/marketing/MarketingShell";
 export const Route = createFileRoute("/terminal_/$slug")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { tab: TerminalTabKey; view?: ProjectView } => ({
-    tab: isTerminalTab(search.tab) ? search.tab : "mapa",
-    view: search.view == null ? undefined : projectView(search.view),
-  }),
+  ): {
+    tab: TerminalTabKey;
+    view?: ProjectView;
+    amount?: number;
+    currency?: "USD";
+    instrument?: "equity";
+  } => {
+    const amount = equityAmount(search);
+    return {
+      ...(amount ? equitySearch(amount) : {}),
+      tab: isTerminalTab(search.tab) ? search.tab : "mapa",
+      view: search.view == null ? undefined : projectView(search.view),
+    };
+  },
   beforeLoad: ({ params, search }) => {
     const canonical = canonicalProjectSlug(params.slug);
     if (canonical && canonical !== params.slug) {
@@ -52,7 +63,7 @@ export const Route = createFileRoute("/terminal_/$slug")({
 
 function TerminalPage() {
   const { slug } = Route.useParams();
-  const { tab, view } = Route.useSearch();
+  const { tab, view, amount } = Route.useSearch();
   const project = getTerminalProject(slug);
 
   if (!project) {
@@ -72,6 +83,12 @@ function TerminalPage() {
   }
 
   return (
-    <ProjectTerminalShell key={project.slug} project={project} tab={tab} view={projectView(view)} />
+    <ProjectTerminalShell
+      key={project.slug}
+      project={project}
+      tab={tab}
+      view={projectView(view)}
+      amount={amount}
+    />
   );
 }

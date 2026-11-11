@@ -1,3 +1,4 @@
+import { safeAuthNext } from "@/lib/investor/investmentIntent";
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { z } from "zod";
@@ -31,15 +32,6 @@ export const Route = createFileRoute("/auth")({
   }),
   component: AuthPage,
 });
-
-function safeAuthNext(next?: string) {
-  // Reject backslashes and control characters before either URL parser handles the path.
-  // eslint-disable-next-line no-control-regex
-  if (!next?.startsWith("/") || next.startsWith("//") || /[\\\u0000-\u001f\u007f]/.test(next)) {
-    return "/dashboard";
-  }
-  return next;
-}
 
 type Mode = "login" | "signup";
 
