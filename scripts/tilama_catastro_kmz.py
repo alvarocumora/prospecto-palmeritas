@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Refresca el catastro del KMZ de Tilama con el catastro SERNAGEOMIN vigente.
 
-Consulta Marcelo_Layer/FeatureServer/2 (catastro SNGM v2 en ArcGIS Online, el
-mismo servicio que usa src/lib/sngm.ts) dentro del recuadro de Tilama, pagina
-de a 2.000 registros y reemplaza la carpeta "Catastro minero del sector" del
+Consulta VIEW_WGS84/FeatureServer/2 de arcgisawa.sernageomin.cl (el servicio
+que usa el visor oficial appsngmaz) dentro del recuadro de Tilama, pagina de a
+500 registros (maxRecordCount de la capa) y reemplaza la carpeta "Catastro minero del sector" del
 KMZ. Luego cruza las zonas de interes y las muestras de la Tabla 1 de Esterio
 contra esas concesiones y anota el resultado en cada placemark y en
 docs/tilama/catastro_vivo_resumen.md.
@@ -31,6 +31,8 @@ from shapely.geometry import Point, shape
 # (appsngmaz.sernageomin.cl/catastro_SNGM/js/map.js, nov-2026). La capa /0 son
 # los vertices. Marcelo_Layer en ArcGIS Online ya no existe.
 LAYER = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer/2"
+# maxRecordCount de la capa del visor es 500
+PAGINA = 500
 ROOT_AGOL = "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services"
 # Recuadro del sector Tilama / Los Verdes (lon/lat WGS84)
 BBOX = (-71.21, -32.12, -71.02, -31.93)
@@ -169,16 +171,17 @@ def fetch_live() -> list[dict]:
         while True:
             params = {**base, **v}
             if paginar:
-                params.update(resultRecordCount="2000", resultOffset=str(offset))
+                params.update(resultRecordCount=str(PAGINA), resultOffset=str(offset))
             fc = _get(params)
             if fc.get("error"):
                 feats = None
                 break
             page = fc.get("features", [])
             feats += page
-            if not paginar or len(page) < 2000:
+            mas = fc.get("exceededTransferLimit") or (fc.get("properties") or {}).get("exceededTransferLimit")
+            if not paginar or (len(page) < PAGINA and not mas):
                 break
-            offset += 2000
+            offset += len(page)
         if feats is not None:
             print(f"Consulta OK con where={v['where']!r}, paginada={paginar}")
             return feats
