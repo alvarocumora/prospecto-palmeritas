@@ -279,7 +279,12 @@ def main() -> None:
     else:
         feats = fetch_live()
     feats = [f for f in feats if f.get("geometry")]
-    print(f"{len(feats)} concesiones en el recuadro")
+    from collections import Counter
+    print(f"{len(feats)} registros en el recuadro: {dict(Counter(str(f['properties'].get('SITUACION_CONCESION')) for f in feats))}")
+    # La capa del visor trae tambien las concesiones ELIMINADAS (historicas);
+    # para tenencia solo cuentan las constituidas y en tramite.
+    feats = [f for f in feats if str(f["properties"].get("SITUACION_CONCESION") or "").upper() != "ELIMINADA"]
+    print(f"{len(feats)} concesiones vigentes (constituidas o en tramite)")
 
     root = ET.fromstring(zipfile.ZipFile(KMZ).read("doc.kml"))
     doc = root.find(q("Document"))
