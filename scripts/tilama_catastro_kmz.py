@@ -48,18 +48,43 @@ def q(tag: str) -> str:
     return f"{{{K}}}{tag}"
 
 
+# El servicio de ArcGIS Online del visor oficial puede filtrar por origen; se
+# envian los mismos encabezados que manda el navegador desde el visor.
+HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130 Safari/537.36",
+    "Referer": "https://appsngmaz.sernageomin.cl/catastro_SNGM/home/index",
+    "Origin": "https://appsngmaz.sernageomin.cl",
+    "Accept": "application/json, text/plain, */*",
+}
+
+
+def diagnostico() -> None:
+    url = f"{LAYER}?f=json"
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=60) as r:
+            meta = json.load(r)
+        if meta.get("error"):
+            print("Metadatos de la capa con error:", meta["error"])
+        else:
+            campos = [f["name"] for f in meta.get("fields", [])]
+            print(f"Capa: {meta.get('name')} | formatos: {meta.get('supportedQueryFormats')} | campos: {campos}")
+    except urllib.error.HTTPError as e:
+        print(f"Metadatos HTTP {e.code}: {e.read()[:400]!r} | encabezados: {dict(e.headers)}")
+
+
 def _get(params: dict) -> dict:
     url = f"{LAYER}/query?{urllib.parse.urlencode(params)}"
     try:
-        with urllib.request.urlopen(url, timeout=60) as r:
+        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=60) as r:
             return json.load(r)
     except urllib.error.HTTPError as e:
         cuerpo = e.read()[:400].decode("utf-8", "replace")
-        print(f"HTTP {e.code} en {url}\n{cuerpo}")
+        print(f"HTTP {e.code} en {url}\ncuerpo: {cuerpo!r}\nencabezados: {dict(e.headers)}")
         return {"error": {"code": e.code, "message": cuerpo}}
 
 
 def fetch_live() -> list[dict]:
+    diagnostico()
     base = {
         "geometry": ",".join(map(str, BBOX)),
         "geometryType": "esriGeometryEnvelope",
