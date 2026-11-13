@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+"""Refresca el catastro del KMZ de Tilama con el catastro SERNAGEOMIN vigente.
+
+Consulta Marcelo_Layer/FeatureServer/2 (catastro SNGM v2 en ArcGIS Online, el
+mismo servicio que usa src/lib/sngm.ts) dentro del recuadro de Tilama, pagina
+de a 2.000 registros y reemplaza la carpeta "Catastro minero del sector" del
+KMZ. Luego cruza las zonas de interes y las muestras de la Tabla 1 de Esterio
+contra esas concesiones y anota el resultado en cada placemark y en
+docs/tilama/catastro_vivo_resumen.md.
+
+Uso:
+  python scripts/tilama_catastro_kmz.py                 # consulta en vivo
+  python scripts/tilama_catastro_kmz.py --source f.geojson   # sin red (pruebas)
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as dt
+import json
+import math
+import urllib.parse
+import urllib.request
+import zipfile
+from pathlib import Path
+from xml.etree import ElementTree as ET
+
+from shapely.geometry import Point, shape
+
+LAYER = (
+    "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/"
+    "Marcelo_Layer/FeatureServer/2"
+)
+# Recuadro del sector Tilama / Los Verdes (lon/lat WGS84)
+BBOX = (-71.21, -32.12, -71.02, -31.93)
+KMZ = Path("docs/tilama/tilama_prioridades_estructuras.kmz")
+RESUMEN = Path("docs/tilama/catastro_vivo_resumen.md")
+CATASTRO_FOLDER = "Catastro minero del sector"
+# Roles que el proyecto marca como propios (mismos que el KMZ original)
+ROLES_PROPIOS = {"043031060-7", "043031059-3", "043031291-K", "043031292-8"}
+TITULARES_PROYECTO = ("FERNANDEZ VASQUEZ", "FERNANDEZ CHACANA")
+
+K = "http://www.opengis.net/kml/2.2"
+ET.register_namespace("", K)
+
+
+def q(tag: str) -> str:
+    return f"{{{K}}}{tag}"
+
+
+def fetch_live() -> list[dict]:
+    feats: list[dict] = []
+    offset = 0
+    while True:
+        params = {
+            "where": "1=1",
+            "outFields": "*",
+            "outSR": "4326",
+            "f": "geojson",
+            "geometry": ",".join(map(str, BBOX)),
+            "geometryType": "esriGeometryEnvelope",
+            "inSR": "4326",
+            "spatialRel": "esriSpatialRelIntersects",
+            "resultRecordCount": "2000",
+            "resultOffset": str(offset),
+        }
+        url = f"{LAYER}/query?{urllib.parse.urlencode(params)}"
+        with urllib.request.urlopen(url, timeout=60) as r:
+            fc = json.load(r)
+        if fc.get("error"):
+            raise SystemExit(f"Error del FeatureServer: {fc['error']}")
+        page = fc.get("features", [])
+        feats += page
+        if len(page) < 2000:
+            return feats
+        offset += 2000
+
+
+def rol_de(p: dict) -> str:
+    rol = str(p.get("NUMERO_ROL") or "").strip()
+    dv = str(p.get("DV_ROL") or "").strip()
+    return f"{rol}-{dv}" if dv else rol
+
+
+def es_propia(p: dict) -> bool:
+    return rol_de(p) in ROLES_PROPIOS
+
+
+def es_proyecto(p: dict) -> bool:
+    t = str(p.get("TITULAR_NOMBRE") or "").upper()
+    return es_propia(p) or any(x in t for x in TITULARES_PROYECTO)
+
+
+def fecha_txt(v) -> str:
+    if isinstance(v, (int, float)):
+        return dt.datetime.fromtimestamp(v / 1000, dt.timezone.utc).strftime("%d-%m-%Y")
+    return str(v or "—")
+
+
+def rings(geom: dict):
+    if geom["type"] == "Polygon":
+        yield from geom["coordinates"][:1]
+    elif geom["type"] == "MultiPolygon":
+        for poly in geom["coordinates"]:
+            yield poly[0]
+
+
+def placemark(f: dict, hoy: str) -> ET.Element:
+    p = f["properties"]
+    own, proj = es_propia(p), es_proyecto(p)
+    pm = ET.Element(q("Placemark"))
+    nombre = str(p.get("NOMBRE") or "s/n").strip()
+    ET.SubElement(pm, q("name")).text = ("[PROPIA] " if own else "") + nombre
+    ET.SubElement(pm, q("description")).text = (
+        f"Rol: {rol_de(p)}\nTitular: {p.get('TITULAR_NOMBRE')}\n"
+        f"Situacion: {p.get('SITUACION_CONCESION')} | Tipo: {p.get('TIPO_CONCESION')}\n"
+        f"Hectareas: {p.get('HECTAREAS')} | Comuna: {p.get('COMUNA')}\n"
+        f"Vencimiento: {fecha_txt(p.get('FECHA_VENCIMIENTO'))} | Datum origen: {p.get('DATUM')} {p.get('HUSO') or ''}\n"
+        f"Fuente: SERNAGEOMIN Marcelo_Layer/FeatureServer/2, consultado {hoy}"
+    )
+    st = ET.SubElement(pm, q("Style"))
+    ls = ET.SubElement(st, q("LineStyle"))
+    ET.SubElement(ls, q("color")).text = "ff00c000" if own else ("ff00a0ff" if proj else "ffb0b0b0")
+    ET.SubElement(ls, q("width")).text = "3" if own else ("2" if proj else "1")
+    ps = ET.SubElement(st, q("PolyStyle"))
+    ET.SubElement(ps, q("color")).text = "3300c000" if own else ("2200a0ff" if proj else "11b0b0b0")
+    mg = ET.SubElement(pm, q("MultiGeometry"))
+    for ring in rings(f["geometry"]):
+        pol = ET.SubElement(mg, q("Polygon"))
+        lr = ET.SubElement(ET.SubElement(pol, q("outerBoundaryIs")), q("LinearRing"))
+        ET.SubElement(lr, q("coordinates")).text = " ".join(f"{x:.7f},{y:.7f},0" for x, y, *_ in ring)
+    return pm
+
+
+def area_ha(g) -> float:
+    # Area aproximada en ha (equirectangular local, suficiente para porcentajes)
+    lat = g.centroid.y
+    return g.area * (111_320 ** 2) * math.cos(math.radians(lat)) / 1e4
+
+
+def kml_geom(pm: ET.Element):
+    from shapely.geometry import LineString, Polygon
+
+    c = next(pm.iter(q("coordinates")), None)
+    if c is None:
+        return None
+    pts = [tuple(map(float, v.split(",")[:2])) for v in c.text.split()]
+    if pm.find(f".//{q('Point')}") is not None:
+        return Point(pts[0])
+    if pm.find(f".//{q('LineString')}") is not None:
+        return LineString(pts)
+    return Polygon(pts)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--source", help="GeoJSON local en lugar de la consulta en vivo")
+    args = ap.parse_args()
+    hoy = dt.date.today().strftime("%d-%m-%Y")
+    if args.source:
+        feats = json.loads(Path(args.source).read_text())["features"]
+        hoy += " (archivo local)"
+    else:
+        feats = fetch_live()
+    feats = [f for f in feats if f.get("geometry")]
+    print(f"{len(feats)} concesiones en el recuadro")
+
+    root = ET.fromstring(zipfile.ZipFile(KMZ).read("doc.kml"))
+    doc = root.find(q("Document"))
+    folder = next(f for f in doc.findall(q("Folder")) if f.findtext(q("name")).startswith(CATASTRO_FOLDER))
+    for child in list(folder):
+        if child.tag == q("Placemark"):
+            folder.remove(child)
+    folder.find(q("name")).text = f"{CATASTRO_FOLDER} (SERNAGEOMIN, consultado {hoy})"
+    desc = folder.find(q("description"))
+    if desc is None:
+        desc = ET.SubElement(folder, q("description"))
+    desc.text = (
+        f"Catastro SERNAGEOMIN vigente (Marcelo_Layer/FeatureServer/2) dentro de {BBOX}, consultado {hoy}. "
+        "Verde: roles propios del proyecto. Naranjo: titulares Fernandez Vasquez / Fernandez Chacana. Gris: terceros. "
+        "Referencial: la tenencia se acredita con certificado del Conservador de Minas."
+    )
+    for f in sorted(feats, key=lambda f: (not es_proyecto(f["properties"]), str(f["properties"].get("NOMBRE")))):
+        folder.append(placemark(f, hoy))
+
+    concesiones = [(f["properties"], shape(f["geometry"]).buffer(0)) for f in feats]
+
+    def tenencia(g) -> str:
+        if g.geom_type == "Point":
+            hits = [p for p, c in concesiones if c.contains(g)]
+            if not hits:
+                return "fuera de toda concesion vigente del catastro (terreno posiblemente libre: verificar)"
+            return "; ".join(f"{p.get('NOMBRE')} ({rol_de(p)}, {p.get('TITULAR_NOMBRE')}, {p.get('SITUACION_CONCESION')})" for p in hits)
+        if g.geom_type == "LineString":
+            hits = [p for p, c in concesiones if c.intersects(g)]
+            return "cruza " + ("; ".join(f"{p.get('NOMBRE')} ({p.get('TITULAR_NOMBRE')})" for p in hits) or "terreno sin concesion vigente")
+        tot = area_ha(g)
+        partes = []
+        for p, c in concesiones:
+            if c.intersects(g):
+                pct = area_ha(c.intersection(g)) / tot * 100
+                if pct >= 0.5:
+                    partes.append(f"{pct:.0f} % {p.get('NOMBRE')} ({rol_de(p)}, {p.get('TITULAR_NOMBRE')})")
+        libre = 100 - sum(area_ha(c.intersection(g)) for _, c in concesiones if c.intersects(g)) / tot * 100
+        if libre >= 0.5:
+            partes.append(f"{libre:.0f} % sin concesion vigente")
+        return "; ".join(partes) or "sin concesion vigente"
+
+    lineas = [f"# Tenencia de Tilama según el catastro SERNAGEOMIN ({hoy})", "",
+              f"Fuente: `Marcelo_Layer/FeatureServer/2`, recuadro {BBOX}, {len(feats)} concesiones. "
+              "Generado por `scripts/tilama_catastro_kmz.py`. Referencial: no reemplaza el certificado del Conservador de Minas.", ""]
+    for fo in doc.findall(q("Folder")):
+        nombre = fo.findtext(q("name"))
+        if not (nombre.startswith("Zonas de interes") or nombre.startswith("Muestreo historico") or nombre.startswith("Referencias del informe")):
+            continue
+        lineas += [f"## {nombre}", ""]
+        for pm in fo.findall(q("Placemark")):
+            g = kml_geom(pm)
+            if g is None:
+                continue
+            t = tenencia(g)
+            d = pm.find(q("description"))
+            if d is None:
+                d = ET.SubElement(pm, q("description"))
+            base = (d.text or "").split("\n\nTENENCIA (catastro SERNAGEOMIN")[0]
+            d.text = f"{base}\n\nTENENCIA (catastro SERNAGEOMIN {hoy}): {t}"
+            lineas.append(f"- **{pm.findtext(q('name'))}**: {t}")
+        lineas.append("")
+
+    data = b'<?xml version="1.0" encoding="UTF-8"?>\n' + ET.tostring(root, encoding="utf-8")
+    with zipfile.ZipFile(KMZ, "w", zipfile.ZIP_DEFLATED) as z:
+        z.writestr("doc.kml", data)
+    RESUMEN.write_text("\n".join(lineas), encoding="utf-8")
+    print(f"KMZ y {RESUMEN} actualizados")
+
+
+if __name__ == "__main__":
+    main()
