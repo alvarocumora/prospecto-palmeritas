@@ -2,6 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireAnyModuleRole } from "@/lib/access/roleMiddleware";
 import { z } from "zod";
 import { publicUrl } from "@/lib/publicUrl";
+import {
+  isActiveProjectInvitation,
+  isSignedTechnicalReport,
+  mayNotifyProject,
+  resolveProjectNotificationRecipients,
+} from "@/lib/access/projectNotifications";
 
 const InviteSchema = z.object({
   invitationId: z.string().uuid(),
@@ -16,7 +22,7 @@ const ReportSchema = z.object({
 
 /**
  * Manually send a project invitation email for an existing project_invitations row.
- * Requires the caller to be a member of the project.
+ * Requires owner/admin authorization and an active, unexpired invitation.
  */
 export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
   .middleware([requireAnyModuleRole])
@@ -26,20 +32,27 @@ export const sendProjectInvitationEmail = createServerFn({ method: "POST" })
     const { data: inv, error } = await supabase
       .from("project_invitations")
       .select(
-        "id, email, role, token, expires_at, project_id, projects:project_id(name, code, organization_id, organizations:organization_id(name))",
+        "id, email, role, token, status, expires_at, project_id, projects:project_id(name, code, organization_id, organizations:organization_id(name))",
       )
       .eq("id", data.invitationId)
       .maybeSingle();
     if (error || !inv) throw new Error("Invitación no encontrada");
 
-    // authorization: invited_by or project member
-    const { data: member } = await supabase
+    // El acceso de lectura (viewer, geologist, etc.) no permite reenviar tokens.
+    const { data: member, error: memberError } = await supabase
       .from("project_members")
-      .select("user_id")
+      .select("role")
       .eq("project_id", inv.project_id)
       .eq("user_id", userId)
       .maybeSingle();
-    if (!member) throw new Error("No tienes acceso a este proyecto");
+    if (memberError || !mayNotifyProject(member?.role, context.access.isSuperAdmin)) {
+      throw new Response("No autorizado a enviar invitaciones de este proyecto.", {
+        status: 403,
+      });
+    }
+    if (!isActiveProjectInvitation(inv.status, inv.expires_at)) {
+      throw new Response("Esta invitación no está pendiente o ha expirado.", { status: 409 });
+    }
 
     const { data: inviterProfile } = await supabase
       .from("profiles")
@@ -101,13 +114,22 @@ export const sendReportSignedEmail = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error || !report) throw new Error("Reporte no encontrado");
 
-    const { data: member } = await supabase
+    const { data: member, error: memberError } = await supabase
       .from("project_members")
-      .select("user_id")
+      .select("role")
       .eq("project_id", report.project_id)
       .eq("user_id", userId)
       .maybeSingle();
-    if (!member) throw new Error("No tienes acceso a este proyecto");
+    if (memberError || !mayNotifyProject(member?.role, context.access.isSuperAdmin)) {
+      throw new Response("No autorizado a comunicar reportes de este proyecto.", {
+        status: 403,
+      });
+    }
+    if (!isSignedTechnicalReport(report.status, report.signature_date)) {
+      throw new Response("El reporte aún no está firmado o no tiene fecha de firma.", {
+        status: 409,
+      });
+    }
 
     let leadQp = "—";
     if (report.lead_qp_id) {
@@ -119,20 +141,27 @@ export const sendReportSignedEmail = createServerFn({ method: "POST" })
       if (qp) leadQp = `${qp.full_name} · ${qp.registration_body ?? qp.profession ?? ""}`.trim();
     }
 
-    let recipients = data.recipientEmails ?? [];
-    if (recipients.length === 0) {
-      // default: all project members
-      const { data: members } = await supabase
-        .from("project_members")
-        .select("user_id")
-        .eq("project_id", report.project_id);
-      const userIds = (members ?? []).map((m) => m.user_id);
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("email")
-        .in("user_id", userIds);
-      recipients = (profs ?? []).map((p) => p.email).filter(Boolean) as string[];
+    // El caller no puede añadir correos externos a un reporte confidencial.
+    // Tanto la lista automática como la personalizada se comparan con el roster.
+    const { data: members, error: rosterError } = await supabase
+      .from("project_members")
+      .select("user_id")
+      .eq("project_id", report.project_id);
+    if (rosterError || !members?.length) {
+      throw new Error("No se pudo verificar la nómina del proyecto.");
     }
+    const userIds = members.map((member) => member.user_id);
+    const { data: profiles, error: profileError } = await supabase
+      .from("profiles")
+      .select("email")
+      .in("user_id", userIds);
+    if (profileError) {
+      throw new Error("No se pudo verificar el correo de los miembros del proyecto.");
+    }
+    const projectEmails = (profiles ?? [])
+      .map((profile) => profile.email)
+      .filter((email): email is string => typeof email === "string" && email.length > 0);
+    const recipients = resolveProjectNotificationRecipients(data.recipientEmails, projectEmails);
 
     const project = (report as unknown as { projects?: { name?: string } | null }).projects ?? null;
     const templateName =
