@@ -18,6 +18,7 @@ import argparse
 import datetime as dt
 import json
 import math
+import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
@@ -47,32 +48,61 @@ def q(tag: str) -> str:
     return f"{{{K}}}{tag}"
 
 
-def fetch_live() -> list[dict]:
-    feats: list[dict] = []
-    offset = 0
-    while True:
-        params = {
-            "where": "1=1",
-            "outFields": "*",
-            "outSR": "4326",
-            "f": "geojson",
-            "geometry": ",".join(map(str, BBOX)),
-            "geometryType": "esriGeometryEnvelope",
-            "inSR": "4326",
-            "spatialRel": "esriSpatialRelIntersects",
-            "resultRecordCount": "2000",
-            "resultOffset": str(offset),
-        }
-        url = f"{LAYER}/query?{urllib.parse.urlencode(params)}"
+def _get(params: dict) -> dict:
+    url = f"{LAYER}/query?{urllib.parse.urlencode(params)}"
+    try:
         with urllib.request.urlopen(url, timeout=60) as r:
-            fc = json.load(r)
-        if fc.get("error"):
-            raise SystemExit(f"Error del FeatureServer: {fc['error']}")
-        page = fc.get("features", [])
-        feats += page
-        if len(page) < 2000:
+            return json.load(r)
+    except urllib.error.HTTPError as e:
+        cuerpo = e.read()[:400].decode("utf-8", "replace")
+        print(f"HTTP {e.code} en {url}\n{cuerpo}")
+        return {"error": {"code": e.code, "message": cuerpo}}
+
+
+def fetch_live() -> list[dict]:
+    base = {
+        "geometry": ",".join(map(str, BBOX)),
+        "geometryType": "esriGeometryEnvelope",
+        "inSR": "4326",
+        "outSR": "4326",
+        "spatialRel": "esriSpatialRelIntersects",
+        "returnGeometry": "true",
+        "f": "geojson",
+    }
+    # Variantes de mas completa a mas simple; la ultima es la que usa
+    # src/components/map/overlays.ts en la plataforma.
+    variantes = [
+        {"where": "1=1", "outFields": "*"},
+        {"where": "1=1", "outFields": "*", "paginar": False},
+        {"where": "ID_SITUACION_CONCESION in (1,3,9)", "outFields": "*", "paginar": False},
+        {"where": "ID_SITUACION_CONCESION in (1,3)", "paginar": False,
+         "outFields": "ORIGEN,NUMERO_ROL,DV_ROL,NOMBRE,HECTAREAS,FECHA_VENCIMIENTO,SITUACION_CONCESION,TITULAR_DIVISION,COMUNA"},
+    ]
+    for v in variantes:
+        paginar = v.pop("paginar", True)
+        feats: list[dict] = []
+        offset = 0
+        while True:
+            params = {**base, **v}
+            if paginar:
+                params.update(resultRecordCount="2000", resultOffset=str(offset))
+            fc = _get(params)
+            if fc.get("error"):
+                feats = None
+                break
+            page = fc.get("features", [])
+            feats += page
+            if not paginar or len(page) < 2000:
+                break
+            offset += 2000
+        if feats is not None:
+            print(f"Consulta OK con where={v['where']!r}, paginada={paginar}")
             return feats
-        offset += 2000
+    raise SystemExit("El FeatureServer rechazo todas las variantes de consulta")
+
+
+def titular(p: dict) -> str:
+    return str(p.get("TITULAR_NOMBRE") or p.get("TITULAR_DIVISION") or "s/i")
 
 
 def rol_de(p: dict) -> str:
@@ -86,7 +116,7 @@ def es_propia(p: dict) -> bool:
 
 
 def es_proyecto(p: dict) -> bool:
-    t = str(p.get("TITULAR_NOMBRE") or "").upper()
+    t = titular(p).upper()
     return es_propia(p) or any(x in t for x in TITULARES_PROYECTO)
 
 
@@ -111,7 +141,7 @@ def placemark(f: dict, hoy: str) -> ET.Element:
     nombre = str(p.get("NOMBRE") or "s/n").strip()
     ET.SubElement(pm, q("name")).text = ("[PROPIA] " if own else "") + nombre
     ET.SubElement(pm, q("description")).text = (
-        f"Rol: {rol_de(p)}\nTitular: {p.get('TITULAR_NOMBRE')}\n"
+        f"Rol: {rol_de(p)}\nTitular: {titular(p)}\n"
         f"Situacion: {p.get('SITUACION_CONCESION')} | Tipo: {p.get('TIPO_CONCESION')}\n"
         f"Hectareas: {p.get('HECTAREAS')} | Comuna: {p.get('COMUNA')}\n"
         f"Vencimiento: {fecha_txt(p.get('FECHA_VENCIMIENTO'))} | Datum origen: {p.get('DATUM')} {p.get('HUSO') or ''}\n"
@@ -189,17 +219,17 @@ def main() -> None:
             hits = [p for p, c in concesiones if c.contains(g)]
             if not hits:
                 return "fuera de toda concesion vigente del catastro (terreno posiblemente libre: verificar)"
-            return "; ".join(f"{p.get('NOMBRE')} ({rol_de(p)}, {p.get('TITULAR_NOMBRE')}, {p.get('SITUACION_CONCESION')})" for p in hits)
+            return "; ".join(f"{p.get('NOMBRE')} ({rol_de(p)}, {titular(p)}, {p.get('SITUACION_CONCESION')})" for p in hits)
         if g.geom_type == "LineString":
             hits = [p for p, c in concesiones if c.intersects(g)]
-            return "cruza " + ("; ".join(f"{p.get('NOMBRE')} ({p.get('TITULAR_NOMBRE')})" for p in hits) or "terreno sin concesion vigente")
+            return "cruza " + ("; ".join(f"{p.get('NOMBRE')} ({titular(p)})" for p in hits) or "terreno sin concesion vigente")
         tot = area_ha(g)
         partes = []
         for p, c in concesiones:
             if c.intersects(g):
                 pct = area_ha(c.intersection(g)) / tot * 100
                 if pct >= 0.5:
-                    partes.append(f"{pct:.0f} % {p.get('NOMBRE')} ({rol_de(p)}, {p.get('TITULAR_NOMBRE')})")
+                    partes.append(f"{pct:.0f} % {p.get('NOMBRE')} ({rol_de(p)}, {titular(p)})")
         libre = 100 - sum(area_ha(c.intersection(g)) for _, c in concesiones if c.intersects(g)) / tot * 100
         if libre >= 0.5:
             partes.append(f"{libre:.0f} % sin concesion vigente")
