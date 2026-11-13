@@ -58,6 +58,49 @@ HEADERS = {
 }
 
 
+ROOT = LAYER.split("/Marcelo_Layer/")[0]
+
+
+def _json(url: str) -> dict:
+    with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=60) as r:
+        return json.load(r)
+
+
+def descubrir_capa() -> str | None:
+    """Busca en la organizacion SNGM la capa de concesiones vigente.
+
+    SERNAGEOMIN renombra servicios (Marcelo_Layer dejo de responder en
+    nov-2026): se elige la capa de poligonos que tenga NUMERO_ROL y NOMBRE.
+    """
+    try:
+        servicios = _json(f"{ROOT}?f=json").get("services", [])
+    except Exception as e:  # noqa: BLE001
+        print(f"No se pudo listar {ROOT}: {e}")
+        return None
+    candidatos = [s for s in servicios if s.get("type") == "FeatureServer"
+                  and any(k in s["name"].lower() for k in ("conces", "marcelo", "catastro", "pertenen", "minera"))]
+    print(f"{len(servicios)} servicios en la organizacion; candidatos: {[s['name'] for s in candidatos]}")
+    elegida = None
+    for s in candidatos:
+        base = f"{ROOT}/{s['name']}/FeatureServer"
+        try:
+            capas = _json(f"{base}?f=json").get("layers", [])
+        except Exception as e:  # noqa: BLE001
+            print(f"  {s['name']}: error {e}")
+            continue
+        for c in capas:
+            try:
+                meta = _json(f"{base}/{c['id']}?f=json")
+            except Exception:  # noqa: BLE001
+                continue
+            campos = {f["name"].upper() for f in meta.get("fields", [])}
+            ok = meta.get("geometryType") == "esriGeometryPolygon" and {"NUMERO_ROL", "NOMBRE"} <= campos
+            print(f"  {s['name']}/{c['id']} {c.get('name')} {meta.get('geometryType')} {'<- concesiones' if ok else ''}")
+            if ok and elegida is None:
+                elegida = f"{base}/{c['id']}"
+    return elegida
+
+
 def diagnostico() -> None:
     url = f"{LAYER}?f=json"
     try:
@@ -84,7 +127,18 @@ def _get(params: dict) -> dict:
 
 
 def fetch_live() -> list[dict]:
+    global LAYER
     diagnostico()
+    try:
+        vivo = not _json(f"{LAYER}?f=json").get("error")
+    except Exception:  # noqa: BLE001
+        vivo = False
+    if not vivo:
+        nueva = descubrir_capa()
+        if not nueva:
+            raise SystemExit("No se encontro la capa de concesiones en la organizacion SNGM")
+        print(f"Usando capa descubierta: {nueva}")
+        LAYER = nueva
     base = {
         "geometry": ",".join(map(str, BBOX)),
         "geometryType": "esriGeometryEnvelope",
