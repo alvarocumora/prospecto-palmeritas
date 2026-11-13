@@ -43,8 +43,13 @@ jobs:
           : > urls.txt
           grep -oE 'https?://[^"'"'"' )]*(arcgis|FeatureServer|MapServer|services)[^"'"'"' )]*' visor.html >> urls.txt || true
           while read -r js; do
-            case "$js" in http*) u="$js";; /*) u="$base$js";; *) u="$base/catastro_SNGM/$js";; esac
-            curl -sSL -A "$UA" "$u" | grep -oE 'https?://[^"'"'"' )]*(arcgis|FeatureServer|MapServer|/rest/services)[^"'"'"' )]*' >> urls.txt || true
+            case "$js" in http*) u="$js";; /*) u="$base$js";; ../*) u="$base/catastro_SNGM/${js#../}";; *) u="$base/catastro_SNGM/home/$js";; esac
+            case "$js" in *jquery*|*bootstrap*|*sweetalert*|*DataTable*|*calcite*|*proj4*) continue;; esac
+            f=$(basename "${js%%\?*}")
+            curl -sSL -A "$UA" "$u" -o "js_$f" || continue
+            echo "-- $u ($(wc -c < "js_$f") bytes)"
+            grep -oE 'https?://[^"'"'"' )]*(arcgis|FeatureServer|MapServer|/rest/services|sernageomin)[^"'"'"' )]*' "js_$f" >> urls.txt || true
+            grep -n -oE '.{0,80}(FeatureLayer|portalItem|MapImageLayer|url ?:|/query|layerId|itemId).{0,160}' "js_$f" | head -40 || true
           done < js.txt
           echo "== URLs de servicios en el visor =="; sort -u urls.txt
       - name: Consultar catastro y regenerar KMZ
