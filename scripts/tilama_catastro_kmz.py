@@ -27,10 +27,11 @@ from xml.etree import ElementTree as ET
 
 from shapely.geometry import Point, shape
 
-LAYER = (
-    "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services/"
-    "Marcelo_Layer/FeatureServer/2"
-)
+# Capa de concesiones que consume hoy el visor oficial
+# (appsngmaz.sernageomin.cl/catastro_SNGM/js/map.js, nov-2026). La capa /0 son
+# los vertices. Marcelo_Layer en ArcGIS Online ya no existe.
+LAYER = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer/2"
+ROOT_AGOL = "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services"
 # Recuadro del sector Tilama / Los Verdes (lon/lat WGS84)
 BBOX = (-71.21, -32.12, -71.02, -31.93)
 KMZ = Path("docs/tilama/tilama_prioridades_estructuras.kmz")
@@ -58,7 +59,7 @@ HEADERS = {
 }
 
 
-ROOT = LAYER.split("/Marcelo_Layer/")[0]
+ROOT = ROOT_AGOL
 
 
 def _json(url: str) -> dict:
@@ -114,7 +115,7 @@ def diagnostico() -> None:
             print("Metadatos de la capa con error:", meta["error"])
         else:
             campos = [f["name"] for f in meta.get("fields", [])]
-            print(f"Capa: {meta.get('name')} | formatos: {meta.get('supportedQueryFormats')} | campos: {campos}")
+            print(f"Capa: {meta.get('name')} | formatos: {meta.get('supportedQueryFormats')} | max {meta.get('maxRecordCount')} | campos: {campos}")
     except urllib.error.HTTPError as e:
         print(f"Metadatos HTTP {e.code}: {e.read()[:400]!r} | encabezados: {dict(e.headers)}")
 
@@ -228,7 +229,7 @@ def placemark(f: dict, hoy: str) -> ET.Element:
         f"Situacion: {p.get('SITUACION_CONCESION')} | Tipo: {p.get('TIPO_CONCESION')}\n"
         f"Hectareas: {p.get('HECTAREAS')} | Comuna: {p.get('COMUNA')}\n"
         f"Vencimiento: {fecha_txt(p.get('FECHA_VENCIMIENTO'))} | Datum origen: {p.get('DATUM')} {p.get('HUSO') or ''}\n"
-        f"Fuente: SERNAGEOMIN Marcelo_Layer/FeatureServer/2, consultado {hoy}"
+        f"Fuente: SERNAGEOMIN VIEW_WGS84/FeatureServer/2 (visor oficial), consultado {hoy}"
     )
     st = ET.SubElement(pm, q("Style"))
     ls = ET.SubElement(st, q("LineStyle"))
@@ -288,7 +289,7 @@ def main() -> None:
     if desc is None:
         desc = ET.SubElement(folder, q("description"))
     desc.text = (
-        f"Catastro SERNAGEOMIN vigente (Marcelo_Layer/FeatureServer/2) dentro de {BBOX}, consultado {hoy}. "
+        f"Catastro SERNAGEOMIN vigente (VIEW_WGS84/FeatureServer/2, el que usa el visor oficial) dentro de {BBOX}, consultado {hoy}. "
         "Verde: roles propios del proyecto. Naranjo: titulares Fernandez Vasquez / Fernandez Chacana. Gris: terceros. "
         "Referencial: la tenencia se acredita con certificado del Conservador de Minas."
     )
@@ -319,7 +320,7 @@ def main() -> None:
         return "; ".join(partes) or "sin concesion vigente"
 
     lineas = [f"# Tenencia de Tilama según el catastro SERNAGEOMIN ({hoy})", "",
-              f"Fuente: `Marcelo_Layer/FeatureServer/2`, recuadro {BBOX}, {len(feats)} concesiones. "
+              f"Fuente: `arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer/2`, recuadro {BBOX}, {len(feats)} concesiones. "
               "Generado por `scripts/tilama_catastro_kmz.py`. Referencial: no reemplaza el certificado del Conservador de Minas.", ""]
     for fo in doc.findall(q("Folder")):
         nombre = fo.findtext(q("name"))

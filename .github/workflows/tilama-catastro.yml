@@ -1,7 +1,7 @@
 name: Tilama catastro SERNAGEOMIN
 
-# Refresca el catastro del KMZ de Tilama desde el FeatureServer Marcelo_Layer
-# (catastro SNGM v2) y anota la tenencia de zonas y muestras.
+# Refresca el catastro del KMZ de Tilama desde el FeatureServer que usa el
+# visor oficial SNGM (arcgisawa.sernageomin.cl/.../VIEW_WGS84/FeatureServer/2) y anota la tenencia de zonas y muestras.
 on:
   workflow_dispatch:
   schedule:
@@ -31,27 +31,6 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install shapely
-      - name: Diagnostico - servicios que usa el visor oficial SNGM
-        continue-on-error: true
-        run: |
-          UA='Mozilla/5.0 (X11; Linux x86_64) Chrome/130 Safari/537.36'
-          base=https://appsngmaz.sernageomin.cl
-          curl -sSL -A "$UA" "$base/catastro_SNGM/home/index" -o visor.html || true
-          echo "HTML: $(wc -c < visor.html) bytes"
-          grep -oE '(src|href)="[^"]+\.js[^"]*"' visor.html | sed -E 's/^(src|href)="//;s/"$//' | sort -u > js.txt
-          cat js.txt
-          : > urls.txt
-          grep -oE 'https?://[^"'"'"' )]*(arcgis|FeatureServer|MapServer|services)[^"'"'"' )]*' visor.html >> urls.txt || true
-          while read -r js; do
-            case "$js" in http*) u="$js";; /*) u="$base$js";; ../*) u="$base/catastro_SNGM/${js#../}";; *) u="$base/catastro_SNGM/home/$js";; esac
-            case "$js" in *jquery*|*bootstrap*|*sweetalert*|*DataTable*|*calcite*|*proj4*) continue;; esac
-            f=$(basename "${js%%\?*}")
-            curl -sSL -A "$UA" "$u" -o "js_$f" || continue
-            echo "-- $u ($(wc -c < "js_$f") bytes)"
-            grep -oE 'https?://[^"'"'"' )]*(arcgis|FeatureServer|MapServer|/rest/services|sernageomin)[^"'"'"' )]*' "js_$f" >> urls.txt || true
-            grep -n -oE '.{0,80}(FeatureLayer|portalItem|MapImageLayer|url ?:|/query|layerId|itemId).{0,160}' "js_$f" | head -40 || true
-          done < js.txt
-          echo "== URLs de servicios en el visor =="; sort -u urls.txt
       - name: Consultar catastro y regenerar KMZ
         run: python scripts/tilama_catastro_kmz.py
       - name: Guardar cambios
