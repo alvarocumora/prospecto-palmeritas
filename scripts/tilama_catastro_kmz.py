@@ -79,23 +79,27 @@ def descubrir_capa() -> str | None:
         return None
     candidatos = [s for s in servicios if s.get("type") == "FeatureServer"
                   and any(k in s["name"].lower() for k in ("conces", "marcelo", "catastro", "pertenen", "minera"))]
-    print(f"{len(servicios)} servicios en la organizacion; candidatos: {[s['name'] for s in candidatos]}")
+    print(f"{len(servicios)} servicios en la organizacion: {sorted(s['name'] for s in servicios)}")
+    print(f"candidatos: {[s['name'] for s in candidatos]}")
     elegida = None
     for s in candidatos:
         base = f"{ROOT}/{s['name']}/FeatureServer"
         try:
-            capas = _json(f"{base}?f=json").get("layers", [])
+            info = _json(f"{base}?f=json")
         except Exception as e:  # noqa: BLE001
             print(f"  {s['name']}: error {e}")
             continue
+        capas = info.get("layers", [])
+        if not capas:
+            print(f"  {s['name']}: sin capas {str(info)[:200]}")
         for c in capas:
             try:
                 meta = _json(f"{base}/{c['id']}?f=json")
             except Exception:  # noqa: BLE001
                 continue
-            campos = {f["name"].upper() for f in meta.get("fields", [])}
+            campos = {f["name"].upper() for f in meta.get("fields") or []}
             ok = meta.get("geometryType") == "esriGeometryPolygon" and {"NUMERO_ROL", "NOMBRE"} <= campos
-            print(f"  {s['name']}/{c['id']} {c.get('name')} {meta.get('geometryType')} {'<- concesiones' if ok else ''}")
+            print(f"  {s['name']}/{c['id']} {c.get('name')} {meta.get('geometryType')} n_campos={len(campos)} {sorted(campos)[:25]} {'<- concesiones' if ok else ''}")
             if ok and elegida is None:
                 elegida = f"{base}/{c['id']}"
     return elegida
