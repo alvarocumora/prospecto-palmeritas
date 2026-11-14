@@ -1,0 +1,42 @@
+name: Tilama screening Sentinel-2
+
+# Screening Sentinel-2 del distrito Tilama: calibra contra la mineralización
+# conocida, cruza las anomalías con el catastro SNGM vigente, las zonas
+# marcadas y los pedimentos VALESC, y propone pedimentos en terreno libre.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/tilama_satelite_zonas.py'
+      - 'docs/tilama/pedimentos/pedimentos_valesc.json'
+      - 'docs/tilama/pedimentos/zonas_marcadas_visor.json'
+      - '.github/workflows/tilama-satelite.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tilama-satelite-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  screening:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Instalar pipeline remoto
+        run: python -m pip install -e ./geocapitals-remote scipy
+      - name: Screening Sentinel-2 y cruce con catastro
+        run: python scripts/tilama_satelite_zonas.py
+      - name: Subir resultados
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tilama-satelite
+          path: out/tilama_satelite/
+          if-no-files-found: warn
+          retention-days: 30

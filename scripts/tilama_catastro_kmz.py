@@ -35,7 +35,7 @@ LAYER = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/Featur
 PAGINA = 500
 ROOT_AGOL = "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services"
 # Recuadro del sector Tilama / Los Verdes (lon/lat WGS84)
-BBOX = (-71.21, -32.12, -71.02, -31.93)
+BBOX = (-71.235, -32.12, -71.02, -31.93)
 KMZ = Path("docs/tilama/tilama_prioridades_estructuras.kmz")
 RESUMEN = Path("docs/tilama/catastro_vivo_resumen.md")
 CATASTRO_FOLDER = "Catastro minero del sector"
