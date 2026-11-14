@@ -278,39 +278,26 @@
   "n": 11,
   "nombre": "LEONOR 11",
   "zona": "W (26,00 km²)",
-  "E0": 289500,
+  "E0": 290500,
   "E1": 293500,
   "N0": 6452000,
   "N1": 6454000,
-  "EW": 4000,
+  "EW": 3000,
   "NS": 2000,
-  "ha": 800,
-  "pm_E": 291500.0,
+  "ha": 600,
+  "pm_E": 292000.0,
   "pm_N": 6453000.0,
   "datum": "PSAD56 (La Canoa 1956), Huso 19",
-  "libre_ha": 769.0,
-  "solapes": [
-   [
-    "LA MOLOTO 1/6",
-    "043031304-5",
-    "CONSTITUIDA",
-    6.0
-   ],
-   [
-    "ESPERANZA 1/10",
-    "043030480-1",
-    "CONSTITUIDA",
-    25.0
-   ]
-  ],
+  "libre_ha": 600.0,
+  "solapes": [],
   "comuna": "Los Vilos",
   "muestras": [],
-  "pm_E_wgs": 291300.0,
+  "pm_E_wgs": 291800.0,
   "pm_N_wgs": 6452675.0,
   "tasa_utm_ha": 0.02,
-  "tasa_utm": 16.0,
-  "tasa_clp": 1159040,
-  "patente_anual_clp": 3477120
+  "tasa_utm": 12.0,
+  "tasa_clp": 869280,
+  "patente_anual_clp": 2607840
  },
  {
   "n": 12,
@@ -341,48 +328,28 @@
   "n": 13,
   "nombre": "LEONOR 13",
   "zona": "relleno entre pedimentos",
-  "E0": 292000,
-  "E1": 296000,
+  "E0": 291825,
+  "E1": 294825,
   "N0": 6448000,
   "N1": 6449000,
-  "EW": 4000,
+  "EW": 3000,
   "NS": 1000,
-  "ha": 400,
-  "pm_E": 294000.0,
+  "ha": 300,
+  "pm_E": 293325.0,
   "pm_N": 6448500.0,
   "datum": "PSAD56 (La Canoa 1956), Huso 19",
-  "libre_ha": 381.6,
-  "solapes": [
-   [
-    "LA CONFIANZA 1/2 (1)",
-    "043030229-9",
-    "CONSTITUIDA",
-    12.4
-   ],
-   [
-    "LA COMPLICA 1/13",
-    "043031302-9",
-    "CONSTITUIDA",
-    6.0
-   ],
-   [
-    "EL FUTURO 1/20",
-    "043030230-2",
-    "CONSTITUIDA",
-    11.86
-   ]
-  ],
+  "libre_ha": 300.0,
+  "solapes": [],
   "comuna": "Los Vilos",
   "muestras": [
-   "anomalía T-01 (33.32 ha)",
-   "anomalía T-03 (10.4 ha)"
+   "anomalía T-01 (33.32 ha)"
   ],
-  "pm_E_wgs": 293800.0,
+  "pm_E_wgs": 293125.0,
   "pm_N_wgs": 6448175.0,
-  "tasa_utm_ha": 0.02,
-  "tasa_utm": 8.0,
-  "tasa_clp": 579520,
-  "patente_anual_clp": 1738560
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 1.5,
+  "tasa_clp": 108660,
+  "patente_anual_clp": 1303920
  },
  {
   "n": 14,
