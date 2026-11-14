@@ -1,0 +1,161 @@
+{
+ "nota": "Esri World Imagery; georreferencia en WGS84 (EPSG:4326) por esquinas de tesela Web Mercator",
+ "mosaicos": [
+  {
+   "archivo": "mosaico_general_z16.jpg",
+   "z": 16,
+   "ancho": 9472,
+   "alto": 5376,
+   "tile_x0": 19800,
+   "tile_y0": 38922,
+   "lon_oeste": -71.2353515625,
+   "lat_norte": -31.998759371947305,
+   "lon_este": -71.0321044921875,
+   "lat_sur": -32.09653629470278
+  },
+  {
+   "archivo": "mosaico_leonor1_z17.jpg",
+   "z": 17,
+   "ancho": 3840,
+   "alto": 5120,
+   "tile_x0": 39644,
+   "tile_y0": 77857,
+   "lon_oeste": -71.114501953125,
+   "lat_norte": -32.029034818735845,
+   "lon_este": -71.07330322265625,
+   "lat_sur": -32.07559289203769
+  },
+  {
+   "archivo": "mosaico_faena_m1m2_z18.jpg",
+   "z": 18,
+   "ancho": 4096,
+   "alto": 4096,
+   "tile_x0": 79296,
+   "tile_y0": 155717,
+   "lon_oeste": -71.103515625,
+   "lat_norte": -32.03252749583841,
+   "lon_este": -71.08154296875,
+   "lat_sur": -32.051152857201714
+  },
+  {
+   "archivo": "mosaico_hueco_santa_carolina_z18.jpg",
+   "z": 18,
+   "ancho": 4608,
+   "alto": 6144,
+   "tile_x0": 79274,
+   "tile_y0": 155728,
+   "lon_oeste": -71.13372802734375,
+   "lat_norte": -32.045332838858506,
+   "lon_este": -71.1090087890625,
+   "lat_sur": -32.07326555104238
+  },
+  {
+   "archivo": "mosaico_leonor_9_z17.jpg",
+   "z": 17,
+   "ancho": 1792,
+   "alto": 2560,
+   "tile_x0": 39656,
+   "tile_y0": 77846,
+   "lon_oeste": -71.08154296875,
+   "lat_norte": -32.00341778396365,
+   "lon_este": -71.06231689453125,
+   "lat_sur": -32.026706293336126
+  },
+  {
+   "archivo": "mosaico_leonor_10_z17.jpg",
+   "z": 17,
+   "ancho": 1792,
+   "alto": 3840,
+   "tile_x0": 39613,
+   "tile_y0": 77865,
+   "lon_oeste": -71.19964599609375,
+   "lat_norte": -32.047660890608626,
+   "lon_este": -71.180419921875,
+   "lat_sur": -32.082574559545904
+  },
+  {
+   "archivo": "mosaico_leonor_11_z17.jpg",
+   "z": 17,
+   "ancho": 1792,
+   "alto": 3584,
+   "tile_x0": 39621,
+   "tile_y0": 77866,
+   "lon_oeste": -71.17767333984375,
+   "lat_norte": -32.04998888314202,
+   "lon_este": -71.158447265625,
+   "lat_sur": -32.082574559545904
+  },
+  {
+   "archivo": "mosaico_leonor_12_z17.jpg",
+   "z": 17,
+   "ancho": 3840,
+   "alto": 1792,
+   "tile_x0": 39625,
+   "tile_y0": 77872,
+   "lon_oeste": -71.16668701171875,
+   "lat_norte": -32.063955594660406,
+   "lon_este": -71.12548828125,
+   "lat_sur": -32.080247396291796
+  },
+  {
+   "archivo": "mosaico_leonor_13_z17.jpg",
+   "z": 17,
+   "ancho": 3840,
+   "alto": 1792,
+   "tile_x0": 39608,
+   "tile_y0": 77877,
+   "lon_oeste": -71.21337890625,
+   "lat_norte": -32.07559289203769,
+   "lon_este": -71.17218017578125,
+   "lat_sur": -32.09188262002179
+  },
+  {
+   "archivo": "mosaico_leonor_14_z17.jpg",
+   "z": 17,
+   "ancho": 1792,
+   "alto": 1792,
+   "tile_x0": 39620,
+   "tile_y0": 77877,
+   "lon_oeste": -71.180419921875,
+   "lat_norte": -32.07559289203769,
+   "lon_este": -71.16119384765625,
+   "lat_sur": -32.09188262002179
+  },
+  {
+   "archivo": "mosaico_elara_19_z17.jpg",
+   "z": 17,
+   "ancho": 2048,
+   "alto": 3840,
+   "tile_x0": 39636,
+   "tile_y0": 77862,
+   "lon_oeste": -71.136474609375,
+   "lat_norte": -32.040676557717454,
+   "lon_este": -71.114501953125,
+   "lat_sur": -32.07559289203769
+  },
+  {
+   "archivo": "mosaico_elara_20_z17.jpg",
+   "z": 17,
+   "ancho": 2816,
+   "alto": 1792,
+   "tile_x0": 39629,
+   "tile_y0": 77861,
+   "lon_oeste": -71.15570068359375,
+   "lat_norte": -32.03834832833119,
+   "lon_este": -71.12548828125,
+   "lat_sur": -32.054644690549296
+  },
+  {
+   "archivo": "mosaico_elara_21_z17.jpg",
+   "z": 17,
+   "ancho": 1792,
+   "alto": 1792,
+   "tile_x0": 39640,
+   "tile_y0": 77870,
+   "lon_oeste": -71.12548828125,
+   "lat_norte": -32.05930026106166,
+   "lon_este": -71.10626220703125,
+   "lat_sur": -32.07559289203769
+  }
+ ]
+}
