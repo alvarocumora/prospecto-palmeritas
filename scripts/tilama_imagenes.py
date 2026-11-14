@@ -124,6 +124,9 @@ def main():
     meta["mosaicos"].append(mosaic("leonor1", a[0], a[1], b[0], b[1], 17))
     a = psad_to_ll(301700, 6452300); b = psad_to_ll(303600, 6454300)
     meta["mosaicos"].append(mosaic("faena_m1m2", a[0], a[1], b[0], b[1], 18))
+    # hueco libre entre ELARA 10/15, LEONOR 7 y Santa Carolina: huellas en zigzag (posibles accesos a labores)
+    a = psad_to_ll(298800, 6449800); b = psad_to_ll(301000, 6452900)
+    meta["mosaicos"].append(mosaic("hueco_santa_carolina", a[0], a[1], b[0], b[1], 18))
     # detalle nivel B (anomalías) a z17
     for p in P:
         if p.get("nivel") == "B":
