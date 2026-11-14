@@ -90,7 +90,7 @@ Que, en virtud de lo dispuesto en el Código de Minería (Ley N° 18.248) y su R
 
 **1. Individualización del pedimento:**
 - Nombre propuesto: `[COMPLETAR]`
-- Superficie: 510,0 hectáreas
+- Superficie: 607,7 hectáreas *(actualizado 14-11-2026: ampliado respecto a la versión anterior de 510 ha, ver nota)*
 - Comuna: Los Vilos / Provincia: Choapa / Región: Coquimbo
 - Datum: PSAD56 / Huso: 19 Sur
 
@@ -98,14 +98,19 @@ Que, en virtud de lo dispuesto en el Código de Minería (Ley N° 18.248) y su R
 
 | Vértice | Este (E) | Norte (N) |
 |---|---|---|
-| B-1 | 302.000,0 | 6.451.000,0 |
-| B-2 | 304.550,0 | 6.451.000,0 |
-| B-3 | 304.550,0 | 6.449.000,0 |
-| B-4 | 302.000,0 | 6.449.000,0 |
+| B-1 | 304.123,4 | 6.451.049,6 |
+| B-2 | 301.983,4 | 6.451.049,7 |
+| B-3 | 301.983,4 | 6.454.049,5 |
+| B-4 | 303.323,4 | 6.454.049,6 |
+| B-5 | 303.323,4 | 6.453.599,5 |
+| B-6 | 304.123,4 | 6.453.599,5 |
+| B-7 (=B-1) | 304.123,4 | 6.451.049,6 |
 
-Punto medio del pedimento: E 303.275,0 / N 6.450.000,0 (PSAD56, Huso 19S)
+Punto medio aproximado del pedimento: E 303.000,0 / N 6.452.500,0 (PSAD56, Huso 19S)
 
-**3. Fundamento de hecho:** El terreno individualizado no registra, a la fecha de esta presentación (14 de noviembre de 2026), concesión minera constituida ni en trámite que lo cubra, según constatación en el Catastro Minero en Línea de SERNAGEOMIN. El vértice B-1 colinda directamente con el límite sureste de la concesión LAS TRANCAS1/20. `[Perito/abogado: confirmar vigencia a la fecha real de presentación.]`
+**Nota 14-11-2026:** este polígono reemplaza la versión anterior (rectángulo simple de 510 ha). Alvy midió en el catastro un hueco de ~10,58 km² en este mismo sector; al recalcularlo tomando en cuenta TODAS las concesiones activas reales (incluida LAS TRANCAS1/20, que su captura no mostraba con etiqueta pero sí ocupa parte del área), el espacio verificado 100% libre que queda es de 6,08 km² (607,7 ha), con esta forma de 6 lados en vez de un rectángulo simple. El vértice B-2/B-3 colinda con el borde este de PLAZETAS/PLAZETAS 2 y el borde sur de LOS VERDES 4 1/10 (tu propia mina).
+
+**3. Fundamento de hecho:** El terreno individualizado no registra, a la fecha de esta presentación (14 de noviembre de 2026), concesión minera constituida ni en trámite que lo cubra, según constatación en el Catastro Minero en Línea de SERNAGEOMIN (verificación geométrica completa contra las 516 concesiones activas del sector, no solo las etiquetadas en pantalla). `[Perito/abogado: confirmar vigencia a la fecha real de presentación.]`
 
 **POR TANTO,**
 
@@ -117,6 +122,18 @@ Ruego a US.S. tener por presentada esta solicitud de pedimento de exploración, 
 `[FECHA]`
 
 ---
+
+## 3bis. Otros 3 polígonos que marcaste (9,71 km², 3,19 km² y 26,00 km²) — estado y prioridad
+
+Verifiqué un punto representativo de cada uno contra el catastro en vivo: **los 3 están libres (sin superposición con concesión constituida ni en trámite)**, igual que A y B. Pero no pude reconstruir la forma y superficie exacta de tu polígono dibujado en ninguno de los 3 — en cada caso, el espacio realmente libre que logré verificar con una geometría limpia es más chico que lo que tú mediste, porque tu trazado se extiende hacia terreno abierto más allá de las concesiones que alcanzo a identificar en tus capturas. No es que esté "tomado" — es que no tengo cómo confirmar el borde exacto sin tu polígono real.
+
+| Hueco | Ubicación | Verificado libre (área limpia) | Señal geológica | Prioridad |
+|---|---|---|---|---|
+| ~9,71 km² | Entre LA FLORIDA 1/1-6, POLACO 6 y el grupo YENDRICK A4/A5/A6/UNO | ~2,0 km² confirmados | Buena — anomalías de 1,5-2,2% Cu (TOO-281, TOO-275, TOO-272) a 600-900 m | Media-alta |
+| ~3,19 km² | Al oeste de SANTA CAROLINA 2, entre CHELE/CHELE NORTE y EL CANELO/BLANQUILLA | ~2,4 km² confirmados | Moderada — anomalías ~0,58% Cu (TOO-128, TOO-118) y muestra TIL8 Chele Norte a ~1,1 km | Media |
+| ~26,00 km² | Mucho más al oeste, cerca de un embalse, rodeado por concesiones "LA DURA" | ~4,1 km² confirmados (de los 26 que mediste) | **Sin datos** — no hay ninguna muestra ni anomalía analizada de este proyecto a menos de 5,6 km | Baja (no por mala geología, sino porque no tenemos información ahí todavía) |
+
+**Para avanzar con cualquiera de estos 3** necesito que me pases, de cada uno, al menos 2 esquinas opuestas (Norte/Este) tal como las mediste — con eso te armo la solicitud igual que hice con A y B.
 
 ## 4. Costos referenciales (verificar antes de decidir)
 
