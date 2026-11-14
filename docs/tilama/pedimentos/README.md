@@ -6,13 +6,13 @@ Son 16 pedimentos de exploración que suman 7.300 ha, y están **pegados entre s
 
 **Coordenadas.** Todo está en **PSAD56 (La Canoa 1956), Huso 19**, el sistema nativo del catastro SERNAGEOMIN y el que usan los pedimentos y manifestaciones presentados por la Oficina Judicial Virtual en 2024 y 2025 (Lechuza 1, Miranda 29, Golden Mine V, Viviana III). El visor dibuja ese catastro en WGS84 con un desfase fijo de +200 m Este y +325 m Norte, medido sobre 1.244 vértices vecinos con `scripts/tilama_datum_sngm.py`. pyproj da otro desfase (+183 / +374), así que no se debe usar para convertir.
 
-**Manifestaciones LEONOR M1 a M13.** El terreno libre que queda contra concesiones de terceros, en franjas de menos de 1 km donde no cabe un pedimento, se cubre con 13 manifestaciones que suman 823 ha de pertenencias.
+**Explotación y exploración.** La exploración queda en los pedimentos LEONOR 1 a 16. La explotación queda en 14 manifestaciones que suman 117 + 7 pertenencias.
 
-- **Pertenencias.** Hay 103 en total. Cada una mide 100 m o múltiplos por lado, con un máximo de 10 ha (art. 28). Sus bordes se apoyan en los de las concesiones vecinas y de los LEONOR. El solape total con terceros es menor a 0,2 ha.
-- **Rectángulo manifestado.** Cada manifestación pide un rectángulo centrado en su punto de interés (art. 46), con una razón máxima de 5:1 y un tope de 1.000 ha (art. 44). En la mensura se ubican solo las pertenencias que calzan.
-- **M1 (142 ha)** cubre el hueco entre LEONOR 6, LEONOR 7 y LEONOR 9.
-- **M6 (66 ha)** cubre la anomalía T-03.
-- **M13 (15 ha)** cubre TOO-255 (1,99 % CuT).
+- **LEONOR M1 a M13** cubren los huecos de menos de 1 km entre los LEONOR y las concesiones de terceros, porque ahí no cabe un pedimento. Sus pertenencias tienen lados de 100 m o múltiplos y un máximo de 10 ha (art. 28), y calzan con el límite de los vecinos.
+- **Bordes que no son múltiplo de 100 m.** Donde el hueco no mide un múltiplo de 100 m, la pertenencia se monta unos metros sobre el vecino (38 ha en total) o sobre un LEONOR (40 ha). En esa franja prevalece la concesión anterior, así que el límite efectivo es el del vecino. Quedan sin cubrir 27 ha de 944, en franjas sueltas de menos de 0,3 ha cada una o encerradas entre terceros.
+- **LEONOR GUANACA** (7 pertenencias, 39 ha) cubre los desmontes de la mina antigua Los Verdes / La Guanaca (M1-M2, 7,7 y 10,65 % CuT), dentro de LEONOR 1. Hay que presentarla antes que LEONOR 1, porque el art. 115 hace caducar la concesión de exploración si su titular explota dentro de ella.
+- **Rectángulo manifestado.** Cada manifestación pide un rectángulo centrado en su punto de interés (art. 46), con razón máxima 5:1 y tope de 1.000 ha (art. 44). En la mensura se ubican solo las pertenencias del CSV.
+- **Patente de explotación.** Con la Ley 21.853 (DO 05-11-2026) pasa a 0,4 UTM/ha, y a 0,1 UTM/ha rebajada para pequeña minería de hasta 500 ha. Rige cuando se publique el Reglamento.
 
 Archivos:
 
