@@ -6,7 +6,7 @@ Son 16 pedimentos de exploración que suman 7.300 ha, y están **pegados entre s
 
 **Coordenadas.** Todo está en **PSAD56 (La Canoa 1956), Huso 19**, el sistema nativo del catastro SERNAGEOMIN y el que usan los pedimentos y manifestaciones presentados por la Oficina Judicial Virtual en 2024 y 2025 (Lechuza 1, Miranda 29, Golden Mine V, Viviana III). El visor dibuja ese catastro en WGS84 con un desfase fijo de +200 m Este y +325 m Norte, medido sobre 1.244 vértices vecinos con `scripts/tilama_datum_sngm.py`. pyproj da otro desfase (+183 / +374), así que no se debe usar para convertir.
 
-**Explotación y exploración.** La exploración queda en los pedimentos LEONOR 1 a 16. La explotación queda en 14 manifestaciones que suman 124 pertenencias.
+**Explotación y exploración.** La exploración queda en los pedimentos LEONOR 1 a 16. La explotación queda en 14 manifestaciones que suman 123 pertenencias.
 
 - **LEONOR M1 a M13** cubren los huecos de menos de 1 km entre los LEONOR y las concesiones de terceros, porque ahí no cabe un pedimento. Sus pertenencias tienen lados de 100 m o múltiplos y un máximo de 10 ha (art. 28), y calzan con el límite de los vecinos.
 - **Bordes que no son múltiplo de 100 m.** Donde el hueco no mide un múltiplo de 100 m, la pertenencia se monta unos metros sobre el vecino (38 ha en total) o sobre un LEONOR (40 ha). En esa franja prevalece la concesión anterior, así que el límite efectivo es el del vecino. Quedan sin cubrir 27 ha de 944, en franjas sueltas de menos de 0,3 ha cada una o encerradas entre terceros.
