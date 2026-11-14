@@ -3,7 +3,7 @@
 Pide al FeatureServer del visor las mismas concesiones dos veces: en WGS84 UTM 19S
 (EPSG:32719) y en PSAD56 UTM 19S (EPSG:24879). Si el dato nativo está en PSAD56, las
 esquinas en 24879 salen redondas. Imprime el desfase por vértice y la capa de vértices
-(capa 0) para ver qué campos de coordenadas trae.
+(capa 0) para ver qué campos de coordenadas trae. También sirve para revisar el catastro el día de la presentación.
 """
 from __future__ import annotations
 
