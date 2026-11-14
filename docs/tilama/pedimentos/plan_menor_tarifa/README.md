@@ -8,11 +8,11 @@ Este plan protege las mejores fuentes de los análisis con la menor superficie p
 
 **LEONOR 1 dividida.** La parte norte, donde está la faena abierta de los desmontes M1/M2 (mina antigua Los Verdes / La Guanaca, 7,7 y 10,65 % CuT), va como explotación. La parte sur sigue como exploración, en el pedimento LEONOR 2.
 
-La manifestación de LEONOR 1 tiene 16 pertenencias que suman 165 ha:
+La manifestación de LEONOR 1 tiene 17 pertenencias que suman 165 ha:
 
 - 15 pertenencias de 10 ha, de 200 m E-O por 500 m N-S, sobre 302.000–303.000 E y 6.452.500–6.454.000 N.
 - La faena queda en la pertenencia 7, rodeada por la 2, la 6 y la 8.
-- La pertenencia 16 tiene 15 ha y cubre TOO-255 (1,99 % CuT) y el terreno libre hasta Yendrick A4.
+- La pertenencia 16 (10 ha) cubre TOO-255 (1,99 % CuT) y la 17 (5 ha) llega hasta Yendrick A4, porque ninguna pertenencia puede pasar de 10 ha.
 
 Al dividirla en pertenencias de 10 ha, después se puede renunciar a las que no tengan mineral y pagar solo por las que se trabajen. El rectángulo manifestado mide 1.300 × 1.600 m y está centrado en N 6.453.230 / E 302.650 (PSAD56). Como es explotación, la faena se puede trabajar sin el riesgo del art. 115. Se presenta antes que los pedimentos. El detalle está en `tilama_leonor1_pertenencias.png`.
 

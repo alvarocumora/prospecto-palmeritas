@@ -2,7 +2,7 @@
  {
   "nombre": "LEONOR 1",
   "mejora": "Faena de los desmontes M1/M2 y TOO-255",
-  "n_pert": 16,
+  "n_pert": 17,
   "pert_ha": 165,
   "pertenencias": [
    {
@@ -141,13 +141,22 @@
     "nota": ""
    },
    {
+    "n": 16,
     "E0": 303000,
+    "N0": 6453530,
+    "E1": 303200,
+    "N1": 6454030,
+    "ha": 10,
+    "nota": "TOO-255"
+   },
+   {
+    "n": 17,
+    "E0": 303200,
     "N0": 6453530,
     "E1": 303300,
     "N1": 6454030,
-    "ha": 15,
-    "n": 16,
-    "nota": "TOO-255"
+    "ha": 5,
+    "nota": ""
    }
   ],
   "rect": {
