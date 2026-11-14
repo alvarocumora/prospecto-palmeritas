@@ -33,7 +33,17 @@ jobs:
       - run: python -m pip install shapely
       - name: Consultar catastro y regenerar KMZ
         run: python scripts/tilama_catastro_kmz.py
+      - name: Subir KMZ y resumen como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: tilama-catastro
+          path: |
+            docs/tilama/tilama_prioridades_estructuras.kmz
+            docs/tilama/catastro_vivo_resumen.md
+      # En un PR solo se valida y se deja el artefacto: un commit hecho con
+      # GITHUB_TOKEN no dispara el CI y dejaria el PR sin checks en su head.
       - name: Guardar cambios
+        if: github.event_name != 'pull_request'
         run: |
           if git diff --quiet && [ -z "$(git status --porcelain docs/tilama)" ]; then
             echo "Sin cambios en el catastro"; exit 0
