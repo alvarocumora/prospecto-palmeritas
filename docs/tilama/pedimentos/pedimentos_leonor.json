@@ -1,7 +1,7 @@
 [
  {
   "n": 1,
-  "nombre": "VALESC 1",
+  "nombre": "LEONOR 1",
   "zona": "C2 (10,58 km²)",
   "E0": 301940,
   "E1": 302940,
@@ -19,11 +19,17 @@
   "muestras": [
    "M1/M2 (7,7 y 10,65 % CuT)",
    "TOO-255 (1,99 % CuT)"
-  ]
+  ],
+  "pm_E_psad56": 302623,
+  "pm_N_psad56": 6452049,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 8.0,
+  "tasa_clp": 579520,
+  "patente_anual_clp": 1738560
  },
  {
   "n": 2,
-  "nombre": "VALESC 2",
+  "nombre": "LEONOR 2",
   "zona": "C2 (10,58 km²)",
   "E0": 302940,
   "E1": 303940,
@@ -38,11 +44,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 303623,
+  "pm_N_psad56": 6451599,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 8.0,
+  "tasa_clp": 579520,
+  "patente_anual_clp": 1738560
  },
  {
   "n": 3,
-  "nombre": "VALESC 3",
+  "nombre": "LEONOR 3",
   "zona": "B2 (10,40 km²)",
   "E0": 304800,
   "E1": 306800,
@@ -64,11 +76,17 @@
    ]
   ],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 305983,
+  "pm_N_psad56": 6455399,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 8.0,
+  "tasa_clp": 579520,
+  "patente_anual_clp": 1738560
  },
  {
   "n": 4,
-  "nombre": "VALESC 4",
+  "nombre": "LEONOR 4",
   "zona": "B2 (10,40 km²)",
   "E0": 304940,
   "E1": 306940,
@@ -96,11 +114,17 @@
    ]
   ],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 306123,
+  "pm_N_psad56": 6453579,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
  },
  {
   "n": 5,
-  "nombre": "VALESC 5",
+  "nombre": "LEONOR 5",
   "zona": "B2 (10,40 km²)",
   "E0": 303800,
   "E1": 304800,
@@ -122,11 +146,17 @@
    ]
   ],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 304483,
+  "pm_N_psad56": 6456399,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
  },
  {
   "n": 6,
-  "nombre": "VALESC 6",
+  "nombre": "LEONOR 6",
   "zona": "S (21,06 km²)",
   "E0": 295750,
   "E1": 298750,
@@ -141,11 +171,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 297433,
+  "pm_N_psad56": 6450399,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 24.0,
+  "tasa_clp": 1738560,
+  "patente_anual_clp": 5215680
  },
  {
   "n": 7,
-  "nombre": "VALESC 7",
+  "nombre": "LEONOR 7",
   "zona": "S (21,06 km²)",
   "E0": 298750,
   "E1": 302750,
@@ -160,11 +196,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 300933,
+  "pm_N_psad56": 6449049,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 16.0,
+  "tasa_clp": 1159040,
+  "patente_anual_clp": 3477120
  },
  {
   "n": 8,
-  "nombre": "VALESC 8",
+  "nombre": "LEONOR 8",
   "zona": "S (21,06 km²)",
   "E0": 295800,
   "E1": 296800,
@@ -179,11 +221,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 296483,
+  "pm_N_psad56": 6452899,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 0.5,
+  "tasa_clp": 36220,
+  "patente_anual_clp": 434640
  },
  {
   "n": 9,
-  "nombre": "VALESC 9",
+  "nombre": "LEONOR 9",
   "zona": "S (21,06 km²)",
   "E0": 300800,
   "E1": 301800,
@@ -198,11 +246,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 301483,
+  "pm_N_psad56": 6450549,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 0.5,
+  "tasa_clp": 36220,
+  "patente_anual_clp": 434640
  },
  {
   "n": 10,
-  "nombre": "VALESC 10",
+  "nombre": "LEONOR 10",
   "zona": "W (26,00 km²)",
   "E0": 289750,
   "E1": 295750,
@@ -217,11 +271,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 526,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 292933,
+  "pm_N_psad56": 6451046,
+  "tasa_utm_ha": 0.03,
+  "tasa_utm": 54.0,
+  "tasa_clp": 3911760,
+  "patente_anual_clp": 7823520
  },
  {
   "n": 11,
-  "nombre": "VALESC 11",
+  "nombre": "LEONOR 11",
   "zona": "W (26,00 km²)",
   "E0": 289285,
   "E1": 293285,
@@ -236,11 +296,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 222,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 291468,
+  "pm_N_psad56": 6453484,
+  "tasa_utm_ha": 0.02,
+  "tasa_utm": 8.0,
+  "tasa_clp": 579520,
+  "patente_anual_clp": 1738560
  },
  {
   "n": 12,
-  "nombre": "VALESC 12",
+  "nombre": "LEONOR 12",
   "zona": "W (26,00 km²)",
   "E0": 293800,
   "E1": 294800,
@@ -255,11 +321,17 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 294483,
+  "pm_N_psad56": 6453046,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 0.5,
+  "tasa_clp": 36220,
+  "patente_anual_clp": 434640
  },
  {
   "n": 13,
-  "nombre": "VALESC 13",
+  "nombre": "LEONOR 13",
   "zona": "W (26,00 km²)",
   "E0": 291750,
   "E1": 294750,
@@ -274,6 +346,12 @@
   "comuna": "Los Vilos",
   "solapes": [],
   "sin_catastro_verificado_ha": 0,
-  "muestras": []
+  "muestras": [],
+  "pm_E_psad56": 293433,
+  "pm_N_psad56": 6449046,
+  "tasa_utm_ha": 0.005,
+  "tasa_utm": 1.5,
+  "tasa_clp": 108660,
+  "patente_anual_clp": 1303920
  }
 ]

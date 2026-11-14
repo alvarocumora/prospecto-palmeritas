@@ -11,10 +11,10 @@
    resaltan, el informe lo dice: el método no confirmaría nada en este distrito.
 4. Anomalías = píxeles sobre el percentil 95 del puntaje combinado, agrupadas
    en manchas; se cruzan con el catastro SERNAGEOMIN vigente y con los
-   pedimentos VALESC propuestos.
+   pedimentos LEONOR propuestos.
 5. Para cada mancha en terreno libre se propone un rectángulo de pedimento
    legal (lados de 1.000 m o múltiplos, N-S/E-O) sin solapar concesiones
-   vigentes ni los VALESC.
+   vigentes ni los LEONOR.
 
 Todo es DERIVADO / INTERPRETADO: Sentinel-2 no identifica minerales ni mide
 ley. Sirve para priorizar visitas y muestreo, no para estimar recursos.
@@ -33,7 +33,7 @@ sys.path.insert(0, str(ROOT / "geocapitals-remote" / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 OUT = ROOT / "out" / "tilama_satelite"
-VALESC = ROOT / "docs" / "tilama" / "pedimentos" / "pedimentos_valesc.json"
+LEONOR = ROOT / "docs" / "tilama" / "pedimentos" / "pedimentos_leonor.json"
 ZONAS = ROOT / "docs" / "tilama" / "pedimentos" / "zonas_marcadas_visor.json"
 CRS = "EPSG:32719"
 
@@ -109,7 +109,7 @@ def catastro_vigente():
 
 def mejor_rectangulo(mancha, libre, bloqueado, x0s, y0s):
     """Rectángulo legal (lados 1-4 km) que cubre la mayor parte de la mancha en
-    terreno libre sin tocar lo bloqueado (catastro + VALESC + otros propuestos)."""
+    terreno libre sin tocar lo bloqueado (catastro + LEONOR + otros propuestos)."""
     import shapely
     best = None
     cx, cy = mancha.centroid.x, mancha.centroid.y
@@ -187,10 +187,10 @@ def main():
     geoms, U = catastro_vigente()
     dist = box(*shapely.bounds(unary_union([g for _, g in geoms])))
     libre = dist.difference(U)
-    valesc = json.loads(VALESC.read_text())
+    leonor = json.loads(LEONOR.read_text())
     from shapely.geometry import Polygon
     zonas = {k: Polygon(v).buffer(0) for k, v in json.loads(ZONAS.read_text()).items()} if ZONAS.exists() else {}
-    VB = [box(v["E0"], v["N0"], v["E1"], v["N1"]) for v in valesc]
+    VB = [box(v["E0"], v["N0"], v["E1"], v["N1"]) for v in leonor]
     bloqueado = unary_union([U] + VB)
 
     edges_x = sorted({round(c + k * 1000) for _, g in geoms for c in (g.bounds[0], g.bounds[2]) for k in range(-4, 5)})
@@ -201,11 +201,11 @@ def main():
     for n_, m in enumerate(manchas, 1):
         g = m["geom"]
         en_libre = g.intersection(libre).area / g.area
-        en_valesc = [v["nombre"] for v, b in zip(valesc, VB) if g.intersects(b)]
+        en_leonor = [v["nombre"] for v, b in zip(leonor, VB) if g.intersects(b)]
         titulares = sorted({str(p.get("TITULAR_NOMBRE") or p.get("TITULAR_DIVISION")) for p, cg in geoms if cg.intersects(g)})
         en_zona = [k for k, zg in zonas.items() if g.intersects(zg)]
-        m.update(id=f"S2-{n_:02d}", libre_pct=round(en_libre * 100), en_valesc=en_valesc, en_zona=en_zona, titulares=titulares[:6])
-        if en_libre >= 0.5 and not en_valesc and not en_zona:
+        m.update(id=f"S2-{n_:02d}", libre_pct=round(en_libre * 100), en_leonor=en_leonor, en_zona=en_zona, titulares=titulares[:6])
+        if en_libre >= 0.5 and not en_leonor and not en_zona:
             r = mejor_rectangulo(g, libre, bloqueado, edges_x, edges_y)
             if r:
                 b = box(*r[1]); bloqueado = unary_union([bloqueado, b])
@@ -232,7 +232,7 @@ def main():
     for p, cg in geoms:
         for gg in getattr(cg, "geoms", [cg]):
             xs, ys = gg.exterior.xy; ax.plot(xs, ys, color="#9fb3c8", lw=.5)
-    for v, b in zip(valesc, VB):
+    for v, b in zip(leonor, VB):
         xs, ys = b.exterior.xy; ax.plot(xs, ys, color="#2ecc71", lw=2); ax.text(b.centroid.x, b.centroid.y, v["nombre"], color="#2ecc71", fontsize=7, ha="center")
     for m in manchas:
         for gg in getattr(m["geom"], "geoms", [m["geom"]]):
@@ -246,7 +246,7 @@ def main():
         ax.scatter(e, n, s=25, c="#ffffff", ec="k", zorder=5)
     ax.set_xlim(ext[0], ext[1]); ax.set_ylim(ext[2], ext[3]); ax.ticklabel_format(useOffset=False, style="plain")
     ax.set_title("Tilama — puntaje Sentinel-2 (Al-OH + óxidos Fe + gossan), manchas p95 y pedimentos candidatos", loc="left", fontsize=10)
-    fig.text(.01, .005, "DERIVADO / INTERPRETADO. Verde: VALESC propuestos. Celeste: manchas p95. Amarillo: pedimentos candidatos en terreno libre. Blanco: muestras con ley (Esterio).", fontsize=7)
+    fig.text(.01, .005, "DERIVADO / INTERPRETADO. Verde: LEONOR propuestos. Celeste: manchas p95. Amarillo: pedimentos candidatos en terreno libre. Blanco: muestras con ley (Esterio).", fontsize=7)
     plt.tight_layout(); plt.savefig(OUT / "tilama_s2_mapa.png")
 
     lines = ["# Tilama — screening Sentinel-2 de zonas libres", "",
@@ -260,7 +260,7 @@ def main():
     lines += ["## Manchas (p95, 2 ha o más)", ""]
     for m in manchas:
         lines.append(f"- {m['id']}: {m['ha']} ha, puntaje medio {m['puntaje_medio']}, {m['libre_pct']} % libre"
-                     + (f", dentro de {', '.join(m['en_valesc'])}" if m['en_valesc'] else "")
+                     + (f", dentro de {', '.join(m['en_leonor'])}" if m['en_leonor'] else "")
                      + (f", en zona marcada {', '.join(m['en_zona'])}" if m['en_zona'] else "")
                      + (f"; titulares: {', '.join(m['titulares'])}" if m['titulares'] else ""))
     lines += ["", "## Pedimentos candidatos en terreno libre", ""]

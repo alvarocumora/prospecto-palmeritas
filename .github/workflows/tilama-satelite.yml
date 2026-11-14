@@ -2,13 +2,13 @@ name: Tilama screening Sentinel-2
 
 # Screening Sentinel-2 del distrito Tilama: calibra contra la mineralización
 # conocida, cruza las anomalías con el catastro SNGM vigente, las zonas
-# marcadas y los pedimentos VALESC, y propone pedimentos en terreno libre.
+# marcadas y los pedimentos LEONOR, y propone pedimentos en terreno libre.
 on:
   workflow_dispatch:
   pull_request:
     paths:
       - 'scripts/tilama_satelite_zonas.py'
-      - 'docs/tilama/pedimentos/pedimentos_valesc.json'
+      - 'docs/tilama/pedimentos/pedimentos_leonor.json'
       - 'docs/tilama/pedimentos/zonas_marcadas_visor.json'
       - '.github/workflows/tilama-satelite.yml'
 
