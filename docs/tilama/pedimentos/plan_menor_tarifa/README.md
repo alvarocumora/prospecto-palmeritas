@@ -8,13 +8,13 @@ Este plan protege las mejores fuentes de los análisis con la menor superficie p
 
 **LEONOR 1 dividida.** La parte norte, donde está la faena abierta de los desmontes M1/M2 (mina antigua Los Verdes / La Guanaca, 7,7 y 10,65 % CuT), va como explotación. La parte sur sigue como exploración, en el pedimento LEONOR 2.
 
-La manifestación de LEONOR 1 tiene 17 pertenencias que suman 165 ha:
+La manifestación de LEONOR 1 tiene 33 pertenencias de 5 ha cada una (100 m E-O por 500 m N-S), 165 ha en total:
 
-- 15 pertenencias de 10 ha, de 200 m E-O por 500 m N-S, sobre 302.000–303.000 E y 6.452.500–6.454.000 N.
-- La faena queda en la pertenencia 7, rodeada por la 2, la 6 y la 8.
-- La pertenencia 16 (10 ha) cubre TOO-255 (1,99 % CuT) y la 17 (5 ha) llega hasta Yendrick A4, porque ninguna pertenencia puede pasar de 10 ha.
+- 30 pertenencias sobre 302.000–303.000 E y 6.452.500–6.454.000 N.
+- La faena queda en la pertenencia 13, con la 12, la 14 y la 15 al lado.
+- 3 pertenencias sobre 303.000–303.300 E; TOO-255 (1,99 % CuT) queda en la 31.
 
-Al dividirla en pertenencias de 10 ha, después se puede renunciar a las que no tengan mineral y pagar solo por las que se trabajen. El rectángulo manifestado mide 1.300 × 1.600 m y está centrado en N 6.453.230 / E 302.650 (PSAD56). Como es explotación, la faena se puede trabajar sin el riesgo del art. 115. Se presenta antes que los pedimentos. El detalle está en `tilama_leonor1_pertenencias.png`.
+Con pertenencias de 5 ha se puede renunciar después, con más precisión, a las que no tengan mineral. El rectángulo manifestado mide 1.300 × 1.600 m y está centrado en N 6.453.230 / E 302.650 (PSAD56). Como es explotación, la faena se puede trabajar sin el riesgo del art. 115. Se presenta antes que los pedimentos. El detalle está en `tilama_leonor1_pertenencias.png`.
 
 **Exploración, núcleo.** LEONOR 2 a 6 (1.100 ha) rodean LEONOR 1 por el sur y el este, junto al bloque Los Verdes–El Alto de Fernández. LEONOR 2 corresponde a la mitad sur del antiguo LEONOR 1.
 
@@ -33,7 +33,7 @@ Patentes: exploración 3/50 UTM/ha al año (Ley 21.649) y explotación 0,4 UTM/h
 | LEONOR 1 completa en explotación + LEONOR 2–11 en exploración | 1.800 ha | 301 ha | $16,5 M | $0,65 M |
 | **LEONOR 1 dividida: faena en explotación + resto en exploración (este)** | 1.900 ha | 165 ha | **$13,0 M** ($8,3 M expl. + $4,8 M LEONOR 1) | **$0,69 M** |
 | Igual, con patente rebajada de pequeña minería en LEONOR 1 (0,1 UTM/ha) | 1.900 ha | 165 ha | $9,5 M | $0,69 M |
-| Igual, renunciando después a todo menos las pertenencias 2, 6, 7, 8 y 16 (55 ha) | 1.900 ha | 55 ha | $9,9 M | — |
+| Igual, renunciando después a todo menos las pertenencias 12 a 15 y 31 (25 ha) | 1.900 ha | 25 ha | $9,0 M | — |
 
 Las manifestaciones tienen además costo de mensura y perito, y cada escrito suma inscripción en el Conservador y publicación en el Boletín. Esos costos hay que cotizarlos aparte.
 
