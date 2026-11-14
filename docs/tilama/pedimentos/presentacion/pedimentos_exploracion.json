@@ -915,5 +915,137 @@
   "tasa_clp": 108660,
   "patente_anual_clp": 1303920,
   "nombre_anterior": "LEONOR 32"
+ },
+ {
+  "n": 33,
+  "nombre": "ELARA 19",
+  "zona": "Accesos",
+  "nivel": "B",
+  "E0": 299000,
+  "E1": 300000,
+  "N0": 6450000,
+  "N1": 6453000,
+  "EW": 1000,
+  "NS": 3000,
+  "ha": 300,
+  "pm_E": 299500.0,
+  "pm_N": 6451500.0,
+  "pm_E_wgs": 299300.0,
+  "pm_N_wgs": 6451175.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 160.0,
+  "solapes": [
+   [
+    "EL CANELO",
+    "043031906-K",
+    "CONSTITUIDA",
+    50.0
+   ],
+   [
+    "SANTA CAROLINA 2 1/10",
+    "043030672-3",
+    "CONSTITUIDA",
+    45.0
+   ],
+   [
+    "CENTINELA 1/10",
+    "043031055-0",
+    "CONSTITUIDA",
+    30.0
+   ],
+   [
+    "SANTA CAROLINA 1/6",
+    "043030561-1",
+    "CONSTITUIDA",
+    30.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Hueco con accesos antiguos: cubre ~4 km de caminos mineros en zigzag sobre terreno libre (OSM 372455229/372455247) y una franja de ripio; colinda con ELARA 10/15 y LEONOR 7",
+  "origen": "hueco fotointerpretado 14-11-2026",
+  "tasa_utm": 1.5,
+  "tasa_clp": 108660,
+  "patente_anual_clp": 1303920
+ },
+ {
+  "n": 34,
+  "nombre": "ELARA 20",
+  "zona": "Accesos",
+  "nivel": "B",
+  "E0": 297000,
+  "E1": 299000,
+  "N0": 6452350,
+  "N1": 6453350,
+  "EW": 2000,
+  "NS": 1000,
+  "ha": 200,
+  "pm_E": 298000.0,
+  "pm_N": 6452850.0,
+  "pm_E_wgs": 297800.0,
+  "pm_N_wgs": 6452525.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 106.3,
+  "solapes": [
+   [
+    "EL CANELO 3",
+    "043031910-8",
+    "CONSTITUIDA",
+    35.0
+   ],
+   [
+    "TILAMA",
+    "043031916-7",
+    "EN TRAMITE",
+    35.0
+   ],
+   [
+    "CHELE 1/10",
+    "043031140-9",
+    "CONSTITUIDA",
+    50.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Cierra el libre al norte de ELARA 10, entre El Canelo 3, Chele 1/10 y el pedimento TILAMA (en trámite, de terceros); da continuidad a ELARA 19",
+  "origen": "hueco fotointerpretado 14-11-2026",
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
+ },
+ {
+  "n": 35,
+  "nombre": "ELARA 21",
+  "zona": "Accesos",
+  "nivel": "B",
+  "E0": 300000,
+  "E1": 301000,
+  "N0": 6450000,
+  "N1": 6451000,
+  "EW": 1000,
+  "NS": 1000,
+  "ha": 100,
+  "pm_E": 300500.0,
+  "pm_N": 6450500.0,
+  "pm_E_wgs": 300300.0,
+  "pm_N_wgs": 6450175.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 30.0,
+  "solapes": [
+   [
+    "CENTINELA 1/10",
+    "043031055-0",
+    "CONSTITUIDA",
+    70.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Cierra la franja libre entre Centinela 1/10 y LEONOR 5, al final del camino en zigzag; cobertura del acceso",
+  "origen": "hueco fotointerpretado 14-11-2026",
+  "tasa_utm": 0.5,
+  "tasa_clp": 36220,
+  "patente_anual_clp": 434640
  }
 ]
