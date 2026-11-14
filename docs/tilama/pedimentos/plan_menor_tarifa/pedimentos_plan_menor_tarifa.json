@@ -1,32 +1,5 @@
 [
  {
-  "n": 1,
-  "nombre": "LEONOR 1",
-  "zona": "Núcleo",
-  "E0": 302000,
-  "E1": 303000,
-  "N0": 6451000,
-  "N1": 6454000,
-  "EW": 1000,
-  "NS": 3000,
-  "ha": 300,
-  "pm_E": 302500.0,
-  "pm_N": 6452500.0,
-  "pm_E_wgs": 302300.0,
-  "pm_N_wgs": 6452175.0,
-  "datum": "PSAD56 (La Canoa 1956), Huso 19",
-  "libre_ha": 300,
-  "solapes": [],
-  "comuna": "Los Vilos",
-  "muestras": [
-   "Desmontes M1/M2 (7,7 y 10,65 % CuT)"
-  ],
-  "fundamento": "Rodea los desmontes de la mina antigua (M1/M2) y colinda con Los Verdes 4 y El Alto (TOO-220 3,88 %, Zona 1 La Guanaca)",
-  "tasa_utm": 1.5,
-  "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
- },
- {
   "n": 2,
   "nombre": "LEONOR 2",
   "zona": "Núcleo",
