@@ -9,20 +9,20 @@ Borrador del 14-11-2026. Titular: Valle Escondido SpA (Minera Valle Escondido Sp
 - En la mensura se ubican 33 pertenencias de 5 ha cada una, 165 ha en total, sobre la faena de los desmontes M1/M2 (pertenencia 13) y sobre TOO-255 (pertenencia 31).
 - Solo se mensuran las pertenencias que tengan mineral.
 
-**LEONOR 2 a 32, exploración.** Son 31 pedimentos que suman 7.200 ha, todos de 300 ha o menos para pagar la tasa mínima del art. 51. Van numerados por prioridad:
+**LEONOR 2 a 14 y ELARA 1 a 18, exploración.** Son 31 pedimentos que suman 7.200 ha, todos de 300 ha o menos para pagar la tasa mínima del art. 51. Van numerados por prioridad:
 
 - **Nivel A, núcleo (LEONOR 2 a 8, 1.500 ha).** Colindan con LEONOR 1 o con el bloque Fernández. Se llevan a sentencia.
 - **Nivel B, anomalías (LEONOR 9 a 14, 1.500 ha).** Cubren T-01 a T-07 y T-09. Antes del día 90 se revisan en terreno.
-- **Nivel C, borde (LEONOR 15 a 32, 4.200 ha).** Cubren el borde sin evidencia. Se dejan caducar salvo que el terreno muestre algo.
+- **Nivel C, borde (ELARA 1 a 18, 4.200 ha).** Antes se llamaban LEONOR 15 a 32. Cubren el borde sin evidencia. Se dejan caducar salvo que el terreno muestre algo.
 
 No hay solapes entre pedimentos propios ni con las pertenencias de LEONOR 1. Con terceros hay solapes menores:
 
 | Pedimento | Solape |
 |---|---|
 | LEONOR 14 | 15 ha de La Confianza y El Futuro, para tomar T-03 |
-| LEONOR 17 | 4,9 ha de Pupio 19 |
-| LEONOR 23 | 0,9 ha de Fernanda 4 |
-| LEONOR 24 y 29 | 5 ha de Santa Carolina 2 |
+| ELARA 3 | 4,9 ha de Pupio 19 |
+| ELARA 9 | 0,9 ha de Fernanda 4 |
+| ELARA 10 y 15 | 5 ha de Santa Carolina 2 |
 
 ## Calendario
 

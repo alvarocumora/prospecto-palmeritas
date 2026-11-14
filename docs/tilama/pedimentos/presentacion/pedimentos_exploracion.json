@@ -386,7 +386,7 @@
  },
  {
   "n": 15,
-  "nombre": "LEONOR 15",
+  "nombre": "ELARA 1",
   "zona": "Borde",
   "nivel": "C",
   "E0": 305000,
@@ -409,11 +409,12 @@
   "origen": "LEONOR 3",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 15"
  },
  {
   "n": 16,
-  "nombre": "LEONOR 16",
+  "nombre": "ELARA 2",
   "zona": "Borde",
   "nivel": "C",
   "E0": 306000,
@@ -436,11 +437,12 @@
   "origen": "LEONOR 3",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 16"
  },
  {
   "n": 17,
-  "nombre": "LEONOR 17",
+  "nombre": "ELARA 3",
   "zona": "Borde",
   "nivel": "C",
   "E0": 305140,
@@ -470,11 +472,12 @@
   "origen": "LEONOR 4",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 17"
  },
  {
   "n": 18,
-  "nombre": "LEONOR 18",
+  "nombre": "ELARA 4",
   "zona": "Borde",
   "nivel": "C",
   "E0": 290500,
@@ -497,11 +500,12 @@
   "origen": "LEONOR 11",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 18"
  },
  {
   "n": 19,
-  "nombre": "LEONOR 19",
+  "nombre": "ELARA 5",
   "zona": "Borde",
   "nivel": "C",
   "E0": 294000,
@@ -524,11 +528,12 @@
   "origen": "LEONOR 16",
   "tasa_utm": 0.5,
   "tasa_clp": 36220,
-  "patente_anual_clp": 434640
+  "patente_anual_clp": 434640,
+  "nombre_anterior": "LEONOR 19"
  },
  {
   "n": 20,
-  "nombre": "LEONOR 20",
+  "nombre": "ELARA 6",
   "zona": "Borde",
   "nivel": "C",
   "E0": 296000,
@@ -551,11 +556,12 @@
   "origen": "LEONOR 8",
   "tasa_utm": 0.5,
   "tasa_clp": 36220,
-  "patente_anual_clp": 434640
+  "patente_anual_clp": 434640,
+  "nombre_anterior": "LEONOR 20"
  },
  {
   "n": 21,
-  "nombre": "LEONOR 21",
+  "nombre": "ELARA 7",
   "zona": "Borde",
   "nivel": "C",
   "E0": 290500,
@@ -578,11 +584,12 @@
   "origen": "LEONOR 11",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 21"
  },
  {
   "n": 22,
-  "nombre": "LEONOR 22",
+  "nombre": "ELARA 8",
   "zona": "Borde",
   "nivel": "C",
   "E0": 294000,
@@ -605,11 +612,12 @@
   "origen": "LEONOR 12",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 22"
  },
  {
   "n": 23,
-  "nombre": "LEONOR 23",
+  "nombre": "ELARA 9",
   "zona": "Borde",
   "nivel": "C",
   "E0": 304000,
@@ -639,11 +647,12 @@
   "origen": "LEONOR 14",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 23"
  },
  {
   "n": 24,
-  "nombre": "LEONOR 24",
+  "nombre": "ELARA 10",
   "zona": "Borde",
   "nivel": "C",
   "E0": 296000,
@@ -673,11 +682,12 @@
   "origen": "LEONOR 6",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 24"
  },
  {
   "n": 25,
-  "nombre": "LEONOR 25",
+  "nombre": "ELARA 11",
   "zona": "Borde",
   "nivel": "C",
   "E0": 290000,
@@ -700,11 +710,12 @@
   "origen": "LEONOR 10",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 25"
  },
  {
   "n": 26,
-  "nombre": "LEONOR 26",
+  "nombre": "ELARA 12",
   "zona": "Borde",
   "nivel": "C",
   "E0": 291000,
@@ -727,11 +738,12 @@
   "origen": "LEONOR 10",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 26"
  },
  {
   "n": 27,
-  "nombre": "LEONOR 27",
+  "nombre": "ELARA 13",
   "zona": "Borde",
   "nivel": "C",
   "E0": 292000,
@@ -754,11 +766,12 @@
   "origen": "LEONOR 10",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 27"
  },
  {
   "n": 28,
-  "nombre": "LEONOR 28",
+  "nombre": "ELARA 14",
   "zona": "Borde",
   "nivel": "C",
   "E0": 294000,
@@ -781,11 +794,12 @@
   "origen": "LEONOR 10",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 28"
  },
  {
   "n": 29,
-  "nombre": "LEONOR 29",
+  "nombre": "ELARA 15",
   "zona": "Borde",
   "nivel": "C",
   "E0": 296000,
@@ -815,11 +829,12 @@
   "origen": "LEONOR 6",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 29"
  },
  {
   "n": 30,
-  "nombre": "LEONOR 30",
+  "nombre": "ELARA 16",
   "zona": "Borde",
   "nivel": "C",
   "E0": 304000,
@@ -842,11 +857,12 @@
   "origen": "LEONOR 14",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 30"
  },
  {
   "n": 31,
-  "nombre": "LEONOR 31",
+  "nombre": "ELARA 17",
   "zona": "Borde",
   "nivel": "C",
   "E0": 303000,
@@ -869,11 +885,12 @@
   "origen": "LEONOR 15",
   "tasa_utm": 0.5,
   "tasa_clp": 36220,
-  "patente_anual_clp": 434640
+  "patente_anual_clp": 434640,
+  "nombre_anterior": "LEONOR 31"
  },
  {
   "n": 32,
-  "nombre": "LEONOR 32",
+  "nombre": "ELARA 18",
   "zona": "Borde",
   "nivel": "C",
   "E0": 296000,
@@ -896,6 +913,7 @@
   "origen": "LEONOR 6",
   "tasa_utm": 1.5,
   "tasa_clp": 108660,
-  "patente_anual_clp": 1303920
+  "patente_anual_clp": 1303920,
+  "nombre_anterior": "LEONOR 32"
  }
 ]
