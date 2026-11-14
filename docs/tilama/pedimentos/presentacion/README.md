@@ -48,3 +48,14 @@ No hay solapes entre pedimentos propios ni con las pertenencias de LEONOR 1. Con
 - `pedimentos_exploracion.json` y `leonor1_explotacion.json`: datos fuente.
 
 Los planes alternativos quedan en `../` (plan completo con manifestaciones M) y en `../plan_menor_tarifa/`.
+
+## Faenas y accesos por imagen satelital (14-11-2026)
+
+Capa `tilama_faenas_accesos.kmz`, hecha por fotointerpretación de Esri World Imagery (z16–z18) y OpenStreetMap con `scripts/tilama_imagenes.py`. Todo trazado se verifica en terreno.
+
+- **Acceso a la faena M1/M2 (LEONOR 1).** El camino más probable es una huella perfilada que no está en OSM y que corre 150–350 m al norte de LEONOR 1, por terreno de las concesiones Fernández. Para usarla hay que llegar a un acuerdo o pedir una servidumbre. El lineamiento del suroeste es una quebrada, no un camino.
+- **Faena M1/M2.** En el punto no se ve un botadero claro. Hay dos parches grises a 100–300 m al norte que podrían ser desmontes.
+- **Hueco libre de unos 170 ha** entre ELARA 10/15, LEONOR 7 y Santa Carolina 2. Tiene unos 4 km de caminos mineros en zigzag sobre terreno libre. Los caminos terminan en CENTINELA 1/10 y SANTA CAROLINA 2 1/10, probablemente en labores antiguas de terceros. Conviene cubrirlo.
+- **T-03** es una cantera de cuarzo activa de terceros (La Confianza / El Futuro).
+- **T-01 (LEONOR 13)** es agricultura: huertos, invernaderos y tranques. Se recomienda bajar LEONOR 13 de prioridad o soltarla.
+- **LEONOR 14** toca el pueblo de Tilama, así que aplica el art. 17.
