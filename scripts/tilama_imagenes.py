@@ -127,6 +127,13 @@ def main():
     # hueco libre entre ELARA 10/15, LEONOR 7 y Santa Carolina: huellas en zigzag (posibles accesos a labores)
     a = psad_to_ll(298800, 6449800); b = psad_to_ll(301000, 6452900)
     meta["mosaicos"].append(mosaic("hueco_santa_carolina", a[0], a[1], b[0], b[1], 18))
+    # blancos de explotación: muestras con ley en terreno libre o dentro del paquete mínimo (z18)
+    for nombre, e0, n0, e1, n1 in (("noreste_too280", 303900, 6455000, 307100, 6457200),
+                                   ("norte_too211", 301200, 6454400, 302500, 6455500),
+                                   ("leonor3_leonor5", 301300, 6450500, 303200, 6452200),
+                                   ("leonor2_too253", 302900, 6451300, 304000, 6452400)):
+        a = psad_to_ll(e0, n0); b = psad_to_ll(e1, n1)
+        meta["mosaicos"].append(mosaic(nombre, a[0], a[1], b[0], b[1], 18))
     # detalle nivel B (anomalías) a z17
     for p in P:
         if p.get("nivel") == "B":
