@@ -190,7 +190,10 @@ def main():
     leonor = json.loads(LEONOR.read_text())
     from shapely.geometry import Polygon
     zonas = {k: Polygon(v).buffer(0) for k, v in json.loads(ZONAS.read_text()).items()} if ZONAS.exists() else {}
-    VB = [box(v["E0"], v["N0"], v["E1"], v["N1"]) for v in leonor]
+    # pedimentos_leonor.json va en PSAD56 nativo SERNAGEOMIN; el visor lo dibuja en
+    # WGS84 con un desfase fijo de +200 m E / +325 m N (medido en tilama_datum_sngm.py).
+    dx, dy = (200, 325) if "PSAD56" in str(leonor[0].get("datum", "")) else (0, 0)
+    VB = [box(v["E0"] - dx, v["N0"] - dy, v["E1"] - dx, v["N1"] - dy) for v in leonor]
     bloqueado = unary_union([U] + VB)
 
     edges_x = sorted({round(c + k * 1000) for _, g in geoms for c in (g.bounds[0], g.bounds[2]) for k in range(-4, 5)})
