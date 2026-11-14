@@ -30,10 +30,13 @@ No hay solapes entre pedimentos propios ni con las pertenencias de LEONOR 1. Con
 
 ## Calendario
 
+Plazos según el Código de Minería, cotejados con la guía de [propiedadminera.cl](https://propiedadminera.cl/ayuda/pedimento-y-manifestacion). Ojo: un error en las coordenadas del punto medio o del punto de interés no se puede corregir después (art. 49).
+
 1. **Día 0.** Revisar el catastro, presentar LEONOR 1 por la Oficina Judicial Virtual y después los 34 pedimentos.
-2. **Dentro de 30 días.** Pagar la tasa de los pedimentos, en total $2,8 M.
-3. **Con la resolución.** Inscribir en el Conservador de Minas y publicar en el Boletín Oficial de Minería.
-4. **Hasta el día 90 desde la resolución (art. 55).** Hacer el reconocimiento de los niveles B y C. Pedir la sentencia, con el plano del perito y la patente proporcional, solo de los pedimentos que se mantienen. Los demás caducan sin pagar patente. La Ley 21.420 impide volver a pedirlos de inmediato.
+2. **Dentro de 30 días desde la presentación.** Pagar las tasas: $2,8 M por los pedimentos y unos $0,3 M por LEONOR 1, que paga 208 ha × 0,02 UTM (art. 51). Si el tribunal observa defectos, se corrigen dentro de 8 días (art. 49).
+3. **Dentro de 30 días desde la resolución (art. 52).** Inscribir en el Conservador de Minas y publicar en el Boletín Oficial de Minería. Los feriados se cuentan. Hay que guardar el PDF original de la edición del Boletín, porque no sirven copias impresas ni escaneadas.
+4. **LEONOR 1, entre los días 91 y 120 desde la presentación (art. 59).** Pedir la mensura, con el perito contratado de antes.
+5. **Pedimentos, hasta el día 90 desde la resolución (art. 55).** Hacer el reconocimiento de los niveles B y C. Pedir la sentencia, con el plano del perito y la patente proporcional, solo de los pedimentos que se mantienen. Los demás caducan sin pagar patente. La Ley 21.420 impide volver a pedirlos de inmediato.
 
 ## Costos (UTM noviembre 2026: $72.440)
 
