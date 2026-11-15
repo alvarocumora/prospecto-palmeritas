@@ -29,7 +29,7 @@ El archivo de muestras trae además errores de transcripción documentados en `.
 - **LEONOR 5 (100 ha):** TOO-240 (4,69 %), además del corredor sur hacia la faena.
 - **LEONOR 2 (200 ha):** TOO-253 (3,62 %).
 - **MARTINA 2, 3 y 4 (600 ha):** la franja de afloramientos del noreste, con TOO-276 y 277, TOO-280 (6,10 %) y TOO-286 y 287.
-- **MARTINA 5 a 8, 10 y 11 (1.300 ha):** cubren todo el terreno libre de Potrero Alto dentro de la comuna de Los Vilos, con 609 ha libres:
+- **MARTINA 5 a 8, 10 y 11 (1.300 ha):** cubren todo el terreno libre de Potrero Alto dentro de la comuna de Los Vilos, con 698 ha libres:
   - **MARTINA 5:** es la antigua ELARA 3, en el centro de Potrero Alto (TOO-284).
   - **MARTINA 6:** al oeste, junto a Yendrick.
   - **MARTINA 7:** al sur, entre Fernanda 2 y 3.
