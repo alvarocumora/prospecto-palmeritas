@@ -1,0 +1,20 @@
+name: Nómina peritos mensuradores
+on:
+  push:
+    branches: ['tools/nomina-peritos']
+permissions:
+  contents: write
+jobs:
+  bajar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Descargar nómina oficial 2026 de SERNAGEOMIN
+        run: |
+          mkdir out && cd out
+          curl -fsSL -A "Mozilla/5.0" -o nomina_peritos_2026.pdf "https://www.sernageomin.cl/wp-content/uploads/2026/04/2.-NOMINA-PERITOS-2026.pdf"
+          ls -la
+          git init -q -b data/nomina-peritos
+          git config user.name "tilama-bot"; git config user.email "tilama-bot@users.noreply.github.com"
+          git add -A && git commit -q -m "Nómina peritos 2026"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/nomina-peritos
