@@ -18,6 +18,7 @@ import argparse
 import datetime as dt
 import json
 import math
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -122,11 +123,19 @@ def diagnostico() -> None:
         print(f"Metadatos HTTP {e.code}: {e.read()[:400]!r} | encabezados: {dict(e.headers)}")
 
 
-def _get(params: dict) -> dict:
+def _get(params: dict, intentos: int = 4) -> dict:
     url = f"{LAYER}/query?{urllib.parse.urlencode(params)}"
     try:
-        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=60) as r:
-            return json.load(r)
+        for i in range(intentos):
+            try:
+                with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=90) as r:
+                    return json.load(r)
+            except (TimeoutError, ConnectionError, urllib.error.URLError) as e:
+                # el servidor de SERNAGEOMIN corta lecturas largas a veces; reintentar con espera creciente
+                if isinstance(e, urllib.error.HTTPError) or i == intentos - 1:
+                    raise
+                print(f"reintento {i + 1} tras {type(e).__name__}: {e}")
+                time.sleep(5 * (i + 1))
     except urllib.error.HTTPError as e:
         cuerpo = e.read()[:400].decode("utf-8", "replace")
         print(f"HTTP {e.code} en {url}\ncuerpo: {cuerpo!r}\nencabezados: {dict(e.headers)}")
