@@ -7,11 +7,11 @@ Es la base de trabajo al menor costo: protege la faena de LEONOR 1 y las leyes c
 ## Explotación: cuatro manifestaciones
 
 - **LEONOR 1, 1 al 208.** Faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). El rectángulo manifestado es de 208 ha. En la mensura basta con 5 pertenencias clave de 5 ha (faena, TOO-255 y vecinas); se puede llegar a 33 si el terreno lo justifica.
-- **LEONOR 15, 1 al 18.** Es la única con labores y camino a la vista. Toma una franja libre de 75 m entre Expancion 1/12 y Polaco 7. Ahí hay conos de desmonte gris bajo el afloramiento de TOO-210 (6,83 % Cu, que está en Polaco 7, de terceros), está TOO-211 (1,62 % Cu) y pasa un camino perfilado en zigzag a 400 m al oeste. Se mensura 1 pertenencia (301.700–301.800 E × 6.454.800–6.455.300 N), con 3,6 ha libres. TOO-211 está a 10 m del borde de Expancion, así que hay que confirmar con GPS antes de presentar.
-- **LEONOR 16, 1 al 98.** Es la parte oeste de la tendencia mineralizada del noreste: TOO-273, 276 y 277, con 1,9 a 2,0 % Cu, en terreno libre. Se mensuran 2 pertenencias.
-- **LEONOR 17, 1 al 60.** Es la parte este de la misma tendencia: TOO-280 (6,1 % Cu, la mejor ley libre del sector) y TOO-286 y 287 (3,5 %). Se mensuran 2 pertenencias.
+- **MARTINA 1, 1 al 18.** Es la única con labores y camino a la vista. Toma una franja libre de 75 m entre Expancion 1/12 y Polaco 7. Ahí hay conos de desmonte gris bajo el afloramiento de TOO-210 (6,83 % Cu, que está en Polaco 7, de terceros), está TOO-211 (1,62 % Cu) y pasa un camino perfilado en zigzag a 400 m al oeste. Se mensura 1 pertenencia (301.700–301.800 E × 6.454.800–6.455.300 N), con 3,6 ha libres. TOO-211 está a 10 m del borde de Expancion, así que hay que confirmar con GPS antes de presentar.
+- **MARTINA 2, 1 al 98.** Es la parte oeste de la tendencia mineralizada del noreste: TOO-273, 276 y 277, con 1,9 a 2,0 % Cu, en terreno libre. Se mensuran 2 pertenencias.
+- **MARTINA 3, 1 al 60.** Es la parte este de la misma tendencia: TOO-280 (6,1 % Cu, la mejor ley libre del sector) y TOO-286 y 287 (3,5 %). Se mensuran 2 pertenencias.
 
-En LEONOR 16 y 17 la imagen no muestra caminos ni labores: son afloramientos a 6 a 8 km del camino público. Las tres manifestaciones nuevas tienen rectángulos de 100 ha o menos, para pagar la tasa mínima de manifestación (0,01 UTM/ha).
+En MARTINA 2 y 3 la imagen no muestra caminos ni labores: son afloramientos a 6 a 8 km del camino público. Las tres manifestaciones nuevas tienen rectángulos de 100 ha o menos, para pagar la tasa mínima de manifestación (0,01 UTM/ha).
 
 ## Exploración: tres pedimentos
 
@@ -38,7 +38,7 @@ Los montos están en `tilama_minimo_costos.csv`. Las publicaciones se calcularon
 
 ## Orden de presentación
 
-1. **Día 0.** Revisar el catastro y confirmar con GPS TOO-211 y TOO-240. Presentar primero las manifestaciones LEONOR 1, 15, 16 y 17, y después los pedimentos LEONOR 2, 3 y 5.
+1. **Día 0.** Revisar el catastro y confirmar con GPS TOO-211 y TOO-240. Presentar primero las manifestaciones LEONOR 1, MARTINA 1, MARTINA 2 y MARTINA 3, y después los pedimentos LEONOR 2, 3 y 5.
 2. **Dentro de 30 días.** Pagar las tasas. Si el tribunal observa defectos, corregirlos dentro de 8 días.
 3. **Dentro de 30 días desde la resolución.** Inscribir en el Conservador de Minas y publicar en el Boletín. Guardar el PDF original de la edición.
 4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de las cuatro manifestaciones.
