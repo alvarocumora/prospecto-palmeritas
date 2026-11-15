@@ -1,9 +1,10 @@
 ﻿nombre;tipo;ha_pedidas;ha_mensura;PI_N;PI_E;contiene;tasa;boletin;inscripcion;patente;patente_rebajada;nota;total_primer_ano
 LEONOR 1, 1 AL 208;Manifestación (explotación);208;25;6453230;302650;"Desmontes de la mina antigua Los Verdes / La Guanaca (M1/M2, 7,7 y 10,65 % CuT); TOO-255 (1,99 % CuT)";301350;237155;25000;724400;181100;"Mensurar 5 pertenencias clave (faena, TOO-255 y vecinas); hasta 33 si el terreno lo justifica";1287905
 MARTINA 1, 1 AL 35;Manifestación (explotación);35;11;6453950;303250;"TOO-256 (4,89 % Cu); TOO-255 (1,99 % Cu)";25354;237155;25000;318736;79684;TOO-256 queda en una franja libre de 40 m entre LEONOR 1 y Yendrick A4, a 38 m del vecino: confirmar con GPS. La pertenencia 2 toma el libre al norte de TOO-255.;606245
-MARTINA 2, 1 AL 120;Manifestación (explotación);120;28;6456200;304750;"TOO-276 (2,04 % Cu); TOO-277 (2,04 % Cu)";173856;237155;25000;811328;202832;Tendencia mineralizada del noreste, parte oeste. Sin acceso: 6 km del camino público.;1247339
-MARTINA 3, 1 AL 120;Manifestación (explotación);120;28;6456100;306250;"TOO-280 (6,10 % Cu); TOO-278 (0,63 % Cu); TOO-279 (0,63 % Cu); TOO-286 (3,50 % Cu); TOO-287 (3,50 % Cu); TOO-285 (0,69 % Cu)";173856;237155;25000;811328;202832;Tendencia mineralizada del noreste, parte este, con la mejor ley libre (TOO-280, 6,1 % Cu).;1247339
 LEONOR 2;Pedimento (exploración);200;200;6452500;303500;TOO-253 (3,62 % Cu);72440;120749;25000;869280;869280;Núcleo: colinda con LEONOR 1 (faena M1/M2) o con el bloque mineralizado Fernández;1087469
 LEONOR 3;Pedimento (exploración);200;200;6451500;302500;"TOO-237 (5,04 %); TOO-262 (2,48 %); TOO-234 (2,40 %); TOO-258 (1,99 %); otras 8 entre 0,5 y 0,9 %";72440;120749;25000;869280;869280;Núcleo: colinda con LEONOR 1 (faena M1/M2) o con el bloque mineralizado Fernández;1087469
 LEONOR 5;Pedimento (exploración);100;100;6450500;301500;TOO-240 (4,69 %);36220;120749;25000;434640;434640;Núcleo: colinda con LEONOR 1 (faena M1/M2) o con el bloque mineralizado Fernández;616609
-TOTAL;;;;;;;855516;1310867;175000;4838992;2839648;;7180375
+MARTINA 2;Pedimento (exploración);200;200;6456350;304500;TOO-276 y TOO-277 (2,04 %);72440;120749;25000;869280;869280;Zona de interés Martina, parte oeste: afloramientos con TOO-276 y TOO-277 (2,04 % Cu);1087469
+MARTINA 3;Pedimento (exploración);200;200;6455350;305500;"TOO-280 (6,10 %); TOO-278 y TOO-279 (0,63 %)";72440;120749;25000;869280;869280;Zona de interés Martina, centro: TOO-280 (6,10 % Cu), TOO-278 y TOO-279;1087469
+MARTINA 4;Pedimento (exploración);200;200;6455350;306500;"TOO-286 y TOO-287 (3,50 %); TOO-285 (0,69 %)";72440;120749;25000;869280;869280;Zona de interés Martina, parte este: TOO-286 y TOO-287 (3,50 % Cu), TOO-285;1087469
+TOTAL;;;;;;;725124;1198804;200000;5824176;5041824;;7948104

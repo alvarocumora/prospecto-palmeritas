@@ -190,9 +190,9 @@
  },
  {
   "n": 9,
-  "nombre": "LEONOR 9",
+  "nombre": "MARTINA 2",
   "zona": "Anomalía",
-  "nivel": "B",
+  "nivel": "A",
   "E0": 304000,
   "E1": 305000,
   "N0": 6455350,
@@ -211,11 +211,12 @@
   "muestras": [
    "T-09 (3.1 ha)"
   ],
-  "fundamento": "Anomalía SWIR por verificar en terreno",
+  "fundamento": "Zona de interés Martina, parte oeste: afloramientos con TOO-276 y TOO-277 (2,04 % Cu)",
   "origen": "LEONOR 5",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
-  "patente_anual_clp": 869280
+  "patente_anual_clp": 869280,
+  "nombre_anterior": "LEONOR 9"
  },
  {
   "n": 10,
@@ -386,9 +387,9 @@
  },
  {
   "n": 15,
-  "nombre": "ELARA 1",
-  "zona": "Borde",
-  "nivel": "C",
+  "nombre": "MARTINA 3",
+  "zona": "Anomalía",
+  "nivel": "A",
   "E0": 305000,
   "E1": 306000,
   "N0": 6454350,
@@ -405,18 +406,18 @@
   "solapes": [],
   "comuna": "Los Vilos",
   "muestras": [],
-  "fundamento": "Cobertura de borde sin evidencia: evaluar y, si no aparece nada, dejar caducar",
+  "fundamento": "Zona de interés Martina, centro: TOO-280 (6,10 % Cu), TOO-278 y TOO-279",
   "origen": "LEONOR 3",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
   "patente_anual_clp": 869280,
-  "nombre_anterior": "LEONOR 15"
+  "nombre_anterior": "ELARA 1"
  },
  {
   "n": 16,
-  "nombre": "ELARA 2",
-  "zona": "Borde",
-  "nivel": "C",
+  "nombre": "MARTINA 4",
+  "zona": "Anomalía",
+  "nivel": "A",
   "E0": 306000,
   "E1": 307000,
   "N0": 6454350,
@@ -433,12 +434,12 @@
   "solapes": [],
   "comuna": "Los Vilos",
   "muestras": [],
-  "fundamento": "Cobertura de borde sin evidencia: evaluar y, si no aparece nada, dejar caducar",
+  "fundamento": "Zona de interés Martina, parte este: TOO-286 y TOO-287 (3,50 % Cu), TOO-285",
   "origen": "LEONOR 3",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
   "patente_anual_clp": 869280,
-  "nombre_anterior": "LEONOR 16"
+  "nombre_anterior": "ELARA 2"
  },
  {
   "n": 17,

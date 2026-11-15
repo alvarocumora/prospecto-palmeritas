@@ -1,4 +1,4 @@
-# Tilama: paquete mínimo para presentar
+# Tilama: presentación por prioridad
 
 Borrador del 15-11-2026. Titular: Valle Escondido SpA (Minera Valle Escondido SpA). Juzgado de Letras y Garantía de Los Vilos. Todas las coordenadas están en PSAD56 (La Canoa 1956), Huso 19, en el marco del catastro SERNAGEOMIN.
 
@@ -11,41 +11,26 @@ Las coordenadas de `src/data/geo/tilama/geochem_core.json` vienen de la transcri
 Con la ubicación corregida:
 
 - **TOO-211 queda dentro de Los Verdes 5**, que es de terceros. Por eso se eliminó la antigua MARTINA 1, la de la franja libre junto a Expancion.
-- **MARTINA 2 y 3 se rediseñaron** sobre la posición real de las muestras.
+- **La zona del noreste ahora se cubre con exploración** (MARTINA 2, 3 y 4).
 - **TOO-273 cae en Yendrick A5**, también de terceros.
 - **Aparece libre TOO-256 (4,89 % Cu)**, pegada al este de LEONOR 1.
 - **LEONOR 3, 5 y 2 siguen conteniendo sus muestras.** TOO-233 queda en Las Trancas y TOO-238 queda 30 m al sur de LEONOR 3.
 
 El archivo de muestras trae además errores de transcripción documentados en `../../revision-informe-esterio-2026-11-13.md`: filas desplazadas, coordenadas repetidas y TOO-270 con 45,6 % Cu. Hay que cotejarlo con el original de EMT.
 
-## Explotación: cuatro manifestaciones
+## Estructura: explotación en las faenas, exploración en las zonas de interés
 
-- **LEONOR 1, 1 al 208.** Cubre la faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). En la mensura bastan 5 pertenencias clave de 5 ha; se puede llegar a 33 si el terreno lo justifica.
-- **MARTINA 1, 1 al 35.** Punto de interés en N 6.453.950 / E 303.250. Se mensuran 2 pertenencias:
-  - una de 5 ha sobre TOO-256 (4,89 % Cu), en la franja libre de 40 m entre LEONOR 1 y Yendrick A4, en trámite;
-  - otra de 6 ha en el libre al norte de TOO-255.
+**Explotación (2 manifestaciones):**
+- **LEONOR 1, 1 al 208.** Cubre la faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). En la mensura se ubican 5 pertenencias clave de 5 ha, y hasta 33 si el terreno lo justifica.
+- **MARTINA 1, 1 al 35.** Punto de interés: N 6.453.950 / E 303.250. Se mensuran 2 pertenencias (11 ha): una sobre TOO-256 (4,89 % Cu) y otra en el libre al norte de TOO-255. TOO-256 queda a 38 m de Yendrick A4, así que hay que confirmarla con GPS.
 
-  TOO-256 está a 38 m del vecino, así que hay que confirmarla con GPS antes de presentar.
-- **MARTINA 2, 1 al 120.** Punto de interés en N 6.456.200 / E 304.750. Se mensuran 3 pertenencias (28 ha), desde TOO-276 y 277 (2,04 % Cu) hacia el este, siguiendo la franja de afloramientos.
-- **MARTINA 3, 1 al 120.** Punto de interés en N 6.456.100 / E 306.250. Queda pegada a MARTINA 2. Se mensuran 3 pertenencias (28 ha) que cubren TOO-280 (6,10 % Cu), TOO-278 y 279 (0,63 %) y TOO-286 y 287 (3,50 %).
-
-Entre MARTINA 2 y 3 cubren de punta a punta, unos 2,5 km, la tendencia mineralizada del noreste, toda en terreno libre. La imagen no muestra caminos ni labores; el camino público queda a 6–8 km. Los rectángulos de MARTINA 2 y 3 son de 120 ha, así que pagan una tasa de 0,02 UTM/ha.
-
-## Exploración: tres pedimentos
-
-- **LEONOR 3 (200 ha).** TOO-237 (5,04 %), TOO-262 (2,48 %), TOO-234 (2,40 %), TOO-258 (1,99 %) y otras ocho muestras entre 0,5 y 0,9 %. Queda pegada al sur de la faena.
-- **LEONOR 5 (100 ha).** TOO-240 (4,69 %). Da el corredor sur hacia la faena desde el camino antiguo en zigzag.
+**Exploración prioritaria (6 pedimentos, 1.100 ha):**
+- **LEONOR 3 (200 ha).** TOO-237 (5,04 %), TOO-262 (2,48 %), TOO-234 (2,40 %), TOO-258 (1,99 %) y otras ocho muestras de 0,5 a 0,9 %. Queda al sur de la faena.
+- **LEONOR 5 (100 ha).** TOO-240 (4,69 %). Da el corredor sur hacia la faena.
 - **LEONOR 2 (200 ha).** TOO-253 (3,62 %). Queda al este de la faena.
+- **MARTINA 2, 3 y 4 (600 ha).** Cubren la zona de interés del noreste: una franja de afloramientos de unos 2,5 km, toda en terreno libre y sin camino. MARTINA 2 tiene TOO-276 y 277 (2,04 %); MARTINA 3, TOO-280 (6,10 %); MARTINA 4, TOO-286 y 287 (3,50 %). Antes se llamaban LEONOR 9, ELARA 1 y ELARA 2. Si el terreno confirma, se manifiesta dentro de ellos con preferencia, porque solo el titular de la exploración puede manifestar en su interior.
 
-## Resto de la exploración (08 a 38): cubrir todo el sector
-
-Son los otros 31 pedimentos del plan completo (`../presentacion/`): LEONOR 4 y 6 a 14, y ELARA 1 a 21. Suman 7.300 ha y, junto con LEONOR 2, 3 y 5, cubren todo el sector con 7.800 ha de exploración. Se presentan después de los siete del paquete mínimo, en este orden: nivel A (LEONOR 4, 6, 7 y 8), nivel B (LEONOR 9 a 14 y ELARA 19 a 21) y nivel C (ELARA 1 a 18).
-
-- **Costo de presentarlos:** tasa de $2,64 M y unos $4,5 M entre Boletín e inscripción.
-- **Patente, si todos llegaran a sentencia:** $31,7 M al año. Lo normal es pedir sentencia solo de los que muestren algo en terreno hasta el día 90 y dejar caducar el resto. La patente de un pedimento se paga solo si se pide su sentencia.
-- **Solapes con manifestaciones propias:** LEONOR 9, ELARA 1 y ELARA 2 se montan sobre los rectángulos de MARTINA 2 y MARTINA 3 (205 ha). Como las manifestaciones se presentan antes, prevalecen en esa parte, y el pedimento cubre el entorno.
-- **Muestras dentro de estos pedimentos:** LEONOR 6 contiene TOO-238 (2,16 %), ELARA 15 contiene TOO-132 (1,17 %), ELARA 19 contiene TOO-116 (0,83 %) y ELARA 3 contiene TOO-284 (0,73 %).
-- **Observaciones de la imagen:** en LEONOR 13 la anomalía es agrícola, LEONOR 14 toca el pueblo de Tilama (art. 17) y ELARA 19 tiene los caminos mineros antiguos en zigzag.
+**Resto de la exploración (28 pedimentos, 6.700 ha):** LEONOR 4, 6 a 8 y 10 a 14, y ELARA 3 a 21. Con ellos queda cubierto todo el sector. En el orden de subida van después de los prioritarios: primero nivel A, luego B y al final C. Observaciones de la imagen: en LEONOR 13 la anomalía es agrícola, LEONOR 14 toca el pueblo de Tilama (art. 17) y ELARA 19 tiene los caminos antiguos en zigzag.
 
 ## Accesos
 
@@ -56,25 +41,24 @@ El acceso no depende de estas concesiones. Depende de una servidumbre de tránsi
 
 ## Costos (UTM noviembre 2026: $72.440)
 
-El detalle está en `tilama_minimo_costos.csv`.
+El detalle está en `orden_y_costos.csv` y en `tilama_minimo_costos.csv`.
 
-- **Primer año:** unos $7,2 M. Son tasas por $0,86 M, Boletín por $1,3 M, inscripciones estimadas en $0,18 M y patentes por $4,8 M. LEONOR 1 se cuenta con 5 pertenencias.
-- **Cada marzo:** $4,8 M de patente, o $2,8 M con la patente rebajada de pequeña minería en las manifestaciones.
+- **Prioritarios (01 a 08):** tasa de $0,73 M y unos $1,4 M entre Boletín e inscripción. Si todos llegan a sentencia y mensura, la patente suma $5,8 M al año, con LEONOR 1 en 5 pertenencias.
+- **Resto (09 a 36):** tasa de $2,4 M y unos $4,1 M entre Boletín e inscripción. La patente sería de $29,1 M al año si todos llegaran a sentencia. Lo normal es pedir sentencia solo de los que muestren algo en terreno y dejar caducar el resto.
 - **Falta cotizar el perito.**
 
 ## Orden de presentación
 
-1. **Día 0.** Revisar el catastro, confirmar TOO-256 con GPS y presentar las manifestaciones (LEONOR 1, MARTINA 1, MARTINA 2 y MARTINA 3). Después, los pedimentos (LEONOR 2, 3 y 5).
+1. **Día 0.** Revisar el catastro y confirmar TOO-256 con GPS. Subir 01 y 02 (manifestaciones), luego 03 a 08 (exploración prioritaria) y después 09 a 36.
 2. **Dentro de 30 días.** Pagar las tasas. Si hay defectos, corregirlos dentro de 8 días.
 3. **Dentro de 30 días desde la resolución.** Inscribir y publicar en el Boletín, guardando el PDF original de la edición.
-4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de las manifestaciones.
-5. **Hasta el día 90 desde la resolución.** Pedir la sentencia de los pedimentos.
+4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de LEONOR 1 y MARTINA 1.
+5. **Hasta el día 90 desde la resolución.** Pedir la sentencia de los pedimentos que valgan la pena.
 
 ## Archivos
 
-- `para_subir/`: los 38 escritos en PDF, numerados en el orden de presentación. Del 01 al 07 está el paquete mínimo; del 08 al 38, el resto de la exploración. También vienen en `tilama_todo_para_subir.zip`, con los 38, y en `tilama_resto_exploracion_para_subir.zip`, solo con los del 08 al 38.
-- `orden_y_costos.csv`: orden de subida y costos de cada pieza.
-- `tilama_minimo_manifestaciones.docx` y `tilama_minimo_pedimentos.docx`: hojas de control y escritos.
-- `tilama_minimo.kmz` y `tilama_minimo.png`: mapa y plano.
-- `tilama_minimo_costos.csv`: costo por pieza.
-- `manifestaciones_minimo.json` y `pedimentos_minimo.json`: datos fuente.
+- `para_subir/`: los 36 escritos en PDF, numerados en el orden de subida. Vienen también en `tilama_todo_para_subir.zip` (los 36) y en `tilama_prioritario_para_subir.zip` (01 a 08).
+- `orden_y_costos.csv`: orden de subida y costos por pieza.
+- `tilama_minimo_manifestaciones.docx` y `tilama_minimo_pedimentos.docx`: hojas de control y escritos de lo prioritario.
+- `tilama_minimo.kmz` y `tilama_minimo.png`: mapa y plano de lo prioritario.
+- `manifestaciones_minimo.json` y `pedimentos_minimo.json`: datos fuente. El plan completo está en `../presentacion/pedimentos_exploracion.json`.
