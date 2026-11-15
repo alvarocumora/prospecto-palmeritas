@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import statistics
 import sys
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -21,6 +22,20 @@ BASE = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/Feature
 WHERE = "SITUACION_CONCESION <> 'ELIMINADA'"
 # Recuadro ampliado hasta el límite regional Coquimbo/Valparaíso (sur y este de Tilama).
 BBOX = (-71.30, -32.22, -70.95, -31.93)
+
+
+def _get_json(url: str, tries: int = 4) -> dict:
+    """GET con reintentos: el FeatureServer de SERNAGEOMIN corta lecturas largas al azar."""
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=120) as r:
+                return json.load(r)
+        except (TimeoutError, OSError, ValueError) as e:
+            if i == tries - 1:
+                raise
+            print(f"reintento {i + 1} tras error: {e}")
+            time.sleep(5 * (i + 1))
+    return {}
 
 
 def q(layer: int, out_sr: int, extra: dict | None = None) -> dict:
@@ -35,8 +50,7 @@ def q(layer: int, out_sr: int, extra: dict | None = None) -> dict:
     while True:
         p["resultOffset"] = off
         url = f"{BASE}/{layer}/query?" + urllib.parse.urlencode(p)
-        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=90) as r:
-            d = json.load(r)
+        d = _get_json(url)
         if "error" in d:
             print("ERROR", layer, out_sr, d["error"]); return {"features": out}
         out += d.get("features", [])
