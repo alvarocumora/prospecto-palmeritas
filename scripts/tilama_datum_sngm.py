@@ -15,10 +15,12 @@ import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from tilama_catastro_kmz import BBOX, HEADERS  # noqa: E402
+from tilama_catastro_kmz import HEADERS  # noqa: E402
 
 BASE = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer"
 WHERE = "SITUACION_CONCESION <> 'ELIMINADA'"
+# Recuadro ampliado hasta el límite regional Coquimbo/Valparaíso (sur y este de Tilama).
+BBOX = (-71.30, -32.22, -70.95, -31.93)
 
 
 def q(layer: int, out_sr: int, extra: dict | None = None) -> dict:
