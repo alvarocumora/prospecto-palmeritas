@@ -1,40 +1,46 @@
 ﻿orden;nombre;tipo;ha;tasa_30_dias;boletin_e_inscripcion;patente_si_va_a_sentencia
 01;LEONOR 1;Manifestación (explotación);208;301350;262155;724400
 02;MARTINA 1;Manifestación (explotación);35;25354;262155;318736
-03;LEONOR 2;Pedimento (exploración);200;72440;145749;869280
-04;LEONOR 3;Pedimento (exploración);200;72440;145749;869280
-05;LEONOR 5;Pedimento (exploración);100;36220;145749;434640
-06;MARTINA 2;Pedimento (exploración);200;72440;145749;869280
-07;MARTINA 3;Pedimento (exploración);200;72440;145749;869280
-08;MARTINA 4;Pedimento (exploración);200;72440;145749;869280
-09;LEONOR 4;Pedimento (exploración) nivel A;200;72440;145749;869280
-10;LEONOR 6;Pedimento (exploración) nivel A;200;72440;145749;869280
-11;LEONOR 7;Pedimento (exploración) nivel A;300;108660;145749;1303920
-12;LEONOR 8;Pedimento (exploración) nivel A;300;108660;145749;1303920
-13;LEONOR 10;Pedimento (exploración) nivel B;300;108660;145749;1303920
-14;LEONOR 11;Pedimento (exploración) nivel B;300;108660;145749;1303920
-15;LEONOR 12;Pedimento (exploración) nivel B;300;108660;145749;1303920
-16;LEONOR 13;Pedimento (exploración) nivel B;300;108660;145749;1303920
-17;LEONOR 14;Pedimento (exploración) nivel B;100;36220;145749;434640
-18;ELARA 19;Pedimento (exploración) nivel B;300;108660;145749;1303920
-19;ELARA 20;Pedimento (exploración) nivel B;200;72440;145749;869280
+03;LEONOR 2;Pedimento (exploración) nivel A;200;72440;145749;869280
+04;LEONOR 3;Pedimento (exploración) nivel A;200;72440;145749;869280
+05;LEONOR 5;Pedimento (exploración) nivel A;100;36220;145749;434640
+06;MARTINA 2;Pedimento (exploración) nivel A;200;72440;145749;869280
+07;MARTINA 3;Pedimento (exploración) nivel A;200;72440;145749;869280
+08;MARTINA 4;Pedimento (exploración) nivel A;200;72440;145749;869280
+09;MARTINA 5;Pedimento (exploración) nivel A;200;72440;145749;869280
+10;MARTINA 6;Pedimento (exploración) nivel A;200;72440;145749;869280
+11;MARTINA 7;Pedimento (exploración) nivel A;200;72440;145749;869280
+12;MARTINA 8;Pedimento (exploración) nivel A;300;108660;145749;1303920
+13;MARTINA 10;Pedimento (exploración) nivel A;200;72440;145749;869280
+14;MARTINA 11;Pedimento (exploración) nivel A;200;72440;145749;869280
+15;LEONOR 4;Pedimento (exploración) nivel A;200;72440;145749;869280
+16;LEONOR 6;Pedimento (exploración) nivel A;200;72440;145749;869280
+17;LEONOR 7;Pedimento (exploración) nivel A;300;108660;145749;1303920
+18;LEONOR 8;Pedimento (exploración) nivel A;300;108660;145749;1303920
+19;ELARA 19;Pedimento (exploración) nivel B;300;108660;145749;1303920
 20;ELARA 21;Pedimento (exploración) nivel B;100;36220;145749;434640
-21;ELARA 3;Pedimento (exploración) nivel C;200;72440;145749;869280
-22;ELARA 4;Pedimento (exploración) nivel C;300;108660;145749;1303920
-23;ELARA 5;Pedimento (exploración) nivel C;100;36220;145749;434640
-24;ELARA 6;Pedimento (exploración) nivel C;100;36220;145749;434640
-25;ELARA 7;Pedimento (exploración) nivel C;300;108660;145749;1303920
-26;ELARA 8;Pedimento (exploración) nivel C;200;72440;145749;869280
-27;ELARA 9;Pedimento (exploración) nivel C;200;72440;145749;869280
-28;ELARA 10;Pedimento (exploración) nivel C;300;108660;145749;1303920
-29;ELARA 11;Pedimento (exploración) nivel C;300;108660;145749;1303920
-30;ELARA 12;Pedimento (exploración) nivel C;300;108660;145749;1303920
-31;ELARA 13;Pedimento (exploración) nivel C;300;108660;145749;1303920
-32;ELARA 14;Pedimento (exploración) nivel C;300;108660;145749;1303920
-33;ELARA 15;Pedimento (exploración) nivel C;300;108660;145749;1303920
-34;ELARA 16;Pedimento (exploración) nivel C;200;72440;145749;869280
-35;ELARA 17;Pedimento (exploración) nivel C;100;36220;145749;434640
-36;ELARA 18;Pedimento (exploración) nivel C;300;108660;145749;1303920
-;TOTAL 01-36;;8043;3151864;5479776;34945056
-;Prioritario 01-08;;1343;725124;1398804;5824176
-;Resto 09-36;;6700;2426740;4080972;29120880
+21;LEONOR 10;Pedimento (exploración) nivel B;300;108660;145749;1303920
+22;LEONOR 11;Pedimento (exploración) nivel B;300;108660;145749;1303920
+23;LEONOR 12;Pedimento (exploración) nivel B;300;108660;145749;1303920
+24;LEONOR 13;Pedimento (exploración) nivel B;300;108660;145749;1303920
+25;LEONOR 14;Pedimento (exploración) nivel B;100;36220;145749;434640
+26;ELARA 20;Pedimento (exploración) nivel B;200;72440;145749;869280
+27;ELARA 4;Pedimento (exploración) nivel C;300;108660;145749;1303920
+28;ELARA 5;Pedimento (exploración) nivel C;100;36220;145749;434640
+29;ELARA 6;Pedimento (exploración) nivel C;100;36220;145749;434640
+30;ELARA 7;Pedimento (exploración) nivel C;300;108660;145749;1303920
+31;ELARA 8;Pedimento (exploración) nivel C;200;72440;145749;869280
+32;ELARA 9;Pedimento (exploración) nivel C;200;72440;145749;869280
+33;ELARA 10;Pedimento (exploración) nivel C;300;108660;145749;1303920
+34;ELARA 11;Pedimento (exploración) nivel C;300;108660;145749;1303920
+35;ELARA 12;Pedimento (exploración) nivel C;300;108660;145749;1303920
+36;ELARA 13;Pedimento (exploración) nivel C;300;108660;145749;1303920
+37;ELARA 14;Pedimento (exploración) nivel C;300;108660;145749;1303920
+38;ELARA 15;Pedimento (exploración) nivel C;300;108660;145749;1303920
+39;ELARA 16;Pedimento (exploración) nivel C;200;72440;145749;869280
+40;ELARA 17;Pedimento (exploración) nivel C;100;36220;145749;434640
+41;ELARA 18;Pedimento (exploración) nivel C;300;108660;145749;1303920
+;TOTAL 01-41;;9143;3550284;6208521;39726096
+;Presentar ahora 01-20;;4043;1703064;3147792;17559456
+;Explotación + zona Martina/Potrero Alto + núcleo 01-14;;2643;1195984;2273298;11474496
+;Resto 21-41;;5100;1847220;3060729;22166640

@@ -27,7 +27,7 @@ for l in open('/tmp/claude-0/ped/datum_hoy.txt'):
 ARR={'LOS VERDES 4 1/10','LOS VERDES 5 1/12','PEUMO 1/20','LAS TRANCAS1/20'}
 ANX={'LOS VERDES 3 1/20','ALTO LOS VERDES 2 1/15','EL CANELO','EL ALTO','PLAZETAS','PLAZETAS 2','EL CANELO 2','BLANQUILLA 1/2','SANTA CAROLINA 2 1/10','SANTA CAROLINA 1/6','CAMPANARIO 2 1/10','LA FLORIDA 1/6','LA FLORIDA 1'}
 Pall=json.load(open(D+'presentacion/pedimentos_exploracion.json')); MAN=json.load(open(D+'paquete_minimo/manifestaciones_minimo.json'))
-PRI=['LEONOR 2','LEONOR 3','LEONOR 5','MARTINA 2','MARTINA 3','MARTINA 4']; CIN=['LEONOR 4','LEONOR 6','LEONOR 7','LEONOR 8','ELARA 19','ELARA 21']
+PRI=['LEONOR 2','LEONOR 3','LEONOR 5','MARTINA 2','MARTINA 3','MARTINA 4','MARTINA 5','MARTINA 6','MARTINA 7','MARTINA 8','MARTINA 10','MARTINA 11']; CIN=['LEONOR 4','LEONOR 6','LEONOR 7','LEONOR 8','ELARA 19','ELARA 21']
 G=json.load(open(R+'src/data/geo/tilama/geochem_core.json'))
 S=[(x['Muestra'],(x['Cu_ppm'] or 0)/1e4,x['Este_UTM']+17,x['Norte_UTM']-49) for x in G if x['Este_UTM']]
 osm=json.load(open(IMG+'osm.geojson')); ti=Transformer.from_crs(4326,32719,always_xy=True)
@@ -79,7 +79,7 @@ def norte_escala(ax,E0,N0,E1,N1,L=1000):
   ax.text(sx+L/2,sy+(N1-N0)*.014,f'{L:,} m'.replace(',','.'),ha='center',fontsize=8,color='white',weight='bold',zorder=21)
 LEG=[Patch(fc=C['exp'],ec='#880e4f',alpha=.75,label='Fase I · Explotación propia: LEONOR 1 y MARTINA 1 (pertenencias a mensurar)'),
  Line2D([],[],color=C['exp'],ls=':',label='Rectángulo manifestado'),
- Patch(fc=C['pri'],ec='#a04000',alpha=.5,label='Fase I · Exploración prioritaria: LEONOR 2, 3, 5 y MARTINA 2–4 (1.100 ha)'),
+ Patch(fc=C['pri'],ec='#a04000',alpha=.5,label='Fase I · Exploración prioritaria: LEONOR 2, 3, 5 y\nMARTINA 2–11, zona Martina y Potrero Alto (2.400 ha)'),
  Patch(fc=C['cin'],ec='#ca6f1e',alpha=.45,label='Fase I · Cinturón de exploración: LEONOR 4, 6–8, ELARA 19 y 21 (1.400 ha)'),
  Patch(fc=C['arr'],ec='#9a7d0a',alpha=.6,label='Fase I · Arranque integrado (arriendo): Los Verdes 4 y 5, Peumo 1, Las Trancas 1'),
  Patch(fc=C['anx'],ec='#b7950b',alpha=.5,label='Fase II · Anexos del proyecto integrado (terceros)'),
@@ -94,13 +94,13 @@ def cajetin(fig,titulo,sub):
   fig.text(.012,.012,'Valle Escondido SpA (Minera Valle Escondido SpA) · Proyecto Tilama / Los Verdes, Los Vilos, Región de Coquimbo · Coordenadas UTM PSAD56 (La Canoa 1956) Huso 19, marco catastro SERNAGEOMIN · Catastro al 15-11-2026 · Imagen Esri World Imagery · Borrador de trabajo, no es plano oficial ni de mensura.',fontsize=6.6,color='#566573')
 with PdfPages(D+'tilama_plano_fases.pdf') as pdf:
   # Lámina 1: plano general
-  E0,N0,E1,N1=289500,6447500,308400,6457800
+  E0,N0,E1,N1=289500,6447500,309000,6458600
   fig=plt.figure(figsize=(16.54,11.69))
   ax=fig.add_axes([.012,.045,.70,.885]); base(ax,E0,N0,E1,N1,'mosaico_general_z16.jpg',8); norte_escala(ax,E0,N0,E1,N1,2000)
   cajetin(fig,'Proyecto Minero Integrado Tilama / Los Verdes — plano de fases','Lámina 1 de 3 · Plano general: concesiones propias por fase, bloque Los Verdes a integrar, muestras y accesos')
   lx=fig.add_axes([.725,.36,.265,.57]); lx.axis('off'); lx.legend(handles=LEG,loc='upper left',fontsize=7.4,frameon=False,title='Fases',title_fontsize=9,alignment='left',labelspacing=1.0)
   tx=fig.add_axes([.725,.045,.265,.30]); tx.axis('off')
-  rows=[('Fase I explotación','LEONOR 1 + MARTINA 1','243 ha manif.'),('Fase I exploración prioritaria','6 pedimentos','1.100 ha'),('Fase I cinturón','6 pedimentos','1.400 ha'),('Fase I arranque integrado','4 concesiones terceros','349 ha'),('Fase II anexos','13 concesiones terceros','~1.600 ha'),('Fase III ampliación','22 pedimentos','5.300 ha')]
+  rows=[('Fase I explotación','LEONOR 1 + MARTINA 1','243 ha manif.'),('Fase I exploración prioritaria','12 pedimentos','2.400 ha'),('Fase I cinturón','6 pedimentos','1.400 ha'),('Fase I arranque integrado','4 concesiones terceros','349 ha'),('Fase II anexos','13 concesiones terceros','~1.600 ha'),('Fase III ampliación','21 pedimentos','5.100 ha')]
   tb=tx.table(cellText=rows,colLabels=['Fase','Piezas','Superficie'],loc='upper left',colWidths=[.48,.32,.2],cellLoc='left')
   tb.auto_set_font_size(False); tb.set_fontsize(7.2); tb.scale(1,1.45)
   for (r,c),cell in tb.get_celld().items():
@@ -121,9 +121,9 @@ with PdfPages(D+'tilama_plano_fases.pdf') as pdf:
   fig=plt.figure(figsize=(16.54,11.69))
   cajetin(fig,'Fases de exploración y explotación','Lámina 3 de 3 · Programa por etapas con hitos de decisión. Montos en pesos de noviembre de 2026 (UTM $72.440); terreno y perito a cotizar.')
   fases=[
-   ('FASE 0','Semanas 0–2','Presentación y resguardo',['Cotejar ensayes clave con el original de EMT','Contratar perito; revisar los puntos de los escritos','Presentar por OJV: LEONOR 1, MARTINA 1 y 12 pedimentos','Revisar títulos del bloque Los Verdes (vigencia, patentes, gravámenes)'],'Tasas ≈ $1,2 M · Boletín e inscripción ≈ $2,3 M','#1b2631'),
+   ('FASE 0','Semanas 0–2','Presentación y resguardo',['Cotejar ensayes clave con el original de EMT','Contratar perito; revisar los puntos de los escritos','Presentar por OJV: LEONOR 1, MARTINA 1 y 18 pedimentos (escritos 01 a 20)','Revisar títulos del bloque Los Verdes (vigencia, patentes, gravámenes)'],'Tasas ≈ $1,7 M · Boletín e inscripción ≈ $3,1 M','#1b2631'),
    ('FASE I-A','Días 0–90','Validación en terreno',['GPS de faena M1/M2 y muestras clave (TOO-256, 237, 240, 253, 280, 286)','Remuestreo por canaletas con QA/QC en LEONOR 3, M1/M2 y franja Martina','Recorrer accesos: huella norte, zigzag ELARA 19, corredor sur LEONOR 5','Identificar dueños superficiales y negociar servidumbres','Carta de intención con titulares del bloque Los Verdes'],'Campaña de 3–4 días y análisis: a cotizar','#a04000'),
-   ('HITO','Día 90','Decisión',['Sentencia solo de los pedimentos con resultado','Mensura de LEONOR 1 y MARTINA 1 (días 91–120)','Inscripción ENAMI como pequeña minería','Firma de arriendo del arranque integrado'],'Patente de lo prioritario ≈ $5,8 M/año','#7d3c98'),
+   ('HITO','Día 90','Decisión',['Sentencia solo de los pedimentos con resultado','Mensura de LEONOR 1 y MARTINA 1 (días 91–120)','Inscripción ENAMI como pequeña minería','Firma de arriendo del arranque integrado'],'Patente si todo 01–20 va a sentencia ≈ $17,6 M/año','#7d3c98'),
    ('FASE I-B','Meses 4–12','Explotación inicial',['Pequeña minería sobre la faena de LEONOR 1: limpieza y muestreo de desmontes','Venta de mineral oxidado a ENAMI según pauta vigente','Permisos: Sernageomin (método de explotación y cierre), art. 17 donde aplique','Arranque integrado: Los Verdes 4 y 5, Peumo 1, Las Trancas 1 (canon 10 % sobre ventas)'],'Según plan de inversión y resultados de terreno','#c2185b'),
    ('FASE II','Años 1–2','Exploración sistemática',['Mapeo 1:5.000 y geoquímica en todo el distrito integrado','Geofísica (magnetometría y gamma-espectrometría, IP donde convenga)','Sondajes de reconocimiento en los blancos validados','Incorporación de anexos al proyecto integrado según hitos'],'Programa a definir con los resultados de Fase I','#1f618d'),
    ('FASE III','Años 2–4','Recurso y valorización',['Ampliación de la exploración a los pedimentos de borde que muestren interés','Estimación de recursos y reporte técnico bajo estándar NI 43-101 / JORC','Data room unificado y venta o financiamiento del proyecto como un todo'],'Según resultados','#117864')]

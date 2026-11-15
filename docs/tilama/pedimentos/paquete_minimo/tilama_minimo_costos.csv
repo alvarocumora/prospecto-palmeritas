@@ -7,4 +7,10 @@ LEONOR 5;Pedimento (exploración);100;100;6450500;301500;TOO-240 (4,69 %);36220;
 MARTINA 2;Pedimento (exploración);200;200;6456350;304500;TOO-276 y TOO-277 (2,04 %);72440;120749;25000;869280;869280;Zona de interés Martina, parte oeste: afloramientos con TOO-276 y TOO-277 (2,04 % Cu);1087469
 MARTINA 3;Pedimento (exploración);200;200;6455350;305500;"TOO-280 (6,10 %); TOO-278 y TOO-279 (0,63 %)";72440;120749;25000;869280;869280;Zona de interés Martina, centro: TOO-280 (6,10 % Cu), TOO-278 y TOO-279;1087469
 MARTINA 4;Pedimento (exploración);200;200;6455350;306500;"TOO-286 y TOO-287 (3,50 %); TOO-285 (0,69 %)";72440;120749;25000;869280;869280;Zona de interés Martina, parte este: TOO-286 y TOO-287 (3,50 % Cu), TOO-285;1087469
-TOTAL;;;;;;;725124;1198804;200000;5824176;5041824;;7948104
+MARTINA 5;Pedimento (exploración);200;200;6453850;306140;"TOO-284 (0,73 %); Potrero Alto";72440;120749;25000;869280;869280;"Zona de interés Martina / Potrero Alto, centro: TOO-284 (0,73 % Cu); entre Yendrick Uno y Pupio 19";1087469
+MARTINA 6;Pedimento (exploración);200;200;6454000;304500;Potrero Alto oeste;72440;120749;25000;869280;869280;"Potrero Alto oeste: libre entre Yendrick A5, Yendrick Uno y MARTINA 3; junto a TOO-270 y TOO-273 (en terceros)";1087469
+MARTINA 7;Pedimento (exploración);200;200;6452850;306150;Potrero Alto sur;72440;120749;25000;869280;869280;Potrero Alto sur: libre al sur de MARTINA 5, entre Fernanda 2 y 3;1087469
+MARTINA 8;Pedimento (exploración);300;300;6454450;308000;Potrero Alto este;108660;120749;25000;1303920;1303920;Potrero Alto este: libre al este de MARTINA 5, junto a Pupio 19 y al límite con Petorca;1558329
+MARTINA 10;Pedimento (exploración);200;200;6456850;306000;Norte de la zona Martina;72440;120749;25000;869280;869280;Norte de MARTINA 3 y 4, hasta Bruselas A 14/15: cierra la zona Martina por el norte;1087469
+MARTINA 11;Pedimento (exploración);200;200;6457850;304000;Norte de La Florida 1;72440;120749;25000;869280;869280;Norte de La Florida 1 y de MARTINA 2, hasta Polaco 4;1087469
+TOTAL;;;;;;;1195984;1923298;350000;11474496;10692144;;14943778

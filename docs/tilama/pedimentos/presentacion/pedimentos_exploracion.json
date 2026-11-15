@@ -443,9 +443,9 @@
  },
  {
   "n": 17,
-  "nombre": "ELARA 3",
-  "zona": "Borde",
-  "nivel": "C",
+  "nombre": "MARTINA 5",
+  "zona": "Anomalía",
+  "nivel": "A",
   "E0": 305140,
   "E1": 307140,
   "N0": 6453350,
@@ -469,12 +469,12 @@
   ],
   "comuna": "Los Vilos",
   "muestras": [],
-  "fundamento": "Cobertura de borde sin evidencia: evaluar y, si no aparece nada, dejar caducar",
+  "fundamento": "Zona de interés Martina / Potrero Alto, centro: TOO-284 (0,73 % Cu); entre Yendrick Uno y Pupio 19",
   "origen": "LEONOR 4",
   "tasa_utm": 1.0,
   "tasa_clp": 72440,
   "patente_anual_clp": 869280,
-  "nombre_anterior": "LEONOR 17"
+  "nombre_anterior": "ELARA 3"
  },
  {
   "n": 18,
@@ -1048,5 +1048,201 @@
   "tasa_utm": 0.5,
   "tasa_clp": 36220,
   "patente_anual_clp": 434640
+ },
+ {
+  "n": 36,
+  "nombre": "MARTINA 6",
+  "zona": "Anomalía",
+  "nivel": "A",
+  "E0": 304000,
+  "E1": 305000,
+  "N0": 6453000,
+  "N1": 6455000,
+  "EW": 1000,
+  "NS": 2000,
+  "ha": 200,
+  "pm_E": 304500.0,
+  "pm_N": 6454000.0,
+  "pm_E_wgs": 304300.0,
+  "pm_N_wgs": 6453675.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 57.3,
+  "solapes": [
+   [
+    "YENDRICK UNO, DEL 1 AL 20",
+    "",
+    "CONSTITUIDA",
+    86.0
+   ],
+   [
+    "YENDRICK A5, DEL 1 AL 20",
+    "",
+    "EN TRAMITE",
+    45.5
+   ],
+   [
+    "YENDRICK A4, 1 AL 16",
+    "",
+    "EN TRAMITE",
+    11.2
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [
+   "TOO-270 (45.57 %)"
+  ],
+  "fundamento": "Potrero Alto oeste: libre entre Yendrick A5, Yendrick Uno y MARTINA 3; junto a TOO-270 y TOO-273 (en terceros)",
+  "origen": "Potrero Alto 15-11-2026",
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
+ },
+ {
+  "n": 37,
+  "nombre": "MARTINA 7",
+  "zona": "Anomalía",
+  "nivel": "A",
+  "E0": 305150,
+  "E1": 307150,
+  "N0": 6452350,
+  "N1": 6453350,
+  "EW": 2000,
+  "NS": 1000,
+  "ha": 200,
+  "pm_E": 306150.0,
+  "pm_N": 6452850.0,
+  "pm_E_wgs": 305950.0,
+  "pm_N_wgs": 6452525.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 80.7,
+  "solapes": [
+   [
+    "FERNANDA 3 DEL 1-10",
+    "",
+    "CONSTITUIDA",
+    68.0
+   ],
+   [
+    "FERNANDA 2 DEL 1-10",
+    "",
+    "EN TRAMITE",
+    51.3
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Potrero Alto sur: libre al sur de MARTINA 5, entre Fernanda 2 y 3",
+  "origen": "Potrero Alto 15-11-2026",
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
+ },
+ {
+  "n": 38,
+  "nombre": "MARTINA 8",
+  "zona": "Anomalía",
+  "nivel": "A",
+  "E0": 307500,
+  "E1": 308500,
+  "N0": 6452950,
+  "N1": 6455950,
+  "EW": 1000,
+  "NS": 3000,
+  "ha": 300,
+  "pm_E": 308000.0,
+  "pm_N": 6454450.0,
+  "pm_E_wgs": 307800.0,
+  "pm_N_wgs": 6454125.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 105.0,
+  "solapes": [
+   [
+    "PUPIO 19 1/60",
+    "",
+    "CONSTITUIDA",
+    195.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Potrero Alto este: libre al este de MARTINA 5, junto a Pupio 19 y al límite con Petorca",
+  "origen": "Potrero Alto 15-11-2026",
+  "tasa_utm": 1.5,
+  "tasa_clp": 108660,
+  "patente_anual_clp": 1303920
+ },
+ {
+  "n": 39,
+  "nombre": "MARTINA 10",
+  "zona": "Anomalía",
+  "nivel": "A",
+  "E0": 305000,
+  "E1": 307000,
+  "N0": 6456350,
+  "N1": 6457350,
+  "EW": 2000,
+  "NS": 1000,
+  "ha": 200,
+  "pm_E": 306000.0,
+  "pm_N": 6456850.0,
+  "pm_E_wgs": 305800.0,
+  "pm_N_wgs": 6456525.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 130.0,
+  "solapes": [
+   [
+    "BRUSELAS A 14",
+    "",
+    "CONSTITUIDA",
+    35.0
+   ],
+   [
+    "BRUSELAS A 15",
+    "",
+    "CONSTITUIDA",
+    35.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Norte de MARTINA 3 y 4, hasta Bruselas A 14/15: cierra la zona Martina por el norte",
+  "origen": "Potrero Alto 15-11-2026",
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
+ },
+ {
+  "n": 40,
+  "nombre": "MARTINA 11",
+  "zona": "Anomalía",
+  "nivel": "A",
+  "E0": 303000,
+  "E1": 305000,
+  "N0": 6457350,
+  "N1": 6458350,
+  "EW": 2000,
+  "NS": 1000,
+  "ha": 200,
+  "pm_E": 304000.0,
+  "pm_N": 6457850.0,
+  "pm_E_wgs": 303800.0,
+  "pm_N_wgs": 6457525.0,
+  "datum": "PSAD56 (La Canoa 1956), Huso 19",
+  "libre_ha": 130.0,
+  "solapes": [
+   [
+    "POLACO 4 1/100",
+    "",
+    "CONSTITUIDA",
+    70.0
+   ]
+  ],
+  "comuna": "Los Vilos",
+  "muestras": [],
+  "fundamento": "Norte de La Florida 1 y de MARTINA 2, hasta Polaco 4",
+  "origen": "Potrero Alto 15-11-2026",
+  "tasa_utm": 1.0,
+  "tasa_clp": 72440,
+  "patente_anual_clp": 869280
  }
 ]

@@ -24,13 +24,23 @@ El archivo de muestras trae además errores de transcripción documentados en `.
 - **LEONOR 1, 1 al 208.** Cubre la faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). En la mensura se ubican 5 pertenencias clave de 5 ha, y hasta 33 si el terreno lo justifica.
 - **MARTINA 1, 1 al 35.** Punto de interés: N 6.453.950 / E 303.250. Se mensuran 2 pertenencias (11 ha): una sobre TOO-256 (4,89 % Cu) y otra en el libre al norte de TOO-255. TOO-256 queda a 38 m de Yendrick A4, así que hay que confirmarla con GPS.
 
-**Exploración prioritaria (6 pedimentos, 1.100 ha):**
-- **LEONOR 3 (200 ha).** TOO-237 (5,04 %), TOO-262 (2,48 %), TOO-234 (2,40 %), TOO-258 (1,99 %) y otras ocho muestras de 0,5 a 0,9 %. Queda al sur de la faena.
-- **LEONOR 5 (100 ha).** TOO-240 (4,69 %). Da el corredor sur hacia la faena.
-- **LEONOR 2 (200 ha).** TOO-253 (3,62 %). Queda al este de la faena.
-- **MARTINA 2, 3 y 4 (600 ha).** Cubren la zona de interés del noreste: una franja de afloramientos de unos 2,5 km, toda en terreno libre y sin camino. MARTINA 2 tiene TOO-276 y 277 (2,04 %); MARTINA 3, TOO-280 (6,10 %); MARTINA 4, TOO-286 y 287 (3,50 %). Antes se llamaban LEONOR 9, ELARA 1 y ELARA 2. Si el terreno confirma, se manifiesta dentro de ellos con preferencia, porque solo el titular de la exploración puede manifestar en su interior.
+**Exploración prioritaria (12 pedimentos, 2.400 ha):**
+- **LEONOR 3 (200 ha):** TOO-237 (5,04 %), TOO-262 (2,48 %), TOO-234 (2,40 %), TOO-258 (1,99 %) y otras ocho muestras de 0,5 a 0,9 %.
+- **LEONOR 5 (100 ha):** TOO-240 (4,69 %), además del corredor sur hacia la faena.
+- **LEONOR 2 (200 ha):** TOO-253 (3,62 %).
+- **MARTINA 2, 3 y 4 (600 ha):** la franja de afloramientos del noreste, con TOO-276 y 277, TOO-280 (6,10 %) y TOO-286 y 287.
+- **MARTINA 5 a 8, 10 y 11 (1.300 ha):** cubren todo el terreno libre de Potrero Alto dentro de la comuna de Los Vilos, con 609 ha libres:
+  - **MARTINA 5:** es la antigua ELARA 3, en el centro de Potrero Alto (TOO-284).
+  - **MARTINA 6:** al oeste, junto a Yendrick.
+  - **MARTINA 7:** al sur, entre Fernanda 2 y 3.
+  - **MARTINA 8:** al este, junto a Pupio 19.
+  - **MARTINA 10:** al norte de MARTINA 3 y 4.
+  - **MARTINA 11:** al norte de La Florida 1.
+- **Petorca:** al este de MARTINA 8 quedan unas 270 ha libres, pero caen en la comuna de Petorca (Región de Valparaíso), según los límites de OSM (`scripts/tilama_comunas.py`). El punto medio de esos pedimentos quedaría en otra jurisdicción, así que no se incluyeron.
 
-**Resto de la exploración (28 pedimentos, 6.700 ha):** LEONOR 4, 6 a 8 y 10 a 14, y ELARA 3 a 21. Con ellos queda cubierto todo el sector. En el orden de subida van después de los prioritarios: primero nivel A, luego B y al final C. Observaciones de la imagen: en LEONOR 13 la anomalía es agrícola, LEONOR 14 toca el pueblo de Tilama (art. 17) y ELARA 19 tiene los caminos antiguos en zigzag.
+**Cinturón alrededor de Los Verdes (6 pedimentos, 1.400 ha):** LEONOR 4, 6, 7 y 8, ELARA 19 y ELARA 21.
+
+**Resto de la exploración (21 pedimentos, 5.100 ha):** LEONOR 10 a 14 y ELARA 4 a 18 y 20. Con ellos queda cubierto todo el sector. En el orden de subida van después de los prioritarios: primero nivel A, luego B y al final C. Observaciones de la imagen: en LEONOR 13 la anomalía es agrícola, LEONOR 14 toca el pueblo de Tilama (art. 17) y ELARA 19 tiene los caminos antiguos en zigzag.
 
 ## Accesos
 
@@ -41,15 +51,15 @@ El acceso no depende de estas concesiones. Depende de una servidumbre de tránsi
 
 ## Costos (UTM noviembre 2026: $72.440)
 
-El detalle está en `orden_y_costos.csv` y en `tilama_minimo_costos.csv`.
+El detalle está en `orden_y_costos.csv`.
 
-- **Prioritarios (01 a 08):** tasa de $0,73 M y unos $1,4 M entre Boletín e inscripción. Si todos llegan a sentencia y mensura, la patente suma $5,8 M al año, con LEONOR 1 en 5 pertenencias.
-- **Resto (09 a 36):** tasa de $2,4 M y unos $4,1 M entre Boletín e inscripción. La patente sería de $29,1 M al año si todos llegaran a sentencia. Lo normal es pedir sentencia solo de los que muestren algo en terreno y dejar caducar el resto.
-- **Falta cotizar el perito.**
+- **Para presentar ahora (01 a 20):** tasas por $1,7 M y unos $3,1 M entre Boletín e inscripción. Si todo llegara a sentencia y mensura, la patente sería de $17,6 M al año.
+- **Resto (21 a 41):** tasas por $1,8 M y unos $3,1 M entre Boletín e inscripción. Se presenta después del terreno.
+- La patente solo se paga por lo que se lleva a sentencia, así que el resto se deja caducar. **Falta cotizar el perito.**
 
 ## Orden de presentación
 
-1. **Día 0.** Revisar el catastro y confirmar TOO-256 con GPS. Subir 01 y 02 (manifestaciones), luego 03 a 08 (exploración prioritaria) y después 09 a 36.
+1. **Día 0.** Revisar el catastro y confirmar TOO-256 con GPS. Subir 01 y 02 (manifestaciones), luego 03 a 14 (exploración prioritaria) y 15 a 20 (cinturón). Los escritos 21 a 41 se suben después del terreno.
 2. **Dentro de 30 días.** Pagar las tasas. Si hay defectos, corregirlos dentro de 8 días.
 3. **Dentro de 30 días desde la resolución.** Inscribir y publicar en el Boletín, guardando el PDF original de la edición.
 4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de LEONOR 1 y MARTINA 1.
@@ -57,7 +67,7 @@ El detalle está en `orden_y_costos.csv` y en `tilama_minimo_costos.csv`.
 
 ## Archivos
 
-- `para_subir/`: los 36 escritos en PDF, numerados en el orden de subida. Vienen también en `tilama_todo_para_subir.zip` (los 36) y en `tilama_prioritario_para_subir.zip` (01 a 08).
+- `para_subir/`: los 41 escritos en PDF, numerados en el orden de subida. Vienen también en `tilama_ahora_01a20_para_subir.zip`, con lo que se presenta ahora, y en `tilama_todo_para_subir.zip`, con los 41.
 - `orden_y_costos.csv`: orden de subida y costos por pieza.
 - `tilama_minimo_manifestaciones.docx` y `tilama_minimo_pedimentos.docx`: hojas de control y escritos de lo prioritario.
 - `tilama_minimo.kmz` y `tilama_minimo.png`: mapa y plano de lo prioritario.
