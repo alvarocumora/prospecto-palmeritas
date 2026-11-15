@@ -1,0 +1,35 @@
+name: Tilama imágenes alta resolución
+
+# Descarga mosaicos Esri World Imagery y OSM para fotointerpretar faenas y accesos.
+# Publica el resultado en la rama data/tilama-imagenes (no toca la rama del PR).
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/tilama_imagenes.py'
+      - '.github/workflows/tilama-imagenes.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  imagenes:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pillow pyproj
+      - run: python scripts/tilama_imagenes.py
+      - name: Publicar en rama de datos
+        run: |
+          cd out/tilama_imagenes
+          git init -q -b data/tilama-imagenes
+          git config user.name "tilama-bot"
+          git config user.email "tilama-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Mosaicos Tilama ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/tilama-imagenes

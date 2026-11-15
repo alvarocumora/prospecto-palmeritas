@@ -1,0 +1,26 @@
+name: Tilama datum SERNAGEOMIN
+
+# Diagnóstico: compara las concesiones vecinas de LEONOR en WGS84 y PSAD56
+# según el FeatureServer del visor oficial. Solo imprime en el log.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/tilama_datum_sngm.py'
+      - '.github/workflows/tilama-datum.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  datum:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install shapely
+      - run: python scripts/tilama_datum_sngm.py
