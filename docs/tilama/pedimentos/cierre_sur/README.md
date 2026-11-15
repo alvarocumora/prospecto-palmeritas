@@ -27,7 +27,7 @@ Las escombreras y huellas en zigzag de E 298.000–299.000 × N 6.444.500–6.44
   - 05 a 31: MARTINA 12 a 31. Primero va el acceso al núcleo, luego la columna de Tilama y Quelón, el sur y el borde este.
 - Algunas piezas tienen el punto medio en Los Vilos pero una parte de su superficie en la comuna de Petorca: MARTINA 17, 18, 19, 24, 26, 27 y 29. El escrito lo indica.
 - `orden_y_costos.csv`: costos por pieza, con hectáreas libres, huellas y solapes. El mismo detalle está en `cierre_sur.json`.
-- `tilama_cierre_sur.png` y `tilama_cierre_sur.kmz`: mapa del diseño.
+- `tilama_cierre_sur.png`: mapa del diseño. El KMZ completo es `../tilama_proyecto_fase2.kmz`.
 
 Advertencias:
 
