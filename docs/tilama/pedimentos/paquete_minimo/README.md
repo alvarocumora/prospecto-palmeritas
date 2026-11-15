@@ -37,6 +37,16 @@ Entre MARTINA 2 y 3 cubren de punta a punta, unos 2,5 km, la tendencia mineraliz
 - **LEONOR 5 (100 ha).** TOO-240 (4,69 %). Da el corredor sur hacia la faena desde el camino antiguo en zigzag.
 - **LEONOR 2 (200 ha).** TOO-253 (3,62 %). Queda al este de la faena.
 
+## Resto de la exploración (08 a 38): cubrir todo el sector
+
+Son los otros 31 pedimentos del plan completo (`../presentacion/`): LEONOR 4 y 6 a 14, y ELARA 1 a 21. Suman 7.300 ha y, junto con LEONOR 2, 3 y 5, cubren todo el sector con 7.800 ha de exploración. Se presentan después de los siete del paquete mínimo, en este orden: nivel A (LEONOR 4, 6, 7 y 8), nivel B (LEONOR 9 a 14 y ELARA 19 a 21) y nivel C (ELARA 1 a 18).
+
+- **Costo de presentarlos:** tasa de $2,64 M y unos $4,5 M entre Boletín e inscripción.
+- **Patente, si todos llegaran a sentencia:** $31,7 M al año. Lo normal es pedir sentencia solo de los que muestren algo en terreno hasta el día 90 y dejar caducar el resto. La patente de un pedimento se paga solo si se pide su sentencia.
+- **Solapes con manifestaciones propias:** LEONOR 9, ELARA 1 y ELARA 2 se montan sobre los rectángulos de MARTINA 2 y MARTINA 3 (205 ha). Como las manifestaciones se presentan antes, prevalecen en esa parte, y el pedimento cubre el entorno.
+- **Muestras dentro de estos pedimentos:** LEONOR 6 contiene TOO-238 (2,16 %), ELARA 15 contiene TOO-132 (1,17 %), ELARA 19 contiene TOO-116 (0,83 %) y ELARA 3 contiene TOO-284 (0,73 %).
+- **Observaciones de la imagen:** en LEONOR 13 la anomalía es agrícola, LEONOR 14 toca el pueblo de Tilama (art. 17) y ELARA 19 tiene los caminos mineros antiguos en zigzag.
+
 ## Accesos
 
 El acceso no depende de estas concesiones. Depende de una servidumbre de tránsito sobre el suelo del dueño superficial, que se puede pedir por la vía legal una vez constituida la concesión. Hay dos caminos posibles:
@@ -62,7 +72,8 @@ El detalle está en `tilama_minimo_costos.csv`.
 
 ## Archivos
 
-- `para_subir/`: los 7 escritos en PDF, numerados en el orden de presentación. También vienen juntos en `tilama_minimo_para_subir.zip`.
+- `para_subir/`: los 38 escritos en PDF, numerados en el orden de presentación. Del 01 al 07 está el paquete mínimo; del 08 al 38, el resto de la exploración. También vienen en `tilama_todo_para_subir.zip`, con los 38, y en `tilama_resto_exploracion_para_subir.zip`, solo con los del 08 al 38.
+- `orden_y_costos.csv`: orden de subida y costos de cada pieza.
 - `tilama_minimo_manifestaciones.docx` y `tilama_minimo_pedimentos.docx`: hojas de control y escritos.
 - `tilama_minimo.kmz` y `tilama_minimo.png`: mapa y plano.
 - `tilama_minimo_costos.csv`: costo por pieza.
