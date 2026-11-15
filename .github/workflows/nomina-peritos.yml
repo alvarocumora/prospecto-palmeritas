@@ -12,7 +12,15 @@ jobs:
       - name: Descargar nómina oficial 2026 de SERNAGEOMIN
         run: |
           mkdir out && cd out
-          curl -fsSL -A "Mozilla/5.0" -o nomina_peritos_2026.pdf "https://www.sernageomin.cl/wp-content/uploads/2026/04/2.-NOMINA-PERITOS-2026.pdf"
+          # el servidor no envía el certificado intermedio: se obtiene por AIA y se agrega al bundle
+          echo | openssl s_client -connect www.sernageomin.cl:443 -servername www.sernageomin.cl 2>/dev/null | openssl x509 > leaf.pem
+          AIA=$(openssl x509 -in leaf.pem -noout -text | grep -A1 "CA Issuers" | grep -o 'http[^ ]*' | head -1)
+          echo "AIA: $AIA"
+          curl -fsSL "$AIA" -o inter.der
+          (openssl x509 -inform DER -in inter.der -out inter.pem 2>/dev/null || cp inter.der inter.pem)
+          cat /etc/ssl/certs/ca-certificates.crt inter.pem > bundle.pem
+          curl -fsSL --cacert bundle.pem -A "Mozilla/5.0" -o nomina_peritos_2026.pdf "https://www.sernageomin.cl/wp-content/uploads/2026/04/2.-NOMINA-PERITOS-2026.pdf"
+          rm -f leaf.pem inter.der inter.pem bundle.pem
           ls -la
           git init -q -b data/nomina-peritos
           git config user.name "tilama-bot"; git config user.email "tilama-bot@users.noreply.github.com"
