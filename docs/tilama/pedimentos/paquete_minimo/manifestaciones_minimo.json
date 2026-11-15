@@ -326,86 +326,105 @@
  },
  {
   "nombre": "MARTINA 1",
-  "mejora": "Conos de desmonte gris bajo el afloramiento de TOO-210 (6,83 % Cu, en Polaco 7) y camino perfilado en zigzag a 400 m al oeste",
-  "n_pert": 1,
-  "pert_ha": 5,
+  "mejora": "Muestra de alta ley pegada al borde este de LEONOR 1",
+  "n_pert": 2,
+  "pert_ha": 11,
   "rect": {
-   "E0": 301600,
-   "N0": 6454750,
-   "E1": 301900,
-   "N1": 6455350,
-   "EW": 300,
-   "NS": 600,
-   "ha": 18
+   "E0": 303000,
+   "N0": 6453600,
+   "E1": 303500,
+   "N1": 6454300,
+   "EW": 500,
+   "NS": 700,
+   "ha": 35
   },
-  "pi_E": 301750,
-  "pi_N": 6455050,
+  "pi_E": 303250,
+  "pi_N": 6453950,
   "junto_a": [
-   "Expancion 1/12",
-   "Los Verdes 5 1/12",
-   "Polaco 7 1/155"
+   "LEONOR 1",
+   "LEONOR 2",
+   "Yendrick A4 1 al 16 (en trámite)",
+   "La Florida 1 (en trámite)"
   ],
   "contiene": [
-   "TOO-211 (1.62 % Cu)"
+   "TOO-256 (4,89 % Cu)",
+   "TOO-255 (1,99 % Cu)"
   ],
-  "solape_terceros_ha": 13.7,
+  "solape_terceros_ha": 11.2,
   "pertenencias": [
    {
     "n": 1,
-    "E0": 301700,
-    "N0": 6454800,
-    "E1": 301800,
-    "N1": 6455300,
+    "E0": 303300,
+    "N0": 6453600,
+    "E1": 303400,
+    "N1": 6454100,
     "ha": 5,
-    "nota": "TOO-211 y conos de desmonte gris"
+    "nota": "TOO-256 (4,89 % Cu)"
+   },
+   {
+    "n": 2,
+    "E0": 303000,
+    "N0": 6454030,
+    "E1": 303300,
+    "N1": 6454230,
+    "ha": 6,
+    "nota": "Libre al norte de TOO-255 (1,99 % Cu, en LEONOR 1)"
    }
   ],
-  "nota": "Franja libre de 75 m entre Expancion 1/12 y Polaco 7. TOO-211 queda a 10 m del borde: confirmar con GPS antes de presentar."
+  "nota": "TOO-256 queda en una franja libre de 40 m entre LEONOR 1 y Yendrick A4, a 38 m del vecino: confirmar con GPS. La pertenencia 2 toma el libre al norte de TOO-255."
  },
  {
   "nombre": "MARTINA 2",
   "mejora": "Afloramientos con ley; sin caminos ni labores visibles",
-  "n_pert": 2,
-  "pert_ha": 10,
+  "n_pert": 3,
+  "pert_ha": 28,
   "rect": {
-   "E0": 304100,
-   "N0": 6455400,
-   "E1": 304800,
-   "N1": 6456800,
-   "EW": 700,
-   "NS": 1400,
-   "ha": 98
+   "E0": 304000,
+   "N0": 6455800,
+   "E1": 305500,
+   "N1": 6456600,
+   "EW": 1500,
+   "NS": 800,
+   "ha": 120
   },
-  "pi_E": 304450,
-  "pi_N": 6456100,
+  "pi_E": 304750,
+  "pi_N": 6456200,
   "junto_a": [
    "La Florida 1 (en trámite)",
    "Yendrick A5 (en trámite)"
   ],
   "contiene": [
-   "TOO-273 (1.94 % Cu)",
-   "TOO-276 (2.04 % Cu)",
-   "TOO-277 (2.04 % Cu)"
+   "TOO-276 (2,04 % Cu)",
+   "TOO-277 (2,04 % Cu)"
   ],
   "solape_terceros_ha": 0.0,
   "pertenencias": [
    {
     "n": 1,
-    "E0": 304134,
-    "N0": 6455400,
-    "E1": 304234,
-    "N1": 6455900,
-    "ha": 5,
-    "nota": "TOO-273"
+    "E0": 304100,
+    "N0": 6456280,
+    "E1": 304600,
+    "N1": 6456480,
+    "ha": 10,
+    "nota": "TOO-276 y TOO-277 (2,04 % Cu)"
    },
    {
     "n": 2,
-    "E0": 304270,
-    "N0": 6456700,
-    "E1": 304770,
-    "N1": 6456800,
-    "ha": 5,
-    "nota": "TOO-276 y TOO-277"
+    "E0": 304600,
+    "N0": 6456230,
+    "E1": 305100,
+    "N1": 6456430,
+    "ha": 10,
+    "nota": "Continuación de la tendencia hacia el este"
+   },
+   {
+    "n": 3,
+    "E0": 305100,
+    "N0": 6456180,
+    "E1": 305500,
+    "N1": 6456380,
+    "ha": 8,
+    "nota": "Continuación de la tendencia hacia el este"
    }
   ],
   "nota": "Tendencia mineralizada del noreste, parte oeste. Sin acceso: 6 km del camino público."
@@ -413,49 +432,59 @@
  {
   "nombre": "MARTINA 3",
   "mejora": "Afloramientos con ley; sin caminos ni labores visibles",
-  "n_pert": 2,
-  "pert_ha": 10,
+  "n_pert": 3,
+  "pert_ha": 28,
   "rect": {
-   "E0": 305760,
-   "N0": 6456160,
-   "E1": 306760,
-   "N1": 6456760,
-   "EW": 1000,
-   "NS": 600,
-   "ha": 60
+   "E0": 305500,
+   "N0": 6455700,
+   "E1": 307000,
+   "N1": 6456500,
+   "EW": 1500,
+   "NS": 800,
+   "ha": 120
   },
-  "pi_E": 306260,
-  "pi_N": 6456460,
+  "pi_E": 306250,
+  "pi_N": 6456100,
   "junto_a": [
-   "Bruselas A 14/15",
-   "Pupio 19"
+   "Pupio 19 1/60",
+   "Bruselas A 14/15"
   ],
   "contiene": [
-   "TOO-280 (6.1 % Cu)",
-   "TOO-278 (0.63 % Cu)",
-   "TOO-279 (0.63 % Cu)",
-   "TOO-286 (3.5 % Cu)",
-   "TOO-287 (3.5 % Cu)"
+   "TOO-280 (6,10 % Cu)",
+   "TOO-278 (0,63 % Cu)",
+   "TOO-279 (0,63 % Cu)",
+   "TOO-286 (3,50 % Cu)",
+   "TOO-287 (3,50 % Cu)",
+   "TOO-285 (0,69 % Cu)"
   ],
   "solape_terceros_ha": 0.0,
   "pertenencias": [
    {
     "n": 1,
-    "E0": 305840,
-    "N0": 6456260,
-    "E1": 305940,
-    "N1": 6456760,
-    "ha": 5,
-    "nota": "TOO-278, TOO-279 y TOO-280"
+    "E0": 305500,
+    "N0": 6456100,
+    "E1": 306000,
+    "N1": 6456300,
+    "ha": 10,
+    "nota": "TOO-280 (6,10 % Cu), TOO-278 y TOO-279"
    },
    {
     "n": 2,
-    "E0": 306592,
-    "N0": 6456200,
-    "E1": 306692,
-    "N1": 6456700,
-    "ha": 5,
-    "nota": "TOO-286 y TOO-287"
+    "E0": 306000,
+    "N0": 6456100,
+    "E1": 306400,
+    "N1": 6456300,
+    "ha": 8,
+    "nota": "Continuación de la tendencia"
+   },
+   {
+    "n": 3,
+    "E0": 306400,
+    "N0": 6455800,
+    "E1": 306600,
+    "N1": 6456300,
+    "ha": 10,
+    "nota": "TOO-286 y TOO-287 (3,50 % Cu)"
    }
   ],
   "nota": "Tendencia mineralizada del noreste, parte este, con la mejor ley libre (TOO-280, 6,1 % Cu)."

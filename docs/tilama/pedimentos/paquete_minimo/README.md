@@ -1,53 +1,69 @@
-# Tilama: paquete mínimo para presentar ahora
+# Tilama: paquete mínimo para presentar
 
-Borrador del 14-11-2026. Titular: Valle Escondido SpA (Minera Valle Escondido SpA). Juzgado de Letras y Garantía de Los Vilos. Coordenadas en PSAD56 (La Canoa 1956), Huso 19.
+Borrador del 15-11-2026. Titular: Valle Escondido SpA (Minera Valle Escondido SpA). Juzgado de Letras y Garantía de Los Vilos. Todas las coordenadas están en PSAD56 (La Canoa 1956), Huso 19, en el marco del catastro SERNAGEOMIN.
 
-Es la base de trabajo al menor costo: protege la faena de LEONOR 1 y las leyes conocidas en terreno pedible, y agrega explotación solo donde hay ley alta en terreno libre o desmontes visibles. Lo que no tiene ensayes (el resto de LEONOR, las anomalías SWIR y el borde ELARA) queda en `../presentacion/` por si después se quiere ampliar.
+Esta es la base de trabajo al menor costo. Protege la faena de LEONOR 1, las leyes conocidas en terreno pedible y la tendencia mineralizada libre del noreste. Lo que no tiene ensayes (el resto de LEONOR, las anomalías SWIR y el borde ELARA) sigue disponible en `../presentacion/`, por si después se quiere ampliar.
+
+## Corrección del 15-11-2026: ubicación de las muestras
+
+Las coordenadas de `src/data/geo/tilama/geochem_core.json` vienen de la transcripción del Anexo B de EMT y están en el PSAD56 de Esterio. La versión del 14-11 les sumó por error el desfase del visor (+200 / +325), lo que dejaba todas las muestras corridas unos 416 m al nor-noreste. La conversión correcta al marco del catastro es **+17 m Este, −49 m Norte**. Se comprobó con TOO-220 y TOO-255, que con esa conversión coinciden al metro con la columna WGS84 de Esterio más el desfase del visor.
+
+Con la ubicación corregida:
+
+- **TOO-211 queda dentro de Los Verdes 5**, que es de terceros. Por eso se eliminó la antigua MARTINA 1, la de la franja libre junto a Expancion.
+- **MARTINA 2 y 3 se rediseñaron** sobre la posición real de las muestras.
+- **TOO-273 cae en Yendrick A5**, también de terceros.
+- **Aparece libre TOO-256 (4,89 % Cu)**, pegada al este de LEONOR 1.
+- **LEONOR 3, 5 y 2 siguen conteniendo sus muestras.** TOO-233 queda en Las Trancas y TOO-238 queda 30 m al sur de LEONOR 3.
+
+El archivo de muestras trae además errores de transcripción documentados en `../../revision-informe-esterio-2026-11-13.md`: filas desplazadas, coordenadas repetidas y TOO-270 con 45,6 % Cu. Hay que cotejarlo con el original de EMT.
 
 ## Explotación: cuatro manifestaciones
 
-- **LEONOR 1, 1 al 208.** Faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). El rectángulo manifestado es de 208 ha. En la mensura basta con 5 pertenencias clave de 5 ha (faena, TOO-255 y vecinas); se puede llegar a 33 si el terreno lo justifica.
-- **MARTINA 1, 1 al 18.** Es la única con labores y camino a la vista. Toma una franja libre de 75 m entre Expancion 1/12 y Polaco 7. Ahí hay conos de desmonte gris bajo el afloramiento de TOO-210 (6,83 % Cu, que está en Polaco 7, de terceros), está TOO-211 (1,62 % Cu) y pasa un camino perfilado en zigzag a 400 m al oeste. Se mensura 1 pertenencia (301.700–301.800 E × 6.454.800–6.455.300 N), con 3,6 ha libres. TOO-211 está a 10 m del borde de Expancion, así que hay que confirmar con GPS antes de presentar.
-- **MARTINA 2, 1 al 98.** Es la parte oeste de la tendencia mineralizada del noreste: TOO-273, 276 y 277, con 1,9 a 2,0 % Cu, en terreno libre. Se mensuran 2 pertenencias.
-- **MARTINA 3, 1 al 60.** Es la parte este de la misma tendencia: TOO-280 (6,1 % Cu, la mejor ley libre del sector) y TOO-286 y 287 (3,5 %). Se mensuran 2 pertenencias.
+- **LEONOR 1, 1 al 208.** Cubre la faena de los desmontes M1/M2 (7,7 y 10,65 % CuT) y TOO-255 (1,99 %). En la mensura bastan 5 pertenencias clave de 5 ha; se puede llegar a 33 si el terreno lo justifica.
+- **MARTINA 1, 1 al 35.** Punto de interés en N 6.453.950 / E 303.250. Se mensuran 2 pertenencias:
+  - una de 5 ha sobre TOO-256 (4,89 % Cu), en la franja libre de 40 m entre LEONOR 1 y Yendrick A4, en trámite;
+  - otra de 6 ha en el libre al norte de TOO-255.
 
-En MARTINA 2 y 3 la imagen no muestra caminos ni labores: son afloramientos a 6 a 8 km del camino público. Las tres manifestaciones nuevas tienen rectángulos de 100 ha o menos, para pagar la tasa mínima de manifestación (0,01 UTM/ha).
+  TOO-256 está a 38 m del vecino, así que hay que confirmarla con GPS antes de presentar.
+- **MARTINA 2, 1 al 120.** Punto de interés en N 6.456.200 / E 304.750. Se mensuran 3 pertenencias (28 ha), desde TOO-276 y 277 (2,04 % Cu) hacia el este, siguiendo la franja de afloramientos.
+- **MARTINA 3, 1 al 120.** Punto de interés en N 6.456.100 / E 306.250. Queda pegada a MARTINA 2. Se mensuran 3 pertenencias (28 ha) que cubren TOO-280 (6,10 % Cu), TOO-278 y 279 (0,63 %) y TOO-286 y 287 (3,50 %).
+
+Entre MARTINA 2 y 3 cubren de punta a punta, unos 2,5 km, la tendencia mineralizada del noreste, toda en terreno libre. La imagen no muestra caminos ni labores; el camino público queda a 6–8 km. Los rectángulos de MARTINA 2 y 3 son de 120 ha, así que pagan una tasa de 0,02 UTM/ha.
 
 ## Exploración: tres pedimentos
 
-- **LEONOR 3 (200 ha).** Es la pieza con más ley: TOO-237 (5,04 %), TOO-233 (3,79 %), TOO-262 (2,48 %), TOO-234 (2,40 %) y TOO-238 (2,16 %). Queda pegada al sur de la faena.
-- **LEONOR 5 (100 ha).** Tiene TOO-240 (4,69 %, a 11 m del borde norte: confirmar con GPS). Además da el corredor sur hacia la faena desde el camino antiguo en zigzag (OSM 372455229), que termina a 1,5 km.
-- **LEONOR 2 (200 ha).** Tiene TOO-253 (3,62 %) y queda al este de la faena.
-
-En la imagen de alta resolución no se ven labores en estas tres piezas. Las muestras parecen de afloramiento.
+- **LEONOR 3 (200 ha).** TOO-237 (5,04 %), TOO-262 (2,48 %), TOO-234 (2,40 %), TOO-258 (1,99 %) y otras ocho muestras entre 0,5 y 0,9 %. Queda pegada al sur de la faena.
+- **LEONOR 5 (100 ha).** TOO-240 (4,69 %). Da el corredor sur hacia la faena desde el camino antiguo en zigzag.
+- **LEONOR 2 (200 ha).** TOO-253 (3,62 %). Queda al este de la faena.
 
 ## Accesos
 
-El acceso a la faena no depende de estas concesiones, sino de una servidumbre de tránsito sobre el suelo del dueño superficial. Una vez constituida la concesión, la servidumbre se puede pedir por la vía legal. Hay dos caminos posibles:
+El acceso no depende de estas concesiones. Depende de una servidumbre de tránsito sobre el suelo del dueño superficial, que se puede pedir por la vía legal una vez constituida la concesión. Hay dos caminos posibles:
 
-- **Por el norte:** la huella que corre 150 a 350 m al norte de LEONOR 1, por terreno Fernández. Es el más corto.
-- **Por el sur:** el camino en zigzag hasta 300.614 E / 6.450.275 N, y desde ahí 1,5 a 3 km por dentro de LEONOR 5 y 3.
+- **Por el norte:** la huella a 150–350 m de LEONOR 1, por terreno Fernández.
+- **Por el sur:** el camino en zigzag y luego 1,5 a 3 km por dentro de LEONOR 5 y 3.
 
 ## Costos (UTM noviembre 2026: $72.440)
 
-Los montos están en `tilama_minimo_costos.csv`. Las publicaciones se calcularon con la tarifa 2026 del Boletín Oficial de Minería, edición Illapel, con IVA. La inscripción es un estimado.
+El detalle está en `tilama_minimo_costos.csv`.
 
-- **Primer año: unos $5,7 M.** Incluye tasas ($0,6 M), Boletín ($1,3 M), inscripciones ($0,2 M) y patentes ($3,6 M). LEONOR 1 se calcula con 5 pertenencias.
-- **Cada marzo: $3,6 M de patente**, o $2,5 M con la patente rebajada de pequeña minería en las manifestaciones.
-- **Falta cotizar el perito:** la mensura de las cuatro manifestaciones y los planos de los tres pedimentos.
+- **Primer año:** unos $7,2 M. Son tasas por $0,86 M, Boletín por $1,3 M, inscripciones estimadas en $0,18 M y patentes por $4,8 M. LEONOR 1 se cuenta con 5 pertenencias.
+- **Cada marzo:** $4,8 M de patente, o $2,8 M con la patente rebajada de pequeña minería en las manifestaciones.
+- **Falta cotizar el perito.**
 
 ## Orden de presentación
 
-1. **Día 0.** Revisar el catastro y confirmar con GPS TOO-211 y TOO-240. Presentar primero las manifestaciones LEONOR 1, MARTINA 1, MARTINA 2 y MARTINA 3, y después los pedimentos LEONOR 2, 3 y 5.
-2. **Dentro de 30 días.** Pagar las tasas. Si el tribunal observa defectos, corregirlos dentro de 8 días.
-3. **Dentro de 30 días desde la resolución.** Inscribir en el Conservador de Minas y publicar en el Boletín. Guardar el PDF original de la edición.
-4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de las cuatro manifestaciones.
+1. **Día 0.** Revisar el catastro, confirmar TOO-256 con GPS y presentar las manifestaciones (LEONOR 1, MARTINA 1, MARTINA 2 y MARTINA 3). Después, los pedimentos (LEONOR 2, 3 y 5).
+2. **Dentro de 30 días.** Pagar las tasas. Si hay defectos, corregirlos dentro de 8 días.
+3. **Dentro de 30 días desde la resolución.** Inscribir y publicar en el Boletín, guardando el PDF original de la edición.
+4. **Entre los días 91 y 120 desde la presentación.** Pedir la mensura de las manifestaciones.
 5. **Hasta el día 90 desde la resolución.** Pedir la sentencia de los pedimentos.
 
 ## Archivos
 
-- `tilama_minimo_manifestaciones.docx`: hoja de control y cuatro escritos de manifestación.
-- `tilama_minimo_pedimentos.docx`: hoja de control y tres escritos de pedimento.
-- `tilama_minimo.kmz` y `tilama_minimo.png`: mapa con las piezas, las pertenencias a mensurar y las muestras de 0,2 % Cu o más.
+- `para_subir/`: los 7 escritos en PDF, numerados en el orden de presentación. También vienen juntos en `tilama_minimo_para_subir.zip`.
+- `tilama_minimo_manifestaciones.docx` y `tilama_minimo_pedimentos.docx`: hojas de control y escritos.
+- `tilama_minimo.kmz` y `tilama_minimo.png`: mapa y plano.
 - `tilama_minimo_costos.csv`: costo por pieza.
 - `manifestaciones_minimo.json` y `pedimentos_minimo.json`: datos fuente.
