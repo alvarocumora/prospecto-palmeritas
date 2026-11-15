@@ -94,6 +94,23 @@ def main():
         print("C|" + json.dumps(r, ensure_ascii=False))
     print("CONCESIONES_JSON_FIN")
 
+    # Búsqueda por rol o nombre en todo Chile, incluidas las eliminadas (minas históricas con certificados ENAMI)
+    for where in ("NUMERO_ROL LIKE '%032663%'", "UPPER(NOMBRE) LIKE '%TILAMA NORTE%'", "UPPER(NOMBRE) LIKE '%ZORRO%' AND NUMERO_ROL LIKE '04303%'"):
+        url = f"{BASE}/2/query?" + urllib.parse.urlencode({"where": where, "outFields": "*", "returnGeometry": "true", "outSR": 24879, "f": "json"})
+        try:
+            d = _get_json(url)
+        except Exception as e:  # noqa: BLE001
+            print("BUSCA error", where, e); continue
+        if "error" in d:
+            print("BUSCA error", where, d["error"]); continue
+        for f in d.get("features", []):
+            a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+            print("BUSCA|" + json.dumps({"where": where, "n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                         "sit": a.get("SITUACION_CONCESION"), "tipo": a.get("TIPO_CONCESION"),
+                                         "titular": a.get("TITULAR") or a.get("NOMBRE_TITULAR"),
+                                         "psad": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False))
+        print("BUSCA fin", where, len(d.get("features", [])))
+
     v = q(0, 32719, {"resultRecordCount": 50})
     print("VERTICES capa0 muestra:")
     for f in v["features"][:40]:
