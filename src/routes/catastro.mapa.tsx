@@ -225,7 +225,7 @@ const PAISES: Record<
 /** Paleta cartográfica institucional (el motor WebGL necesita valores literales). */
 const MAP_COLORS = {
   constituida: "#0F69B4",
-  tramite: "#E0A21B",
+  tramite: "#F5B700",
   eliminada: "#8a94a3",
   otro: "#5b6b80",
 };
@@ -435,12 +435,12 @@ function NationalCatastroMap() {
             },
             layers: [
               { id: "base", type: "raster", source: "base" },
-              { id: "osm", type: "raster", source: "osm", paint: { "raster-opacity": 0.35 } },
+              { id: "osm", type: "raster", source: "osm", paint: { "raster-opacity": 0.2 } },
               {
                 id: "eliminadas-fill",
                 type: "fill",
                 source: "eliminadas",
-                paint: { "fill-color": MAP_COLORS.eliminada, "fill-opacity": 0.08 },
+                paint: { "fill-color": MAP_COLORS.eliminada, "fill-opacity": 0.12 },
               },
               {
                 id: "eliminadas-line",
@@ -448,7 +448,7 @@ function NationalCatastroMap() {
                 source: "eliminadas",
                 paint: {
                   "line-color": MAP_COLORS.eliminada,
-                  "line-width": 0.7,
+                  "line-width": 1.2,
                   "line-dasharray": [3, 3],
                 },
               },
@@ -456,13 +456,34 @@ function NationalCatastroMap() {
                 id: "concesiones-fill",
                 type: "fill",
                 source: "concesiones",
-                paint: { "fill-color": SITUACION_EXPR, "fill-opacity": 0.12 },
+                paint: {
+                  "fill-color": SITUACION_EXPR,
+                  "fill-opacity": ["case", ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]], 0.22, 0.3],
+                },
+              },
+              {
+                id: "concesiones-casing",
+                type: "line",
+                source: "concesiones",
+                paint: { "line-color": "#ffffff", "line-opacity": 0.75, "line-width": 3 },
               },
               {
                 id: "concesiones-line",
                 type: "line",
                 source: "concesiones",
-                paint: { "line-color": SITUACION_EXPR, "line-width": 0.9 },
+                filter: ["!", ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]]],
+                paint: { "line-color": SITUACION_EXPR, "line-width": 1.8 },
+              },
+              {
+                id: "concesiones-tramite-line",
+                type: "line",
+                source: "concesiones",
+                filter: ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
+                paint: {
+                  "line-color": MAP_COLORS.tramite,
+                  "line-width": 2.2,
+                  "line-dasharray": [2, 1.5],
+                },
               },
             ],
           },
