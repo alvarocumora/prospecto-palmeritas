@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import {
+  Wrench,
   Search,
   Layers,
   Building2,
@@ -18,6 +19,7 @@ import {
   Printer,
   ExternalLink,
 } from "lucide-react";
+import { CatastroWorkbench } from "@/features/catastro-workbench/CatastroWorkbench";
 import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroShell";
 import { CatastroProjectPage } from "@/features/catastro-project/CatastroProjectPage";
 import { useProjects } from "@/hooks/useProjects";
@@ -293,6 +295,7 @@ function NationalCatastroMap() {
   const [showEliminadas, setShowEliminadas] = useState<boolean>(!!search.elim);
   const [showFilters, setShowFilters] = useState(false);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [toolsOpen, setToolsOpen] = useState(false);
   const [selected, setSelected] = useState<SelectedProps | null>(null);
   const [pais, setPais] = useState<Pais>(search.pais ?? "CL");
   const [analysisSelection, setAnalysisSelection] = useState<SelectedProps[]>([]);
@@ -877,8 +880,23 @@ function NationalCatastroMap() {
           )}
         </div>
 
+        {toolsOpen && (
+          <div className="absolute top-2 right-14 bottom-24 sm:bottom-3 left-2 sm:left-auto sm:w-[380px] z-[600] print:hidden">
+            <CatastroWorkbench map={mapReady ? mapObjRef.current : null} onClose={() => setToolsOpen(false)} />
+          </div>
+        )}
+
         {/* Controles de mapa: basemap + geolocalización */}
         <div className="absolute top-2 right-2 z-[500] flex flex-col gap-2 print:hidden">
+          <button
+            type="button"
+            onClick={() => setToolsOpen((v) => !v)}
+            title="Herramientas: pedimento, prelación, boletín"
+            aria-label="Herramientas catastrales"
+            className={`p-2 rounded-lg border border-border backdrop-blur shadow-lg self-end ${toolsOpen ? "bg-primary text-primary-foreground" : "bg-background/95 text-muted-foreground hover:text-foreground"}`}
+          >
+            <Wrench className="w-4 h-4" />
+          </button>
           <div className="rounded-lg border border-border bg-background/95 backdrop-blur shadow-lg flex overflow-hidden">
             <button
               type="button"

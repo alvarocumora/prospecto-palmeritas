@@ -24,9 +24,12 @@ const TONE: Record<string, string> = {
   libre_indicativo: "border-hairline text-content",
 };
 
-export function PriorityCheckPanel() {
-  const [lat, setLat] = useState("");
-  const [lng, setLng] = useState("");
+export function PriorityCheckPanel({
+  initialLat,
+  initialLng,
+}: { initialLat?: number; initialLng?: number } = {}) {
+  const [lat, setLat] = useState(initialLat != null ? initialLat.toFixed(5) : "");
+  const [lng, setLng] = useState(initialLng != null ? initialLng.toFixed(5) : "");
   const [comuna, setComuna] = useState("");
   const [own, setOwn] = useState("");
   const [busy, setBusy] = useState(false);
