@@ -182,6 +182,7 @@ import { Route as AuthenticatedProjectsProjectIdSectionRouteImport } from './rou
 import { Route as ApiPublicHooksSignatureRemindersRouteImport } from './routes/api/public/hooks/signature-reminders'
 import { Route as ApiPublicNotificationsCatastroExpirationsRouteImport } from './routes/api/public/notifications/catastro-expirations'
 import { Route as ApiPublicNotificationsSatelliteAnomaliesRouteImport } from './routes/api/public/notifications/satellite-anomalies'
+import { Route as ApiPublicTilesPeRouteImport } from './routes/api/public/tiles/pe'
 import { Route as ApiPublicVerifyComplianceReportIdRouteImport } from './routes/api.public.verify-compliance.$reportId'
 import { Route as ApiV1CadastreSearchRouteImport } from './routes/api.v1.cadastre.search'
 import { Route as CatastroProyectoTitularesIdRouteImport } from './routes/catastro.proyecto.titulares.$id'
@@ -1153,6 +1154,11 @@ const ApiPublicNotificationsSatelliteAnomaliesRoute =
     path: '/api/public/notifications/satellite-anomalies',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicTilesPeRoute = ApiPublicTilesPeRouteImport.update({
+  id: '/api/public/tiles/pe',
+  path: '/api/public/tiles/pe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicVerifyComplianceReportIdRoute =
   ApiPublicVerifyComplianceReportIdRouteImport.update({
     id: '/api/public/verify-compliance/$reportId',
@@ -1381,6 +1387,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
+  '/api/public/tiles/pe': typeof ApiPublicTilesPeRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
@@ -1565,6 +1572,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
+  '/api/public/tiles/pe': typeof ApiPublicTilesPeRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
@@ -1751,6 +1759,7 @@ export interface FileRoutesById {
   '/api/public/hooks/signature-reminders': typeof ApiPublicHooksSignatureRemindersRoute
   '/api/public/notifications/catastro-expirations': typeof ApiPublicNotificationsCatastroExpirationsRoute
   '/api/public/notifications/satellite-anomalies': typeof ApiPublicNotificationsSatelliteAnomaliesRoute
+  '/api/public/tiles/pe': typeof ApiPublicTilesPeRoute
   '/api/public/verify-compliance/$reportId': typeof ApiPublicVerifyComplianceReportIdRoute
   '/api/v1/cadastre/search': typeof ApiV1CadastreSearchRoute
   '/catastro/proyecto/titulares/$id': typeof CatastroProyectoTitularesIdRoute
@@ -1937,6 +1946,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
+    | '/api/public/tiles/pe'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
     | '/catastro/proyecto/titulares/$id'
@@ -2121,6 +2131,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
+    | '/api/public/tiles/pe'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
     | '/catastro/proyecto/titulares/$id'
@@ -2306,6 +2317,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/signature-reminders'
     | '/api/public/notifications/catastro-expirations'
     | '/api/public/notifications/satellite-anomalies'
+    | '/api/public/tiles/pe'
     | '/api/public/verify-compliance/$reportId'
     | '/api/v1/cadastre/search'
     | '/catastro/proyecto/titulares/$id'
@@ -2402,6 +2414,7 @@ export interface RootRouteChildren {
   ApiPublicHooksSignatureRemindersRoute: typeof ApiPublicHooksSignatureRemindersRoute
   ApiPublicNotificationsCatastroExpirationsRoute: typeof ApiPublicNotificationsCatastroExpirationsRoute
   ApiPublicNotificationsSatelliteAnomaliesRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRoute
+  ApiPublicTilesPeRoute: typeof ApiPublicTilesPeRoute
   ApiPublicVerifyComplianceReportIdRoute: typeof ApiPublicVerifyComplianceReportIdRoute
   ApiV1CadastreSearchRoute: typeof ApiV1CadastreSearchRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -3625,6 +3638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicNotificationsSatelliteAnomaliesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/tiles/pe': {
+      id: '/api/public/tiles/pe'
+      path: '/api/public/tiles/pe'
+      fullPath: '/api/public/tiles/pe'
+      preLoaderRoute: typeof ApiPublicTilesPeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/verify-compliance/$reportId': {
       id: '/api/public/verify-compliance/$reportId'
       path: '/api/public/verify-compliance/$reportId'
@@ -4128,6 +4148,7 @@ const rootRouteChildren: RootRouteChildren = {
     ApiPublicNotificationsCatastroExpirationsRoute,
   ApiPublicNotificationsSatelliteAnomaliesRoute:
     ApiPublicNotificationsSatelliteAnomaliesRoute,
+  ApiPublicTilesPeRoute: ApiPublicTilesPeRoute,
   ApiPublicVerifyComplianceReportIdRoute:
     ApiPublicVerifyComplianceReportIdRoute,
   ApiV1CadastreSearchRoute: ApiV1CadastreSearchRoute,
