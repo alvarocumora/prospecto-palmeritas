@@ -222,33 +222,42 @@ const PAISES: Record<
   },
 };
 
-/** Paleta cartográfica institucional (el motor WebGL necesita valores literales). */
+/** Paleta cartográfica institucional (el motor WebGL necesita valores literales).
+ * Cruza tipo (exploración/explotación) y situación (constituida/trámite/eliminada). */
 const MAP_COLORS = {
-  constituida: "#0F69B4",
-  tramite: "#F5B700",
-  eliminada: "#8a94a3",
+  explotacionConst: "#1D4ED8",
+  exploracionConst: "#059669",
+  explotacionTram: "#EA580C",
+  exploracionTram: "#EAB308",
+  eliminada: "#64748B",
   otro: "#5b6b80",
 };
 
-/** Expresión MapLibre equivalente a colorForSituacion. */
+const UP = (k: string) => ["upcase", ["to-string", ["get", k]]];
+const IS_ELIM = ["in", "ELIMIN", UP("SITUACION_CONCESION")];
+const IS_TRAM = ["in", "TRAMITE", UP("SITUACION_CONCESION")];
+const IS_EXPLOT = ["in", "EXPLOTA", UP("TIPO_CONCESION")];
+
+/** Expresión MapLibre equivalente a colorForConcesion. */
 const SITUACION_EXPR = [
   "case",
-  ["in", "ELIMIN", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
-  MAP_COLORS.eliminada,
-  ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
-  MAP_COLORS.tramite,
-  ["in", "CONSTITU", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
-  MAP_COLORS.constituida,
+  IS_ELIM, MAP_COLORS.eliminada,
+  ["all", IS_TRAM, IS_EXPLOT], MAP_COLORS.explotacionTram,
+  IS_TRAM, MAP_COLORS.exploracionTram,
+  IS_EXPLOT, MAP_COLORS.explotacionConst,
+  ["in", "EXPLORA", UP("TIPO_CONCESION")], MAP_COLORS.exploracionConst,
   MAP_COLORS.otro,
 ] as unknown as import("maplibre-gl").ExpressionSpecification;
 
-/** Color por situación legal (señal de due-diligence). */
-function colorForSituacion(situacion: unknown): string {
+/** Color por tipo + situación legal (señal de due-diligence). */
+function colorForSituacion(situacion: unknown, tipo?: unknown): string {
   const s = String(situacion ?? "").toUpperCase();
+  const t = String(tipo ?? "").toUpperCase();
   if (s.includes("ELIMIN")) return MAP_COLORS.eliminada;
-  if (s.includes("TRAMITE") || s.includes("TRÁMITE")) return MAP_COLORS.tramite;
-  if (s.includes("CONSTITU")) return MAP_COLORS.constituida;
-  return MAP_COLORS.otro;
+  const tram = s.includes("TRAMITE") || s.includes("TRÁMITE");
+  if (t.includes("EXPLOTA")) return tram ? MAP_COLORS.explotacionTram : MAP_COLORS.explotacionConst;
+  if (t.includes("EXPLORA")) return tram ? MAP_COLORS.exploracionTram : MAP_COLORS.exploracionConst;
+  return tram ? MAP_COLORS.exploracionTram : MAP_COLORS.otro;
 }
 
 type SelectedProps = Record<string, unknown>;
@@ -458,7 +467,7 @@ function NationalCatastroMap() {
                 source: "concesiones",
                 paint: {
                   "fill-color": SITUACION_EXPR,
-                  "fill-opacity": ["case", ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]], 0.22, 0.3],
+                  "fill-opacity": ["case", IS_TRAM, 0.2, IS_EXPLOT, 0.3, 0.24] as never,
                 },
               },
               {
@@ -472,7 +481,7 @@ function NationalCatastroMap() {
                 type: "line",
                 source: "concesiones",
                 filter: ["!", ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]]],
-                paint: { "line-color": SITUACION_EXPR, "line-width": 1.8 },
+                paint: { "line-color": SITUACION_EXPR, "line-width": ["case", IS_EXPLOT, 2.2, 1.8] as never },
               },
               {
                 id: "concesiones-tramite-line",
@@ -480,9 +489,9 @@ function NationalCatastroMap() {
                 source: "concesiones",
                 filter: ["in", "TRAMITE", ["upcase", ["to-string", ["get", "SITUACION_CONCESION"]]]],
                 paint: {
-                  "line-color": MAP_COLORS.tramite,
+                  "line-color": SITUACION_EXPR,
                   "line-width": 2.2,
-                  "line-dasharray": [2, 1.5],
+                  "line-dasharray": [2.5, 1.5],
                 },
               },
             ],
@@ -926,7 +935,7 @@ function NationalCatastroMap() {
               <SelRow
                 k="Situación"
                 v={selected.SITUACION_CONCESION}
-                color={colorForSituacion(selected.SITUACION_CONCESION)}
+                color={colorForSituacion(selected.SITUACION_CONCESION, selected.TIPO_CONCESION)}
               />
             </dl>
             {rolOf(selected) && (
@@ -988,9 +997,11 @@ function NationalCatastroMap() {
         <div className="absolute bottom-3 left-3 z-[400] px-2.5 py-2 rounded-lg bg-background/90 border border-border text-[10px] font-mono text-muted-foreground backdrop-blur space-y-1">
           {pais === "CL" ? (
             <>
-              <LegendRow color={MAP_COLORS.constituida} label="Constituida" />
-              <LegendRow color={MAP_COLORS.tramite} label="En trámite" />
-              <LegendRow color={MAP_COLORS.eliminada} label="Eliminada" />
+              <LegendRow color={MAP_COLORS.explotacionConst} label="Explotación constituida" />
+              <LegendRow color={MAP_COLORS.exploracionConst} label="Exploración constituida" />
+              <LegendRow color={MAP_COLORS.explotacionTram} label="Explotación en trámite (manifestación)" dashed />
+              <LegendRow color={MAP_COLORS.exploracionTram} label="Exploración en trámite (pedimento)" dashed />
+              <LegendRow color={MAP_COLORS.eliminada} label="Caducada / eliminada" dashed />
               {featureCount != null && !needsZoom && (
                 <div className="pt-1 border-t border-border/60 text-foreground">
                   {featureCount.toLocaleString("es-CL")} concesiones en vista
@@ -1044,12 +1055,12 @@ function Chip({
   );
 }
 
-function LegendRow({ color, label }: { color: string; label: string }) {
+function LegendRow({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
   return (
     <div className="flex items-center gap-1.5">
       <span
-        className="inline-block w-3 h-2.5 rounded-sm border"
-        style={{ borderColor: color, backgroundColor: `${color}33` }}
+        className={`inline-block w-3 h-2.5 rounded-sm border-2 ${dashed ? "border-dashed" : ""}`}
+        style={{ borderColor: color, backgroundColor: `${color}40` }}
       />
       {label}
     </div>
