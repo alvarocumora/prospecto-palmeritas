@@ -32,9 +32,9 @@ export const Route = createFileRoute("/api/public/tiles/pe")({
           // INGEMMET omite el certificado intermedio: reintentar con él adjunto.
         }
         const img = await fetchWithIntermediate(up);
-        if (img) return ok(img, "image/png");
+        if (img) return ok(img as unknown as BodyInit, "image/png");
         // Tesela vacía (no error) para no romper el mapa; se reintenta en 1 min.
-        return ok(EMPTY_PNG, "image/png", "public, max-age=60");
+        return ok(EMPTY_PNG as unknown as BodyInit, "image/png", "public, max-age=60");
       },
     },
   },
