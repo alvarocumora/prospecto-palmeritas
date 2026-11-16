@@ -20,7 +20,13 @@ const TIPO_TXT: Record<EscritoTipo, { titulo: string; arts: string }> = {
   },
 };
 
-export function downloadPedimentoEscrito(ped: PedimentoResult, tipo: EscritoTipo = "pedimento") {
+export type EscritoDatos = {
+  nombre?: string; rut?: string; nacionalidad?: string; profesion?: string; domicilio?: string;
+  comuna?: string; region?: string; tribunal?: string; concesion?: string;
+};
+
+export function downloadPedimentoEscrito(ped: PedimentoResult, tipo: EscritoTipo = "pedimento", d: EscritoDatos = {}) {
+  const v = (x: string | undefined, ph: string) => (x && x.trim() ? x.trim() : ph);
   const { titulo, arts } = TIPO_TXT[tipo];
   const doc = new jsPDF({ unit: "pt", format: "a4" });
   const M = 64;
@@ -52,16 +58,16 @@ export function downloadPedimentoEscrito(ped: PedimentoResult, tipo: EscritoTipo
   };
 
   doc.setFont("times", "normal").setFontSize(11);
-  doc.text("S. J. L. de [COMUNA / TRIBUNAL COMPETENTE]", W - M, y, { align: "right" });
+  doc.text(`S. J. L. — ${v(d.tribunal, "[TRIBUNAL COMPETENTE]")}`, W - M, y, { align: "right" });
   y += 22;
 
   para(
-    "[NOMBRE DEL PETICIONARIO], [NACIONALIDAD], [PROFESIÓN U OFICIO], cédula nacional de " +
-      "identidad / RUT N° [RUT], domiciliado(a) en [DOMICILIO], a US. respetuosamente digo:",
+    `${v(d.nombre, "[NOMBRE DEL PETICIONARIO]")}, ${v(d.nacionalidad, "[NACIONALIDAD]")}, ${v(d.profesion, "[PROFESIÓN U OFICIO]")}, cédula nacional de ` +
+      `identidad / RUT N° ${v(d.rut, "[RUT]")}, domiciliado(a) en ${v(d.domicilio, "[DOMICILIO]")}, a US. respetuosamente digo:`,
   );
   para(
-    `Que por el presente acto vengo en constituir ${titulo}, de conformidad con ${arts}, ` +
-      `en la comuna de [COMUNA], Región de [REGIÓN], con las siguientes características:`,
+    `Que por el presente acto vengo en constituir ${titulo}${d.concesion?.trim() ? ` denominada "${d.concesion.trim()}"` : ""}, de conformidad con ${arts}, ` +
+      `en la comuna de ${v(d.comuna, "[COMUNA]")}, Región de ${v(d.region, "[REGIÓN]")}, con las siguientes características:`,
   );
   para(
     `Punto medio de la cara norte (coordenadas UTM, Datum [PSAD56 / SIRGAS], Huso ${ped.huso} Sur): ` +
@@ -100,7 +106,7 @@ export function downloadPedimentoEscrito(ped: PedimentoResult, tipo: EscritoTipo
   doc.setFont("times", "normal").setFontSize(11).setTextColor(17);
   doc.text("_______________________________________", W / 2, y, { align: "center" });
   y += 15;
-  doc.text("[NOMBRE Y FIRMA DEL PETICIONARIO] — RUT [RUT]", W / 2, y, { align: "center" });
+  doc.text(`${v(d.nombre, "[NOMBRE Y FIRMA DEL PETICIONARIO]")} — RUT ${v(d.rut, "[RUT]")}`, W / 2, y, { align: "center" });
   y += 28;
 
   doc.setDrawColor(184, 134, 11).setFillColor(255, 248, 236);

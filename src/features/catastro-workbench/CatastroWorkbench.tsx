@@ -5,12 +5,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { FileText, Copy, Loader2, Ruler, Scale, Newspaper, X, Crosshair } from "lucide-react";
+import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X, Crosshair } from "lucide-react";
 import { toast } from "sonner";
 import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
 import type { PedimentoResult } from "@/lib/pedimentoGeometry";
-import { downloadPedimentoEscrito } from "@/lib/pedimentoEscritoPdf";
+import { downloadPedimentoEscrito, type EscritoDatos } from "@/lib/pedimentoEscritoPdf";
+import { suggestTribunal } from "@/lib/cadastre/tribunales";
+import { pedimentoGeoJson, pedimentoKml, downloadText } from "@/lib/cadastre/pedimentoExport";
 import { PriorityCheckPanel } from "@/features/catastro-priority/PriorityCheckPanel";
 import { useMiningBulletins } from "@/hooks/useMiningBulletins";
 
@@ -53,6 +55,8 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
   const [err, setErr] = useState<string | null>(null);
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [bounds, setBounds] = useState<[number, number, number, number] | null>(null);
+  const [datos, setDatos] = useState<EscritoDatos>({});
+  const setD = (k: keyof EscritoDatos) => (e: React.ChangeEvent<HTMLInputElement>) => setDatos((p) => ({ ...p, [k]: e.target.value }));
   const propose = useServerFn(proposePedimentoOnAoi);
   const { data: bulletins, loading: bLoading } = useMiningBulletins(500, bounds);
 
@@ -79,6 +83,27 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
         b.centroid_lng >= w && b.centroid_lng <= e && b.centroid_lat >= s && b.centroid_lat <= n,
     );
   }, [bulletins, bounds]);
+
+  // Comuna sugerida: la solicitud del catastro más cercana al centro del pedimento (dato real).
+  const comunaSugerida = useMemo(() => {
+    if (!ped) return null;
+    const c = ped.rectangleWgs84.geometry.coordinates[0];
+    const lng = (c[0][0] + c[2][0]) / 2, lat = (c[0][1] + c[2][1]) / 2;
+    let best: { d: number; comuna: string } | null = null;
+    for (const b of bulletins) {
+      if (!b.comuna || b.centroid_lat == null || b.centroid_lng == null) continue;
+      const d = (b.centroid_lat - lat) ** 2 + (b.centroid_lng - lng) ** 2;
+      if (!best || d < best.d) best = { d, comuna: b.comuna };
+    }
+    return best && best.d < 0.04 ? best.comuna : null;
+  }, [ped, bulletins]);
+
+  useEffect(() => {
+    if (!comunaSugerida) return;
+    setDatos((p) => p.comuna ? p : { ...p, comuna: comunaSugerida, tribunal: p.tribunal || (suggestTribunal(comunaSugerida).known ? suggestTribunal(comunaSugerida).tribunal : "") });
+  }, [comunaSugerida]);
+
+  const trib = suggestTribunal(datos.comuna);
 
   useEffect(() => {
     const src = map?.getSource(BOL_SRC) as GeoJSONSource | undefined;
@@ -150,14 +175,38 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                   <div className="rounded border border-border p-2"><div className="text-muted-foreground">Superficie</div><div className="font-semibold">{ped.areaHa.toLocaleString("es-CL", { maximumFractionDigits: 0 })} ha</div></div>
                   <div className="rounded border border-border p-2"><div className="text-muted-foreground">Huso / datum</div><div className="font-semibold">{ped.huso}S · {ped.datum}</div></div>
                 </div>
+                <div className="rounded border border-border p-2 space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Datos del escrito</div>
+                  {([
+                    ["nombre", "Nombre del peticionario"], ["rut", "RUT"], ["nacionalidad", "Nacionalidad"],
+                    ["profesion", "Profesión u oficio"], ["domicilio", "Domicilio"], ["concesion", "Nombre de la concesión"],
+                    ["comuna", "Comuna"], ["region", "Región"], ["tribunal", "Tribunal"],
+                  ] as const).map(([k, label]) => (
+                    <input key={k} aria-label={label} placeholder={label} value={datos[k] ?? ""} onChange={setD(k)}
+                      className="w-full rounded border border-border bg-background px-2 py-1 text-xs" />
+                  ))}
+                  {datos.comuna && (
+                    <div className="text-[10px] text-muted-foreground">
+                      {trib.known ? <>Tribunal sugerido: <button type="button" className="underline" onClick={() => setDatos((p) => ({ ...p, tribunal: trib.tribunal }))}>{trib.tribunal}</button> · verificar en OJV</> : "Sin tribunal conocido para esta comuna: complétalo a mano."}
+                      {comunaSugerida && datos.comuna === comunaSugerida && " · comuna tomada de la solicitud más cercana del catastro."}
+                    </div>
+                  )}
+                  <div className="text-[10px] text-muted-foreground">Los campos vacíos quedan como [POR COMPLETAR] en el escrito.</div>
+                </div>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => downloadText(pedimentoKml(ped, datos.concesion || undefined), `pedimento-${ped.areaHa}ha.kml`, "application/vnd.google-earth.kml+xml")}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded border border-border px-2 py-1.5 text-xs hover:bg-muted"><Download className="w-3.5 h-3.5" />KML (Google Earth)</button>
+                  <button type="button" onClick={() => downloadText(pedimentoGeoJson(ped, datos.concesion || undefined), `pedimento-${ped.areaHa}ha.geojson`, "application/geo+json")}
+                    className="flex-1 flex items-center justify-center gap-1.5 rounded border border-border px-2 py-1.5 text-xs hover:bg-muted"><Download className="w-3.5 h-3.5" />GeoJSON (QGIS)</button>
+                </div>
                 <pre className="rounded border border-border bg-muted/40 p-2 text-[10px] font-mono whitespace-pre-wrap">{ojvVertexText(ped)}</pre>
                 <div className="text-[10px] text-muted-foreground">{ped.concessionsChecked} concesiones revisadas.</div>
                 <div className="grid grid-cols-1 gap-1.5">
                   <button type="button" onClick={() => { navigator.clipboard.writeText(ojvVertexText(ped)); toast.success("Vértices copiados para OJV"); }}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Copy className="w-3.5 h-3.5" />Copiar minuta de vértices (OJV)</button>
-                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "pedimento")}
+                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "pedimento", datos)}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><FileText className="w-3.5 h-3.5" />Escrito borrador · pedimento (exploración)</button>
-                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "manifestacion")}
+                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "manifestacion", datos)}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><FileText className="w-3.5 h-3.5" />Escrito borrador · manifestación (explotación)</button>
                   <button type="button" onClick={() => setTab("prelacion")}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Scale className="w-3.5 h-3.5" />Revisar prelación de este sector</button>
