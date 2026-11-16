@@ -36,6 +36,13 @@
       "when": 1794837574649,
       "tag": "0004_harden_rls_tautologies_search_path",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794859795337,
+      "tag": "0005_scope_data_sources_ingest_runs_reads",
+      "breakpoints": true
     }
   ]
 }
