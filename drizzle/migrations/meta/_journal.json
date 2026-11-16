@@ -29,6 +29,13 @@
       "when": 1792675565050,
       "tag": "0003_investment_test_flags",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794837574649,
+      "tag": "0004_harden_rls_tautologies_search_path",
+      "breakpoints": true
     }
   ]
 }

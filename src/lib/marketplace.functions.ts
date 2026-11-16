@@ -172,7 +172,9 @@ export const getCommodityLotDetail = createServerFn({ method: "GET" })
 // ---------- Public: list certifications catalog ----------
 export const listCommodityCertifications = createServerFn({ method: "GET" }).handler(
   async (): Promise<CommodityCertification[]> => {
-    const supabase = serverPublicClient();
+    // Public catalog of certification names; RLS now requires sign-in, so read
+    // only non-sensitive catalog columns server-side.
+    const { supabaseAdmin: supabase } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabase
       .from("commodity_certifications")
       .select("id,code,name,issuer,description,category")
