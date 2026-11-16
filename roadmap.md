@@ -73,3 +73,4 @@
 - [ ] Rediseñar el deck 16:9 editorial con los mismos componentes (el deck público sigue intacto).
 - [ ] Revisar el aviso de control de calidad que aparece en el memorándum.
 - [ ] Actualización trimestral y cartola: bloqueadas por falta de datos verificados o privacidad.
+- [ ] Catastro nacional usable desde la portada con límites por plan

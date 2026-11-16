@@ -5,7 +5,10 @@
 // (appsngmaz.sernageomin.cl/catastro_SNGM) a ArcGIS Online. Este módulo es la
 // única fuente de verdad de esos endpoints — no hardcodear URLs en consumidores.
 //
-// Servicios verificados en la organización (203 FeatureServers):
+// 2026-11-16: Marcelo_Layer fue retirado (HTTP 400). El visor oficial usa
+// arcgisawa.sernageomin.cl/VIEW_WGS84 (no accesible públicamente); su espejo
+// público es WGS84_TEST (~597k concesiones con eliminadas).
+// Servicios verificados en la organización:
 //  - Marcelo_Layer/2        → concesiones vigentes (~103.000 polígonos, WGS84)
 //  - Marcelo_Layer/0        → vértices de concesión (puntos)
 //  - Marceloeliminadas      → concesiones eliminadas (histórico)
@@ -21,11 +24,11 @@
 export const SNGM_SERVICES_ROOT =
   "https://services1.arcgis.com/OyjvVdFTl5hfSdX3/arcgis/rest/services";
 
-export const SNGM_CONCESIONES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/2`;
-export const SNGM_VERTICES_URL = `${SNGM_SERVICES_ROOT}/Marcelo_Layer/FeatureServer/0`;
+export const SNGM_CONCESIONES_URL = `${SNGM_SERVICES_ROOT}/WGS84_TEST/FeatureServer/2`;
+export const SNGM_VERTICES_URL = `${SNGM_SERVICES_ROOT}/WGS84_TEST/FeatureServer/0`;
 export const SNGM_CONCESIONES_ELIMINADAS_URL = `${SNGM_SERVICES_ROOT}/Marceloeliminadas/FeatureServer/0`;
 /** Concesiones eliminadas — capa de polígonos (WGS84_Concesion, ~594k). Terreno liberado. */
-export const SNGM_ELIMINADAS_POLY_URL = `${SNGM_SERVICES_ROOT}/Marceloeliminadas/FeatureServer/2`;
+export const SNGM_ELIMINADAS_POLY_URL = SNGM_CONCESIONES_URL;
 /** Faenas e instalaciones mineras (130 puntos: empresa, faena, recurso). */
 export const SNGM_YACIMIENTOS_URL = `${SNGM_SERVICES_ROOT}/ACCESO_YACIMIENTOS/FeatureServer/1`;
 /** Geología 1:10.000 (642 polígonos: UNIDAD, Clase_Geol). Nombre con í percent-encoded. */

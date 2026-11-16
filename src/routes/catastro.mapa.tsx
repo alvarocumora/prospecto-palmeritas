@@ -162,7 +162,8 @@ function buildWhere(tipo: TipoFilter, situacion: SituacionFilter): string {
   if (tipo !== "all")
     clauses.push(`TIPO_CONCESION = '${tipo === "exploracion" ? "EXPLORACION" : "EXPLOTACION"}'`);
   if (situacion !== "all") clauses.push(`SITUACION_CONCESION = '${SITUACION_SQL[situacion]}'`);
-  return clauses.length ? clauses.join(" AND ") : "1=1";
+  if (situacion === "all") clauses.push("SITUACION_CONCESION <> 'ELIMINADA'");
+  return clauses.join(" AND ");
 }
 
 type Pais = "CL" | "PE" | "BR" | "ZM" | "MW";
@@ -373,7 +374,7 @@ function NationalCatastroMap() {
     try {
       const [vigentes, eliminadas] = await Promise.all([
         queryExtent(SNGM_CONCESIONES_URL, buildWhere(st.tipo, st.situacion)),
-        st.showEliminadas ? queryExtent(SNGM_ELIMINADAS_POLY_URL, "1=1") : Promise.resolve([]),
+        st.showEliminadas ? queryExtent(SNGM_ELIMINADAS_POLY_URL, "SITUACION_CONCESION = 'ELIMINADA'") : Promise.resolve([]),
       ]);
       if (seq !== fetchSeq.current) return;
       featuresRef.current = { vigentes, eliminadas };
