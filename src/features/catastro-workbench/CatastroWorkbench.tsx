@@ -54,7 +54,7 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [bounds, setBounds] = useState<[number, number, number, number] | null>(null);
   const propose = useServerFn(proposePedimentoOnAoi);
-  const { data: bulletins, loading: bLoading } = useMiningBulletins(500);
+  const { data: bulletins, loading: bLoading } = useMiningBulletins(500, bounds);
 
   useEffect(() => {
     if (!map) return;

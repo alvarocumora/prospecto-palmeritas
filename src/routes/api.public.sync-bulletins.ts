@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
-import { fetchHolderBulletins } from "@/lib/bulletinSync";
+import { fetchHolderBulletins, fetchNationalTramitePage, NATIONAL_PAGE_SIZE } from "@/lib/bulletinSync";
 
 // Sync del Boletín Oficial de Minería (watch-driven).
 // Cron-triggered (HMAC x-cron-secret). Por cada titular vigilado consulta su
@@ -27,6 +27,46 @@ export const Route = createFileRoute("/api/public/sync-bulletins")({
         const sb = createClient(url, key, { auth: { persistSession: false } });
 
         const runStart = new Date().toISOString();
+
+        // Modo nacional: ?mode=national&offset=0&pages=3 → upsert de todas las
+        // concesiones EN TRÁMITE del país. Devuelve nextOffset para continuar.
+        const qs = new URL(request.url).searchParams;
+        if (qs.get("mode") === "national") {
+          let offset = Math.max(0, Number(qs.get("offset") ?? 0) || 0);
+          const pages = Math.min(5, Math.max(1, Number(qs.get("pages") ?? 3) || 3));
+          let upserted = 0;
+          let more = true;
+          try {
+            for (let i = 0; i < pages && more; i++) {
+              const page = await fetchNationalTramitePage(offset);
+              more = page.more;
+              offset += NATIONAL_PAGE_SIZE;
+              for (let k = 0; k < page.rows.length; k += 500) {
+                const chunk = page.rows
+                  .slice(k, k + 500)
+                  .map((r) => ({ ...r, scraped_at: runStart }));
+                const { error } = await sb
+                  .from("mining_bulletins")
+                  .upsert(chunk, { onConflict: "content_hash" });
+                if (error) throw new Error(error.message);
+                upserted += chunk.length;
+              }
+            }
+            await sb.from("bulletin_sync_runs").insert({
+              source: "sernageomin-v2-national",
+              started_at: runStart,
+              finished_at: new Date().toISOString(),
+              status: "ok",
+              scraped_count: upserted,
+              inserted_count: upserted,
+              alerts_created: 0,
+            });
+            return Response.json({ ok: true, upserted, nextOffset: more ? offset : null });
+          } catch (e) {
+            const msg = e instanceof Error ? e.message : "error";
+            return Response.json({ ok: false, error: msg, offset }, { status: 500 });
+          }
+        }
         let holdersProcessed = 0;
         let bulletinsInserted = 0;
         let alertsCreated = 0;

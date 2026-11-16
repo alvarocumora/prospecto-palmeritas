@@ -43,21 +43,28 @@ export type WatchHolder = {
   created_at: string;
 };
 
-export function useMiningBulletins(limit = 100) {
+export function useMiningBulletins(
+  limit = 100,
+  bbox?: [number, number, number, number] | null,
+) {
+  const bboxKey = bbox ? bbox.map((v) => v.toFixed(3)).join(",") : "";
   const [data, setData] = useState<MiningBulletin[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
-    const { data: rows } = await supabase
-      .from("mining_bulletins")
-      .select("*")
+    let q = supabase.from("mining_bulletins").select("*");
+    if (bboxKey) {
+      const [w, so, e, n] = bboxKey.split(",").map(Number);
+      q = q.gte("centroid_lng", w).lte("centroid_lng", e).gte("centroid_lat", so).lte("centroid_lat", n);
+    }
+    const { data: rows } = await q
       .order("publication_date", { ascending: false, nullsFirst: false })
       .order("scraped_at", { ascending: false })
       .limit(limit);
     setData((rows ?? []) as MiningBulletin[]);
     setLoading(false);
-  }, [limit]);
+  }, [limit, bboxKey]);
 
   useEffect(() => {
     refresh();
