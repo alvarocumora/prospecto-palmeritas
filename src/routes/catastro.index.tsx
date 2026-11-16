@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation } from "@tanstack/react-query";
@@ -7,6 +7,9 @@ import { PublicCatastroShell } from "@/features/catastro-public/PublicCatastroSh
 import { searchConcessions } from "@/lib/catastroPublic.functions";
 
 export const Route = createFileRoute("/catastro/")({
+  beforeLoad: () => {
+    throw redirect({ to: "/catastro/mapa", replace: true });
+  },
   head: () => ({
     meta: [
       {

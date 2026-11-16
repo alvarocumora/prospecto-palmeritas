@@ -173,6 +173,12 @@ export function MarketingHeader() {
           ))}
         </nav>
         <div className="flex-1" />
+        <Link
+          to="/catastro/mapa"
+          className="text-sm font-medium text-content hover:text-accent-brand whitespace-nowrap"
+        >
+          Catastro
+        </Link>
         <div className="hidden sm:inline-flex">
           <LangToggle />
         </div>

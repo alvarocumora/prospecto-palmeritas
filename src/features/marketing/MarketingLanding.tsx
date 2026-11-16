@@ -54,12 +54,20 @@ export function MarketingLanding() {
               Rondas de cobre en explotación, desde USD 15.000.
             </h2>
           </div>
+          <div className="flex flex-wrap gap-3">
           <Link
             to="/inversion/terminal"
             className="inline-flex h-11 shrink-0 items-center gap-2 rounded-sm bg-accent-brand px-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-accent-brand-contrast hover:bg-im-cobalt-deep"
           >
             Abrir Investor Terminal <ArrowRight className="h-4 w-4" />
           </Link>
+          <Link
+            to="/catastro/mapa"
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-sm border border-im-gold px-5 text-[11px] font-semibold uppercase tracking-[0.2em] text-im-gold hover:bg-im-gold hover:text-surface-inverse"
+          >
+            Catastro en vivo <ArrowRight className="h-4 w-4" />
+          </Link>
+          </div>
         </div>
       </section>
 
