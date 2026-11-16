@@ -5,6 +5,7 @@ import { useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import {
   Wrench,
+  Route as RouteIcon,
   Search,
   Layers,
   Building2,
@@ -294,6 +295,7 @@ function NationalCatastroMap() {
   const [basemap, setBasemap] = useState<Basemap>(search.base ?? "satelite");
   const [showEliminadas, setShowEliminadas] = useState<boolean>(!!search.elim);
   const [showFilters, setShowFilters] = useState(false);
+  const [showLabels, setShowLabels] = useState(true);
   const [panelOpen, setPanelOpen] = useState(true);
   const [toolsOpen, setToolsOpen] = useState(false);
   const [selected, setSelected] = useState<SelectedProps | null>(null);
@@ -442,12 +444,30 @@ function NationalCatastroMap() {
                 maxzoom: 19,
                 attribution: "© OpenStreetMap",
               },
+              refs: {
+                type: "raster",
+                tiles: [
+                  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}",
+                ],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: "Esri",
+              },
+              places: {
+                type: "raster",
+                tiles: [
+                  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+                ],
+                tileSize: 256,
+                maxzoom: 19,
+                attribution: "Esri",
+              },
               concesiones: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
               eliminadas: { type: "geojson", data: { type: "FeatureCollection", features: [] } },
             },
             layers: [
               { id: "base", type: "raster", source: "base" },
-              { id: "osm", type: "raster", source: "osm", paint: { "raster-opacity": 0.2 } },
+              { id: "osm", type: "raster", source: "osm", paint: { "raster-opacity": 0 }, layout: { visibility: "none" } },
               {
                 id: "eliminadas-fill",
                 type: "fill",
@@ -501,6 +521,12 @@ function NationalCatastroMap() {
           },
         });
         map.touchZoomRotate.disableRotation();
+        // Rutas y nombres de ciudades encima de los polígonos para orientarse.
+        map.once("load", () => {
+          map!.addLayer({ id: "refs", type: "raster", source: "refs", paint: { "raster-opacity": 0.9 } });
+          map!.addLayer({ id: "places", type: "raster", source: "places" });
+        });
+        map.addControl(new maplibregl.ScaleControl({ unit: "metric", maxWidth: 120 }), "bottom-left");
         map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
         mapObjRef.current = map;
 
@@ -562,7 +588,9 @@ function NationalCatastroMap() {
       map.addSource("foreign", {
         type: "raster",
         tiles: [
-          `${cfg.mapServer}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:${cfg.layer ?? 0}&f=image`,
+          pais === "PE"
+            ? `${window.location.origin}/api/public/tiles/pe?bbox={bbox-epsg-3857}`
+            : `${cfg.mapServer}/export?bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&format=png32&transparent=true&layers=show:${cfg.layer ?? 0}&f=image`,
         ],
         tileSize: 256,
         attribution: cfg.inst,
@@ -582,6 +610,13 @@ function NationalCatastroMap() {
     syncUrlRef.current();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pais, mapReady]);
+
+  useEffect(() => {
+    const map = mapObjRef.current;
+    if (!mapReady || !map) return;
+    for (const id of ["refs", "places"])
+      if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", showLabels ? "visible" : "none");
+  }, [showLabels, mapReady]);
 
   // Cambio de basemap.
   useEffect(() => {
@@ -915,6 +950,15 @@ function NationalCatastroMap() {
               <MapIcon className="w-4 h-4" />
             </button>
           </div>
+          <button
+            type="button"
+            onClick={() => setShowLabels((v) => !v)}
+            title={showLabels ? "Ocultar rutas y ciudades" : "Mostrar rutas y ciudades"}
+            aria-pressed={showLabels}
+            className={`p-2 rounded-lg border border-border backdrop-blur shadow-lg self-end ${showLabels ? "bg-primary/10 text-primary" : "bg-background/95 text-muted-foreground hover:text-foreground"}`}
+          >
+            <RouteIcon className="w-4 h-4" />
+          </button>
           <button
             type="button"
             onClick={locate}
