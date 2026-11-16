@@ -12,6 +12,7 @@ import {
   FileDown,
 } from "lucide-react";
 import { generateHolderProfilePdf } from "@/lib/pdf/holder-profile";
+import { PriorityCheckPanel } from "@/features/catastro-priority/PriorityCheckPanel";
 import { LegalAlertsFeed } from "@/components/ops/LegalAlertsFeed";
 import { useProjects } from "@/hooks/useProjects";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,7 +56,7 @@ function BoletinModule() {
   } = useCourtCaseAlerts(active?.id ?? null);
   const [syncing, setSyncing] = useState(false);
   const [syncingPjud, setSyncingPjud] = useState(false);
-  const [tab, setTab] = useState<"legal" | "alerts" | "all" | "pjud" | "watch">("legal");
+  const [tab, setTab] = useState<"legal" | "alerts" | "all" | "pjud" | "watch" | "prioridad">("legal");
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
 
@@ -191,6 +192,9 @@ function BoletinModule() {
         </TabButton>
         <TabButton active={tab === "all"} onClick={() => setTab("all")}>
           Todas las publicaciones
+        </TabButton>
+        <TabButton active={tab === "prioridad"} onClick={() => setTab("prioridad")}>
+          Revisar prioridad
         </TabButton>
         <TabButton active={tab === "watch"} onClick={() => setTab("watch")}>
           Titulares vigilados
@@ -381,6 +385,8 @@ function BoletinModule() {
           </div>
         </>
       )}
+
+      {tab === "prioridad" && <PriorityCheckPanel />}
 
       {tab === "watch" && active && user && (
         <WatchHoldersPanel

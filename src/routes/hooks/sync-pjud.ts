@@ -162,7 +162,7 @@ export const Route = createFileRoute("/hooks/sync-pjud")({
             },
           };
 
-          const extractPrompt = `Extrae todas las causas judiciales relacionadas con minería visibles en esta página del Poder Judicial de Chile (PJUD): oposiciones a mensura, sumarios sanitarios mineros, recursos ambientales mineros, juicios de servidumbre minera. Para cada causa incluye: número de rol, tribunal, jurisdicción, materia, demandante, demandado completo, RUT del demandado, comuna, región, fecha de ingreso (YYYY-MM-DD), último movimiento, estado, y URL de la causa si aparece.`;
+          const extractPrompt = `Extrae todas las causas judiciales relacionadas con minería visibles en esta página del Poder Judicial de Chile (PJUD): solicitudes de constitución (pedimentos y manifestaciones, materia no contenciosa) con su fecha de ingreso exacta, oposiciones a mensura, sumarios sanitarios mineros, recursos ambientales mineros, juicios de servidumbre minera. Para cada causa incluye: número de rol, tribunal, jurisdicción, materia, demandante, demandado completo, RUT del demandado, comuna, región, fecha de ingreso (YYYY-MM-DD), último movimiento, estado, y URL de la causa si aparece.`;
 
           const extracted = await firecrawlExtract(PJUD_SEARCH_URL, extractPrompt, schema);
 
