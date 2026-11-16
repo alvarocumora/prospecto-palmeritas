@@ -11,6 +11,7 @@ import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
 import type { PedimentoResult } from "@/lib/pedimentoGeometry";
 import { downloadPedimentoEscrito, type EscritoDatos } from "@/lib/pedimentoEscritoPdf";
+import { PRESET_VALLE_ESCONDIDO } from "@/lib/cadastre/escritoPresets";
 import { suggestTribunal } from "@/lib/cadastre/tribunales";
 import { pedimentoGeoJson, pedimentoKml, downloadText } from "@/lib/cadastre/pedimentoExport";
 import { PriorityCheckPanel } from "@/features/catastro-priority/PriorityCheckPanel";
@@ -192,11 +193,15 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                   </details>
                 )}
                 <div className="rounded border border-border p-2 space-y-1.5">
-                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Datos del escrito</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Datos del escrito</div>
+                    <button type="button" className="text-[10px] underline" onClick={() => setDatos((p) => ({ ...p, ...PRESET_VALLE_ESCONDIDO }))}>Usar Valle Escondido SpA</button>
+                  </div>
+                  {datos.representada && <p className="text-[10px] text-muted-foreground">p.p. {datos.representada} · RUT {datos.rutRepresentada} · notif. {datos.email}</p>}
                   {([
                     ["nombre", "Nombre del peticionario"], ["rut", "RUT"], ["nacionalidad", "Nacionalidad"],
                     ["profesion", "Profesión u oficio"], ["domicilio", "Domicilio"], ["concesion", "Nombre de la concesión"],
-                    ["comuna", "Comuna"], ["region", "Región"], ["tribunal", "Tribunal"],
+                    ["sector", "Sector (ej. Tilama)"], ["comuna", "Comuna"], ["provincia", "Provincia"], ["region", "Región (ej. de Coquimbo)"], ["tribunal", "Tribunal"],
                   ] as const).map(([k, label]) => (
                     <input key={k} aria-label={label} placeholder={label} value={datos[k] ?? ""} onChange={setD(k)}
                       className="w-full rounded border border-border bg-background px-2 py-1 text-xs" />
@@ -227,7 +232,7 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                   <button type="button" onClick={() => setTab("prelacion")}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Scale className="w-3.5 h-3.5" />Revisar prelación de este sector</button>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Borrador para abogado de minería; datos del peticionario quedan [POR COMPLETAR].</p>
+                <p className="text-[10px] text-muted-foreground">Borrador para abogado de minería; campos vacíos quedan [POR COMPLETAR].</p>
               </div>
             )}
           </div>
