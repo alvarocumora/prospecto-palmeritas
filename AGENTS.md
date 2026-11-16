@@ -16,3 +16,4 @@
 - Structured AI estimates (report assessment, property estimate) go through src/lib/ai-responses.server.ts (Responses API, strict schema, streamed) — free-form JSON from compatible chat mistranslated keys and failed validation.
 - Public investor presentations use a shared documentary slide model in the marketing module and the canonical ProjectDoc deck renderer; documentary values never mutate live investment terms — prevents economic drift and duplicate PDF systems.
 - Investor slides have a single centered 1920×1080 scaling component, URL-selected pages, and a mobile reading companion — preserves print proportions without making phone text unreadable.
+- Catastro pedimento/manifestación design lives in src/lib/cadastre/designer.ts (pure UTM rules, snap 100 m, 1-ha cells) and always emits the shared PedimentoResult — keeps minuta OJV, escrito and KML/GeoJSON on one geometry.

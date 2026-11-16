@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X, Crosshair } from "lucide-react";
+import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X } from "lucide-react";
 import { toast } from "sonner";
 import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
@@ -15,6 +15,8 @@ import { suggestTribunal } from "@/lib/cadastre/tribunales";
 import { pedimentoGeoJson, pedimentoKml, downloadText } from "@/lib/cadastre/pedimentoExport";
 import { PriorityCheckPanel } from "@/features/catastro-priority/PriorityCheckPanel";
 import { useMiningBulletins } from "@/hooks/useMiningBulletins";
+import { DesignerPanel, type DesignerHandle } from "./DesignerPanel";
+import { SpectralPanel } from "./SpectralPanel";
 
 type Tab = "pedimento" | "prelacion" | "boletin";
 const PED_SRC = "wb-pedimento";
@@ -56,6 +58,17 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
   const [center, setCenter] = useState<{ lat: number; lng: number } | null>(null);
   const [bounds, setBounds] = useState<[number, number, number, number] | null>(null);
   const [datos, setDatos] = useState<EscritoDatos>({});
+  const [seed, setSeed] = useState<{ bbox: [number, number, number, number]; label: string } | null>(null);
+  const [meta, setMeta] = useState<DesignerHandle>({ kind: "pedimento", pertenencias: [] });
+  useEffect(() => {
+    const onSeed = (e: Event) => {
+      const d = (e as CustomEvent<{ bbox: [number, number, number, number]; label: string }>).detail;
+      setTab("pedimento");
+      setSeed(d);
+    };
+    window.addEventListener("catastro:design-from", onSeed);
+    return () => window.removeEventListener("catastro:design-from", onSeed);
+  }, []);
   const setD = (k: keyof EscritoDatos) => (e: React.ChangeEvent<HTMLInputElement>) => setDatos((p) => ({ ...p, [k]: e.target.value }));
   const propose = useServerFn(proposePedimentoOnAoi);
   const { data: bulletins, loading: bLoading } = useMiningBulletins(500, bounds);
@@ -69,7 +82,8 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
       setBounds([b.getWest(), b.getSouth(), b.getEast(), b.getNorth()]);
     };
     const init = () => { ensureLayers(map); upd(); };
-    if (map.isStyleLoaded()) init(); else map.once("load", init);
+    upd();
+    if (map.isStyleLoaded()) init(); else map.once("idle", init);
     map.on("moveend", upd);
     map.on("styledata", () => ensureLayers(map));
     return () => { map.off("moveend", upd); };
@@ -160,21 +174,23 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
       <div className="flex-1 overflow-y-auto text-sm">
         {tab === "pedimento" && (
           <div className="p-3 space-y-3">
-            <p className="text-xs text-muted-foreground">
-              Encuadra el sector y calcula el mayor rectángulo N-S/E-W vacante (máx. 5.000 ha) contra el catastro SERNAGEOMIN en vivo. Vacancia indicativa: confirmar en OJV.
-            </p>
-            <button type="button" onClick={runPedimento} disabled={busy || !map}
-              className="w-full flex items-center justify-center gap-2 rounded bg-primary px-3 py-2 text-sm text-primary-foreground disabled:opacity-50">
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4" />}
-              {busy ? "Calculando…" : "Trazar pedimento en esta vista"}
-            </button>
+            <DesignerPanel map={map} ped={ped} setPed={setPed} runAuto={runPedimento} busy={busy} seedBbox={seed} onMeta={setMeta} />
             {err && <div className="text-xs text-destructive">{err}</div>}
             {ped && (
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="rounded border border-border p-2"><div className="text-muted-foreground">Superficie</div><div className="font-semibold">{ped.areaHa.toLocaleString("es-CL", { maximumFractionDigits: 0 })} ha</div></div>
+                  <div className="rounded border border-border p-2"><div className="text-muted-foreground">Superficie</div><div className="font-semibold">{(meta.kind === "manifestacion" && meta.pertenencias.length ? meta.pertenencias.reduce((a, r) => a + ((r.e - r.w) * (r.n - r.s)) / 10000, 0) : ped.areaHa).toLocaleString("es-CL", { maximumFractionDigits: 0 })} ha</div></div>
                   <div className="rounded border border-border p-2"><div className="text-muted-foreground">Huso / datum</div><div className="font-semibold">{ped.huso}S · {ped.datum}</div></div>
                 </div>
+                <SpectralPanel map={map} ped={ped} />
+                {meta.kind === "manifestacion" && meta.pertenencias.length > 0 && (
+                  <details className="rounded border border-border p-2 text-[10px] font-mono">
+                    <summary className="cursor-pointer text-xs font-sans">Pertenencias ({meta.pertenencias.length})</summary>
+                    {meta.pertenencias.map((r, i) => (
+                      <div key={i}>P{i + 1}: SW N {Math.round(r.s).toLocaleString("es-CL")} E {Math.round(r.w).toLocaleString("es-CL")} · {(r.e - r.w)}×{(r.n - r.s)} m · {((r.e - r.w) * (r.n - r.s)) / 10000} ha</div>
+                    ))}
+                  </details>
+                )}
                 <div className="rounded border border-border p-2 space-y-1.5">
                   <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Datos del escrito</div>
                   {([

@@ -531,13 +531,13 @@ function NationalCatastroMap() {
         mapObjRef.current = map;
 
         map.on("click", "concesiones-fill", (e) => {
-          const props = e.features?.[0]?.properties;
-          if (props) setSelected(props);
+          const f = e.features?.[0];
+          if (f?.properties) setSelected({ ...f.properties, __bbox: geomBbox(f.geometry) });
         });
         map.on("click", "eliminadas-fill", (e) => {
           if (map!.queryRenderedFeatures(e.point, { layers: ["concesiones-fill"] }).length) return;
-          const props = e.features?.[0]?.properties;
-          if (props) setSelected({ ...props, SITUACION_CONCESION: "ELIMINADA" });
+          const f = e.features?.[0];
+          if (f?.properties) setSelected({ ...f.properties, SITUACION_CONCESION: "ELIMINADA", __bbox: geomBbox(f.geometry) });
         });
         for (const id of ["concesiones-fill", "eliminadas-fill"]) {
           map.on("mouseenter", id, () => (map!.getCanvas().style.cursor = "pointer"));
@@ -1000,6 +1000,22 @@ function NationalCatastroMap() {
                 color={colorForSituacion(selected.SITUACION_CONCESION, selected.TIPO_CONCESION)}
               />
             </dl>
+            {Array.isArray(selected.__bbox) && (
+              <button
+                type="button"
+                onClick={() => {
+                  const dead = /ELIMIN|CADUC|EXTING/i.test(String(selected.SITUACION_CONCESION ?? ""));
+                  setToolsOpen(true);
+                  setTimeout(() => window.dispatchEvent(new CustomEvent("catastro:design-from", {
+                    detail: { bbox: selected.__bbox, label: `${dead ? "Caducada" : "Huella de"} ROL ${rolOf(selected) || "s/r"}` },
+                  })), 150);
+                  setSelected(null);
+                }}
+                className="mt-2.5 w-full rounded bg-primary px-2 py-1.5 text-[11px] font-mono text-primary-foreground"
+              >
+                {/ELIMIN|CADUC|EXTING/i.test(String(selected.SITUACION_CONCESION ?? "")) ? "Diseñar sobre esta caducada" : "Diseñar sobre esta huella"}
+              </button>
+            )}
             {rolOf(selected) && (
               <Link
                 to="/catastro/c/$code"
@@ -1115,6 +1131,17 @@ function Chip({
       {children}
     </button>
   );
+}
+
+function geomBbox(g: GeoJSON.Geometry): [number, number, number, number] | null {
+  const pts: number[][] = [];
+  const walk = (c: unknown): void => {
+    if (Array.isArray(c) && typeof c[0] === "number") pts.push(c as number[]);
+    else if (Array.isArray(c)) c.forEach(walk);
+  };
+  if ("coordinates" in g) walk(g.coordinates);
+  if (!pts.length) return null;
+  return [Math.min(...pts.map((p) => p[0])), Math.min(...pts.map((p) => p[1])), Math.max(...pts.map((p) => p[0])), Math.max(...pts.map((p) => p[1]))];
 }
 
 function LegendRow({ color, label, dashed }: { color: string; label: string; dashed?: boolean }) {
