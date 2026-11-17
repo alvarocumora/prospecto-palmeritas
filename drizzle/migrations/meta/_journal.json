@@ -43,6 +43,13 @@
       "when": 1794859795337,
       "tag": "0005_scope_data_sources_ingest_runs_reads",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794924684656,
+      "tag": "0006_scope_reference_reads_to_platform_users",
+      "breakpoints": true
     }
   ]
 }
