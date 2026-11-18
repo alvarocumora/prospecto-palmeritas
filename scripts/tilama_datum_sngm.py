@@ -108,7 +108,7 @@ def main():
     print("ELIMINADAS fin", len(el["features"]))
 
     # Revisión puntual de otro sector (Cerro Alto, Illapel), en WGS84 UTM 19S
-    bb = (-71.11, -31.58, -70.99, -31.47)
+    bb = (-71.25, -31.68, -70.85, -31.38)
     for sit in ("SITUACION_CONCESION <> 'ELIMINADA'", "SITUACION_CONCESION = 'ELIMINADA'"):
         for f in q(2, 32719, {"geometry": ",".join(map(str, bb)), "where": sit})["features"]:
             a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
