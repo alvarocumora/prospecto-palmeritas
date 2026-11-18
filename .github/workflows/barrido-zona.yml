@@ -24,7 +24,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: python -m pip install pillow pyproj
+      - run: python -m pip install pillow pyproj shapely
       - name: Elegir etapa
         run: |
           if ls docs/barrido_faenas/chips_costa_v.json >/dev/null 2>&1; then echo "BARRIDO_ETAPA=chips" >> "$GITHUB_ENV"; fi
