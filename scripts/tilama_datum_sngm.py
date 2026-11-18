@@ -107,6 +107,16 @@ def main():
                                  "psad": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False, default=str))
     print("ELIMINADAS fin", len(el["features"]))
 
+    # Revisión puntual de otro sector (Cerro Alto, Illapel), en WGS84 UTM 19S
+    bb = (-71.11, -31.58, -70.99, -31.47)
+    for sit in ("SITUACION_CONCESION <> 'ELIMINADA'", "SITUACION_CONCESION = 'ELIMINADA'"):
+        for f in q(2, 32719, {"geometry": ",".join(map(str, bb)), "where": sit})["features"]:
+            a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+            print("K|" + json.dumps({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                     "sit": a.get("SITUACION_CONCESION"), "tipo": a.get("TIPO_CONCESION"),
+                                     "titular": a.get("TITULAR_NOMBRE"), "comuna": a.get("COMUNA"),
+                                     "wgs": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False))
+
     # Búsqueda por rol o nombre en todo Chile, incluidas las eliminadas (minas históricas con certificados ENAMI)
     for where in ("NUMERO_ROL LIKE '%032663%'", "UPPER(NOMBRE) LIKE '%TILAMA NORTE%'", "UPPER(NOMBRE) LIKE '%ZORRO%' AND NUMERO_ROL LIKE '04303%'"):
         url = f"{BASE}/2/query?" + urllib.parse.urlencode({"where": where, "outFields": "*", "returnGeometry": "true", "outSR": 24879, "f": "json"})
