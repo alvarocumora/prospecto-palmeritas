@@ -101,9 +101,10 @@ def chips():
     to_ll = Transformer.from_crs(32719, 4326, always_xy=True).transform
     lote = os.environ.get("BARRIDO_LOTE", "costa_v")
     lista = json.loads((ROOT / f"docs/barrido_faenas/chips_{lote}.json").read_text())
-    z, cache = 17, {}
+    cache = {}
     for c in lista:
-        e, n, h = c["E"], c["N"], 300
+        e, n, h = c["E"], c["N"], c.get("h", 300)
+        z = 17 if h <= 300 else 16
         lon0, lat0 = to_ll(e - h, n - h)
         lon1, lat1 = to_ll(e + h, n + h)
         x0, y1 = deg2tile(lon0, lat0, z)
@@ -121,7 +122,7 @@ def chips():
                 img.paste(cache[(tx, ty)], ((tx - int(x0)) * 256, (ty - int(y0)) * 256))
         box = ((x0 - int(x0)) * 256, (y0 - int(y0)) * 256, (x1 - int(x0)) * 256, (y1 - int(y0)) * 256)
         img.crop(tuple(int(v) for v in box)).resize((480, 480)).save(OUT / f"chip_{c['id']}.jpg", quality=80)
-        if len(cache) > 3000:
+        if len(cache) > 1500:
             cache.clear()
     print("chips:", len(lista))
 

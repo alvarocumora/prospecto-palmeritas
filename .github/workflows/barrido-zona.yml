@@ -10,6 +10,7 @@ on:
       - 'scripts/barrido_catastro_zona.py'
       - '.github/workflows/barrido-zona.yml'
       - 'docs/barrido_faenas/chips_*.json'
+      - 'docs/barrido_faenas/lote_actual.txt'
 
 permissions:
   contents: write
@@ -27,14 +28,17 @@ jobs:
       - run: python -m pip install pillow pyproj shapely
       - name: Elegir etapa
         run: |
-          if ls docs/barrido_faenas/chips_costa_v.json >/dev/null 2>&1; then echo "BARRIDO_ETAPA=chips" >> "$GITHUB_ENV"; fi
+          if [ -f docs/barrido_faenas/lote_actual.txt ]; then
+            echo "BARRIDO_ETAPA=chips" >> "$GITHUB_ENV"
+            echo "BARRIDO_LOTE=$(cat docs/barrido_faenas/lote_actual.txt)" >> "$GITHUB_ENV"
+          fi
       - run: python scripts/barrido_catastro_zona.py
       - name: Publicar en rama de datos
         run: |
           cd out/barrido
-          git init -q -b data/barrido-zona
+          git init -q -b "data/barrido-${BARRIDO_LOTE:-zona}"
           git config user.name "tilama-bot"
           git config user.email "tilama-bot@users.noreply.github.com"
           git add -A
           git commit -q -m "Barrido ${BARRIDO_ETAPA:-catastro} ${GITHUB_SHA::7}"
-          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/barrido-zona
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" "data/barrido-${BARRIDO_LOTE:-zona}"
