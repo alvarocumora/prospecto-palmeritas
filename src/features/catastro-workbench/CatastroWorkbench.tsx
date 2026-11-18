@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X } from "lucide-react";
+import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X, CalendarClock, Satellite, ShieldAlert, BookmarkPlus } from "lucide-react";
 import { toast } from "sonner";
 import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
@@ -18,8 +18,14 @@ import { PriorityCheckPanel } from "@/features/catastro-priority/PriorityCheckPa
 import { useMiningBulletins } from "@/hooks/useMiningBulletins";
 import { DesignerPanel, type DesignerHandle } from "./DesignerPanel";
 import { SpectralPanel } from "./SpectralPanel";
+import { OwnCasesPanel } from "./OwnCasesPanel";
+import { downloadEscritoDocx } from "@/lib/cadastre/escritoDocx";
+import { pedimentoInDatum, utmToLngLat, PSAD56_NOTE, type Datum } from "@/lib/cadastre/datum";
+import { loadCases, saveCases, overlapsWithOwn, type OwnCase } from "@/lib/cadastre/ownCases";
+import { ENAMI_ANTECEDENTS } from "@/lib/cadastre/enamiAntecedents";
 
-type Tab = "pedimento" | "prelacion" | "boletin";
+type Tab = "pedimento" | "prelacion" | "boletin" | "causas";
+const ENAMI_SRC = "wb-enami";
 const PED_SRC = "wb-pedimento";
 const BOL_SRC = "wb-boletin";
 
@@ -28,6 +34,20 @@ function ensureLayers(map: MLMap) {
     map.addSource(PED_SRC, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
     map.addLayer({ id: `${PED_SRC}-fill`, type: "fill", source: PED_SRC, paint: { "fill-color": "#c2410c", "fill-opacity": 0.22 } });
     map.addLayer({ id: `${PED_SRC}-line`, type: "line", source: PED_SRC, paint: { "line-color": "#c2410c", "line-width": 3 } });
+  }
+  if (!map.getSource(ENAMI_SRC)) {
+    map.addSource(ENAMI_SRC, {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: ENAMI_ANTECEDENTS.map((a) => ({
+          type: "Feature", properties: { name: `${a.name} · ENAMI` },
+          geometry: { type: "Point", coordinates: utmToLngLat(a.e, a.n, 19, "WGS84") },
+        })),
+      },
+    });
+    map.addLayer({ id: `${ENAMI_SRC}-pt`, type: "circle", source: ENAMI_SRC, paint: { "circle-radius": 8, "circle-color": "#ca8a04", "circle-stroke-color": "#ffffff", "circle-stroke-width": 2 } });
+    map.addLayer({ id: `${ENAMI_SRC}-lbl`, type: "symbol", source: ENAMI_SRC, minzoom: 10, layout: { "text-field": ["get", "name"], "text-size": 11, "text-offset": [0, 1.4] }, paint: { "text-color": "#ffffff", "text-halo-color": "#1e293b", "text-halo-width": 1.5 } });
   }
   if (!map.getSource(BOL_SRC)) {
     map.addSource(BOL_SRC, { type: "geojson", data: { type: "FeatureCollection", features: [] } });
@@ -61,6 +81,33 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
   const [datos, setDatos] = useState<EscritoDatos>({});
   const [seed, setSeed] = useState<{ bbox: [number, number, number, number]; label: string } | null>(null);
   const [meta, setMeta] = useState<DesignerHandle>({ kind: "pedimento", pertenencias: [] });
+  const [datum, setDatum] = useState<Datum>("WGS84");
+  const [own, setOwn] = useState<OwnCase[]>([]);
+  useEffect(() => setOwn(loadCases()), [tab]);
+  const pedOut = useMemo(() => (ped ? pedimentoInDatum(ped, datum) : null), [ped, datum]);
+  const ownHits = useMemo(() => (ped ? overlapsWithOwn(ped.rectangleWgs84, own) : []), [ped, own]);
+  const saveAsOwn = () => {
+    if (!ped) return;
+    const name = (datos.concesion || "").trim() || `DISEÑO ${new Date().toISOString().slice(0, 10)}`;
+    const rit = window.prompt("Rol / RIT asignado (deja vacío si aún no se ingresa):", "") || null;
+    const next: OwnCase[] = [...loadCases(), {
+      id: `${Date.now()}`, name, rit, court: datos.tribunal || null, filedAt: new Date().toISOString().slice(0, 10),
+      ha: ped.areaHa, decision: "pagar", paid: false, geometry: ped.rectangleWgs84,
+    }];
+    saveCases(next); setOwn(next); toast.success(`${name} guardada en Mis causas`);
+  };
+  const auditSat = () => {
+    if (!map || !ped) return;
+    window.dispatchEvent(new CustomEvent("catastro:basemap", { detail: "satelite" }));
+    const c = ped.rectangleWgs84.geometry.coordinates[0];
+    const xs = c.map((p) => p[0]), ys = c.map((p) => p[1]);
+    map.fitBounds([[Math.min(...xs), Math.min(...ys)], [Math.max(...xs), Math.max(...ys)]], { padding: 40, maxZoom: 17 });
+  };
+  const earthUrl = () => {
+    if (!ped) return "#";
+    const c = ped.rectangleWgs84.geometry.coordinates[0];
+    return `https://earth.google.com/web/@${((c[0][1] + c[2][1]) / 2).toFixed(5)},${((c[0][0] + c[2][0]) / 2).toFixed(5)},800a,3000d,35y,0h,0t,0r`;
+  };
   useEffect(() => {
     const onSeed = (e: Event) => {
       const d = (e as CustomEvent<{ bbox: [number, number, number, number]; label: string }>).detail;
@@ -171,6 +218,7 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
         {tabBtn("pedimento", "Pedimento", Ruler)}
         {tabBtn("prelacion", "Prelación", Scale)}
         {tabBtn("boletin", `Boletín${inView.length ? ` (${inView.length})` : ""}`, Newspaper)}
+        {tabBtn("causas", "Mis causas", CalendarClock)}
       </div>
       <div className="flex-1 overflow-y-auto text-sm">
         {tab === "pedimento" && (
@@ -182,6 +230,20 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   <div className="rounded border border-border p-2"><div className="text-muted-foreground">Superficie</div><div className="font-semibold">{(meta.kind === "manifestacion" && meta.pertenencias.length ? meta.pertenencias.reduce((a, r) => a + ((r.e - r.w) * (r.n - r.s)) / 10000, 0) : ped.areaHa).toLocaleString("es-CL", { maximumFractionDigits: 0 })} ha</div></div>
                   <div className="rounded border border-border p-2"><div className="text-muted-foreground">Huso / datum</div><div className="font-semibold">{ped.huso}S · {ped.datum}</div></div>
+                </div>
+                {ownHits.length > 0 && (
+                  <div className="rounded border border-destructive p-2 text-xs text-destructive flex gap-2">
+                    <ShieldAlert className="w-4 h-4 shrink-0" />
+                    <div>Pisa una causa propia: {ownHits.map((h) => `${h.name} (${h.rit ?? "s/rol"}, ${h.ha} ha)`).join(" · ")}. Evita pagar dos tasas por el mismo terreno.</div>
+                  </div>
+                )}
+                <div className="rounded border border-border p-2 space-y-1.5">
+                  <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">¿Hay faena dentro?</div>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={auditSat} className="flex-1 flex items-center justify-center gap-1.5 rounded border border-border px-2 py-1.5 text-xs hover:bg-muted"><Satellite className="w-3.5 h-3.5" />Ver bloque en satélite</button>
+                    <a href={earthUrl()} target="_blank" rel="noreferrer" className="flex-1 flex items-center justify-center rounded border border-border px-2 py-1.5 text-xs hover:bg-muted">Abrir en Google Earth</a>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground">Confirma cortes, rajos, desmontes o caminos mineros dentro del polígono antes de firmar. Puntos dorados: eliminadas con entregas a ENAMI.</p>
                 </div>
                 <SpectralPanel map={map} ped={ped} />
                 {meta.kind === "manifestacion" && meta.pertenencias.length > 0 && (
@@ -220,14 +282,26 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                   <button type="button" onClick={() => downloadText(pedimentoGeoJson(ped, datos.concesion || undefined), `pedimento-${ped.areaHa}ha.geojson`, "application/geo+json")}
                     className="flex-1 flex items-center justify-center gap-1.5 rounded border border-border px-2 py-1.5 text-xs hover:bg-muted"><Download className="w-3.5 h-3.5" />GeoJSON (QGIS)</button>
                 </div>
-                <pre className="rounded border border-border bg-muted/40 p-2 text-[10px] font-mono whitespace-pre-wrap">{ojvVertexText(ped)}</pre>
+                <div className="flex rounded border border-border overflow-hidden text-xs">
+                  {(["WGS84", "PSAD56"] as const).map((d) => (
+                    <button key={d} type="button" onClick={() => setDatum(d)} className={`flex-1 py-1 ${datum === d ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground"}`}>{d}</button>
+                  ))}
+                </div>
+                <pre className="rounded border border-border bg-muted/40 p-2 text-[10px] font-mono whitespace-pre-wrap">{ojvVertexText(pedOut!)}</pre>
+                {datum === "PSAD56" && <p className="text-[10px] text-muted-foreground">{PSAD56_NOTE}</p>}
                 <div className="text-[10px] text-muted-foreground">{ped.concessionsChecked} concesiones revisadas.</div>
                 <div className="grid grid-cols-1 gap-1.5">
-                  <button type="button" onClick={() => { navigator.clipboard.writeText(ojvVertexText(ped)); toast.success("Vértices copiados para OJV"); }}
+                  <button type="button" onClick={() => { navigator.clipboard.writeText(ojvVertexText(pedOut!)); toast.success(`Vértices ${datum} copiados para OJV`); }}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Copy className="w-3.5 h-3.5" />Copiar minuta de vértices (OJV)</button>
-                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "pedimento", datos)}
+                  <button type="button" onClick={() => downloadEscritoDocx(pedOut!, "pedimento", datos)}
+                    className="flex items-center gap-2 rounded border border-primary px-3 py-1.5 text-xs text-primary hover:bg-muted"><FileText className="w-3.5 h-3.5" />Word (.docx) · pedimento ({datum})</button>
+                  <button type="button" onClick={() => downloadEscritoDocx(pedOut!, "manifestacion", datos)}
+                    className="flex items-center gap-2 rounded border border-primary px-3 py-1.5 text-xs text-primary hover:bg-muted"><FileText className="w-3.5 h-3.5" />Word (.docx) · manifestación ({datum})</button>
+                  <button type="button" onClick={saveAsOwn}
+                    className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><BookmarkPlus className="w-3.5 h-3.5" />Guardar como causa propia (blindaje y plazo TGR)</button>
+                  <button type="button" onClick={() => downloadPedimentoEscrito(pedOut!, "pedimento", datos)}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><FileText className="w-3.5 h-3.5" />Escrito borrador · pedimento (exploración)</button>
-                  <button type="button" onClick={() => downloadPedimentoEscrito(ped, "manifestacion", datos)}
+                  <button type="button" onClick={() => downloadPedimentoEscrito(pedOut!, "manifestacion", datos)}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><FileText className="w-3.5 h-3.5" />Escrito borrador · manifestación (explotación)</button>
                   <button type="button" onClick={() => setTab("prelacion")}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Scale className="w-3.5 h-3.5" />Revisar prelación de este sector</button>
@@ -240,6 +314,7 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
         {tab === "prelacion" && center && (
           <PriorityCheckPanel key={`${center.lat.toFixed(4)},${center.lng.toFixed(4)}`} initialLat={center.lat} initialLng={center.lng} />
         )}
+        {tab === "causas" && <OwnCasesPanel onChange={setOwn} />}
         {tab === "boletin" && (
           <div className="p-3 space-y-2">
             <p className="text-xs text-muted-foreground">Publicaciones del Boletín Oficial de Minería con ubicación dentro de la vista (puntos ámbar en el mapa). Publicar no fija prioridad: manda el ingreso judicial.</p>

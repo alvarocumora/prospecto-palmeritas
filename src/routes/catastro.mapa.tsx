@@ -293,6 +293,11 @@ function NationalCatastroMap() {
   const [tipo, setTipo] = useState<TipoFilter>(search.tipo ?? "all");
   const [situacion, setSituacion] = useState<SituacionFilter>(search.sit ?? "all");
   const [basemap, setBasemap] = useState<Basemap>(search.base ?? "satelite");
+  useEffect(() => {
+    const on = (e: Event) => setBasemap((e as CustomEvent<Basemap>).detail);
+    window.addEventListener("catastro:basemap", on);
+    return () => window.removeEventListener("catastro:basemap", on);
+  }, []);
   const [showEliminadas, setShowEliminadas] = useState<boolean>(!!search.elim);
   const [showFilters, setShowFilters] = useState(false);
   const [showLabels, setShowLabels] = useState(true);
