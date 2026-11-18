@@ -1,0 +1,53 @@
+{
+ "nota": "Esri World Imagery; georreferencia en WGS84 (EPSG:4326) por esquinas de tesela Web Mercator",
+ "mosaicos": [
+  {
+   "archivo": "mosaico_petorca_sur_o_z17.jpg",
+   "z": 17,
+   "ancho": 4608,
+   "alto": 7168,
+   "tile_x0": 39619,
+   "tile_y0": 77904,
+   "lon_oeste": -71.18316650390625,
+   "lat_norte": -32.1384086967725,
+   "lon_este": -71.13372802734375,
+   "lat_sur": -32.20350534542367
+  },
+  {
+   "archivo": "mosaico_petorca_sur_e_z17.jpg",
+   "z": 17,
+   "ancho": 4608,
+   "alto": 7168,
+   "tile_x0": 39635,
+   "tile_y0": 77904,
+   "lon_oeste": -71.13922119140625,
+   "lat_norte": -32.1384086967725,
+   "lon_este": -71.08978271484375,
+   "lat_sur": -32.20350534542367
+  },
+  {
+   "archivo": "mosaico_petorca_este_s_z17.jpg",
+   "z": 17,
+   "ancho": 5376,
+   "alto": 5120,
+   "tile_x0": 39652,
+   "tile_y0": 77885,
+   "lon_oeste": -71.092529296875,
+   "lat_norte": -32.094209486993975,
+   "lon_este": -71.03485107421875,
+   "lat_sur": -32.14073437803539
+  },
+  {
+   "archivo": "mosaico_petorca_este_n_z17.jpg",
+   "z": 17,
+   "ancho": 7424,
+   "alto": 6144,
+   "tile_x0": 39662,
+   "tile_y0": 77862,
+   "lon_oeste": -71.0650634765625,
+   "lat_norte": -32.040676557717454,
+   "lon_este": -70.98541259765625,
+   "lat_sur": -32.09653629470278
+  }
+ ]
+}
