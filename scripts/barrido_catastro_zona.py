@@ -50,13 +50,13 @@ def _get_json(url: str, tries: int = 5) -> dict:
 
 
 def bajar(bbox: tuple) -> list:
-    """Todas las concesiones (capa 2) que tocan el recuadro, paginando de a 1000."""
+    """Todas las concesiones (capa 2) que tocan el recuadro, paginando de a 500."""
     out, off = [], 0
     while True:
         p = {"geometry": ",".join(map(str, bbox)), "geometryType": "esriGeometryEnvelope", "inSR": 4326,
              "outSR": 32719, "spatialRel": "esriSpatialRelIntersects", "where": "1=1",
              "outFields": "NOMBRE,NUMERO_ROL,DV_ROL,SITUACION_CONCESION,TIPO_CONCESION,TITULAR_NOMBRE,COMUNA,HECTAREAS,FECHA_VENCIMIENTO",
-             "returnGeometry": "true", "f": "json", "resultRecordCount": 1000, "resultOffset": off,
+             "returnGeometry": "true", "f": "json", "resultRecordCount": 500, "resultOffset": off,
              "orderByFields": "OBJECTID"}
         d = _get_json(f"{BASE}/2/query?" + urllib.parse.urlencode(p))
         if "error" in d:
@@ -71,9 +71,9 @@ def bajar(bbox: tuple) -> list:
                         "venc": a.get("FECHA_VENCIMIENTO"),
                         "rings": [[[round(x), round(y)] for x, y in r] for r in rings]})
         print(f"  offset {off}: {len(fs)}")
-        if len(fs) < 1000 and not d.get("exceededTransferLimit"):
+        if not fs or (len(fs) < 500 and not d.get("exceededTransferLimit")):
             break
-        off += 1000
+        off += len(fs)  # el servidor entrega como máximo 500 por página
     return out
 
 
