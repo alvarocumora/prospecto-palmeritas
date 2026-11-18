@@ -83,6 +83,7 @@ def main():
                 rondas += 1
         filas.append({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
                       "sit": a.get("SITUACION_CONCESION"), "datum": a.get("DATUM"),
+                      "tipo": a.get("TIPO_CONCESION"), "titular": a.get("TITULAR") or a.get("NOMBRE_TITULAR"),
                       "psad": [[round(x, 2), round(y, 2)] for x, y in ring_p],
                       "wgs": [[round(x, 2), round(y, 2)] for x, y in ring_w]})
     print(f"vertices {len(dE)} | redondos en 24879: {rondas}")
