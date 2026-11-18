@@ -1,0 +1,40 @@
+name: Barrido catastro costa y V Región
+
+# Baja el catastro SERNAGEOMIN (vigentes y eliminadas) de zonas nuevas o, con
+# BARRIDO_ETAPA=chips, los recortes satelitales de la lista preparada.
+# Publica el resultado en la rama data/barrido-zona (no toca la rama del PR).
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/barrido_catastro_zona.py'
+      - '.github/workflows/barrido-zona.yml'
+      - 'docs/barrido_faenas/chips_*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  barrido:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install pillow pyproj
+      - name: Elegir etapa
+        run: |
+          if ls docs/barrido_faenas/chips_costa_v.json >/dev/null 2>&1; then echo "BARRIDO_ETAPA=chips" >> "$GITHUB_ENV"; fi
+      - run: python scripts/barrido_catastro_zona.py
+      - name: Publicar en rama de datos
+        run: |
+          cd out/barrido
+          git init -q -b data/barrido-zona
+          git config user.name "tilama-bot"
+          git config user.email "tilama-bot@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Barrido ${BARRIDO_ETAPA:-catastro} ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/barrido-zona
