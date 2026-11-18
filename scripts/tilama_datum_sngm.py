@@ -95,6 +95,18 @@ def main():
         print("C|" + json.dumps(r, ensure_ascii=False))
     print("CONCESIONES_JSON_FIN")
 
+    # Concesiones eliminadas del sector: faenas históricas cuyo terreno puede estar libre hoy
+    el = q(2, 24879, {"where": "SITUACION_CONCESION = 'ELIMINADA'"})
+    if el.get("fields"):
+        print("CAMPOS capa 2:", [f["name"] for f in el["fields"]])
+    for f in el["features"]:
+        a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+        print("E|" + json.dumps({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                 "tipo": a.get("TIPO_CONCESION"),
+                                 "attrs": {k: v for k, v in a.items() if v not in (None, "") and k not in ("NOMBRE", "OBJECTID")},
+                                 "psad": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False, default=str))
+    print("ELIMINADAS fin", len(el["features"]))
+
     # Búsqueda por rol o nombre en todo Chile, incluidas las eliminadas (minas históricas con certificados ENAMI)
     for where in ("NUMERO_ROL LIKE '%032663%'", "UPPER(NOMBRE) LIKE '%TILAMA NORTE%'", "UPPER(NOMBRE) LIKE '%ZORRO%' AND NUMERO_ROL LIKE '04303%'"):
         url = f"{BASE}/2/query?" + urllib.parse.urlencode({"where": where, "outFields": "*", "returnGeometry": "true", "outSR": 24879, "f": "json"})
