@@ -112,13 +112,15 @@ def sur():
     OUT.mkdir(parents=True, exist_ok=True)
     meta = {"nota": "Esri World Imagery; georreferencia en WGS84 (EPSG:4326) por esquinas de tesela Web Mercator",
             "mosaicos": []}
-    for nombre, e0, n0, e1, n1 in (("sur_oeste_s", 290000, 6439000, 295200, 6444000),
-                                   ("sur_oeste_n", 290000, 6444000, 295200, 6449000)):
+    for nombre, e0, n0, e1, n1 in (("petorca_sur_o", 294500, 6435500, 298800, 6442500),
+                                   ("petorca_sur_e", 298800, 6435500, 303000, 6442500),
+                                   ("petorca_este_s", 303000, 6442500, 308000, 6447500),
+                                   ("petorca_este_n", 305500, 6447500, 312500, 6453500)):
         a = psad_to_ll(e0, n0); b = psad_to_ll(e1, n1)
         meta["mosaicos"].append(mosaic(nombre, a[0], a[1], b[0], b[1], 17, quality=78))
     (OUT / "mosaicos.json").write_text(json.dumps(meta, indent=1))
-    lon0, lat0 = psad_to_ll(294000, 6438000)
-    lon1, lat1 = psad_to_ll(310000, 6450000)
+    lon0, lat0 = psad_to_ll(294000, 6435000)
+    lon1, lat1 = psad_to_ll(313000, 6454000)
     (OUT / "osm.geojson").write_text(json.dumps(osm(lon0, lat0, lon1, lat1), ensure_ascii=False))
 
 
