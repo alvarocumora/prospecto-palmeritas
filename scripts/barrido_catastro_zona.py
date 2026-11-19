@@ -195,7 +195,20 @@ def chips():
 if __name__ == "__main__":
     lote = os.environ.get("BARRIDO_LOTE", "")
     OUT.mkdir(parents=True, exist_ok=True)
-    if lote == "validar":
+    if lote == "limache":
+        catastro({"limache": (-71.16, -33.13, -71.02, -33.03)})
+        chips()
+        oq = """[out:json][timeout:60];
+is_in(-33.0791,-71.0913)->.a;
+area.a["admin_level"~"6|8"];
+out tags;"""
+        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=urllib.parse.urlencode({"data": oq}).encode(), headers=HEADERS)
+        try:
+            with urllib.request.urlopen(req, timeout=90) as r:
+                (OUT / "comuna_limache.json").write_text(r.read().decode())
+        except Exception as e:  # noqa: BLE001
+            print("overpass", e)
+    elif lote == "validar":
         catastro(ZONAS_VALIDAR)
         chips()
     elif lote == "choapa":
