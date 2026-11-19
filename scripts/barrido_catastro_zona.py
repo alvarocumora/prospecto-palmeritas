@@ -195,7 +195,11 @@ def chips():
 if __name__ == "__main__":
     lote = os.environ.get("BARRIDO_LOTE", "")
     OUT.mkdir(parents=True, exist_ok=True)
-    if lote == "limache":
+    if lote == "otras":
+        cfg = json.loads((ROOT / "docs/barrido_faenas/otras_causas.json").read_text())
+        catastro({k: tuple(v) for k, v in cfg["zonas"].items()})
+        chips()
+    elif lote == "limache":
         catastro({"limache": (-71.16, -33.13, -71.02, -33.03)})
         chips()
         oq = """[out:json][timeout:60];
