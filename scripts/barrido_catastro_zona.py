@@ -36,6 +36,8 @@ ZONAS = {
 }
 # Lote "choapa": interior de Choapa (Illapel, Salamanca, Canela alta, Combarbalá sur)
 ZONAS_CHOAPA = {"choapa": (-71.55, -32.22, -70.40, -30.95)}
+# Lote "validar": catastro del día sobre todas las piezas por presentar
+ZONAS_VALIDAR = {"tilama_petorca": (-71.32, -32.25, -70.97, -31.96), "cerro_alto": (-71.25, -31.68, -70.85, -31.38)}
 
 GEOCODE = [
     "Planta Portezuelo ENAMI Illapel", "Portezuelo, Illapel", "Minera Las Cenizas Cabildo",
@@ -167,7 +169,7 @@ def chips():
     cache = {}
     for c in lista:
         e, n, h = c["E"], c["N"], c.get("h", 300)
-        z = 17 if h <= 300 else 16
+        z = 17 if h <= 300 or c.get("px", 480) >= 1000 else 16
         lon0, lat0 = to_ll(e - h, n - h)
         lon1, lat1 = to_ll(e + h, n + h)
         x0, y1 = deg2tile(lon0, lat0, z)
@@ -184,7 +186,7 @@ def chips():
                         cache[(tx, ty)] = Image.new("RGB", (256, 256))
                 img.paste(cache[(tx, ty)], ((tx - int(x0)) * 256, (ty - int(y0)) * 256))
         box = ((x0 - int(x0)) * 256, (y0 - int(y0)) * 256, (x1 - int(x0)) * 256, (y1 - int(y0)) * 256)
-        img.crop(tuple(int(v) for v in box)).resize((480, 480)).save(OUT / f"chip_{c['id']}.jpg", quality=80)
+        img.crop(tuple(int(v) for v in box)).resize((c.get("px", 480), c.get("px", 480))).save(OUT / f"chip_{c['id']}.jpg", quality=80)
         if len(cache) > 1500:
             cache.clear()
     print("chips:", len(lista))
@@ -193,7 +195,10 @@ def chips():
 if __name__ == "__main__":
     lote = os.environ.get("BARRIDO_LOTE", "")
     OUT.mkdir(parents=True, exist_ok=True)
-    if lote == "choapa":
+    if lote == "validar":
+        catastro(ZONAS_VALIDAR)
+        chips()
+    elif lote == "choapa":
         geocode()
         catastro(ZONAS_CHOAPA)
     elif lote == "rutas":
