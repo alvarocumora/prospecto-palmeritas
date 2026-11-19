@@ -1,0 +1,131 @@
+{
+ "Planta Portezuelo ENAMI Illapel": [],
+ "Portezuelo, Illapel": [],
+ "Minera Las Cenizas Cabildo": [
+  {
+   "place_id": 2167181,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 800529882,
+   "lat": "-32.4359147",
+   "lon": "-71.0748217",
+   "class": "highway",
+   "type": "residential",
+   "place_rank": 26,
+   "importance": 0.05337333409628439,
+   "addresstype": "residential",
+   "name": "Minera Las Cenizas",
+   "display_name": "Minera Las Cenizas, Villa Las Cenizas, Cabildo, Provincia de Petorca, Región de Valparaíso, Chile",
+   "boundingbox": [
+    "-32.4370550",
+    "-32.4347203",
+    "-71.0760444",
+    "-71.0735790"
+   ]
+  }
+ ],
+ "Planta Cabildo Las Cenizas": [],
+ "Planta Delta ENAMI Ovalle": [
+  {
+   "place_id": 5068758,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1221204661,
+   "lat": "-30.4868258",
+   "lon": "-71.2202381",
+   "class": "landuse",
+   "type": "industrial",
+   "place_rank": 24,
+   "importance": 0.08005282291905086,
+   "addresstype": "industrial",
+   "name": "Planta Delta Enami",
+   "display_name": "Planta Delta Enami, Ovalle, Provincia de Limarí, Región de Coquimbo, Chile",
+   "boundingbox": [
+    "-30.5009890",
+    "-30.4731415",
+    "-71.2240524",
+    "-71.2082381"
+   ]
+  }
+ ],
+ "Minera Barba Combarbalá": [],
+ "Planta Catemu CEMIN": [
+  {
+   "place_id": 2158526,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1247202985,
+   "lat": "-32.7723366",
+   "lon": "-70.9923683",
+   "class": "landuse",
+   "type": "industrial",
+   "place_rank": 24,
+   "importance": 0.08004759822995343,
+   "addresstype": "industrial",
+   "name": "Planta Catemu - Cemin",
+   "display_name": "Planta Catemu - Cemin, Catemu, Provincia de San Felipe de Aconcagua, Región de Valparaíso, Chile",
+   "boundingbox": [
+    "-32.7781221",
+    "-32.7663819",
+    "-70.9996014",
+    "-70.9848668"
+   ]
+  }
+ ],
+ "Fundición Ventanas": [
+  {
+   "place_id": 2134464,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 92357488,
+   "lat": "-32.7596082",
+   "lon": "-71.4816172",
+   "class": "man_made",
+   "type": "works",
+   "place_rank": 30,
+   "importance": 0.19938740066310082,
+   "addresstype": "man_made",
+   "name": "Ex Fundición Ventanas",
+   "display_name": "Ex Fundición Ventanas, Ruta E-30-F, Ventanas, Puchuncaví, Provincia de Valparaíso, Región de Valparaíso, 2490000, Chile",
+   "boundingbox": [
+    "-32.7683288",
+    "-32.7506067",
+    "-71.4859504",
+    "-71.4739237"
+   ]
+  }
+ ],
+ "Minera Tres Valles Salamanca": [
+  {
+   "place_id": 5046376,
+   "licence": "Data © OpenStreetMap contributors, ODbL 1.0. http://osm.org/copyright",
+   "osm_type": "way",
+   "osm_id": 1241922625,
+   "lat": "-31.7274317",
+   "lon": "-71.0126967",
+   "class": "landuse",
+   "type": "industrial",
+   "place_rank": 24,
+   "importance": 0.08004667505912869,
+   "addresstype": "industrial",
+   "name": "Planta Quilmenco - Minera Tres Valles",
+   "display_name": "Planta Quilmenco - Minera Tres Valles, Salamanca, Provincia de Choapa, Región de Coquimbo, Chile",
+   "boundingbox": [
+    "-31.7449420",
+    "-31.7111413",
+    "-71.0252682",
+    "-71.0001198"
+   ]
+  }
+ ],
+ "overpass": {
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+   "timestamp_osm_base": "2026-11-19T02:55:59Z",
+   "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [],
+  "remark": "runtime error: Query timed out in \"query\" at line 4 after 132 seconds."
+ }
+}
