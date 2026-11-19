@@ -192,8 +192,48 @@ def chips():
     print("chips:", len(lista))
 
 
+def auditoria():
+    """Cómo y cuándo se actualiza el catastro: metadatos de la capa y fechas de creación/actualización."""
+    res = {}
+    for lyr in ("", "/0", "/1", "/2"):
+        try:
+            res["meta" + lyr] = _get_json(f"{BASE}{lyr}?f=json")
+        except Exception as e:  # noqa: BLE001
+            res["meta" + lyr] = str(e)
+    F = "NOMBRE,NUMERO_ROL,DV_ROL,SITUACION_CONCESION,TIPO_CONCESION,TITULAR_NOMBRE,COMUNA,HECTAREAS,FECHA_VENCIMIENTO,ORIGEN,FECHA_CREACION,FECHA_ACTUALIZACION,DATUM"
+    def q(where, n=200, order="FECHA_CREACION DESC", geom=False, extra=None):
+        p = {"where": where, "outFields": F, "returnGeometry": "false", "f": "json",
+             "resultRecordCount": n, "orderByFields": order}
+        p.update(extra or {})
+        try:
+            return _get_json(f"{BASE}/2/query?" + urllib.parse.urlencode(p))
+        except Exception as e:  # noqa: BLE001
+            return {"error": str(e)}
+    res["ultimas_creadas_pais"] = q("1=1", 300)
+    res["ultimas_actualizadas_pais"] = q("1=1", 300, "FECHA_ACTUALIZACION DESC")
+    bb = {"geometry": "-71.8,-33.5,-70.3,-30.9", "geometryType": "esriGeometryEnvelope", "inSR": 4326, "spatialRel": "esriSpatialRelIntersects"}
+    res["tramite_zona_recientes"] = q("SITUACION_CONCESION = 'EN TRAMITE'", 500, "FECHA_CREACION DESC", extra=bb)
+    res["valle_escondido"] = q("UPPER(TITULAR_NOMBRE) LIKE '%VALLE ESCONDIDO%'", 500)
+    res["nombres_nuestros"] = q("(UPPER(NOMBRE) LIKE 'MARTINA %' OR UPPER(NOMBRE) LIKE 'LEONOR %' OR UPPER(NOMBRE) LIKE 'ELARA %')", 500, extra=bb)
+    for k in ("ORIGEN", "SITUACION_CONCESION"):
+        p = {"where": "1=1", "outStatistics": json.dumps([{"statisticType": "count", "onStatisticField": "OBJECTID", "outStatisticFieldName": "n"},
+             {"statisticType": "max", "onStatisticField": "FECHA_CREACION", "outStatisticFieldName": "max_creacion"},
+             {"statisticType": "max", "onStatisticField": "FECHA_ACTUALIZACION", "outStatisticFieldName": "max_actualizacion"}]),
+             "groupByFieldsForStatistics": k, "f": "json"}
+        try:
+            res["stats_" + k] = _get_json(f"{BASE}/2/query?" + urllib.parse.urlencode(p))
+        except Exception as e:  # noqa: BLE001
+            res["stats_" + k] = str(e)
+    (OUT / "auditoria_catastro.json").write_text(json.dumps(res, ensure_ascii=False, indent=1, default=str))
+    print("auditoria lista")
+
+
 if __name__ == "__main__":
     lote = os.environ.get("BARRIDO_LOTE", "")
+    if lote == "auditoria":
+        OUT.mkdir(parents=True, exist_ok=True)
+        auditoria()
+        sys.exit(0)
     OUT.mkdir(parents=True, exist_ok=True)
     if lote == "otras":
         cfg = json.loads((ROOT / "docs/barrido_faenas/otras_causas.json").read_text())
