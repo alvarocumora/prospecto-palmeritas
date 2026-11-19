@@ -1,0 +1,21 @@
+muestra;E_WGS84;N_WGS84;CuT_pct;CuSol_pct;CuInsol_pct;Ag_gt;Au_gt;tipo;lugar;concesion_titular
+TIL1A;302025;6453773;4.193;2.025;2.168;124;0.21;canaleta/acopio;cerca TOO-220;LOS VERDES 4 (Fernandez, arranque)
+TIL1B;302025;6453773;2.572;1.746;0.826;45;0.17;canaleta/acopio;cerca TOO-220;LOS VERDES 4 (Fernandez, arranque)
+TIL1C;302025;6453773;4.319;2.175;2.144;122;0.04;canaleta/acopio;cerca TOO-220;LOS VERDES 4 (Fernandez, arranque)
+TIL2A;301103;6454455;13.533;12.923;0.61;160;5.09;rock chip;La Castellana;LOS VERDES 5 (Fernandez, arranque)
+TIL2B;301103;6454455;9.395;9.198;0.197;188;7.48;rock chip;La Castellana;LOS VERDES 5 (Fernandez, arranque)
+TIL2C;301103;6454455;9.215;8.916;0.299;259;38.33;rock chip;La Castellana;LOS VERDES 5 (Fernandez, arranque)
+TIL4A;300403;6455200;1.586;1.169;0.417;13;0.48;rock chip;;ALTO LOS VERDES 2 (Fernandez, anexo)
+TIL4B;300376;6455200;1.764;1.597;0.167;9;2.71;rock chip;;ALTO LOS VERDES 2 (Fernandez, anexo)
+TIL4C;300376;6455200;0.519;0.483;0.036;<2;1.15;rock chip;;ALTO LOS VERDES 2 (Fernandez, anexo)
+TIL5A;300527;6452753;0.524;0.437;0.087;<2;0.12;rock chip;Mina Granero;PEUMO 1/20 (arranque) + PLAZETAS 2 (Prieto) superpuesta
+TIL5B;300527;6452753;0.486;0.357;0.129;<2;0.25;rock chip;Mina Granero;PEUMO 1/20 + PLAZETAS 2
+TIL5C;300527;6452753;5.46;4.734;0.726;115;0.62;seleccion acopio;Mina Granero;PEUMO 1/20 + PLAZETAS 2
+TIL6;300128;6452963;3.758;2.896;0.862;7;0.95;rock chip;;PEUMO 1/20 + PLAZETAS 2
+TIL7A;297369;6454397;2.21;0.113;2.097;3;0.13;seleccion acopio;labores MANDELA;MANDELA (tercero)
+TIL7B;297369;6454397;3.674;0.195;3.479;11;0.61;seleccion acopio;labores MANDELA;MANDELA (tercero)
+TIL7C;297369;6454397;4.686;0.132;4.554;2;0.62;seleccion acopio;labores MANDELA;MANDELA (tercero)
+TIL8A;297294;6453332;1.557;1.079;0.478;<2;0.11;canaleta;;CHELE NORTE (tercero)
+TIL8B;297294;6453332;0.755;0.524;0.231;<2;0.16;canaleta;;CHELE NORTE (tercero)
+TIL8C;297294;6453332;1.378;0.716;0.662;<2;0.06;seleccion acopio;;CHELE NORTE (tercero)
+TIL8D;297294;6453332;1.535;0.592;0.943;<2;0.08;seleccion acopio;;CHELE NORTE (tercero)
