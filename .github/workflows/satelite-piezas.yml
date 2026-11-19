@@ -9,7 +9,7 @@ on:
       - '.github/workflows/satelite-piezas.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   piezas:
@@ -29,3 +29,10 @@ jobs:
           name: satelite-piezas
           path: out/satelite_piezas/
           retention-days: 30
+      - name: Publicar en rama de datos
+        run: |
+          cd out/satelite_piezas
+          git init -q -b data/satelite-piezas
+          git config user.name "tilama-bot"; git config user.email "tilama-bot@users.noreply.github.com"
+          git add -A; git commit -q -m "Satélite por pieza ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/satelite-piezas
