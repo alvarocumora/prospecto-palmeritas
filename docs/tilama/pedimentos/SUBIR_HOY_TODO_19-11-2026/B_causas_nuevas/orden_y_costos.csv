@@ -8,22 +8,18 @@
 1_LOS_VILOS;7;MARTINA 15;Los Vilos;300;300.0;0.0;108660;145749;Cierre noreste (señal de Mo)
 1_LOS_VILOS;8;ELARA 9;Los Vilos;200;199.1;0.9;72440;145749;"Señal de Mo noreste; explotaciones SOL 3 y FERNANDA 2 en trámite pegadas"
 1_LOS_VILOS;9;ELARA 16;Los Vilos;200;200.0;0.0;72440;145749;"Señal de Mo noreste; SOL 3 en trámite pegada"
-1_LOS_VILOS;10;ELARA 17;Los Vilos;100;100.0;0.0;36220;145749;Cierre noreste
 1_LOS_VILOS;11;MARTINA 16;Los Vilos;300;294.0;6.0;108660;145749;Acceso al núcleo
-1_LOS_VILOS;12;MARTINA 18;Los Vilos;200;166.0;34.0;72440;145749;NUR 1C (Mansour) en trámite pegada
 2_PETORCA;1;MARTINA 47;Petorca;300;270.7;29.3;108660;145749;"Labores de LA SUERTE; CHEPITA en trámite pegada"
 2_PETORCA;2;MARTINA 54;Petorca;300;300.0;0.0;108660;145749;Desmontes de LA SUERTE
 2_PETORCA;3;MARTINA 55;Petorca;300;248.9;51.1;108660;145749;Labores de VICTOR
-2_PETORCA;4;MARTINA 40;Petorca;300;262.0;38.0;108660;145749;CARDAS 4 y 6 (Mining Resources) en trámite pegadas
-2_PETORCA;5;MARTINA 42;Petorca;200;200.0;0.0;72440;145749;CARDAS 1 en trámite pegada
-2_PETORCA;6;MARTINA 44;Petorca;100;71.2;28.8;36220;145749;CARDAS 1 y 2 en trámite pegadas
 2_PETORCA;7;MARTINA 46;Petorca;300;282.0;18.0;108660;145749;"ALIANZA en trámite pegada; caminos y labores"
-2_PETORCA;8;MARTINA 49;Petorca;300;259.9;40.1;108660;145749;MILENIUM y ALIANZA en trámite pegadas
 3_ILLAPEL_Cerro_Alto;1;LEONOR CERRO ALTO 1;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros"
 3_ILLAPEL_Cerro_Alto;2;LEONOR CERRO ALTO 2;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros"
 3_ILLAPEL_Cerro_Alto;3;LEONOR CERRO ALTO 3;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros"
 3_ILLAPEL_Cerro_Alto;4;LEONOR CERRO ALTO 4;Illapel;200;200.0;0.0;72440;145749;"Huellas y zona removida; sin terceros"
-2_PETORCA;9;MARTINA 38;Petorca;300;299.9;0.1;108660;145749;"Cubre lo útil de ELARA LAS PALMAS (V-444 La Ligua, se deja caducar)"
-2_PETORCA;10;MARTINA 41;Petorca;100;100.0;0.0;36220;145749;"Cubre lo útil de ELARA LAS PALMAS (V-444 La Ligua, se deja caducar)"
 2_PETORCA;11;MARTINA 69;Petorca;200;200.0;0.0;72440;145749;"Reemplaza LEONOR CANGALLA (V-443 La Ligua, mal tribunal y lados fuera del art. 28); 200 ha de explotaciones históricas eliminadas"
 4_COMBARBALA;1;MARTINA 70;Combarbalá;200;194.5;5.5;72440;145749;"Reemplaza LEONOR LOS SAPOS (V-249, lados fuera del art. 28); WGS84; TINAJAS V y ELPIQUE en trámite pegadas"
+1_LOS_VILOS;13;LEONOR SUR;Los Vilos;48;48;0;34771;145749;"Manifestación LEONOR SUR: TOO-237, TOO-238, TOO-240; acceso por camino minero"
+1_LOS_VILOS;14;LEONOR CENTRO;Los Vilos;195;195;0;141258;145749;Manifestación LEONOR CENTRO: TOO-253, TOO-262, TOO-234, TOO-258
+1_LOS_VILOS;15;MARTINA NORTE;Los Vilos;182;182;0;131841;145749;Manifestación MARTINA NORTE: franja TOO-276 a TOO-287
+3_ILLAPEL_Cerro_Alto;5;LEONOR CERRO ALTO FAENA;Illapel;49;49;0;35496;145749;Manifestación sobre la faena con caminos de Cerro Alto

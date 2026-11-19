@@ -1,6 +1,6 @@
 # Todo lo que se sube hoy, 19-11-2026 (OJV, firma con Clave Única)
 
-Son 20 escritos dentro de causas existentes, más 27 pedimentos y manifestaciones nuevos y 1 desistimiento.
+Son 20 escritos dentro de causas existentes, más 23 pedimentos y manifestaciones nuevos y 1 desistimiento. Hay 8 piezas postergadas en la carpeta C.
 
 ## A. En causas ya ingresadas (Juzgado de Letras y Garantía de Los Vilos)
 
@@ -10,25 +10,30 @@ Carpeta `A_causas_ya_ingresadas_cumple_art43_Los_Vilos`. Son 20 escritos de "Cum
 - Plazo: 8 días desde la resolución del 16-11, o sea hasta alrededor del 24-11. Conviene subirlos hoy para que el tribunal ordene inscribir y publicar.
 - **No** subir nada en V-318 (duplicado, ya desistido) ni en V-328 (ELARA 15), que espera su propia resolución.
 
-## B. Causas nuevas (demanda/solicitud nueva en la OJV)
+## B. Causas nuevas: versión que cuida el gasto inicial (23 escritos + 1 desistimiento)
 
-Carpeta `B_causas_nuevas`. Subir en el orden de la numeración de cada subcarpeta.
+Carpeta `B_causas_nuevas`. Sube en el orden de los números de cada subcarpeta. Los números que faltan corresponden a piezas que se movieron a la carpeta C.
 
 | Juzgado | Subcarpeta | Escritos |
 |---|---|---|
-| Letras y Garantía de Los Vilos | 1_LOS_VILOS | 01 MARTINA 37 → **02 desistimiento: se sube DENTRO de la causa V-327-2026, no como causa nueva** → 03 MARTINA 32 (manifestación) → 04 a 12 |
-| Letras y Garantía de Petorca | 2_PETORCA | 01 a 11 (MARTINA 47, 54, 55, 40, 42, 44, 46, 49, 38, 41 y 69) |
-| Letras de Illapel | 3_ILLAPEL_Cerro_Alto | LEONOR CERRO ALTO 1 a 4 (WGS84) |
-| Letras y Garantía de Combarbalá | 4_COMBARBALA | MARTINA 70 (WGS84) |
+| Letras y Garantía de Los Vilos | 1_LOS_VILOS | 01 MARTINA 37 → **02 desistimiento: se sube DENTRO de la causa V-327-2026** → 03 MARTINA 32 (manifestación) → 04 MARTINA 33, 05 MARTINA 35, 06 MARTINA 12, 07 MARTINA 15, 08 ELARA 9, 09 ELARA 16, 11 MARTINA 16 → **13 LEONOR SUR, 14 LEONOR CENTRO y 15 MARTINA NORTE (manifestaciones nuevas)** |
+| Letras y Garantía de Petorca | 2_PETORCA | 01 MARTINA 47, 02 MARTINA 54, 03 MARTINA 55, 07 MARTINA 46, 11 MARTINA 69 |
+| Letras de Illapel | 3_ILLAPEL_Cerro_Alto | LEONOR CERRO ALTO 1 a 4 → **05 LEONOR CERRO ALTO FAENA (manifestación nueva)**, en WGS84 |
+| Letras y Garantía de Combarbalá | 4_COMBARBALA | MARTINA 70, en WGS84 |
 
-- En cada causa nueva, adjuntar los certificados de estatuto, vigencia y anotaciones de Valle Escondido SpA (primer otrosí).
-- Materia: Minero → Pedimento (concesión de exploración). MARTINA 32 va como Manifestación.
-- Si alguna pieza de 1_LOS_VILOS ya se subió el 18-11, **no repetirla**.
+- Las manifestaciones van como Minero → Manifestación. Las demás, como Pedimento.
+- En cada causa nueva se adjuntan los certificados de estatuto, vigencia y anotaciones de Valle Escondido SpA.
+- Si alguna pieza de 1_LOS_VILOS ya se subió el 18-11, **no la repitas**.
+- Costo de lo nuevo: **$5.369.681**. De eso, $2.017.454 es tasa, que vence en 30 días; el resto, $3.352.227, es el boletín, que se paga después.
+
+## C. Postergadas: no se suben hoy
+
+Carpeta `C_postergadas_no_subir`: ELARA 17, MARTINA 18, 38, 40, 41, 42, 44 y 49. Son del grupo 3 del ranking (cobertura, sin evidencia). Dejarlas fuera ahorra $1.745.512. Se presentan después, solo si el muestreo o un competidor lo justifican.
 
 ## Después de subir
 
 1. Guardar el certificado de envío de cada causa y pasármelo para anotar rol, fecha y hora en el control.
-2. Tasa art. 51: vence a 30 días de cada presentación. Por las 27 nuevas son $2.253.608 hasta alrededor del 19-12. Las del 15-11 vencen el 15-12 y sus escritos de pago están en `presentado/escritos_tasa`.
+2. Tasa art. 51: vence a 30 días de cada presentación. Por las 23 nuevas son $2.017.454, hasta alrededor del 19-12. Las del 15-11 vencen el 15-12 y sus escritos de pago están en `presentado/escritos_tasa`.
 3. Las causas del 17-11 que se dejan caducar no se contestan ni se pagan.
 
-Costo total de lo nuevo de hoy: $6.188.831, que corresponde a $2.253.608 de tasa más $3.935.223 de boletín (el boletín se paga más adelante).
+
