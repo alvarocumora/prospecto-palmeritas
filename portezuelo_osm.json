@@ -1,0 +1,943 @@
+{
+  "version": 0.6,
+  "generator": "Overpass API 0.7.62.11 87bfad18",
+  "osm3s": {
+    "timestamp_osm_base": "2026-11-19T03:03:08Z",
+    "copyright": "The data included in this document is from www.openstreetmap.org. The data is made available under ODbL."
+  },
+  "elements": [
+
+{
+  "type": "node",
+  "id": 214191534,
+  "lat": -31.1781518,
+  "lon": -71.0024382,
+  "tags": {
+    "capital": "8",
+    "name": "Combarbalá",
+    "place": "town",
+    "population": "5915",
+    "population:date": "2017",
+    "source:population": "INE"
+  }
+},
+{
+  "type": "node",
+  "id": 2818565702,
+  "lat": -31.1779218,
+  "lon": -71.0015103,
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:country": "CL",
+    "addr:province": "Limari",
+    "addr:street": "Valdivia",
+    "internet_access": "wired",
+    "internet_access:fee": "yes",
+    "name": "Hotel Barba Lá",
+    "smoking": "no",
+    "tourism": "hotel",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 5952932999,
+  "lat": -31.1064031,
+  "lon": -70.9255564,
+  "tags": {
+    "name": "Portezuelo Alto",
+    "place": "hamlet",
+    "population": "36",
+    "population:date": "2017",
+    "source:population": "INE"
+  }
+},
+{
+  "type": "node",
+  "id": 5952933024,
+  "lat": -31.1758501,
+  "lon": -70.9818265,
+  "tags": {
+    "name": "Combarbalá Oriente",
+    "place": "hamlet",
+    "population": "51",
+    "population:date": "2017",
+    "source:population": "INE"
+  }
+},
+{
+  "type": "node",
+  "id": 5968058409,
+  "lat": -31.1772925,
+  "lon": -71.0101805,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Combarbalá",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 6131966171,
+  "lat": -30.9488684,
+  "lon": -71.2903261,
+  "tags": {
+    "name": "Portezuelos Blancos",
+    "place": "hamlet",
+    "population": "39",
+    "population:date": "2017",
+    "source:population": "INE"
+  }
+},
+{
+  "type": "node",
+  "id": 8941117779,
+  "lat": -31.1738438,
+  "lon": -71.0130270,
+  "tags": {
+    "disused:railway": "station",
+    "name": "Combarbalá"
+  }
+},
+{
+  "type": "node",
+  "id": 10957894944,
+  "lat": -30.9499336,
+  "lon": -71.2902910,
+  "tags": {
+    "addr:country": "CL",
+    "addr:street": "Ruta D-673",
+    "amenity": "school",
+    "name": "Escuela PortezueLos Blancos",
+    "note": "Correcciones masivas a ortografía en nombres de importaciones hechas por equipo de gendarmería"
+  }
+},
+{
+  "type": "node",
+  "id": 12593982416,
+  "lat": -31.1757017,
+  "lon": -71.0000837,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Combarbalá",
+    "public_transport": "platform",
+    "shelter": "yes"
+  }
+},
+{
+  "type": "node",
+  "id": 12873544711,
+  "lat": -31.1052768,
+  "lon": -70.9266171,
+  "tags": {
+    "bus": "yes",
+    "highway": "bus_stop",
+    "name": "Portezuelo Alto - La Loma Larga",
+    "public_transport": "platform"
+  }
+},
+{
+  "type": "node",
+  "id": 12876585789,
+  "lat": -31.0203364,
+  "lon": -70.8551412,
+  "tags": {
+    "name": "Portezuelo Los Romeros"
+  }
+},
+{
+  "type": "node",
+  "id": 12878271071,
+  "lat": -31.1720135,
+  "lon": -71.0119047,
+  "tags": {
+    "direction": "340",
+    "name": "Combarbalá",
+    "traffic_sign": "city_limit"
+  }
+},
+{
+  "type": "node",
+  "id": 12878271081,
+  "lat": -31.1733772,
+  "lon": -71.0107211,
+  "tags": {
+    "board_type": "welcome_sign",
+    "direction": "320",
+    "information": "board",
+    "name": "Bienvenidos a Combarbalá - La Comuna Estrella",
+    "tourism": "information"
+  }
+},
+{
+  "type": "node",
+  "id": 12878429236,
+  "lat": -31.1774385,
+  "lon": -71.0017561,
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Comercio",
+    "government": "social_services",
+    "name": "ChileAtiende Combarbalá",
+    "office": "government"
+  }
+},
+{
+  "type": "node",
+  "id": 12878511137,
+  "lat": -31.1786706,
+  "lon": -71.0008428,
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Maipú",
+    "name": "Oficina de Cultura y Turismo Combarbalá",
+    "office": "guide",
+    "operator": "Ilustre Municipalidad de Combarbalá"
+  }
+},
+{
+  "type": "node",
+  "id": 12879464990,
+  "lat": -31.1801514,
+  "lon": -71.0030520,
+  "tags": {
+    "addr:city": "Combarbalá",
+    "amenity": "social_centre",
+    "name": "Asociación Gremial Minera de Combarbalá"
+  }
+},
+{
+  "type": "node",
+  "id": 12879578483,
+  "lat": -31.1774515,
+  "lon": -71.0101027,
+  "tags": {
+    "board_type": "welcome_sign",
+    "information": "board",
+    "name": "Bienvenido a Combarbalá",
+    "tourism": "information"
+  }
+},
+{
+  "type": "node",
+  "id": 12879866560,
+  "lat": -31.1786024,
+  "lon": -71.0127244,
+  "tags": {
+    "name": "Combarbalá",
+    "traffic_sign": "city_limit"
+  }
+},
+{
+  "type": "node",
+  "id": 12879913388,
+  "lat": -31.1747669,
+  "lon": -70.9994840,
+  "tags": {
+    "name": "Combarbalá",
+    "traffic_sign": "city_limit"
+  }
+},
+{
+  "type": "node",
+  "id": 12879913396,
+  "lat": -31.1751824,
+  "lon": -70.9949432,
+  "tags": {
+    "name": "Combarbalá",
+    "traffic_sign": "city_limit"
+  }
+},
+{
+  "type": "node",
+  "id": 12950581541,
+  "lat": -31.1777259,
+  "lon": -71.0012059,
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "97",
+    "addr:postcode": "1920000",
+    "addr:street": "Comercio",
+    "name": "La Bodega Combarbalá",
+    "opening_hours": "Mo-Sa 10:00-19:00",
+    "operator": "ROSA BUSTAMANTE",
+    "payment:cash": "yes",
+    "payment:credit_cards": "yes",
+    "payment:debit_cards": "yes",
+    "phone": "+56994589536",
+    "shop": "furniture"
+  }
+},
+{
+  "type": "way",
+  "id": 82990336,
+  "center": {
+    "lat": -31.1819808,
+    "lon": -71.0054782
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Avenida Sur",
+    "leisure": "stadium",
+    "name": "Estadio Municipal de Combarbalá Humberto Ángel Astudillo",
+    "nohousenumber": "yes",
+    "sport": "soccer"
+  }
+},
+{
+  "type": "way",
+  "id": 82990351,
+  "center": {
+    "lat": -31.1781865,
+    "lon": -71.0025285
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "leisure": "park",
+    "name": "Plaza de Combarbalá",
+    "object:street": "Plaza de Armas"
+  }
+},
+{
+  "type": "way",
+  "id": 103924814,
+  "center": {
+    "lat": -31.1522440,
+    "lon": -71.0053025
+  },
+  "tags": {
+    "intermittent": "yes",
+    "name": "Río Combarbalá",
+    "waterway": "river",
+    "wikidata": "Q5150591",
+    "wikipedia": "es:Río Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 103924836,
+  "center": {
+    "lat": -31.1753861,
+    "lon": -71.0079966
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:country": "CL",
+    "addr:housenumber": "650",
+    "addr:street": "Comercio",
+    "amenity": "hospital",
+    "healthcare": "hospital",
+    "name": "Hospital San Juan de Dios Combarbala",
+    "wikidata": "Q93742001"
+  }
+},
+{
+  "type": "way",
+  "id": 103924866,
+  "center": {
+    "lat": -31.1713408,
+    "lon": -71.0006880
+  },
+  "tags": {
+    "landuse": "cemetery",
+    "name": "Cementerio de Combarbalá",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 641937478,
+  "center": {
+    "lat": -31.1790760,
+    "lon": -71.0046823
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "230",
+    "addr:street": "Libertad",
+    "amenity": "courthouse",
+    "building": "yes",
+    "name": "Fiscalía Local de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 679290712,
+  "center": {
+    "lat": -31.1745760,
+    "lon": -71.0003986
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "144",
+    "addr:street": "Alonso de Ercilla",
+    "amenity": "school",
+    "name": "Escuela América de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 701695585,
+  "center": {
+    "lat": -31.2292832,
+    "lon": -70.9207593
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 701695587,
+  "center": {
+    "lat": -31.2656459,
+    "lon": -70.8591637
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 701695588,
+  "center": {
+    "lat": -31.2829413,
+    "lon": -70.8171294
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 701695589,
+  "center": {
+    "lat": -31.3321328,
+    "lon": -70.7717505
+  },
+  "tags": {
+    "intermittent": "no",
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 701695623,
+  "center": {
+    "lat": -31.3146722,
+    "lon": -70.7824096
+  },
+  "tags": {
+    "intermittent": "no",
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 753639103,
+  "center": {
+    "lat": -31.2993859,
+    "lon": -70.7951434
+  },
+  "tags": {
+    "intermittent": "no",
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 753639114,
+  "center": {
+    "lat": -31.2408810,
+    "lon": -70.9037527
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 844611233,
+  "center": {
+    "lat": -31.1781728,
+    "lon": -71.0032675
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "203",
+    "addr:street": "Maipú",
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "name": "Iglesia de Combarbalá",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 844611234,
+  "center": {
+    "lat": -31.1777591,
+    "lon": -71.0021044
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "438",
+    "addr:street": "Plaza de Armas",
+    "amenity": "townhall",
+    "building": "yes",
+    "name": "Ilustre Municipalidad de Combarbalá",
+    "townhall:type": "city"
+  }
+},
+{
+  "type": "way",
+  "id": 844611237,
+  "center": {
+    "lat": -31.1785008,
+    "lon": -71.0019451
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "100",
+    "addr:street": "Plaza de Armas",
+    "amenity": "police",
+    "building": "yes",
+    "name": "Subcomisaría Combarbalá",
+    "operator": "Carabineros de Chile",
+    "operator:wikidata": "Q2317752"
+  }
+},
+{
+  "type": "way",
+  "id": 844616792,
+  "center": {
+    "lat": -31.1780067,
+    "lon": -71.0039969
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:country": "CL",
+    "addr:housenumber": "311",
+    "addr:province": "Limari",
+    "addr:street": "Maipú",
+    "building": "fire_station",
+    "name": "1ra. Compañía de Bomberos de Combarbalá",
+    "wheelchair": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1215437859,
+  "center": {
+    "lat": -31.1426637,
+    "lon": -71.0872611
+  },
+  "tags": {
+    "landuse": "industrial",
+    "name": "Central de Respaldo 75MW - Combarbalá",
+    "name:en": "Respaldo Combarbala Power Plant",
+    "operator": "Prime Energy Quickstart SpA",
+    "plant:method": "combustion",
+    "plant:output:electricity": "75 MW",
+    "plant:source": "diesel",
+    "power": "plant",
+    "source": "https://prime-energia.com/prime-energia-chile;https://infotecnica.coordinador.cl/instalaciones/centrales",
+    "start_date": "2021-09-15"
+  }
+},
+{
+  "type": "way",
+  "id": 1240739282,
+  "center": {
+    "lat": -31.2035455,
+    "lon": -71.0359691
+  },
+  "tags": {
+    "landfill:waste": "domestic_waste",
+    "landuse": "landfill",
+    "name": "Vertedero comunal de Combarbalá",
+    "operator": "Ilustre Municipalidad de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391293544,
+  "center": {
+    "lat": -31.1761115,
+    "lon": -71.0098519
+  },
+  "tags": {
+    "location": "outdoor",
+    "name": "Subestación eléctrica Combarbalá",
+    "operator": "CGE",
+    "operator:wikidata": "Q2990390",
+    "power": "substation"
+  }
+},
+{
+  "type": "way",
+  "id": 1391293547,
+  "center": {
+    "lat": -31.1760582,
+    "lon": -71.0100110
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Ruta D-55",
+    "landuse": "industrial",
+    "name": "Subestación eléctrica Combarbalá",
+    "nohousenumber": "yes",
+    "operator": "CGE"
+  }
+},
+{
+  "type": "way",
+  "id": 1391301278,
+  "center": {
+    "lat": -31.1767553,
+    "lon": -71.0015551
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "139",
+    "addr:street": "Juan Ignacio Flores",
+    "amenity": "community_centre",
+    "building": "yes",
+    "name": "Unión Comunal del Adulto Mayor Sol de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391302548,
+  "center": {
+    "lat": -31.1772275,
+    "lon": -71.0000273
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "458",
+    "addr:street": "Avenida Oriente",
+    "building": "yes",
+    "government": "register_office",
+    "name": "Servicio de Registro Civil e Identificación Combarbalá",
+    "office": "government"
+  }
+},
+{
+  "type": "way",
+  "id": 1391304747,
+  "center": {
+    "lat": -31.1776102,
+    "lon": -71.0008648
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "76",
+    "addr:street": "Comercio",
+    "building": "yes",
+    "government": "social_services",
+    "name": "Oficina Local de la Niñez Combarbalá",
+    "office": "government"
+  }
+},
+{
+  "type": "way",
+  "id": 1391307797,
+  "center": {
+    "lat": -31.1783571,
+    "lon": -71.0013936
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Valdivia",
+    "building": "yes",
+    "government": "agriculture",
+    "name": "INDAP Agencia de Área Combarbalá",
+    "office": "government"
+  }
+},
+{
+  "type": "way",
+  "id": 1391307798,
+  "center": {
+    "lat": -31.1781106,
+    "lon": -71.0019655
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Plaza de Armas",
+    "building": "yes",
+    "name": "Notaría, Conservador y Archivero Judicial Combarbalá",
+    "office": "notary"
+  }
+},
+{
+  "type": "way",
+  "id": 1391307799,
+  "center": {
+    "lat": -31.1786680,
+    "lon": -71.0020667
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Plaza de Armas",
+    "amenity": "courthouse",
+    "building": "yes",
+    "name": "Juzgado de Letras y Garantía de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391420477,
+  "center": {
+    "lat": -31.1790882,
+    "lon": -71.0016387
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "390",
+    "addr:street": "Valdivia",
+    "amenity": "courthouse",
+    "building": "yes",
+    "name": "Juzgado de Policía Local de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391420481,
+  "center": {
+    "lat": -31.1802300,
+    "lon": -71.0031489
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "San Carlos",
+    "amenity": "bus_station",
+    "bus": "yes",
+    "name": "Paradero Buses Combarbalá",
+    "public_transport": "station"
+  }
+},
+{
+  "type": "way",
+  "id": 1391420482,
+  "center": {
+    "lat": -31.1802892,
+    "lon": -71.0028967
+  },
+  "tags": {
+    "depot": "bus",
+    "industrial": "depot",
+    "landuse": "industrial",
+    "name": "Buses Combarbalá",
+    "operator": "Buses Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391420483,
+  "center": {
+    "lat": -31.1787107,
+    "lon": -71.0018428
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housename": "CDP Combarbalá",
+    "addr:housenumber": "383",
+    "addr:street": "Valdivia",
+    "amenity": "prison",
+    "building": "yes",
+    "designation": "Gendarmeria",
+    "name": "CDP Combarbalá",
+    "office": "government",
+    "operator": "Gendarmería",
+    "operator:wikidata": "Q3100431"
+  }
+},
+{
+  "type": "way",
+  "id": 1391445103,
+  "center": {
+    "lat": -31.1814759,
+    "lon": -71.0030199
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Avenida Sur",
+    "amenity": "place_of_worship",
+    "building": "yes",
+    "denomination": "evangelical",
+    "name": "Iglesia Evangélica Pentecostal de Combarbalá",
+    "religion": "christian"
+  }
+},
+{
+  "type": "way",
+  "id": 1391456289,
+  "center": {
+    "lat": -31.1823898,
+    "lon": -71.0064540
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Pedro Muranda",
+    "building": "church",
+    "name": "Iglesia Metodista Pentecostal de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391461154,
+  "center": {
+    "lat": -31.1719075,
+    "lon": -71.0084195
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "man_made": "wastewater_plant",
+    "name": "Planta de Tratamiento de Aguas Residuales Combarbalá",
+    "operator": "Aguas del Valle"
+  }
+},
+{
+  "type": "way",
+  "id": 1391463434,
+  "center": {
+    "lat": -31.1809456,
+    "lon": -71.0068900
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "leisure": "horse_riding",
+    "name": "Club de Rodeo Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1391470782,
+  "center": {
+    "lat": -31.1760765,
+    "lon": -70.9913890
+  },
+  "tags": {
+    "addr:city": "La Cantera",
+    "addr:street": "Ruta D-715",
+    "leisure": "horse_riding",
+    "name": "Club de Huasos Valle Combarbalá",
+    "nohousenumber": "yes"
+  }
+},
+{
+  "type": "way",
+  "id": 1410240524,
+  "center": {
+    "lat": -31.1803925,
+    "lon": -70.9995574
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:housenumber": "250",
+    "addr:street": "Los Álamos",
+    "healthcare": "rehabilitation",
+    "name": "Centro Comunitario de Rehabilitación CCR Combarbalá - Mesa Comunal de Discapacidad"
+  }
+},
+{
+  "type": "way",
+  "id": 1410250380,
+  "center": {
+    "lat": -31.1786784,
+    "lon": -70.9997245
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "addr:street": "Maipú",
+    "amenity": "community_centre",
+    "building": "yes",
+    "name": "Unión Comunal de Juntas de Vecinos de Combarbalá"
+  }
+},
+{
+  "type": "way",
+  "id": 1465020914,
+  "center": {
+    "lat": -31.2511268,
+    "lon": -70.8947801
+  },
+  "tags": {
+    "layer": "-1",
+    "name": "Río Combarbalá",
+    "tunnel": "culvert",
+    "waterway": "river"
+  }
+},
+{
+  "type": "way",
+  "id": 1465020915,
+  "center": {
+    "lat": -31.2548030,
+    "lon": -70.8894237
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "waterway": "river"
+  }
+},
+{
+  "type": "relation",
+  "id": 1589896,
+  "center": {
+    "lat": -31.1387266,
+    "lon": -70.9436653
+  },
+  "tags": {
+    "admin_level": "8",
+    "boundary": "administrative",
+    "dpachile:id": "04302",
+    "name": "Combarbalá",
+    "type": "boundary",
+    "wikidata": "Q3850",
+    "wikipedia": "es:Combarbalá"
+  }
+},
+{
+  "type": "relation",
+  "id": 9981383,
+  "center": {
+    "lat": -31.2084721,
+    "lon": -70.9254249
+  },
+  "tags": {
+    "name": "Río Combarbalá",
+    "type": "waterway",
+    "waterway": "river",
+    "wikidata": "Q23648520",
+    "wikipedia": "es:Río Combarbalá"
+  }
+},
+{
+  "type": "relation",
+  "id": 11037363,
+  "center": {
+    "lat": -31.1754789,
+    "lon": -71.0079134
+  },
+  "tags": {
+    "addr:city": "Combarbalá",
+    "building": "yes",
+    "name": "Hospital San Juan de Dios de Combarbalá",
+    "type": "multipolygon"
+  }
+}
+
+  ]
+}
