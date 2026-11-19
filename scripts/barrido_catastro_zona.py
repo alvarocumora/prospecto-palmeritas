@@ -87,6 +87,16 @@ def rutas():
         print("bloque", i, r.get("code"))
         time.sleep(1.5)
     (OUT / "rutas_out.json").write_text(json.dumps(dist))
+    # Ubicación de Portezuelo (Illapel) y del poder de compra de Combarbalá
+    oq = """[out:json][timeout:90];
+nwr["name"~"Portezuelo|Barba|Enami|ENAMI",i](-31.9,-71.5,-30.9,-70.6);
+out center tags;"""
+    try:
+        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=urllib.parse.urlencode({"data": oq}).encode(), headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=120) as r:
+            (OUT / "portezuelo_osm.json").write_text(r.read().decode())
+    except Exception as e:  # noqa: BLE001
+        print("overpass", e)
 
 
 def _get_json(url: str, tries: int = 5) -> dict:
