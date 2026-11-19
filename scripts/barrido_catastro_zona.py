@@ -34,6 +34,59 @@ ZONAS = {
     # Norte de la V Región: Papudo, Zapallar, La Ligua, Cabildo, Petorca, Putaendo, Catemu, Nogales
     "v_norte": (-71.60, -32.95, -70.45, -32.20),
 }
+# Lote "choapa": interior de Choapa (Illapel, Salamanca, Canela alta, Combarbalá sur)
+ZONAS_CHOAPA = {"choapa": (-71.55, -32.22, -70.40, -30.95)}
+
+GEOCODE = [
+    "Planta Portezuelo ENAMI Illapel", "Portezuelo, Illapel", "Minera Las Cenizas Cabildo",
+    "Planta Cabildo Las Cenizas", "Planta Delta ENAMI Ovalle", "Minera Barba Combarbalá",
+    "Planta Catemu CEMIN", "Fundición Ventanas", "Minera Tres Valles Salamanca",
+]
+
+
+def geocode():
+    res = {}
+    for q in GEOCODE:
+        u = "https://nominatim.openstreetmap.org/search?" + urllib.parse.urlencode({"q": q, "format": "json", "limit": 5, "countrycodes": "cl"})
+        try:
+            res[q] = _get_json(u)
+        except Exception as e:  # noqa: BLE001
+            res[q] = str(e)
+        time.sleep(1.2)
+    # Overpass: instalaciones mineras/industriales con nombres útiles en el corredor
+    oq = """[out:json][timeout:120];
+(
+  nwr["name"~"Portezuelo|Cenizas|Delta|Barba|Catemu|Enami|ENAMI|Poder de compra|Planta",i](-33.0,-71.6,-30.4,-70.3)["landuse"~"industrial|quarry"];
+  nwr["name"~"Enami|ENAMI|Poder de compra|Las Cenizas|Planta Delta|Portezuelo|Minera Barba|Catemu",i](-33.0,-71.6,-30.4,-70.3)["industrial"];
+  nwr["name"~"Enami|ENAMI|Poder [Cc]omprador|Poder de [Cc]ompra",i](-33.0,-71.6,-30.4,-70.3);
+);
+out center tags;"""
+    try:
+        req = urllib.request.Request("https://overpass-api.de/api/interpreter", data=urllib.parse.urlencode({"data": oq}).encode(), headers=HEADERS)
+        with urllib.request.urlopen(req, timeout=180) as r:
+            res["overpass"] = json.load(r)
+    except Exception as e:  # noqa: BLE001
+        res["overpass"] = str(e)
+    (OUT / "poderes_geocode.json").write_text(json.dumps(res, ensure_ascii=False, indent=1))
+
+
+def rutas():
+    """Distancias por camino (OSRM público) desde focos a compradores. Entrada: docs/barrido_faenas/rutas_in.json
+    {"origenes": [[lon,lat],...], "destinos": [[lon,lat],...]}"""
+    d = json.loads((ROOT / "docs/barrido_faenas/rutas_in.json").read_text())
+    O, D = d["origenes"], d["destinos"]
+    dist = []
+    for i in range(0, len(O), 80):
+        blk = O[i:i + 80]
+        coords = ";".join(f"{x:.5f},{y:.5f}" for x, y in blk + D)
+        src = ";".join(str(k) for k in range(len(blk)))
+        dst = ";".join(str(len(blk) + k) for k in range(len(D)))
+        u = f"https://router.project-osrm.org/table/v1/driving/{coords}?sources={src}&destinations={dst}&annotations=distance,duration"
+        r = _get_json(u)
+        dist += [{"distance": a, "duration": b} for a, b in zip(r.get("distances", []), r.get("durations", []))]
+        print("bloque", i, r.get("code"))
+        time.sleep(1.5)
+    (OUT / "rutas_out.json").write_text(json.dumps(dist))
 
 
 def _get_json(url: str, tries: int = 5) -> dict:
@@ -77,9 +130,9 @@ def bajar(bbox: tuple) -> list:
     return out
 
 
-def catastro():
+def catastro(zonas=None):
     OUT.mkdir(parents=True, exist_ok=True)
-    for z, bb in ZONAS.items():
+    for z, bb in (zonas or ZONAS).items():
         print("zona", z, bb)
         fs = bajar(bb)
         (OUT / f"catastro_{z}.json").write_text(json.dumps(fs, ensure_ascii=False))
@@ -128,4 +181,14 @@ def chips():
 
 
 if __name__ == "__main__":
-    chips() if os.environ.get("BARRIDO_ETAPA") == "chips" else catastro()
+    lote = os.environ.get("BARRIDO_LOTE", "")
+    OUT.mkdir(parents=True, exist_ok=True)
+    if lote == "choapa":
+        geocode()
+        catastro(ZONAS_CHOAPA)
+    elif lote == "rutas":
+        rutas()
+    elif os.environ.get("BARRIDO_ETAPA") == "chips":
+        chips()
+    else:
+        catastro()
