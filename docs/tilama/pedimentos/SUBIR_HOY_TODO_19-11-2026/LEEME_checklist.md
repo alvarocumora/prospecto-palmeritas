@@ -1,6 +1,6 @@
 # Todo lo que se sube hoy, 19-11-2026 (OJV, firma con Clave Única)
 
-Versión revisada a las 18:05. Se suben 20 escritos dentro de causas existentes, 34 pedimentos y manifestaciones nuevos y 1 desistimiento. Hay 8 piezas postergadas en la carpeta C.
+Versión revisada a las 18:05. Se suben 20 escritos dentro de causas existentes, 35 pedimentos y manifestaciones nuevos y 1 desistimiento. Hay 8 piezas postergadas en la carpeta C.
 
 Cambios de las 17:45, tras revisar la cobertura de las explotaciones eliminadas del distrito de Tilama:
 
@@ -10,8 +10,9 @@ Cambios de las 17:45, tras revisar la cobertura de las explotaciones eliminadas 
 - 17:55: se agrega MARTINA 86 (Petorca) sobre labores y desmontes visibles que marcó Alvy a 1.736 m de altura, libres de terceros. Va con prioridad A.
 - 18:00: se agrega MARTINA 87 (Los Vilos, prioridad B) en el terreno libre junto a la mina LOS BURROS 2, de Héctor Guerrero, que está en operación. El otro punto marcado, a 1.180 m, cae dentro de LAS TRES CHEPAS, constituida de Minera Los Vilos S.A.: no se pide.
 - 18:05: se agrega MARTINA 88 (Petorca, 600 ha, prioridad A) sobre el distrito antiguo de Las Palmas que marcó Alvy: 565 ha de explotaciones eliminadas y ningún tercero. Reemplaza a MARTINA 38 y 41, que siguen en la carpeta C.
+- 21:00: se agrega MARTINA 89 (Petorca, 600 ha, prioridad A) al sur de DON RODRIGO 3, donde Alvy vio movimientos de tierra. Libre de terceros; cubre COBRE NORTE IV 1/60 y exploraciones antiguas de ENAMI, Pan Pacific Copper, Hochschild y Mena Resources.
 
-Revisión hecha: los 54 escritos traen el RUT de Valle Escondido SpA y su nacionalidad chilena. Las superficies de cada escrito calzan con la tabla de costos. El datum es PSAD56 en Los Vilos y Petorca, y WGS84 en Illapel y Combarbalá. Las manifestaciones dicen que no se formulan en uso de una concesión de exploración. La única superposición entre piezas propias es MARTINA 32 dentro de MARTINA 33, y es intencional.
+Revisión hecha: los 55 escritos traen el RUT de Valle Escondido SpA y su nacionalidad chilena. Las superficies de cada escrito calzan con la tabla de costos. El datum es PSAD56 en Los Vilos y Petorca, y WGS84 en Illapel y Combarbalá. Las manifestaciones dicen que no se formulan en uso de una concesión de exploración. La única superposición entre piezas propias es MARTINA 32 dentro de MARTINA 33, y es intencional.
 
 ## A. En causas ya ingresadas (Juzgado de Letras y Garantía de Los Vilos)
 
@@ -22,14 +23,14 @@ Carpeta `A_causas_ya_ingresadas_cumple_art43_Los_Vilos`. Son 20 escritos de "Cum
 - Se suben todos, también los del grupo 3 del ranking: no cuesta nada y mantiene la opción hasta pagar la tasa (15-12).
 - **No** subir nada en V-318 (duplicado, ya desistido) ni en V-328 (ELARA 15).
 
-## B. Causas nuevas (34 escritos + 1 desistimiento)
+## B. Causas nuevas (35 escritos + 1 desistimiento)
 
 Carpeta `B_causas_nuevas`. Sube en el orden de los números de cada subcarpeta. Los números que faltan corresponden a piezas que se movieron a la carpeta C.
 
 | Juzgado | Subcarpeta | Escritos |
 |---|---|---|
 | Letras y Garantía de Los Vilos | 1_LOS_VILOS | 01 MARTINA 37 → **02 desistimiento: se sube DENTRO de la causa V-327-2026** → 03 MARTINA 32 (manifestación) → 04 MARTINA 33, 05 MARTINA 35, 06 MARTINA 12, 07 MARTINA 15, 08 ELARA 9, 09 ELARA 16, 11 MARTINA 16 → 13 LEONOR SUR, 14 LEONOR CENTRO, 15 MARTINA NORTE OESTE y 16 MARTINA NORTE ESTE (manifestaciones) → 17 MARTINA 79, 18 MARTINA 80, 19 MARTINA 81, 20 MARTINA 82, 21 MARTINA 83, 22 MARTINA 84, 23 MARTINA 85 y 24 MARTINA 87 |
-| Letras y Garantía de Petorca | 2_PETORCA | 01 MARTINA 47, 02 MARTINA 54, 03 MARTINA 55, 07 MARTINA 46, 11 MARTINA 69, 12 MARTINA 86, 13 MARTINA 88 |
+| Letras y Garantía de Petorca | 2_PETORCA | 01 MARTINA 47, 02 MARTINA 54, 03 MARTINA 55, 07 MARTINA 46, 11 MARTINA 69, 12 MARTINA 86, 13 MARTINA 88, 14 MARTINA 89 |
 | Letras de Illapel | 3_ILLAPEL_Cerro_Alto | LEONOR CERRO ALTO 1 a 4 → 05 LEONOR CERRO ALTO FAENA (manifestación), en WGS84 |
 | Letras y Garantía de Combarbalá | 4_COMBARBALA | MARTINA 70, en WGS84 |
 
@@ -39,9 +40,9 @@ Carpeta `B_causas_nuevas`. Sube en el orden de los números de cada subcarpeta. 
 
 ### Prioridad al pagar (columna `prioridad` de `orden_y_costos.csv`)
 
-- **A, 16 piezas: pagar tasa, inscribir y publicar.** MARTINA 37, 32, 33 y 35; LEONOR SUR, LEONOR CENTRO, MARTINA NORTE OESTE y ESTE; LEONOR CERRO ALTO 1, 4 y FAENA; MARTINA 47, 54, 55, 86 y 88. Costo: $3.628.659.
+- **A, 17 piezas: pagar tasa, inscribir y publicar.** MARTINA 37, 32, 33 y 35; LEONOR SUR, LEONOR CENTRO, MARTINA NORTE OESTE y ESTE; LEONOR CERRO ALTO 1, 4 y FAENA; MARTINA 47, 54, 55, 86, 88 y 89. Costo: $3.991.728.
 - **B, 18 piezas: se suben hoy para tener la prioridad y se decide después de terreno, antes de que venza la tasa (~19-12).** MARTINA 12, 15, 16, 46, 69, 70, 79 a 85 y 87; ELARA 9 y 16; LEONOR CERRO ALTO 2 y 3. Costo si se pagan todas: $4.434.482. La que no se pague, caduca.
-- Total si se paga todo: **$8.063.141** ($3.107.675 de tasa y $4.955.466 de boletín). Solo la prioridad A: $3.628.659.
+- Total si se paga todo: **$8.426.210** ($3.324.995 de tasa y $5.101.215 de boletín). Solo la prioridad A: $3.991.728.
 
 ## C. Postergadas: no se suben hoy
 
