@@ -1,0 +1,25 @@
+cat,id,comuna,juzgado,minas_eliminadas,ex_titular,libre_ha_600m,E_wgs,N_wgs,lat,lon,visible
+A,V001,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),MAITEN 1/4; MAITEN 1/4; MAITEN 1/2; EL CAMINO 1 1/3,VARGAS ZEPEDA MONICA ELVIRA,36.0,331777,6426048,-32.289729,-70.786495,Camino en zigzag que sube a plataforma/labor
+A,V104,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),FRIEINPERMUNDINER 1/10 (35ha); LA RECUERDO 1/20,ALVAREZ CASTRO ROBERTO PABLO,36.0,324077,6412848,-32.407564,-70.870679,Rajo o pique con desmonte y huellas de acceso
+A,V146,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),CAROLINA 1/10 (100ha); LA RETAMILLA 1/31; PAIHUEN LA CANOA 1/10,JUAN CARLOS FERNANDO Y JAMETT,36.0,327477,6414848,-32.390062,-70.834177,Desmonte/labor en la parte alta con huella
+A,V303,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),CHILE 1/7 (56ha),ALVAREZ CASTRO ROBERTO PABLO,36.0,312877,6426548,-32.282222,-70.987012,Serie de zanjas o caminos en curva de nivel y labores junto al camino
+B,V185,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),CHAMPITA 11/15,MINERA SAN JAVIER LIMITADA,25.7,338577,6419548,-32.349343,-70.715413,Rajo pequeño y campamento; parte de las labores puede caer en concesión vigente
+B,V133,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),BUENA FE; PORTEZUELO,SOC MRA CASABLANCA SA,13.2,322377,6433298,-32.222908,-70.884924,"Labores y caminos, pero rodeado de concesiones vigentes: casi sin área libre"
+B,V020,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),MARTINA 1/10; RELAVE 1/3; TORNO 29/32,ALCAIDE VASQUEZ ERICA CELIA,27.8,310077,6427048,-32.277243,-71.016629,Rajo blanco entre cultivos (puede ser árido)
+B,V011,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),LOS PEQUENES 21/34; BUENA SUERTE 1/3; SHALOM 1/3,CIA MRA CERRO NEGRO SA,35.1,320127,6398948,-32.532257,-70.915314,Labores y plataforma junto a un predio agrícola
+B,V099,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),HEKA 1 1/20; LA CRUZ 1/7,DELGADO TOBAR RENE,35.4,330477,6424848,-32.300353,-70.800509,Excavación o zanja alargada
+B,V175,QUILLOTA,Juzgado de Letras de Quillota,RETIRO 1/60; EL PENASCO 1/8,RIEGEL BADE GERHARD,36.0,286027,6363048,-32.849795,-71.286425,Caminos en zigzag
+B,V144,CABILDO,Juzgado de Letras y Garantía de La Ligua (verificar),LOS TRES HERMANOS 1/16 (96ha); RECONQUISTA 7 1/40; SAN RICARDO 1/10,LAZCANO QUIROZ ANDRES,25.7,329277,6400548,-32.519276,-70.817636,Huellas en zigzag
+B,V049,LA LIGUA,Juzgado de Letras y Garantía de La Ligua,LOS MANTOS 1/18 (72ha); PAULINA 1/20; ANDACOLLO 1/12,ALVAREZ CASTRO ROBERTO PABLO,32.6,300177,6409648,-32.432384,-71.125356,Huellas en zigzag
+B,V055,QUILLOTA,Juzgado de Letras de Quillota,LAS PATAGUAS A 1/10 (46ha); CAROLINA 11/20; ESPERANZA IV 1/10,SOC. AGRICOLA VERTIENTES SPA,36.0,295427,6356948,-32.906575,-71.187396,Huella en zigzag
+B,V073,HIJUELAS,Juzgado de Letras de Quillota (verificar),HADAS 1/15 (55ha); CHORRILLOS 1/100,HEIN HOERNIG RICARDO,36.0,301177,6354548,-32.929269,-71.126469,Camino en zigzag
+B,V098,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),GANADOR 1/18 (74ha); GANADOR 1/6,ALVAREZ CASTRO ROBERTO PABLO,27.3,309877,6429148,-32.258276,-71.018333,Huellas y plataformas
+B,V289,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),MERTONIA 1/5,TAUCANO QUIROZ ADELA DE LAS ME,31.1,324377,6430598,-32.247567,-70.864207,Plataforma con huellas
+B,V302,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),LA OVEJA 1/20; DANIELA 1/20,SLM CALETON 1 DE PETORCA,21.9,322727,6426848,-32.28112,-70.882412,Desmonte blanco en el borde
+B,V198,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),CAMARA 3 1/10; PADRE HURTADO II 1/20,MARTINEZ RASSE CARLOS SALVADOR,36.0,320077,6429398,-32.257705,-70.910056,Huellas en ladera
+B,V117,CALERA,Juzgado de Letras de La Calera,ORO VERDE 1/10 (50ha); JUPITER 1/38,CIA MRA PACHACAMA LTDA,36.0,298277,6364048,-32.843104,-71.155391,Labores y huellas junto a cultivos
+B,V122,HIJUELAS,Juzgado de Letras de Quillota (verificar),MARIA PAZ 44/63; LAS CANAS I/X,TAPIA OCARANZA MARIA ANGELICA,36.0,302427,6357548,-32.902453,-71.112465,Huella en circuito
+B,V156,CANELA,Juzgado de Letras y Garantía de Los Vilos (verificar),BELLAVISTA 4 1/55; CHALO 1/10,ALVEAR PARRA GERARDINE,36.0,256627,6503398,-31.578783,-71.564547,Estructura rectangular (posible cancha o planta)
+B,V205,TIL-TIL,Juzgado de Letras de Colina (verificar),ANUNCIADA 1 Y 4,CM CONSTANCIA D MONTENEGRO LTD,36.0,327577,6354498,-32.934205,-70.844259,Labores en la quebrada (muchas concesiones eliminadas superpuestas)
+Alt,V096,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),CELESTE 2 1/23 (98ha); RITA III 1/10; RAQUEL 2 1/10,MINERA GOLDEYE CHILE LTDA,31.0,341577,6430848,-32.247875,-70.681662,Roca alterada clara
+Alt,V097,PETORCA,Juzgado de Letras y Garantía de Petorca (verificar),CELESTE 2 1/23 (98ha); RITA III 1/10; RAQUEL 2 1/10,MINERA GOLDEYE CHILE LTDA,36.0,340927,6430398,-32.25184,-70.688634,Roca alterada clara

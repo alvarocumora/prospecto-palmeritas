@@ -1,0 +1,37 @@
+﻿carpeta;orden;concesion;juzgado;ha;libre_ha;terceros_ha;tasa_art51;boletin_inscripcion;por_que_hoy;prioridad
+1_LOS_VILOS;1;MARTINA 37;Los Vilos;300;235.0;65.0;108660;145749;"Reemplaza MARTINA 13 (V-327); acceso al núcleo";A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;2;Desistimiento V-327 (MARTINA 13);Los Vilos;0;;;0;0;Subir dentro de la causa V-327, después de MARTINA 37;-
+1_LOS_VILOS;3;MARTINA 32;Los Vilos;11;11.0;0.0;7968;145749;"Mina histórica EL ZORRO; colinda con solicitud TILAMA (Pasten Silva) en trámite";A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;4;MARTINA 33;Los Vilos;100;77.2;22.8;36220;145749;"Labores del Chele; TILAMA de terceros a 50 m";A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;5;MARTINA 35;Los Vilos;200;106.2;93.8;72440;145749;"Labor/rajo blanco; toca TILAMA de terceros";A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;6;MARTINA 12;Los Vilos;300;300.0;0.0;108660;145749;Acceso al núcleo;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;11;MARTINA 16;Los Vilos;300;294.0;6.0;108660;145749;Acceso al núcleo;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+2_PETORCA;1;MARTINA 47;Petorca;300;270.7;29.3;108660;145749;"Labores de LA SUERTE; CHEPITA en trámite pegada";A: pagar tasa, inscribir y publicar
+2_PETORCA;2;MARTINA 54;Petorca;300;300.0;0.0;108660;145749;Desmontes de LA SUERTE;A: pagar tasa, inscribir y publicar
+2_PETORCA;3;MARTINA 55;Petorca;300;248.9;51.1;108660;145749;Labores de VICTOR;A: pagar tasa, inscribir y publicar
+2_PETORCA;7;MARTINA 46;Petorca;300;282.0;18.0;108660;145749;"ALIANZA en trámite pegada; caminos y labores";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+3_ILLAPEL_Cerro_Alto;1;LEONOR CERRO ALTO 1;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros";A: pagar tasa, inscribir y publicar
+3_ILLAPEL_Cerro_Alto;2;LEONOR CERRO ALTO 2;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+3_ILLAPEL_Cerro_Alto;3;LEONOR CERRO ALTO 3;Illapel;300;300.0;0.0;108660;145749;"Faena visible con accesos; sin terceros";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+3_ILLAPEL_Cerro_Alto;4;LEONOR CERRO ALTO 4;Illapel;200;200.0;0.0;72440;145749;"Huellas y zona removida; sin terceros";A: pagar tasa, inscribir y publicar
+2_PETORCA;11;MARTINA 69;Petorca;200;200.0;0.0;72440;145749;"Reemplaza LEONOR CANGALLA (V-443 La Ligua, mal tribunal y lados fuera del art. 28); 200 ha de explotaciones históricas eliminadas";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+4_COMBARBALA;1;MARTINA 70;Combarbalá;200;194.5;5.5;72440;145749;"Reemplaza LEONOR LOS SAPOS (V-249, lados fuera del art. 28); WGS84; TINAJAS V y ELPIQUE en trámite pegadas";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;13;LEONOR SUR;Los Vilos;48;48;0;34771;145749;"Manifestación: 5,04 %, 4,69 % y 2,16 % Cu (original EMT); camino minero a 0,5 km";A: pagar tasa, inscribir y publicar
+3_ILLAPEL_Cerro_Alto;5;LEONOR CERRO ALTO FAENA;Illapel;49;49;0;35496;145749;Manifestación sobre la faena con caminos de Cerro Alto;A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;14;LEONOR CENTRO;Los Vilos;221;221;0;160092;145749;Manifestación: 4,44 %, 3,62 %, 2,40 % y 1,66 % Cu (original EMT);A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;15;MARTINA NORTE OESTE;Los Vilos;55;55;0;39842;145749;Manifestación: 10 % y 2,04 % Cu (original EMT);A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;16;MARTINA NORTE ESTE;Los Vilos;56;56;0;40566;145749;Manifestación: 6,10 %, 4,15 %, 3,50 %, 2,77 % y 2,40 % Cu (original EMT);A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;7;MARTINA 15;Los Vilos;300;300.0;0.0;108660;145749;"Cubre GRADO 11 y 12 (explotaciones eliminadas); la señal de Mo era un error";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;8;ELARA 9;Los Vilos;200;199.1;0.9;72440;145749;"Cubre NORTE 6 de Compañía Minera Tilama (explotación eliminada); la señal de Mo era un error";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;9;ELARA 16;Los Vilos;200;200.0;0.0;72440;145749;"Cubre TILAMA 69/80 de ENAMI y parte de MACANO 1 (explotaciones eliminadas); la señal de Mo era un error";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;17;MARTINA 79;Los Vilos;200;200;0;72440;145749;Explotaciones eliminadas DON RUFO, ARANTXA 1 y TELETON (familia Del Campo), al oeste de Chele;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;18;MARTINA 80;Los Vilos;200;200;0;72440;145749;Explotaciones eliminadas TILAMA 1/10 y 11/20 de ENAMI, junto a MARTINA 37;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;19;MARTINA 81;Los Vilos;400;400;0;144880;145749;Explotaciones eliminadas TILAMA 1, 2 y 3 y MIRADOR (386 ha históricas), al oeste;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;20;MARTINA 82;Los Vilos;400;380;20;144880;145749;Explotaciones eliminadas PUPIO 61/90 y 91/115 (370 ha históricas), al oeste;B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;21;MARTINA 83;Los Vilos;400;400;0;144880;145749;"Pin de Alvy: zona blanca (posible alteración o labor) al oeste de MARTINA 79; exploraciones antiguas de Hochschild, Chepa/Chepita y Tilama 8";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;22;MARTINA 84;Los Vilos;200;198;2;72440;145749;"Pin de Alvy: hueco entre ELARA 15, MARTINA 79 y MARTINA 35; explotaciones eliminadas MARITXU 1, PABLITO, ARANTXA 2, SANTA ROSA DE LIMA y GUAYACAN";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+1_LOS_VILOS;23;MARTINA 85;Los Vilos;400;390;10;144880;145749;"Pin de Alvy al sur, al oeste de MARTINA 37; explotaciones eliminadas LA JOTA y LOS 3 CERRILOS";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+2_PETORCA;12;MARTINA 86;Petorca;100;100;0;36220;145749;"Pin de Alvy: labores y desmontes visibles a 1.736 m, libres; sobre EL QUILLAY 2 (explotación eliminada) y TILAMA 6 de Minera Las Cenizas (eliminada abr-2026)";A: pagar tasa, inscribir y publicar
+1_LOS_VILOS;24;MARTINA 87;Los Vilos;200;177;23;72440;145749;"Pin de Alvy: terreno libre al lado de la mina LOS BURROS 2 (H. Guerrero, en operación, rajo con agua); sobre EL QUILLAY 3 eliminada";B: decidir tras terreno, antes de pagar la tasa (~19-12)
+2_PETORCA;13;MARTINA 88;Petorca;600;600;0;217320;145749;"Pines de Alvy (caminos en zigzag): distrito Las Palmas con 565 ha de explotaciones eliminadas (MI PRIMER AMOR, MI HIJA, MI PADRE, LAS PALMAS 3, MONTECRISTO, CRISTO SALVADOR, LA BENDECIDA y otras); sin terceros. Reemplaza MARTINA 38 y 41";A: pagar tasa, inscribir y publicar
+2_PETORCA;14;MARTINA 89;Petorca;600;600;0;217320;145749;"Pin de Alvy: movimientos de tierra en DON RODRIGO 3 (explotación constituida); terreno libre al sur con COBRE NORTE IV 1/60 y exploraciones antiguas de ENAMI, Pan Pacific Copper, Hochschild y Mena Resources (Bronce Oeste)";A: pagar tasa, inscribir y publicar

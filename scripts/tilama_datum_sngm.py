@@ -10,15 +10,32 @@ from __future__ import annotations
 import json
 import statistics
 import sys
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from tilama_catastro_kmz import BBOX, HEADERS  # noqa: E402
+from tilama_catastro_kmz import HEADERS  # noqa: E402
 
 BASE = "https://arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer"
 WHERE = "SITUACION_CONCESION <> 'ELIMINADA'"
+# Recuadro ampliado hasta el límite regional Coquimbo/Valparaíso (sur y este de Tilama).
+BBOX = (-71.30, -32.22, -70.95, -31.93)
+
+
+def _get_json(url: str, tries: int = 4) -> dict:
+    """GET con reintentos: el FeatureServer de SERNAGEOMIN corta lecturas largas al azar."""
+    for i in range(tries):
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=120) as r:
+                return json.load(r)
+        except (TimeoutError, OSError, ValueError) as e:
+            if i == tries - 1:
+                raise
+            print(f"reintento {i + 1} tras error: {e}")
+            time.sleep(5 * (i + 1))
+    return {}
 
 
 def q(layer: int, out_sr: int, extra: dict | None = None) -> dict:
@@ -33,8 +50,7 @@ def q(layer: int, out_sr: int, extra: dict | None = None) -> dict:
     while True:
         p["resultOffset"] = off
         url = f"{BASE}/{layer}/query?" + urllib.parse.urlencode(p)
-        with urllib.request.urlopen(urllib.request.Request(url, headers=HEADERS), timeout=90) as r:
-            d = json.load(r)
+        d = _get_json(url)
         if "error" in d:
             print("ERROR", layer, out_sr, d["error"]); return {"features": out}
         out += d.get("features", [])
@@ -67,6 +83,7 @@ def main():
                 rondas += 1
         filas.append({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
                       "sit": a.get("SITUACION_CONCESION"), "datum": a.get("DATUM"),
+                      "tipo": a.get("TIPO_CONCESION"), "titular": a.get("TITULAR") or a.get("NOMBRE_TITULAR"),
                       "psad": [[round(x, 2), round(y, 2)] for x, y in ring_p],
                       "wgs": [[round(x, 2), round(y, 2)] for x, y in ring_w]})
     print(f"vertices {len(dE)} | redondos en 24879: {rondas}")
@@ -77,6 +94,45 @@ def main():
     for r in filas:
         print("C|" + json.dumps(r, ensure_ascii=False))
     print("CONCESIONES_JSON_FIN")
+
+    # Concesiones eliminadas del sector: faenas históricas cuyo terreno puede estar libre hoy
+    el = q(2, 24879, {"where": "SITUACION_CONCESION = 'ELIMINADA'"})
+    if el.get("fields"):
+        print("CAMPOS capa 2:", [f["name"] for f in el["fields"]])
+    for f in el["features"]:
+        a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+        print("E|" + json.dumps({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                 "tipo": a.get("TIPO_CONCESION"),
+                                 "attrs": {k: v for k, v in a.items() if v not in (None, "") and k not in ("NOMBRE", "OBJECTID")},
+                                 "psad": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False, default=str))
+    print("ELIMINADAS fin", len(el["features"]))
+
+    # Revisión puntual de otro sector (Cerro Alto, Illapel), en WGS84 UTM 19S
+    bb = (-71.25, -31.68, -70.85, -31.38)
+    for sit in ("SITUACION_CONCESION <> 'ELIMINADA'", "SITUACION_CONCESION = 'ELIMINADA'"):
+        for f in q(2, 32719, {"geometry": ",".join(map(str, bb)), "where": sit})["features"]:
+            a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+            print("K|" + json.dumps({"n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                     "sit": a.get("SITUACION_CONCESION"), "tipo": a.get("TIPO_CONCESION"),
+                                     "titular": a.get("TITULAR_NOMBRE"), "comuna": a.get("COMUNA"),
+                                     "wgs": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False))
+
+    # Búsqueda por rol o nombre en todo Chile, incluidas las eliminadas (minas históricas con certificados ENAMI)
+    for where in ("NUMERO_ROL LIKE '%032663%'", "UPPER(NOMBRE) LIKE '%TILAMA NORTE%'", "UPPER(NOMBRE) LIKE '%ZORRO%' AND NUMERO_ROL LIKE '04303%'"):
+        url = f"{BASE}/2/query?" + urllib.parse.urlencode({"where": where, "outFields": "*", "returnGeometry": "true", "outSR": 24879, "f": "json"})
+        try:
+            d = _get_json(url)
+        except Exception as e:  # noqa: BLE001
+            print("BUSCA error", where, e); continue
+        if "error" in d:
+            print("BUSCA error", where, d["error"]); continue
+        for f in d.get("features", []):
+            a = f["attributes"]; ring = (f.get("geometry") or {}).get("rings", [[]])[0]
+            print("BUSCA|" + json.dumps({"where": where, "n": a.get("NOMBRE"), "rol": f"{a.get('NUMERO_ROL')}-{a.get('DV_ROL')}",
+                                         "sit": a.get("SITUACION_CONCESION"), "tipo": a.get("TIPO_CONCESION"),
+                                         "titular": a.get("TITULAR") or a.get("NOMBRE_TITULAR"),
+                                         "psad": [[round(x), round(y)] for x, y in ring]}, ensure_ascii=False))
+        print("BUSCA fin", where, len(d.get("features", [])))
 
     v = q(0, 32719, {"resultRecordCount": 50})
     print("VERTICES capa0 muestra:")

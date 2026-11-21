@@ -102,6 +102,24 @@ rol prevalecen sobre esta tabla; La Florida 1 figura EN TRÁMITE.*
   y futura**: geofísica, sondajes, análisis, modelamiento, estimación de recursos y
   certificación técnica.
 
+- El propietario entregará **toda la información técnica que obre en su poder**, incluida la
+  generada por terceros interesados en negociaciones anteriores (por ejemplo, el muestreo con
+  certificado de laboratorio Andes Analytical Assay DI2251332, de diciembre de 2022, encargado
+  por Ockam Mining SpA), e informará **quién es titular de esa información** y en qué condiciones
+  la recibió.
+- Mientras no exista autorización del tercero titular, esa información se usará **solo como
+  referencia interna**. Para documentos de venta o financiamiento se generará **muestreo propio
+  de verificación** con cadena de custodia.
+
+## 10 bis. Declaración de negociaciones previas
+
+- El propietario declara que **no mantiene vigente** con terceros (incluido Ockam Mining SpA)
+  ninguna promesa, opción, derecho preferente, arriendo, carta de intención con exclusividad ni
+  compromiso de entregar información o pagar comisiones sobre las concesiones del proyecto, y
+  entregará copia de cualquier instrumento firmado en esas negociaciones.
+- Esta declaración es **condición previa a la firma** y su falsedad habilita al operador a poner
+  término anticipado al contrato con restitución de los pagos efectuados.
+
 ## 11. Cláusula de venta del proyecto
 
 - Incorporada desde el inicio, contemplando **venta directa o indirecta** de concesiones,
@@ -113,7 +131,11 @@ rol prevalecen sobre esta tabla; La Florida 1 figura EN TRÁMITE.*
 ## Próximos pasos (formalización)
 
 1. **Estudio de títulos** por rol (vigencia, gravámenes, servidumbres, prioridad; La Florida
-   1 EN TRÁMITE).
+   1 EN TRÁMITE; revisar la superposición de Plazetas 2 (Prieto, exploración) sobre Peumo
+   1/20 en el sector Mina Granero).
+1b. Pedir al propietario los antecedentes de la negociación con **Ockam Mining SpA** (qué
+   firmaron, por qué no se cerró) y tomar 4–6 **muestras propias de verificación** en Granero,
+   La Castellana y TIL1 antes de firmar.
 2. **Confirmar la conformación de las ~2.600 ha** y el mapa de titulares (varios dueños →
    varios instrumentos de arriendo/promesa).
 3. Redacción del **contrato de arrendamiento minero + promesa** (y sociedad vehículo si
