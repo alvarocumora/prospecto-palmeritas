@@ -47,6 +47,11 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
     items: [
       { to: "/catastro", label: "Catastro minero", desc: "Concesiones de Chile y LATAM" },
       {
+        to: "/exploracion",
+        label: "Exploration Atlas",
+        desc: "Cholqui y Los Verdes · exploración geoespacial",
+      },
+      {
         to: "/catastro/mapa",
         label: "Mapa interactivo",
         desc: "Concesiones, satélite y anomalías",
