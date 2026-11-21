@@ -498,7 +498,7 @@ export const signNdaAndGrantAccess = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
 
     // Etapa del deal (best-effort: la RPC valida transición y autorización)
-    await sb.rpc("deal_advance", {
+    await context.supabase.rpc("deal_advance", {
       p_inquiry_id: inquiry.id,
       p_stage: "nda_firmado",
       p_note: "NDA firmado en la ficha del proyecto",

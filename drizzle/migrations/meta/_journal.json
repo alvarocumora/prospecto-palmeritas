@@ -50,6 +50,13 @@
       "when": 1794924684656,
       "tag": "0006_scope_reference_reads_to_platform_users",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795261335015,
+      "tag": "0007_harden_18_definer_functions",
+      "breakpoints": true
     }
   ]
 }

@@ -1,5 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { listQualifiedPersonsDirectory } from "@/lib/qualifiedPersons.functions";
 import { useProjects } from "./useProjects";
 import { useAuth } from "./useAuth";
 import { toast } from "sonner";
@@ -61,6 +63,7 @@ export type ReportSection = {
 export function useQualifiedPersons() {
   const { active } = useProjects();
   const { user } = useAuth();
+  const fetchQpDirectory = useServerFn(listQualifiedPersonsDirectory);
   const [qps, setQps] = useState<QualifiedPerson[]>([]);
   const [reports, setReports] = useState<TechnicalReport[]>([]);
   const [sections, setSections] = useState<ReportSection[]>([]);
@@ -78,12 +81,12 @@ export function useQualifiedPersons() {
     setLoading(true);
     try {
       const [
-        { data: qpData, error: qpErr },
+        qpData,
         { data: rData, error: rErr },
         { data: sData, error: sErr },
       ] = await Promise.all([
         // Directorio seguro: sin firma, CV, licencia ni historial CDV de terceros
-        supabase.rpc("list_qualified_persons_directory"),
+        fetchQpDirectory({ data: { projectId: active.id } }),
         supabase
           .from("technical_reports")
           .select("*")
@@ -95,7 +98,6 @@ export function useQualifiedPersons() {
           .eq("project_id", active.id)
           .order("section_no"),
       ]);
-      if (qpErr) throw qpErr;
       if (rErr) throw rErr;
       if (sErr) throw sErr;
       const dirRows = (qpData ?? []) as Array<Partial<QualifiedPerson>>;
@@ -116,7 +118,7 @@ export function useQualifiedPersons() {
     } finally {
       setLoading(false);
     }
-  }, [active?.id]);
+  }, [active?.id, fetchQpDirectory]);
 
   useEffect(() => {
     fetchAll();

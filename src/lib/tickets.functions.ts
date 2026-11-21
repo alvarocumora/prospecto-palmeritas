@@ -69,9 +69,14 @@ export const getProjectRound = createServerFn({ method: "GET" })
       .select(SPV_COLS)
       .eq("project_code", data.projectCode)
       .maybeSingle();
-    const { data: status } = await supabase.rpc("spv_round_status", {
-      _project_code: data.projectCode,
-    });
+    let status: unknown = null;
+    if (spv) {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: rpcStatus } = await supabaseAdmin.rpc("spv_round_status", {
+        _project_code: data.projectCode,
+      });
+      status = rpcStatus;
+    }
     const st = Array.isArray(status) ? status[0] : null;
     let mine: TicketRow[] = [];
     if (spv) {

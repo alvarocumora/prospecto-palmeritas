@@ -305,8 +305,9 @@ const GeoInput = z.object({
 export const getOpportunitiesGeo = createServerFn({ method: "POST" })
   .middleware([requireCatastroRole])
   .inputValidator((d: unknown) => GeoInput.parse(d ?? {}))
-  .handler(async ({ data, context }) => {
-    const { data: result, error } = await context.supabase.rpc("opportunities_geo", {
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: result, error } = await supabaseAdmin.rpc("opportunities_geo", {
       _limit: data.limit,
       _min_score: data.minScore,
       _region: data.region ?? undefined,
