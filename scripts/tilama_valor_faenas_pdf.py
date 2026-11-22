@@ -97,26 +97,30 @@ fg = lambda x, d=2: "—" if x is None else f"{x:.{d}f}".replace(".", ",")
 ours, cat = pickle.load(open("/tmp/claude-0/ped/prox/base.pkl", "rb"))
 COMPRA = {"LOS VERDES 4 1/10", "LOS VERDES 5 1/12", "PEUMO 1/20"}
 ANEXO = {"LOS VERDES 3 1/20", "ALTO LOS VERDES 2 1/15", "LAS TRANCAS1/20", "EL ALTO", "EL CANELO", "PLAZETAS"}
-OFF = {"Alto Los Verdes 2": (-150, 6), "Expansión": (12, 10), "La Castellana": (12, -4), "Granero · ex M. Tilama Norte": (12, -14)}
-X0, X1, Y0, Y1 = 295500, 309500, 6446500, 6457000
+OFF = {"Cerro Bayo (Las Cenizas)": (-185, 12), "Alto Los Verdes 2": (-150, 6), "Expansión": (12, 10), "La Castellana": (12, -4), "Granero · ex M. Tilama Norte": (12, -14)}
+X0, X1, Y0, Y1 = 295500, 309000, 6446700, 6457000
 
 with PdfPages(R + f"tilama_mapa_valor_faenas_{FECHA}.pdf") as pdf:
     # ======== página 1: mapa ========
     fig = plt.figure(figsize=(16.5, 11.7)); fig.patch.set_facecolor(PAPER)
-    ax = fig.add_axes([0.04, 0.07, 0.66, 0.84]); ax.set_facecolor("#ECE7DD")
+    ax = fig.add_axes([0.04, 0.07, 0.66, 0.84]); ax.set_facecolor("#3A3F44")
+    SAT = "/tmp/claude-0/ped/sat_tilama_4m.png"  # Esri World Imagery reproyectado a UTM 19S (ver tilama_imagenes.py)
+    import os
+    if os.path.exists(SAT):
+        from PIL import Image as _I; ax.imshow(_I.open(SAT), extent=(295500, 309500, 6446500, 6457000), zorder=0)
     for c in cat:
         if c["sit"] == "ELIMINADA": continue
         b = c["g"].bounds
         if b[2] < X0 or b[0] > X1 or b[3] < Y0 or b[1] > Y1: continue
         x, y = c["g"].exterior.xy if c["g"].geom_type == "Polygon" else c["g"].convex_hull.exterior.xy
-        if c["n"] in COMPRA: ax.fill(x, y, color=COPPER, alpha=.35, lw=1.6, ec=COPPER, zorder=3)
-        elif c["n"] in ANEXO: ax.fill(x, y, color=SAND, alpha=.6, lw=1, ec="#9C8B70", zorder=2)
-        else: ax.plot(x, y, color="#B9B1A3", lw=.5, zorder=1)
+        if c["n"] in COMPRA: ax.fill(x, y, color=COPPER, alpha=.30, lw=2, ec="#FF9A4D", zorder=3)
+        elif c["n"] in ANEXO: ax.fill(x, y, color=SAND, alpha=.28, lw=1, ec="#F2D29B", zorder=2)
+        else: ax.plot(x, y, color="white", lw=.45, alpha=.45, zorder=1)
     for o in ours:
         if "caducar" in o.get("estado", ""): continue
-        x, y = o["g"].exterior.xy; ax.plot(x, y, color=GREEN, lw=1.1, ls="--", zorder=4)
+        x, y = o["g"].exterior.xy; ax.plot(x, y, color="#7CFC9A", lw=1.0, ls="--", zorder=4)
     for nm, a, b, c_, d in [("M50", 306300, 307300, 6444675, 6447675), ("M90", 306800, 307800, 6448675, 6450675), ("M91", 307800, 308800, 6449175, 6450175), ("M86", 305800, 306800, 6448575, 6449575), ("M87", 305800, 307800, 6450675, 6451675)]:
-        ax.plot([a, b, b, a, a], [c_, c_, d, d, c_], color=GREEN, lw=1.6, zorder=5)
+        ax.plot([a, b, b, a, a], [c_, c_, d, d, c_], color="#7CFC9A", lw=1.8, zorder=5)
     def col(cu): return "#B22222" if cu >= 3 else COPPER if cu >= 1 else "#E3B341" if cu >= .3 else SLATE
     for r in til: ax.scatter(float(r["E_WGS84"]), float(r["N_WGS84"]), s=60, c=col(num(r["CuT_pct"])), ec=INK, lw=.6, marker="o", zorder=7)
     for r in emt:
@@ -130,10 +134,10 @@ with PdfPages(R + f"tilama_mapa_valor_faenas_{FECHA}.pdf") as pdf:
                     bbox=dict(boxstyle="round,pad=.25", fc="white", ec="none", alpha=.85))
     ax.set_xlim(X0, X1); ax.set_ylim(Y0, Y1); ax.set_aspect("equal")
     ax.ticklabel_format(style="plain", useOffset=False); ax.tick_params(labelsize=7.5, colors=SLATE)
-    ax.grid(color="white", lw=.6); ax.set_xlabel("Este (m) · WGS84 UTM 19S", color=SLATE); ax.set_ylabel("Norte (m)", color=SLATE)
-    ax.plot([X1 - 2600, X1 - 600], [Y0 + 500] * 2, color=INK, lw=3); ax.text(X1 - 1600, Y0 + 650, "2 km", ha="center", fontsize=8)
-    fig.text(0.04, 0.95, "Tilama / Los Verdes · muestras y faenas", fontsize=20, weight="bold", color=INK)
-    fig.text(0.04, 0.925, f"Uso interno · {FECHA} · leyes de muestras puntuales, no recurso ni reserva · no compartir con peritos ni terceros", fontsize=9.5, color=SLATE)
+    ax.grid(color="white", lw=.4, alpha=.25); ax.set_xlabel("Este (m) · WGS84 UTM 19S", color=SLATE); ax.set_ylabel("Norte (m)", color=SLATE)
+    ax.plot([X1 - 2600, X1 - 600], [Y0 + 500] * 2, color="white", lw=3); ax.text(X1 - 1600, Y0 + 650, "2 km", ha="center", fontsize=8, color="white", weight="bold")
+    fig.text(0.04, 0.95, "Tilama / Los Verdes · muestras y faenas sobre imagen satelital", fontsize=20, weight="bold", color=INK)
+    fig.text(0.04, 0.925, f"Uso interno · {FECHA} · leyes de muestras puntuales, no recurso ni reserva · no compartir con peritos ni terceros · imagen Esri World Imagery", fontsize=9.5, color=SLATE)
     leg = [Line2D([], [], marker="*", ls="", mfc="#FFD23F", mec=INK, ms=15, label="Faena (numerada en la tabla)"),
            Line2D([], [], marker="o", ls="", mfc=COPPER, mec=INK, ms=8, label="Muestra TIL 2022 (3AAA)"),
            Line2D([], [], marker="^", ls="", mfc=COPPER, mec=INK, ms=7, label="Muestra EMT / Esterio"),
@@ -143,9 +147,9 @@ with PdfPages(R + f"tilama_mapa_valor_faenas_{FECHA}.pdf") as pdf:
            Line2D([], [], marker="o", ls="", mfc="#E3B341", mec=INK, ms=7, label="Cu 0,3–1 %"),
            Line2D([], [], marker="o", ls="", mfc=SLATE, mec=INK, ms=7, label="Cu < 0,3 %"),
            plt.Rectangle((0, 0), 1, 1, fc=COPPER, alpha=.35, ec=COPPER, label="Compra Fernández (LV4, LV5, Peumo)"),
-           plt.Rectangle((0, 0), 1, 1, fc=SAND, ec="#9C8B70", label="Derecho preferente / anexos"),
-           Line2D([], [], color=GREEN, ls="--", label="Nuestras solicitudes"),
-           Line2D([], [], color="#B9B1A3", label="Otras concesiones vigentes")]
+           plt.Rectangle((0, 0), 1, 1, fc=SAND, ec="#F2D29B", label="Derecho preferente / anexos"),
+           Line2D([], [], color="#7CFC9A", ls="--", label="Nuestras solicitudes"),
+           Line2D([], [], color="#9AA3AA", label="Otras concesiones vigentes")]
     ax.legend(handles=leg, loc="lower left", fontsize=8, framealpha=.92)
     # panel lateral
     ay = fig.add_axes([0.72, 0.07, 0.26, 0.84]); ay.axis("off")
