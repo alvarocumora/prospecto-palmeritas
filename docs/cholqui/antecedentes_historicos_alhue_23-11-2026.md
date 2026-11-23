@@ -50,3 +50,18 @@ Los informes inéditos de ENAMI (Camus y Duhalde 1981; reconocimiento de MANZANO
 expedientes de mensura de las explotaciones caducadas (Conservador de Minas y juzgado de
 Melipilla) no están digitalizados. Se piden por Ley de Transparencia a ENAMI, en la
 biblioteca de Sernageomin y en el Conservador de Minas.
+
+## Las Bellas, Don Bernardo, Florida y Amanecer (revisión del 23-11, catastro al 18-11)
+
+- Las Bellas: el núcleo (BELLA 1–3, LAS BELLAS VI) ya lo volvieron a pedir en 2026 terceros
+  (SHALOM 1–7 y DORADO UNO/DOS, en trámite: Medina Granifo, una inmobiliaria agrícola y
+  Servicios Geológicos Int.). Queda libre el sur: un rectángulo de 600 ha
+  (E 298.800–301.800 / N 6.227.682–6.229.682, WGS84) con 560 ha libres sobre ex LAS BELLAS V.
+- Don Bernardo: ex BERNARDO y DON BERNARDO 2 (Izquierdo Frutos) quedan 100 % libres. Rectángulo
+  de 600 ha (E 303.800–306.800 / N 6.233.682–6.235.682), al sur de SOL 1/144 y RUA, donde
+  Florida muestreó 7,6 / 2,8 / 2,3 g/t Au.
+- Florida 1–2 (ex Verano Capital): 400 ha con 324 libres (E 306.300–308.300 / N 6.230.682–
+  6.232.682), entre pedimentos chicos recientes y pertenencias de Minera Florida.
+- Amanecer, junto a Las Minitas y Cholqui: solo 147 ha libres y fragmentadas.
+- Historia: el oro de Alhué se descubrió en 1739; la villa de San Gerónimo de la Sierra de
+  Alhué se fundó en 1755 con trapiches, y decayó al bajar la productividad de las minas.
