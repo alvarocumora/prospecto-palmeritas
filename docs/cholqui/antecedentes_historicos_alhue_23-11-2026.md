@@ -1,0 +1,52 @@
+# Cholqui–Alhué: antecedentes históricos y exploración pública (23-11-2026)
+
+Revisión de lo disponible en línea sobre los bolsones de explotaciones caducadas del KMZ
+`kmz_cholqui_alhue_las_palmas_22-11-2026.kmz`. Uso interno.
+
+## Exploración de Minera Florida y Meridian en SIGEX (Sernageomin)
+
+Se bajaron y leyeron las bases de muestras de superficie de tres proyectos de Minera Florida
+(R104_0314, 2022; R104_0942, 2020-2021; R104_0995, 2022-2023). Suman unas 11.700 muestras
+(roca, suelo, sedimento y canaleta) con coordenadas WGS84 19S, más sondajes con certificados
+de laboratorio. El proyecto de Meridian (R104_0069, 2018) trae mapas, geoquímica y sondajes
+en formatos distintos y no se procesó todavía.
+
+El muestreo se concentra en el entorno de la mina (E 310–320 km, N 6.225–6.240 km). Dentro de
+los bolsones libres prácticamente no hay muestras: ninguna en Las Palmas–Palmera, Cisnes,
+Tantehue ni Don Raúl, una en Pharaoh y cuatro de baja ley en Esperanza (Paine). Florida no ha
+explorado esos terrenos, o al menos no lo ha declarado.
+
+Las muestras con oro sobre 1 g/t fuera de la mina caen todas en pertenencias vigentes de
+terceros pegadas a los bolsones, lo que indica que las estructuras mineralizadas pasan por el
+borde de terreno hoy libre:
+
+- Santa Sara 1/12 (SLM Santa Sara de Alhué), E 294.476 / N 6.233.214: 56,5 g/t Au, 39 g/t Ag,
+  0,86 % Cu. Junto al borde suroeste del bolsón 1.
+- Cardonal 1/40 (SCM Alhué-Chancón), E 294.3 / N 6.234.8: 2,1–2,2 g/t Au. Borde oeste del
+  bolsón 1.
+- Rua 1/20 y Sol 1/144 (sociedades legales de Alhué), E 302.7–304.1 / N 6.236.9–6.238.0:
+  7,61; 2,76; 2,34 y 1,45 g/t Au, con cobre de 0,1 a 0,45 %. Rodeadas de las explotaciones
+  caducadas PALMERA 4, 6 y 7, TRANCA y SANTA BLANCA (bolsones 1 y 10).
+- La Esperanza II 1/10 (Gómez Arancibia), E 326.1 / N 6.255.9: 1,8 y 3,6 g/t Au en veta de
+  cuarzo. Borde este del bolsón 4.
+- La Chicharra 1/30 (Minera Florida), E 315.6 / N 6.240.2: hasta 57,9 g/t Au en labores
+  antiguas. Entre los bolsones 2 y 3.
+
+## Literatura publicada
+
+- Poblete (2008), tesis U. de Chile: prospectos Au-Ag Las Bellas y Don Bernardo, 10 km al
+  OSO del distrito Alhué. Unas diez estructuras de 10–30 m de potencia y 100–2.000 m de
+  corrida; muestras de chip con hasta 7,8 g/t Au y 271 g/t Ag. Las Bellas corresponde a las
+  explotaciones caducadas LAS BELLAS IV, V y VI (Jerez Armijo).
+- Camus (Andean Geology): producción de la mina Alhué 1938–1940, unas 14.000 a 21.000 t/año
+  a 7,8–8,4 g/t Au. Cita informes inéditos de Camus y Duhalde (1981) sobre los distritos
+  Chancón y Las Palmas; hay que confirmar si ese Las Palmas es el de Alhué o el de Talca.
+- Moncada (2019), tesis de magíster U. de Chile: fluidos mineralizantes de las zonas Maqui,
+  Lorena y Chilco del distrito Alhué (vetas con unos 5 g/t Au y 23 g/t Ag en promedio).
+
+## Lo que no está en línea
+
+Los informes inéditos de ENAMI (Camus y Duhalde 1981; reconocimiento de MANZANO 1/40) y los
+expedientes de mensura de las explotaciones caducadas (Conservador de Minas y juzgado de
+Melipilla) no están digitalizados. Se piden por Ley de Transparencia a ENAMI, en la
+biblioteca de Sernageomin y en el Conservador de Minas.
