@@ -1,4 +1,4 @@
-# Tenencia de Tilama según el catastro SERNAGEOMIN (16-11-2026)
+# Tenencia de Tilama según el catastro SERNAGEOMIN (23-11-2026)
 
 Fuente: `arcgisawa.sernageomin.cl/server/rest/services/VIEW_WGS84/FeatureServer/2`, recuadro (-71.235, -32.12, -71.02, -31.93), 182 concesiones. Generado por `scripts/tilama_catastro_kmz.py`. Referencial: no reemplaza el certificado del Conservador de Minas.
 
