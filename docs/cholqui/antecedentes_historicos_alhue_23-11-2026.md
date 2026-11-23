@@ -65,3 +65,17 @@ biblioteca de Sernageomin y en el Conservador de Minas.
 - Amanecer, junto a Las Minitas y Cholqui: solo 147 ha libres y fragmentadas.
 - Historia: el oro de Alhué se descubrió en 1739; la villa de San Gerónimo de la Sierra de
   Alhué se fundó en 1755 con trapiches, y decayó al bajar la productividad de las minas.
+
+## Prospecto "Las Palmas" de Luis Pavez Becker (pin de Alvy, 23-11)
+
+- El pin (33°53'54.84"S 71°06'58.79"W, WGS84 E 304.313 / N 6.247.074) está dentro de
+  LAS ARENAS 1/25, explotación constituida de 125 ha a nombre de Luis Hernán Pavez Becker,
+  comuna de Melipilla. Queda 8,4 km al suroeste de la veta La Maza de Cholqui.
+- Su LAS ARENAS 2 1/102 (510 ha) caducó, pero ese terreno hoy lo cubren TANTEHUE 27 a 30
+  (Lecaros, constituidas): no queda nada libre ahí.
+- Encima de LAS ARENAS 1/25 hay pedimentos en trámite de Gonzalo Macaya Danús (PLACILLA 1 y 2,
+  vencen 2030). Esperan que la pertenencia caiga por patente impaga. Al sur está FENIX 1/39
+  (José Morán Ovalle, explotación en trámite).
+- El único terreno libre cerca está al oeste: un rectángulo de 600 ha
+  (E 300.300–303.300 / N 6.247.500–6.249.500) con 406 ha libres, sobre las ex TANTEHUE
+  XVIII a XX.
