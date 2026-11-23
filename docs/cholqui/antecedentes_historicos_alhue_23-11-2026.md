@@ -79,3 +79,15 @@ biblioteca de Sernageomin y en el Conservador de Minas.
 - El único terreno libre cerca está al oeste: un rectángulo de 600 ha
   (E 300.300–303.300 / N 6.247.500–6.249.500) con 406 ha libres, sobre las ex TANTEHUE
   XVIII a XX.
+
+## Sur de LAS ARENAS 1/25 (revisión del 23-11, catastro al 18-11)
+
+- Al sur de LAS ARENAS está FENIX 1/39 (Morán Ovalle, en trámite, hasta N 6.245.816). Más al
+  sur hay una franja libre de unos 9 × 2,5 km (N 6.243.500–6.246.000, E 299–308 km), que llega
+  hasta COBRE (Inversiones Cisnes, vigente, N 6.240.500–6.243.500).
+- No hay explotaciones caducadas en esa franja, solo pedimentos viejos de exploración: VILLA 25
+  a 30 (Minera Meridian), GALLITO 6 (BHP Chile), ILMEN (Inversiones Cisnes), MPR y COIRON XI y XII.
+- Se armaron VALLE ESCONDIDO 25 (E 301.800–304.800 / N 6.243.700–6.245.700) y 26
+  (E 304.800–307.800 / N 6.243.700–6.245.700), de 600 ha cada uno, 100 % libres, fuera de
+  San Juan de Piche (que empieza en E 308 km). OSM no muestra caminos dentro; el acceso sería
+  por Las Arenas o el Cajón de las Casas. Hay que verificarlo en terreno.
