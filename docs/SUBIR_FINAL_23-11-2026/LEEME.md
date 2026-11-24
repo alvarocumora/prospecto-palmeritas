@@ -40,11 +40,12 @@ Costo: unos $4,7 millones de tasa (art. 51) más unos $2,6 millones de Boletín,
 
 ## 3. Opcional, solo si alcanza (unos $2,9 millones en pedimentos)
 
-- **ALITAR (manifestación, ex DON HUGO).** Tiene un rajo escalonado y un tranque, y parece estar en operación. Antes de subirla hay que averiguar quién trabaja ahí.
 - **V-327 DESISTIMIENTO y CEJAR.** Van juntos. Si no subes CEJAR, MARTINA 13 queda sin rectificar y caduca sola.
 - **Pedimentos con historia pero sin muestras:** TULOR, SOLOR, TULAN, ZAPALERI, LASANA, PURITAMA, SOLCOR y SOCOMPA.
 
 ## Lo que no va
+
+- **ALITAR (ex DON HUGO), Auco.** En la imagen satelital hay una planta en operación, con piscina o tranque y estanques. Se sacó del paquete.
 
 - **Manifestaciones sobre pedimentos nuestros ya presentados:** BETER, TILOMONTE, TUMISA y PANIRI.
 - **Nivel B-:** INACALIRI, QUELANA, LINZOR, PILI, TURI, TUMBRE y JURIQUES.
