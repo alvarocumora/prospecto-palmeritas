@@ -91,3 +91,17 @@ biblioteca de Sernageomin y en el Conservador de Minas.
   (E 304.800–307.800 / N 6.243.700–6.245.700), de 600 ha cada uno, 100 % libres, fuera de
   San Juan de Piche (que empieza en E 308 km). OSM no muestra caminos dentro; el acceso sería
   por Las Arenas o el Cajón de las Casas. Hay que verificarlo en terreno.
+
+## Rediseño de Santa Sara–Cardonal (23-11, catastro al 18-11)
+
+- VALLE ESCONDIDO 4 (600 ha) y 23 (400 ha) caían sobre el valle de Hacienda Alhué (paños
+  agrícolas, tranque, escuela y casas). Se cambiaron por cuadros chicos en los cerros, al lado
+  de las pertenencias de Alhué-Chancón y Santa Sara: VE 4 Cardonal este (300 ha, E 294.900–
+  295.900 / N 6.234.800–6.237.800), VE 23 Cardonal norte (300 ha, E 293.800–294.800 /
+  N 6.235.700–6.238.700), VE 27 Divisadero (200 ha, E 296.800–297.800 / N 6.233.500–6.235.500)
+  y VE 28 Los Cóndores norte (300 ha, E 292.800–293.800 / N 6.235.700–6.238.700).
+- Los cuatro están 100 % libres y tienen menos de 3 % de terreno plano (pendiente bajo 7°,
+  según el modelo de elevación). VE 4 cubre las ex MARCELA VII, III y IV 1/60 y VE 27 cubre las
+  ex MINA DIVISADERO 1/30 y ROBLE 15 1/20, todas explotaciones caducadas. Se entra por la
+  Ruta G-680 (Cuesta Alhué).
+- Al sur de SANTA SARA 1/12 no queda nada que sirva: el terreno libre es plano y tiene casas.
