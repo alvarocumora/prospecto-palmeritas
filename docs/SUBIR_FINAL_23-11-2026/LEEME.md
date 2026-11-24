@@ -1,54 +1,67 @@
-# Paquete final para subir (23-11-2026)
+# Paquete final ajustado (24-11-2026)
 
-Solo van las piezas con evidencia real: muestras con ley, faenas visibles, minas eliminadas o historia de ENAMI. El detalle está en `ranking_pendientes_23-11-2026.csv`. Este paquete reemplaza a PDF_SUBIR_ORDENADO_23-11-2026 y a PDF_SUBIR_ALHUE_23-11-2026.
+Este paquete busca el menor costo de mantención sin dejar de proteger lo que tiene evidencia. Se pide como explotación solo donde ya hay una faena o un dato de ley. Donde la evidencia es solo satelital o histórica, se pide como exploración, que tiene una patente seis veces más barata. Las piezas grandes se dividen para pagar menos tasa y poder soltar la mitad que no sirva.
 
-## 1. Explotación: subir primero (10 manifestaciones)
+Catastro revisado al 23-11-2026. Patentes calculadas a UTM de $72.440: exploración 0,06 UTM/ha y explotación 0,4 UTM/ha, o 0,1 UTM/ha con la rebaja de pequeña minería.
 
-Hay que esperar los certificados de envío antes de pasar al punto 2.
+## 1. Explotación: subir primero (7 manifestaciones, 515 ha)
 
-**Juzgado de Melipilla.** TEBENQUICHE, 1 AL 109: pertenencias de 1 ha, libres, a menos de 200 m de SOL 1/144 y RUA 1/20 (Florida: 7,6 / 2,8 / 2,3 g/t Au). Siguen la traza de las ex PALMERA 5, 6 y 7. Reemplaza al pedimento de espera de 900 ha. Las pertenencias para el perito están en `cholqui/pedimentos_alhue_23-11-2026/TEBENQUICHE_pertenencias_WGS84.csv`.
+| Juzgado | Manifestación | Pertenencias | Base |
+|---|---|---|---|
+| Melipilla | TEBENQUICHE | 109 | Flancos de la veta de SOL y RUA (Florida: 7,6 g/t Au) |
+| Petorca | PURICO | 82 | Entorno de la faena Mi Primer Amor |
+| Petorca | CAICHINQUE | 91 | Rajo de Roberto Pablo y Mina Marilyn Monroe |
+| Los Vilos | COLACHI | 72 | Muestras con hasta 4,7 % Cu |
+| Los Vilos | TILOPOZO | 92 | Minas chicas junto a Chele |
+| Illapel | LASCAR | 49 | Faena de la ex Minera Cerro Alto |
+| Illapel | COYO | 20 | Pique de Santa Julia |
 
-**Juzgado de Petorca.** PURICO, 1 AL 82: pertenencias de 1 ha, libres, a menos de 300 m de la faena de MI PRIMER AMOR, que hoy cubren LAS CARDITAS 1/60 y ANIBAL 1/23 (constituidas). Ocupan el hueco libre entre PUTANA y CHILIQUES, sobre las ex MI PRIMER AMOR, MI SEGUNDO AMOR y MI HIJA. Pertenencias en `tilama/pedimentos/rediseno_23-11-2026/PURICO_pertenencias_PSAD56.csv`.
+Hay que esperar los certificados de envío antes de subir la carpeta 2.
 
-CAICHINQUE, 1 AL 91: rajo de la ex ROBERTO PABLO 1/2 y la parte de la ex MINA MARILYN MONROE 1/5 que queda fuera de PUTANA, sobre la antigua LAS PALMAS 4 1/57 (CCM Ojos del Salado). Todo libre. Pertenencias en `tilama/pedimentos/rediseno_23-11-2026/CAICHINQUE_pertenencias_PSAD56.csv`.
+## 2. Exploración: subir después (25 pedimentos, 6.200 ha, todos de 300 ha o menos)
 
-**Juzgado de Illapel.** Son faenas sobre explotaciones eliminadas, todas libres en el catastro del 23-11.
+**Petorca.** LACO, PUJSA, MISCANTI, ACAMARACHI, PUTANA (mitad sur, con Las Palmas–Tránsito), CUCUTER (mitad norte de la antigua PUTANA; 8 ha caen en Los Vilos), CHILIQUES.
 
-| Manifestación | Pertenencias | Qué cubre |
+**Melipilla.** Cada pieza de 600 ha se dividió en dos de 300 ha:
+- CATARPE (este, ex MANZANO de ENAMI) y TUYAJTO (oeste).
+- POCONCHE (norte) y GUATIN (sur).
+- TOCORPURI (norte, Las Bellas) y HECAR (sur).
+
+A eso se suma SEQUITOR.
+
+**Illapel.** LARACHE, más YAYE (200 ha), CHAXA (100 ha) y CAPUR (100 ha). Estas tres pasaron de manifestación a pedimento porque solo las respalda la imagen satelital. Si el muestreo confirma, se manifiesta después dentro de ellas, en uso de sus derechos.
+
+**Los Vilos.** VILAMA, CABUR, HONAR, TATIO, CUCHABRACHE, TILOCALAR, CHECAR.
+
+## 3. Opcional, solo si alcanza
+
+V-327 DESISTIMIENTO más CEJAR, TULOR, SOLOR, TULAN, ZAPALERI, LASANA, PURITAMA, SOLCOR y SOCOMPA.
+
+## Costos
+
+| | Antes del ajuste | Ajustado |
 |---|---|---|
-| LASCAR | 49 | Faena de la ex MINERA CERRO ALTO 1/20 |
-| CHAXA | 75 | Ex TOBOGAN 63: decenas de piques alineados sobre una veta, junto a la ruta |
-| CAPUR | 90 | Ex NARNIA 1/20 y 3: camino en zigzag y plataforma de faena |
-| YAYE | 144 | Ex BUENA ESPERANZA 1/13: desmonte y plataforma |
-| COYO | 20 | Ex SANTA JULIA 1/5: pique con huella |
+| Para presentar (tasa más Boletín) | ≈ $8,8 M | ≈ $6,9 M |
+| Patente anual si todo llega a concesión | ≈ $49 M | ≈ $42 M |
+| Con los cortes del plan de muestreo (abajo) | | ≈ $20–25 M |
 
-**Juzgado de Los Vilos.** Junto a la mina Chele.
+## Prioridad de muestreo
 
-| Manifestación | Pertenencias | Qué cubre |
-|---|---|---|
-| TILOPOZO | 92 | Ex PABLITO y DOÑA MARÍA CLAUDIA |
-| COLACHI | 72 | Muestras con hasta 4,7 % Cu y ex EL ZORRO |
+El orden sigue lo que más cuesta mantener y lo que menos datos tiene. Cada visita decide qué se mensura, qué pedimento llega a sentencia y qué mitad se suelta.
 
-## 2. Exploración: subir después (18 pedimentos, 5.800 ha)
+**Campaña 1. Antes de pedir la mensura, entre los días 91 y 120 desde la presentación. Decide cuántas pertenencias se mensuran.**
+1. TEBENQUICHE: ambos flancos de SOL. Son 109 ha a 0,4 UTM.
+2. CAICHINQUE: el rajo de Roberto Pablo y Marilyn Monroe.
+3. PURICO: los desmontes del lado este del camino.
+4. TILOPOZO: las labores de PABLITO y DOÑA MARÍA CLAUDIA.
+5. COYO: el pique.
 
-| Juzgado | Pedimentos |
-|---|---|
-| Illapel | LARACHE. Rodea LASCAR, por eso va después |
-| Los Vilos | VILAMA, CABUR, HONAR, TATIO, CUCHABRACHE, TILOCALAR, CHECAR |
-| Petorca | LACO, PUJSA, MISCANTI, ACAMARACHI, PUTANA, CHILIQUES |
-| Melipilla | CATARPE, POCONCHE, TOCORPURI, SEQUITOR |
+Pertenencia sin mineral, pertenencia que no se mensura.
 
-Costo: unos $4,7 millones de tasa (art. 51) más unos $2,6 millones de Boletín, en total unos $7,3 millones.
+**Campaña 2. Antes del día 90 desde la resolución de cada pedimento. Decide cuáles llegan a sentencia.**
+1. Las mitades de Alhué: CATARPE o TUYAJTO, POCONCHE o GUATIN, TOCORPURI o HECAR. Se queda la que muestre algo y la otra caduca sin pagar.
+2. Las tres de Cerro Alto que vienen del satélite: YAYE, CHAXA y CAPUR.
+3. PUTANA y CUCUTER: cuál de las dos mitades sigue.
+4. Los Vilos: VILAMA, CABUR, HONAR, TATIO, CUCHABRACHE, TILOCALAR y CHECAR, y además CHILIQUES y SEQUITOR.
 
-## 3. Opcional, solo si alcanza (unos $2,9 millones en pedimentos)
-
-- **V-327 DESISTIMIENTO y CEJAR.** Van juntos. Si no subes CEJAR, MARTINA 13 queda sin rectificar y caduca sola.
-- **Pedimentos con historia pero sin muestras:** TULOR, SOLOR, TULAN, ZAPALERI, LASANA, PURITAMA, SOLCOR y SOCOMPA.
-
-## Lo que no va
-
-- **ALITAR (ex DON HUGO), Auco.** En la imagen satelital hay una planta en operación, con piscina o tranque y estanques. Se sacó del paquete.
-
-- **Manifestaciones sobre pedimentos nuestros ya presentados:** BETER, TILOMONTE, TUMISA y PANIRI.
-- **Nivel B-:** INACALIRI, QUELANA, LINZOR, PILI, TURI, TUMBRE y JURIQUES.
-- **Nivel C:** Combarbalá, Paine, María Pinto, PURI, CAICHINQUE, CHAXA y CAPUR antiguas (los nombres quedaron libres y se reusaron arriba), YAYE, ALITAR, PURICO, COYO y CUCUTER.
+**Muestreo de confirmación, sin apuro.** Estas piezas ya tienen leyes: LACO, PUJSA, MISCANTI, ACAMARACHI, COLACHI y LASCAR.
