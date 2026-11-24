@@ -1,0 +1,53 @@
+﻿nivel;concesion;zona;tipo;ha;tasa_art51_clp;evidencia
+A;LASCAR;Cerro Alto;manifestación;49;0;La faena de Cerro Alto (ex MINERA CERRO ALTO 1/20)
+A;CATARPE;Cholqui–Alhué;pedimento;600;869280;Ex MANZANO 1/40 de ENAMI (363 ha), MINA DIVISADERO, ROBLE 20 y 22, PALMERA 8
+A;TEBENQUICHE;Cholqui–Alhué;pedimento;900;1303920;"Florida: 7,61 / 2,76 / 2,34 g/t Au en RUA y SOL; 14 explotaciones eliminadas (PALMERA 5 a 7, TRANCA). Es pedimento de espera sobre RUA y SOL"
+A;ACAMARACHI;Tilama;pedimento;300;108660;"Faena visible (desmontes y labores de LA SUERTE) más 2 con huellas; 7 explotaciones eliminadas"
+A;COLACHI;Tilama;manifestación;72;0;"6 muestras hasta 4,7 % Cu y 0,6 g/t Au; labores de Santa Teresa; ex EL ZORRO, DOÑA MARÍA CLAUDIA, TELETÓN"
+A;LACO;Tilama;pedimento;200;72440;"12 muestras Cerro Bayo (Las Cenizas) con Cu ≥1 %, hasta 24 %; ex EL QUILLAY 1 y 2"
+A;MISCANTI;Tilama;pedimento;300;108660;"3 muestras dentro, hasta 4,5 % Cu; 6 explotaciones eliminadas"
+A;PUJSA;Tilama;pedimento;100;36220;"3 muestras con hasta 6,4 % Cu; alteración rojiza (ex GEMINIS XII y PANDA XI)"
+A;PUTANA;Tilama;pedimento;600;869280;"12 minas chicas eliminadas (MI PADRE, MI HIJA, EL TRÁNSITO…); yacimiento Las Palmas-Tránsito (Ruiz y Peebles); caminos mineros"
+A-;LARACHE;Cerro Alto;pedimento;300;108660;Rodea la faena de Cerro Alto (ex MINERA CERRO ALTO y AURORA)
+A-;POCONCHE;Cholqui–Alhué;pedimento;600;869280;"Prospecto Don Bernardo (tesis Poblete 2008); al sur de RUA y SOL con oro; ex POLULO y PALMERA 13 y 14"
+A-;TOCORPURI;Cholqui–Alhué;pedimento;600;869280;"Prospecto Las Bellas (Poblete 2008, hasta 7,8 g/t Au); ex LAS BELLAS V, EL RELOJ, BELLA 3"
+B+;SEQUITOR;Cholqui–Alhué;pedimento;200;72440;"Ex MINA DIVISADERO 1/30 y ROBLE 15; pegada a CATARPE"
+B+;CABUR;Tilama;pedimento;300;108660;Ex GRADO 10 a 13 (De Amestica) y TILAMA 49/58 de ENAMI
+B+;CHECAR;Tilama;pedimento;200;72440;Ex DON RUFO, ARANTXA 1, TELETÓN
+B+;CHILIQUES;Tilama;pedimento;300;108660;Ex MINA SOFÍA LORENS, ICO ICO, MI PRIMER AMOR (caminos mineros)
+B+;CUCHABRACHE;Tilama;pedimento;200;72440;Ex TILAMA 1/10 y 11/20 de ENAMI
+B+;HONAR;Tilama;pedimento;200;72440;Ex MACANO 1/49 y TILAMA 69/80 de ENAMI
+B+;TATIO;Tilama;pedimento;300;108660;Ex TILAMA 1/60, CHINA 1/20, LOS CARACOLES
+B+;TILOCALAR;Tilama;pedimento;200;72440;Minas chicas eliminadas (MARITXU, PABLITO, ARANTXA 2, GUAYACÁN, SANTA ROSA DE LIMA)
+B+;TILOPOZO;Tilama;manifestación;92;0;Minas chicas eliminadas junto a Chele (PABLITO, DOÑA MARÍA CLAUDIA, SANTA ROSA DE LIMA, ALFA)
+B+;VILAMA;Tilama;pedimento;300;108660;Ex TILAMA 1/60, GRADO 10 y TILAMA 21/28 y 29/38 de ENAMI
+B;PURITAMA;Cerro Alto;pedimento;200;72440;Ex AURORA 1/36 y YASNA 1/8 (Cerro Alto)
+B;SOCOMPA;Cholqui–Alhué;pedimento;600;869280;"Ex TANTEHUE (7 títulos); al oeste de la mina de Pavez Becker"
+B;SOLCOR;Cholqui–Alhué;pedimento;300;108660;"Ex MARCELA VII, III y IV; al lado de CARDONAL (2,2 g/t)"
+B;CEJAR;Tilama;pedimento;200;72440;Ex TILAMA 11/20 de ENAMI
+B;LASANA;Tilama;pedimento;300;108660;"Ex MONTE BLANCO, LA SUERTE, MONSERRAT, BLANCO 6 (ENAMI); casas de El Manzano adentro"
+B;SOLOR;Tilama;pedimento;200;72440;Ex NORTE 6 1/30 (Cía. Minera Tilama)
+B;TULAN;Tilama;pedimento;200;72440;Ex VENTANA 1/22, EL QUILLAY 3
+B;TULOR;Tilama;pedimento;100;36220;"Ex EL QUILLAY 2; entre LACO y MISCANTI"
+B;ZAPALERI;Tilama;pedimento;300;108660;Ex FRANI, SANTA TERESITA, BLANCO 10 (ENAMI)
+B-;JURIQUES;Cholqui–Alhué;pedimento;400;579520;Ex SUSANA, AMANECER 1, MONTE VERDE
+B-;TUMBRE;Cholqui–Alhué;pedimento;300;108660;Ex TANTEHUE III a VI (bloques de 12 pertenencias de Lecaros)
+B-;TURI;Cholqui–Alhué;pedimento;600;869280;Ex LAS PALMAS 1/60, TINO ESTE, PABLO VI y XII (bloques de 60)
+B-;INACALIRI;Tilama;pedimento;400;579520;"Ex LOS 3 CERRILLOS y LA JOTA; casas de Entre Puentes"
+B-;LINZOR;Tilama;pedimento;200;72440;"Ex LUCRECIA, VALENTINA, HAMBURGO; lejos del núcleo"
+B-;PILI;Tilama;pedimento;600;869280;"Ex COBRE NORTE IV 1/60 y LA FIDELMITA; lejos del núcleo"
+B-;QUELANA;Tilama;pedimento;400;579520;Ex TILAMA 1 a 3 (Agrícola San Francisco), bloques grandes
+C;CAICHINQUE;Cerro Alto;pedimento;300;108660;Cerro Alto: sin historia ni muestras
+C;PURI;Cerro Alto;pedimento;300;108660;Cerro Alto: sin historia ni muestras
+C;ALITAR;Cholqui–Alhué;pedimento;300;108660;Cerros sin historia ni muestras
+C;COYO;Cholqui–Alhué;pedimento;600;869280;Solo pedimentos viejos de exploración (Meridian, BHP)
+C;CUCUTER;Cholqui–Alhué;pedimento;600;869280;Solo bloques grandes de Inversiones Cisnes (1/80)
+C;GUATIN;Cholqui–Alhué;pedimento;600;869280;"Paine; bloques ESPERANZA de 300 pertenencias"
+C;HECAR;Cholqui–Alhué;pedimento;600;869280;"Paine; bloques ESPERANZA de 300 pertenencias"
+C;PURICO;Cholqui–Alhué;pedimento;600;869280;Solo pedimentos viejos de exploración (Meridian, BHP)
+C;SAIRECABUR;Cholqui–Alhué;pedimento;400;579520;"Paine, fuera del foco; La Esperanza II (3,6 g/t) queda pegada pero afuera"
+C;TUYAJTO;Cholqui–Alhué;pedimento;400;579520;Ex PAZ 1/200 de Corporación Vipassana (centro de meditación, no minero)
+C;YAYE;Cholqui–Alhué;pedimento;300;108660;Cerros sin historia ni muestras
+C;QUITOR;Combarbalá;pedimento;200;72440;Combarbalá: ex LAS TINAJAS III y IV, distrito activo, pero fuera del foco y sin muestras propias
+C;CAPUR;Tilama;pedimento;400;579520;"Solo ex PUPIO (bloques grandes tipo Pelambres); sin muestras ni faenas"
+C;CHAXA;Tilama;pedimento;400;579520;Sin explotaciones eliminadas, muestras ni faenas
