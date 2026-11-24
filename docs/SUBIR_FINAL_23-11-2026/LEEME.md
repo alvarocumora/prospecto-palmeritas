@@ -2,9 +2,11 @@
 
 Solo van las piezas con evidencia real: muestras con ley, faenas visibles, minas eliminadas o historia de ENAMI. El detalle está en `ranking_pendientes_23-11-2026.csv`. Este paquete reemplaza a PDF_SUBIR_ORDENADO_23-11-2026 y a PDF_SUBIR_ALHUE_23-11-2026.
 
-## 1. Explotación: subir primero (7 manifestaciones)
+## 1. Explotación: subir primero (8 manifestaciones)
 
 Hay que esperar los certificados de envío antes de pasar al punto 2.
+
+**Juzgado de Melipilla.** TEBENQUICHE, 1 AL 109: pertenencias de 1 ha, libres, a menos de 200 m de SOL 1/144 y RUA 1/20 (Florida: 7,6 / 2,8 / 2,3 g/t Au). Siguen la traza de las ex PALMERA 5, 6 y 7. Reemplaza al pedimento de espera de 900 ha. Las pertenencias para el perito están en `cholqui/pedimentos_alhue_23-11-2026/TEBENQUICHE_pertenencias_WGS84.csv`.
 
 **Juzgado de Illapel.** Son faenas sobre explotaciones eliminadas, todas libres en el catastro del 23-11.
 
@@ -23,16 +25,16 @@ Hay que esperar los certificados de envío antes de pasar al punto 2.
 | TILOPOZO | 92 | Ex PABLITO y DOÑA MARÍA CLAUDIA |
 | COLACHI | 72 | Muestras con hasta 4,7 % Cu y ex EL ZORRO |
 
-## 2. Exploración: subir después (19 pedimentos, 6.700 ha)
+## 2. Exploración: subir después (18 pedimentos, 5.800 ha)
 
 | Juzgado | Pedimentos |
 |---|---|
 | Illapel | LARACHE. Rodea LASCAR, por eso va después |
 | Los Vilos | VILAMA, CABUR, HONAR, TATIO, CUCHABRACHE, TILOCALAR, CHECAR |
 | Petorca | LACO, PUJSA, MISCANTI, ACAMARACHI, PUTANA, CHILIQUES |
-| Melipilla | TEBENQUICHE, CATARPE, POCONCHE, TOCORPURI, SEQUITOR |
+| Melipilla | CATARPE, POCONCHE, TOCORPURI, SEQUITOR |
 
-Costo: unos $6,0 millones de tasa (art. 51) más unos $2,8 millones de Boletín, en total unos $8,8 millones.
+Costo: unos $4,7 millones de tasa (art. 51) más unos $2,6 millones de Boletín, en total unos $7,3 millones.
 
 ## 3. Opcional, solo si alcanza (unos $2,9 millones en pedimentos)
 
