@@ -35,7 +35,9 @@ A eso se suma SEQUITOR.
 
 ## 3. Opcional, solo si alcanza
 
-V-327 DESISTIMIENTO más CEJAR, TULOR, SOLOR, TULAN, ZAPALERI, LASANA, PURITAMA, SOLCOR y SOCOMPA.
+V-327 DESISTIMIENTO más CEJAR, TULOR, SOLOR, TULAN, ZAPALERI, LASANA, PURITAMA, SOLCOR, SOCOMPA y QUITOR (la antigua SOCOMPA de 600 ha, dividida en norte y sur).
+
+Todos los pedimentos del paquete, incluidos los opcionales, tienen 300 ha o menos, así que pagan la tasa más baja del art. 51 (0,005 UTM/ha).
 
 ## Costos
 
