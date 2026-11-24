@@ -2,11 +2,13 @@
 
 Solo van las piezas con evidencia real: muestras con ley, faenas visibles, minas eliminadas o historia de ENAMI. El detalle está en `ranking_pendientes_23-11-2026.csv`. Este paquete reemplaza a PDF_SUBIR_ORDENADO_23-11-2026 y a PDF_SUBIR_ALHUE_23-11-2026.
 
-## 1. Explotación: subir primero (8 manifestaciones)
+## 1. Explotación: subir primero (9 manifestaciones)
 
 Hay que esperar los certificados de envío antes de pasar al punto 2.
 
 **Juzgado de Melipilla.** TEBENQUICHE, 1 AL 109: pertenencias de 1 ha, libres, a menos de 200 m de SOL 1/144 y RUA 1/20 (Florida: 7,6 / 2,8 / 2,3 g/t Au). Siguen la traza de las ex PALMERA 5, 6 y 7. Reemplaza al pedimento de espera de 900 ha. Las pertenencias para el perito están en `cholqui/pedimentos_alhue_23-11-2026/TEBENQUICHE_pertenencias_WGS84.csv`.
+
+**Juzgado de Petorca.** PURICO, 1 AL 82: pertenencias de 1 ha, libres, a menos de 300 m de la faena de MI PRIMER AMOR, que hoy cubren LAS CARDITAS 1/60 y ANIBAL 1/23 (constituidas). Ocupan el hueco libre entre PUTANA y CHILIQUES, sobre las ex MI PRIMER AMOR, MI SEGUNDO AMOR y MI HIJA. Pertenencias en `tilama/pedimentos/rediseno_23-11-2026/PURICO_pertenencias_PSAD56.csv`.
 
 **Juzgado de Illapel.** Son faenas sobre explotaciones eliminadas, todas libres en el catastro del 23-11.
 
