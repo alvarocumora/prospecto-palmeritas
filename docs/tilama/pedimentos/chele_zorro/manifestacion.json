@@ -1,0 +1,27 @@
+[
+ {
+  "nombre": "MARTINA 32",
+  "n_pert": 11,
+  "pert_ha": 11,
+  "rect": {
+   "E0": 297100,
+   "N0": 6454300,
+   "E1": 297650,
+   "N1": 6454500,
+   "EW": 550,
+   "NS": 200,
+   "ha": 11
+  },
+  "pi_E": 297375,
+  "pi_N": 6454400,
+  "junto_a": [
+   "TILAMA (en trámite)",
+   "CHELE NORTE 1/8",
+   "MANDELA 1/10",
+   "ESPERANZA 1/14"
+  ],
+  "contiene": [
+   "franja libre de la antigua EL ZORRO 1/20 (rol 04303-0769-K, eliminada)"
+  ]
+ }
+]

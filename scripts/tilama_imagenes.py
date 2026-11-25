@@ -107,7 +107,59 @@ out geom;"""
     return {"type": "FeatureCollection", "features": feats}
 
 
+def sur():
+    """Sector sur-este hasta el límite regional (MARTINA 12 a 27): faenas y accesos a z17."""
+    OUT.mkdir(parents=True, exist_ok=True)
+    meta = {"nota": "Esri World Imagery; georreferencia en WGS84 (EPSG:4326) por esquinas de tesela Web Mercator",
+            "mosaicos": []}
+    for nombre, e0, n0, e1, n1 in (("petorca_sur_o", 294500, 6435500, 298800, 6442500),
+                                   ("petorca_sur_e", 298800, 6435500, 303000, 6442500),
+                                   ("petorca_este_s", 303000, 6442500, 308000, 6447500),
+                                   ("petorca_este_n", 305500, 6447500, 312500, 6453500)):
+        a = psad_to_ll(e0, n0); b = psad_to_ll(e1, n1)
+        meta["mosaicos"].append(mosaic(nombre, a[0], a[1], b[0], b[1], 17, quality=78))
+    (OUT / "mosaicos.json").write_text(json.dumps(meta, indent=1))
+    lon0, lat0 = psad_to_ll(294000, 6435000)
+    lon1, lat1 = psad_to_ll(313000, 6454000)
+    (OUT / "osm.geojson").write_text(json.dumps(osm(lon0, lat0, lon1, lat1), ensure_ascii=False))
+
+
+def chips():
+    """Recortes z17 de 600 m alrededor de cada concesión de explotación eliminada con terreno libre."""
+    from pyproj import Transformer as _T
+    OUT.mkdir(parents=True, exist_ok=True)
+    to_ll = _T.from_crs(32719, 4326, always_xy=True).transform
+    lista = json.loads((ROOT / "docs/tilama/historico/chips_barrido.json").read_text())
+    z, cache = 17, {}
+    for c in lista:
+        e, n, h = c["E"], c["N"], 300
+        lon0, lat0 = to_ll(e - h, n - h)
+        lon1, lat1 = to_ll(e + h, n + h)
+        x0, y1 = deg2tile(lon0, lat0, z)
+        x1, y0 = deg2tile(lon1, lat1, z)
+        img = Image.new("RGB", ((int(x1) - int(x0) + 1) * 256, (int(y1) - int(y0) + 1) * 256))
+        for tx in range(int(x0), int(x1) + 1):
+            for ty in range(int(y0), int(y1) + 1):
+                if (tx, ty) not in cache:
+                    try:
+                        cache[(tx, ty)] = Image.open(io.BytesIO(get(TILE.format(z=z, x=tx, y=ty)))).convert("RGB")
+                    except Exception as ex:  # noqa: BLE001
+                        print("tesela falló", tx, ty, ex)
+                        cache[(tx, ty)] = Image.new("RGB", (256, 256))
+                img.paste(cache[(tx, ty)], ((tx - int(x0)) * 256, (ty - int(y0)) * 256))
+        box_px = ((x0 - int(x0)) * 256, (y0 - int(y0)) * 256, (x1 - int(x0)) * 256, (y1 - int(y0)) * 256)
+        img.crop(tuple(int(v) for v in box_px)).resize((480, 480)).save(OUT / f"chip_{c['id']}.jpg", quality=80)
+        if len(cache) > 3000:
+            cache.clear()
+    print("chips:", len(lista))
+
+
 def main():
+    import os
+    if os.environ.get("TILAMA_ZONA") == "sur":
+        return sur()
+    if os.environ.get("TILAMA_ZONA") == "chips":
+        return chips()
     OUT.mkdir(parents=True, exist_ok=True)
     base = ROOT / "docs/tilama/pedimentos/presentacion"
     P = json.loads((base / "pedimentos_exploracion.json").read_text())

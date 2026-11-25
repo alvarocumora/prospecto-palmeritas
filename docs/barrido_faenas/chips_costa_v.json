@@ -1,0 +1,7566 @@
+[
+{
+"id": "V001",
+"E": 331777,
+"N": 6426048,
+"score": 4.5,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"MAITEN 1/4 (0ha)",
+"MAITEN 1/4 (0ha)",
+"MAITEN 1/2 (0ha)",
+"EL CAMINO 1 1/3 (0ha)",
+"CABIJA 1/5 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.786495,
+"lat": -32.289729
+},
+{
+"id": "V002",
+"E": 321327,
+"N": 6396948,
+"score": 3.25,
+"com": "CABILDO",
+"libre600": 21.5,
+"minas": [
+"CORINTO 3 1/46 (0ha)",
+"CONSTANZA 1/6 (0ha)",
+"TOY 1/14 (0ha)",
+"EL ESFUERZO 1/14 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.902923,
+"lat": -32.550483
+},
+{
+"id": "V003",
+"E": 319477,
+"N": 6398998,
+"score": 3.02,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LOS PEQUENES 21/34 (0ha)",
+"FLOR DEL INCA 1/8 (1/4) (0ha)",
+"MAURICIO 1/5 (0ha)",
+"HUGO CHAVEZ 1/8 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.922222,
+"lat": -32.531701
+},
+{
+"id": "V004",
+"E": 253627,
+"N": 6516848,
+"score": 3.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MORRO BLANCO 1/7 (0ha)",
+"LA PERDIDA 1/5 (0ha)",
+"COSTERA 1/5 (0ha)"
+],
+"tit": "SAAVEDRA RAMOS DANILO",
+"lon": -71.59278,
+"lat": -31.456918
+},
+{
+"id": "V005",
+"E": 330127,
+"N": 6421048,
+"score": 3.0,
+"com": "CABILDO",
+"libre600": 27.3,
+"minas": [
+"SAN ROBERTO 1/8 (40ha)",
+"ROSARIO 1/7 (0ha)",
+"FRAY LEON III 1/5 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.804904,
+"lat": -32.334564
+},
+{
+"id": "V006",
+"E": 326277,
+"N": 6405598,
+"score": 3.0,
+"com": "CABILDO",
+"libre600": 24.2,
+"minas": [
+"AGUA MALA DEL 1-7 (55ha)",
+"LA GRUTA 1/21 (0ha)",
+"VICTORIA 2 1/11 (0ha)"
+],
+"tit": "RIGOBERTO PATRICIO OLMOS MARCHAN",
+"lon": -70.84863,
+"lat": -32.473278
+},
+{
+"id": "V007",
+"E": 329827,
+"N": 6424248,
+"score": 2.94,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANTONIA 1/5 (19ha)",
+"PERALITO 1/10 (0ha)",
+"PERALITO 1/10 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.807517,
+"lat": -32.305665
+},
+{
+"id": "V008",
+"E": 297527,
+"N": 6358548,
+"score": 2.6,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EBEN EZER 1/20 (76ha)",
+"LUCHADOR 3 1/30 (0ha)",
+"ESPERANZA VII 1/10 (0ha)",
+"ESPERANZA (0ha)",
+"EBER-EZER 1/20 (0ha)"
+],
+"tit": "ROJAS SOTO ROLANDO DELFIN",
+"lon": -71.164604,
+"lat": -32.892543
+},
+{
+"id": "V009",
+"E": 286927,
+"N": 6482798,
+"score": 2.5,
+"com": "ILLAPEL",
+"libre600": 30.4,
+"minas": [
+"LA LLARETA 8 1/10 (42ha)",
+"DESPRECIADA 1/7 (0ha)",
+"MIS AMORES 2 1/148 (0ha)"
+],
+"tit": "CISTERNAS OLIVARES LUIS",
+"lon": -71.24996,
+"lat": -31.770507
+},
+{
+"id": "V010",
+"E": 329927,
+"N": 6423598,
+"score": 2.5,
+"com": "CABILDO",
+"libre600": 34.7,
+"minas": [
+"PERALITO 1/20 (0ha)",
+"PERALITO 1/10 (0ha)",
+"PERALITO 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.806572,
+"lat": -32.311541
+},
+{
+"id": "V011",
+"E": 320127,
+"N": 6398948,
+"score": 2.5,
+"com": "CABILDO",
+"libre600": 35.1,
+"minas": [
+"LOS PEQUENES 21/34 (0ha)",
+"BUENA SUERTE 1/3 (0ha)",
+"SHALOM 1/3 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.915314,
+"lat": -32.532257
+},
+{
+"id": "V012",
+"E": 298177,
+"N": 6358548,
+"score": 2.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EBEN EZER 1/20 (76ha)",
+"LUCHADOR 3 1/30 (0ha)",
+"ESPERANZA VII 1/10 (0ha)",
+"ESPERANZA (0ha)",
+"EBER-EZER 1/20 (0ha)"
+],
+"tit": "ROJAS SOTO ROLANDO DELFIN",
+"lon": -71.15766,
+"lat": -32.892663
+},
+{
+"id": "V013",
+"E": 296427,
+"N": 6358298,
+"score": 2.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LAS PATAGUAS B 1/10 (50ha)",
+"ROSA MARIA 21/30 (0ha)",
+"ESPERANZA VIII 1/10 (0ha)",
+"ESPERANZA 1/20 (0ha)"
+],
+"tit": "SOC. AGRICOLA VERTIENTES SPA",
+"lon": -71.176412,
+"lat": -32.894592
+},
+{
+"id": "V014",
+"E": 328027,
+"N": 6392798,
+"score": 2.36,
+"com": "CABILDO",
+"libre600": 18.2,
+"minas": [
+"FORTUNA 14 1/10 (28ha)",
+"LEON 1/20 (0ha)",
+"CARPALLA 1/7 (0ha)"
+],
+"tit": "SCM FORTUNA",
+"lon": -70.832359,
+"lat": -32.588961
+},
+{
+"id": "V015",
+"E": 256927,
+"N": 6501298,
+"score": 2.3,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA CLAUDIA I 1/20 (0ha)",
+"MINERA SANTA JUANA II 1/19 (0ha)",
+"OCEANIA 1/12 (0ha)",
+"BELLAVISTA 2 1/45 (0ha)",
+"MINERA SANTA JUANA 1/17 (0ha)"
+],
+"tit": "BLANCO BEROIZ HAROLDO FCO",
+"lon": -71.561907,
+"lat": -31.597775
+},
+{
+"id": "V016",
+"E": 301027,
+"N": 6355198,
+"score": 2.3,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"CHORRILLOS 1/100 (0ha)",
+"EL BELLOTAL 1/10 (0ha)",
+"EL PENON 1/10 (0ha)"
+],
+"tit": "HERRERA VICENCIO LEONIDAS",
+"lon": -71.127932,
+"lat": -32.923383
+},
+{
+"id": "V017",
+"E": 272427,
+"N": 6391048,
+"score": 2.26,
+"com": "ZAPALLAR",
+"libre600": 35.0,
+"minas": [
+"CACHAGUA 1/5 (25ha)",
+"PARQUE 1/20 (0ha)",
+"GLORIA 1/5 (0ha)"
+],
+"tit": "BADILLO MOLINA LORENZO ANTONIO",
+"lon": -71.424796,
+"lat": -32.594701
+},
+{
+"id": "V018",
+"E": 321677,
+"N": 6414898,
+"score": 2.25,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LA TITA 1/5 (0ha)",
+"LA VINA 1/5 (0ha)",
+"COLLAO 36, 1/60 (0ha)"
+],
+"tit": "ESTAY BARRAZA ALONSO",
+"lon": -70.895801,
+"lat": -32.388699
+},
+{
+"id": "V019",
+"E": 311577,
+"N": 6425798,
+"score": 2.22,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LUZ 1/100 (0ha)",
+"LOS PLATEADOS 1/10 (0ha)",
+"LOS ARANDA 1/10 (0ha)"
+],
+"tit": "MINERA SUR ANDES LIMITADA",
+"lon": -71.000958,
+"lat": -32.288766
+},
+{
+"id": "V020",
+"E": 310077,
+"N": 6427048,
+"score": 2.15,
+"com": "PETORCA",
+"libre600": 27.8,
+"minas": [
+"MARTINA 1/10 (0ha)",
+"RELAVE 1/3 (0ha)",
+"TORNO 29/32 (0ha)"
+],
+"tit": "ALCAIDE VASQUEZ ERICA CELIA",
+"lon": -71.016629,
+"lat": -32.277243
+},
+{
+"id": "V021",
+"E": 318227,
+"N": 6412048,
+"score": 2.1,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAURITA DOS 1/20 (100ha)",
+"CERRO ASTA 1/10 (0ha)",
+"LAURITA 2 1/20 (0ha)"
+],
+"tit": "RAMIREZ OLMOS GABRIEL ANGEL",
+"lon": -70.933009,
+"lat": -32.413838
+},
+{
+"id": "V022",
+"E": 297427,
+"N": 6359198,
+"score": 2.05,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EBEN EZER 1/20 (76ha)",
+"LUCHADOR 8 1/35 (0ha)",
+"ESPERANZA (0ha)",
+"EBER-EZER 1/20 (0ha)"
+],
+"tit": "ROJAS SOTO ROLANDO DELFIN",
+"lon": -71.16553,
+"lat": -32.886665
+},
+{
+"id": "V023",
+"E": 274177,
+"N": 6522998,
+"score": 2.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"ALFA 1/8 (0ha)",
+"LA SALVA VIDA 1/5 (0ha)"
+],
+"tit": "CORTES SALINAS REBECA",
+"lon": -71.375282,
+"lat": -31.405671
+},
+{
+"id": "V024",
+"E": 277527,
+"N": 6518548,
+"score": 2.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LAURITA 1/10 (0ha)",
+"BLANCA 1/20 (0ha)",
+"BETA 1/10 (0ha)"
+],
+"tit": "PRADO CORTES PEDRO",
+"lon": -71.341068,
+"lat": -31.446436
+},
+{
+"id": "V025",
+"E": 277527,
+"N": 6517898,
+"score": 2.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LAURITA 1/10 (0ha)",
+"BLANCA 1/20 (0ha)",
+"BETA 1/10 (0ha)"
+],
+"tit": "PRADO CORTES PEDRO",
+"lon": -71.341214,
+"lat": -31.452296
+},
+{
+"id": "V026",
+"E": 286027,
+"N": 6500048,
+"score": 2.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"EL TORO 1/7 (35ha)",
+"EL TORO 1/7 (0ha)"
+],
+"tit": "SOLIS SILVA ALEJANDRO",
+"lon": -71.255691,
+"lat": -31.614826
+},
+{
+"id": "V027",
+"E": 281677,
+"N": 6446848,
+"score": 2.0,
+"com": "LOS VILOS",
+"libre600": 27.7,
+"minas": [
+"EL SIFON 2 1/30 (0ha)",
+"EL SIFON 1/12 (0ha)",
+"CONDOR 1/14 (0ha)"
+],
+"tit": "SLM EUREKA I DE NOGALES",
+"lon": -71.313466,
+"lat": -32.093589
+},
+{
+"id": "V028",
+"E": 281677,
+"N": 6446198,
+"score": 2.0,
+"com": "LOS VILOS",
+"libre600": 26.0,
+"minas": [
+"EL SIFON 2 1/30 (0ha)",
+"EL SIFON 1/12 (0ha)",
+"CONDOR 1/14 (0ha)"
+],
+"tit": "SLM EUREKA I DE NOGALES",
+"lon": -71.313614,
+"lat": -32.099448
+},
+{
+"id": "V029",
+"E": 269577,
+"N": 6439248,
+"score": 2.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"ESPERANZA 1/20 (0ha)",
+"LAS TUPAS 1/5 (0ha)",
+"SCORPION 1/10 (0ha)"
+],
+"tit": "SLM ESPERANZA UNO DE QUILIMARI",
+"lon": -71.443413,
+"lat": -32.159685
+},
+{
+"id": "V030",
+"E": 263427,
+"N": 6434298,
+"score": 2.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"MINA HUAQUEN 1/5 (0ha)",
+"COTO 1/6 (0ha)"
+],
+"tit": "COTO PARRA JOSE",
+"lon": -71.509799,
+"lat": -32.203023
+},
+{
+"id": "V031",
+"E": 319427,
+"N": 6429448,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"PETORCA 3 1/9 (0ha)",
+"PADRE HURTADO II 1/20 (0ha)"
+],
+"tit": "MARTINEZ RASSE CARLOS SALVADOR",
+"lon": -70.916944,
+"lat": -32.25715
+},
+{
+"id": "V032",
+"E": 303827,
+"N": 6429048,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 30.4,
+"minas": [
+"LA IGUANA 1/14 (0ha)",
+"LA GOMILIA 1/20 (0ha)",
+"LA MORO 1/6 (0ha)"
+],
+"tit": "KEMPEN Y CAMPOS LIMITADA",
+"lon": -71.082544,
+"lat": -32.258135
+},
+{
+"id": "V033",
+"E": 318427,
+"N": 6428998,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA VICENTE 1/10 (100ha)",
+"BELLAVISTA 1/10 (0ha)",
+"VICENTE 1/10 (0ha)"
+],
+"tit": "GARRIDO HERNANDEZ ARIEL AUGUSO",
+"lon": -70.92764,
+"lat": -32.261046
+},
+{
+"id": "V034",
+"E": 319977,
+"N": 6428348,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"PETORCA 1/7 (56ha)",
+"PETORCA 7 1/7 (0ha)"
+],
+"tit": "GARRIDO HERNANDEZ ARIEL AUGUSO",
+"lon": -70.911315,
+"lat": -32.267157
+},
+{
+"id": "V035",
+"E": 310427,
+"N": 6427948,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 33.3,
+"minas": [
+"ARBOLITO III 1/5 (25ha)",
+"ARBOLITO SEGUNDO 1/10 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -71.012736,
+"lat": -32.269188
+},
+{
+"id": "V036",
+"E": 312227,
+"N": 6426148,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LOS PLATEADOS 1/10 (0ha)",
+"LOS ARANDA 1/10 (0ha)"
+],
+"tit": "ARANDA SANCHEZ CHERMAN ANTONIO",
+"lon": -70.99399,
+"lat": -32.28572
+},
+{
+"id": "V037",
+"E": 292727,
+"N": 6426048,
+"score": 2.0,
+"com": "LA LIGUA",
+"libre600": 32.1,
+"minas": [
+"TOLIMA 1/10 (0ha)",
+"XIMENA 1/20 (0ha)",
+"LA ESTRELLA 1/5 (0ha)"
+],
+"tit": "GEOPERMIN SPA",
+"lon": -71.20096,
+"lat": -32.283183
+},
+{
+"id": "V038",
+"E": 334927,
+"N": 6423548,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 28.6,
+"minas": [
+"LOS PIRQUES 1/20 (0ha)",
+"LOS PIRQUES 1/20 (0ha)",
+"TENCA 1/20 (0ha)",
+"LOS PIRQUES 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.75349,
+"lat": -32.312741
+},
+{
+"id": "V039",
+"E": 335577,
+"N": 6423548,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 25.7,
+"minas": [
+"LOS PIRQUES 1/20 (0ha)",
+"LOS PIRQUES 1/20 (0ha)",
+"TENCA 1/20 (0ha)",
+"LOS PIRQUES 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.746588,
+"lat": -32.312837
+},
+{
+"id": "V040",
+"E": 334927,
+"N": 6422898,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 26.5,
+"minas": [
+"LOS PIRQUES 1/20 (0ha)",
+"LOS PIRQUES 1/20 (0ha)",
+"TENCA 1/20 (0ha)",
+"LOS PIRQUES 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.753603,
+"lat": -32.318602
+},
+{
+"id": "V041",
+"E": 335577,
+"N": 6422898,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LOS PIRQUES 1/20 (0ha)",
+"LOS PIRQUES 1/20 (0ha)",
+"TENCA 1/20 (0ha)",
+"LOS PIRQUES 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.746701,
+"lat": -32.318698
+},
+{
+"id": "V042",
+"E": 310777,
+"N": 6422548,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 16.3,
+"minas": [
+"LA CORA 1/15 (0ha)",
+"EL CUESCO 1/15 (0ha)"
+],
+"tit": "SLM LA CORA DE PETORCA",
+"lon": -71.010096,
+"lat": -32.317933
+},
+{
+"id": "V043",
+"E": 332827,
+"N": 6421798,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 14.0,
+"minas": [
+"BANDURRIAS 1/10 (0ha)",
+"BANDURRIA 1/10 (0ha)",
+"BANDURRIAS 1/12 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.776096,
+"lat": -32.328209
+},
+{
+"id": "V044",
+"E": 303027,
+"N": 6417548,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CURANIPE 1/10 (50ha)",
+"MINA LA PORFIA 1/20 (0ha)"
+],
+"tit": "PARRA MEZA JUAN CARLOS",
+"lon": -71.093415,
+"lat": -32.361671
+},
+{
+"id": "V045",
+"E": 303677,
+"N": 6417548,
+"score": 2.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CURANIPE 1/10 (50ha)",
+"MINA LA PORFIA 1/20 (0ha)"
+],
+"tit": "PARRA MEZA JUAN CARLOS",
+"lon": -71.086511,
+"lat": -32.361786
+},
+{
+"id": "V046",
+"E": 341427,
+"N": 6417548,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 25.7,
+"minas": [
+"SORPRESA 1/10 (50ha)",
+"LOS COBRES 2 1/10 (0ha)"
+],
+"tit": "RODRIGUEZ HUGO SANDRA LEONOR",
+"lon": -70.685473,
+"lat": -32.367786
+},
+{
+"id": "V047",
+"E": 342077,
+"N": 6417548,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 22.3,
+"minas": [
+"SORPRESA 1/10 (50ha)",
+"LOS COBRES 2 1/10 (0ha)"
+],
+"tit": "RODRIGUEZ HUGO SANDRA LEONOR",
+"lon": -70.678567,
+"lat": -32.367878
+},
+{
+"id": "V048",
+"E": 306677,
+"N": 6412998,
+"score": 2.0,
+"com": "CABILDO",
+"libre600": 35.3,
+"minas": [
+"MATUNCHO 1/20 (91ha)",
+"ESCAPADA 1/2 (0ha)",
+"RESGUARDO 1/24 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -71.055574,
+"lat": -32.40333
+},
+{
+"id": "V049",
+"E": 300177,
+"N": 6409648,
+"score": 2.0,
+"com": "LA LIGUA",
+"libre600": 32.6,
+"minas": [
+"LOS MANTOS 1/18 (72ha)",
+"PAULINA 1/20 (0ha)",
+"ANDACOLLO 1/12 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -71.125356,
+"lat": -32.432384
+},
+{
+"id": "V050",
+"E": 328627,
+"N": 6400548,
+"score": 2.0,
+"com": "PUTAENDO",
+"libre600": 20.4,
+"minas": [
+"SAN RICARDO 1/10 (0ha)",
+"COLLAO 37, 1/9 (0ha)"
+],
+"tit": "NEGRETE ESPINOZA RODOLFO",
+"lon": -70.824554,
+"lat": -32.519176
+},
+{
+"id": "V051",
+"E": 335727,
+"N": 6400498,
+"score": 2.0,
+"com": "PUTAENDO",
+"libre600": 34.1,
+"minas": [
+"AHORA SI 1/7 (0ha)",
+"LA ESPERADA 1/7 (0ha)"
+],
+"tit": "SEGUNDO FERNANDEZ GARRIDO EIRL",
+"lon": -70.749002,
+"lat": -32.520701
+},
+{
+"id": "V052",
+"E": 289677,
+"N": 6382748,
+"score": 2.0,
+"com": "NOGALES",
+"libre600": 21.1,
+"minas": [
+"PUCALAN 1/10 (100ha)",
+"VASCONCELO 1/20 (0ha)",
+"PUCALAN 1/20 (0ha)",
+"VASCONCELO 1/20 (0ha)"
+],
+"tit": "GUZMAN CALVO JUAN LUIS",
+"lon": -71.24299,
+"lat": -32.67293
+},
+{
+"id": "V053",
+"E": 289677,
+"N": 6382098,
+"score": 2.0,
+"com": "NOGALES",
+"libre600": 20.7,
+"minas": [
+"PUCALAN 1/10 (100ha)",
+"VASCONCELO 1/20 (0ha)",
+"PUCALAN 1/20 (0ha)",
+"VASCONCELO 1/20 (0ha)"
+],
+"tit": "GUZMAN CALVO JUAN LUIS",
+"lon": -71.243136,
+"lat": -32.678789
+},
+{
+"id": "V054",
+"E": 277127,
+"N": 6366748,
+"score": 2.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"REBECA 1/9 (27ha)",
+"LA LATA 1/10 (0ha)"
+],
+"tit": "SLM REBECA 1/10 PUCHUNCAVI",
+"lon": -71.380566,
+"lat": -32.814674
+},
+{
+"id": "V055",
+"E": 295427,
+"N": 6356948,
+"score": 2.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LAS PATAGUAS A 1/10 (46ha)",
+"CAROLINA 11/20 (0ha)",
+"ESPERANZA IV 1/10 (0ha)"
+],
+"tit": "SOC. AGRICOLA VERTIENTES SPA",
+"lon": -71.187396,
+"lat": -32.906575
+},
+{
+"id": "V056",
+"E": 301927,
+"N": 6354998,
+"score": 2.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"MEXICO 1/10 (0ha)",
+"RUGGIERI 1/100 (0ha)"
+],
+"tit": "SLM BUENA VISTA I DE HIJUELAS",
+"lon": -71.118355,
+"lat": -32.925349
+},
+{
+"id": "V057",
+"E": 295777,
+"N": 6358048,
+"score": 1.95,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LAS PATAGUAS B 1/10 (50ha)",
+"ESPERANZA I 1/10 (0ha)",
+"ROSA MARIA 21/30 (0ha)"
+],
+"tit": "SOC. AGRICOLA VERTIENTES SPA",
+"lon": -71.183412,
+"lat": -32.896725
+},
+{
+"id": "V058",
+"E": 285227,
+"N": 6483648,
+"score": 1.93,
+"com": "ILLAPEL",
+"libre600": 20.2,
+"minas": [
+"LA DESPRECIADA 1/8 (40ha)",
+"PAULA 1 1/10 (0ha)",
+"CANELILLO 4/9 (0ha)",
+"ILLAPEL 17PL 1/75 (0ha)"
+],
+"tit": "SLM LA DESPRECIADA UNA ILLAPEL",
+"lon": -71.267713,
+"lat": -31.762526
+},
+{
+"id": "V059",
+"E": 279927,
+"N": 6353898,
+"score": 1.9,
+"com": "QUILLOTA",
+"libre600": 21.7,
+"minas": [
+"NUEVA SOLEDAD 1/6 (60ha)",
+"LAUREL 2 1/5 (0ha)"
+],
+"tit": "RAMIREZ CIFUENTES EUGENIO",
+"lon": -71.353741,
+"lat": -32.931055
+},
+{
+"id": "V060",
+"E": 296477,
+"N": 6353548,
+"score": 1.9,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 5 1/20 (100ha)",
+"MARTA 1/14 (0ha)",
+"EL PALO 1/5 (0ha)"
+],
+"tit": "RIOS MANZI PABLO HUGO",
+"lon": -71.176926,
+"lat": -32.937418
+},
+{
+"id": "V061",
+"E": 287377,
+"N": 6372198,
+"score": 1.84,
+"com": "NOGALES",
+"libre600": 24.6,
+"minas": [
+"LA DESPRECIADA 2 1/5 (0ha)",
+"LA VIVIANA 1/10 (0ha)"
+],
+"tit": "SALDIVAR ACOSTA GUSTAVO",
+"lon": -71.269911,
+"lat": -32.767584
+},
+{
+"id": "V062",
+"E": 276627,
+"N": 6354898,
+"score": 1.84,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"DUBI 1/10 (0ha)",
+"SEGUNDA 3 1/12 (0ha)"
+],
+"tit": "COFRE CANALES JOEL",
+"lon": -71.388766,
+"lat": -32.921373
+},
+{
+"id": "V063",
+"E": 328677,
+"N": 6392948,
+"score": 1.8,
+"com": "CABILDO",
+"libre600": 18.1,
+"minas": [
+"FORTUNA 14 1/10 (28ha)",
+"ALFA 1/13 (0ha)"
+],
+"tit": "SCM FORTUNA",
+"lon": -70.825409,
+"lat": -32.587709
+},
+{
+"id": "V064",
+"E": 255677,
+"N": 6501548,
+"score": 1.75,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"BELLAVISTA 1 1/50 (0ha)",
+"OCEANIA 1/12 (0ha)",
+"OCEANIA 1/12 (0ha)"
+],
+"tit": "ALVEAR PARRA GERARDINE",
+"lon": -71.575008,
+"lat": -31.595257
+},
+{
+"id": "V065",
+"E": 257577,
+"N": 6501398,
+"score": 1.75,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA CLAUDIA I 1/20 (0ha)",
+"MINERA SANTA JUANA II 1/19 (0ha)",
+"MINERA SANTA JUANA 1/17 (0ha)",
+"BELLAVISTA 3 1/38 (0ha)"
+],
+"tit": "BLANCO BEROIZ HAROLDO FCO",
+"lon": -71.555037,
+"lat": -31.597011
+},
+{
+"id": "V066",
+"E": 330227,
+"N": 6403598,
+"score": 1.75,
+"com": "PUTAENDO",
+"libre600": 31.0,
+"minas": [
+"LA RESGUARDO 1/14 (0ha)",
+"CARMELA Y CLEMENTINA 1/60 (0ha)",
+"PUNTO 4 1/9 (0ha)"
+],
+"tit": "CONSTRUCTORA RAM LTDA",
+"lon": -70.806976,
+"lat": -32.491922
+},
+{
+"id": "V067",
+"E": 328527,
+"N": 6397948,
+"score": 1.75,
+"com": "CABILDO",
+"libre600": 32.7,
+"minas": [
+"COLLAO 6 1/32 (139ha)",
+"PIA VALERIA 1/6 (0ha)",
+"CODORNICES 1/71 (0ha)"
+],
+"tit": "INMOBILIARIA PETROHUE S.A",
+"lon": -70.826092,
+"lat": -32.542604
+},
+{
+"id": "V068",
+"E": 257677,
+"N": 6500748,
+"score": 1.74,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"GLORIA II 1/6 (0ha)",
+"MINERA CLAUDIA I 1/20 (0ha)",
+"MINERA SANTA JUANA II 1/19 (0ha)"
+],
+"tit": "SCM SIGLO XXI",
+"lon": -71.554144,
+"lat": -31.60289
+},
+{
+"id": "V069",
+"E": 282577,
+"N": 6403898,
+"score": 1.71,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"JAURURO (50ha)",
+"MAILEN II 1/40 (0ha)",
+"LEY 1/20 (0ha)"
+],
+"tit": "VASSALLI VANNETTI JUAN E",
+"lon": -71.313752,
+"lat": -32.480916
+},
+{
+"id": "V070",
+"E": 286877,
+"N": 6359348,
+"score": 1.7,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LA BUENA ESPERANZA 1/5 (0ha)",
+"PRIMAVERA 1/2 (0ha)"
+],
+"tit": "CASTILLO VEGA JAVIER",
+"lon": -71.278201,
+"lat": -32.88331
+},
+{
+"id": "V071",
+"E": 256427,
+"N": 6501948,
+"score": 1.65,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"BELLAVISTA 2 1/45 (0ha)",
+"MINERA HUENTELAUQUEN 1/5 (0ha)"
+],
+"tit": "ALVEAR PARRA GERARDINE",
+"lon": -71.567011,
+"lat": -31.59181
+},
+{
+"id": "V072",
+"E": 337677,
+"N": 6432548,
+"score": 1.65,
+"com": "PETORCA",
+"libre600": 19.4,
+"minas": [
+"ANGELICA 6 1/40 (104ha)",
+"EL ARRAYAN 1/10 (0ha)",
+"EL CALENDARIO 1/60 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.722755,
+"lat": -32.231987
+},
+{
+"id": "V073",
+"E": 301177,
+"N": 6354548,
+"score": 1.64,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"HADAS 1/15 (55ha)",
+"CHORRILLOS 1/100 (0ha)"
+],
+"tit": "HEIN HOERNIG RICARDO",
+"lon": -71.126469,
+"lat": -32.929269
+},
+{
+"id": "V074",
+"E": 280977,
+"N": 6445848,
+"score": 1.6,
+"com": "LOS VILOS",
+"libre600": 26.5,
+"minas": [
+"EL SIFON 2 1/30 (0ha)",
+"EL SIFON 1/12 (0ha)"
+],
+"tit": "SLM EUREKA I DE NOGALES",
+"lon": -71.321106,
+"lat": -32.102468
+},
+{
+"id": "V075",
+"E": 313927,
+"N": 6402548,
+"score": 1.6,
+"com": "CABILDO",
+"libre600": 33.9,
+"minas": [
+"SAN ESTEBAN 2 1/10 (0ha)"
+],
+"tit": "CARVAJAL F JAIME",
+"lon": -70.980587,
+"lat": -32.498778
+},
+{
+"id": "V076",
+"E": 335377,
+"N": 6399848,
+"score": 1.6,
+"com": "PUTAENDO",
+"libre600": 32.3,
+"minas": [
+"AHORA SI 1/7 (0ha)",
+"LA ESPERADA 1/7 (0ha)"
+],
+"tit": "SEGUNDO FERNANDEZ GARRIDO EIRL",
+"lon": -70.752841,
+"lat": -32.52651
+},
+{
+"id": "V077",
+"E": 296927,
+"N": 6352698,
+"score": 1.6,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 7 1/5 (50ha)",
+"MARTA 1/14 (0ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.172303,
+"lat": -32.945164
+},
+{
+"id": "V078",
+"E": 297577,
+"N": 6352698,
+"score": 1.6,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 7 1/5 (50ha)",
+"MARTA 1/14 (0ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.165355,
+"lat": -32.945284
+},
+{
+"id": "V079",
+"E": 317677,
+"N": 6397698,
+"score": 1.52,
+"com": "CABILDO",
+"libre600": 15.8,
+"minas": [
+"LALA 1/1000 (0ha)",
+"MARAY NORTE 1/10 (0ha)",
+"MARAI 1/14 (0ha)",
+"CANELO 1/25 (0ha)"
+],
+"tit": "MINERA SUR ANDES LIMITADA",
+"lon": -70.941632,
+"lat": -32.543127
+},
+{
+"id": "V080",
+"E": 278927,
+"N": 6522348,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LLANPIHER 1/10 (0ha)",
+"INDIO III DE LOS ARRAY 1/20 (0ha)"
+],
+"tit": "GOMEZ BUGUENO RIQUELME Y OTRO",
+"lon": -71.3255,
+"lat": -31.412447
+},
+{
+"id": "V081",
+"E": 278027,
+"N": 6521798,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"ENCANTO 1/10 (0ha)",
+"SUEGRA TER 1/20 (0ha)"
+],
+"tit": "OLIVARES CORTES GIL ENRIQUE",
+"lon": -71.335084,
+"lat": -31.417233
+},
+{
+"id": "V082",
+"E": 279077,
+"N": 6521698,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LA AVENTURA 1/20 (0ha)",
+"LLANPIHER 1/10 (0ha)"
+],
+"tit": "VICENCIO BUGUENO ALEJANDRO",
+"lon": -71.324068,
+"lat": -31.418336
+},
+{
+"id": "V083",
+"E": 278027,
+"N": 6521148,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"ENCANTO 1/10 (0ha)",
+"SUEGRA TER 1/20 (0ha)"
+],
+"tit": "OLIVARES CORTES GIL ENRIQUE",
+"lon": -71.335229,
+"lat": -31.423093
+},
+{
+"id": "V084",
+"E": 278877,
+"N": 6514348,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 35.4,
+"minas": [
+"FLOR DE ORO 1/5 (0ha)",
+"BENDICION 3 1/29 (0ha)"
+],
+"tit": "LERY LERY EDUARDO HERNAN",
+"lon": -71.327809,
+"lat": -31.484559
+},
+{
+"id": "V085",
+"E": 278527,
+"N": 6513548,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LA MELOCATO 1/10 (0ha)",
+"LA ALEGRIA 1/20 (0ha)"
+],
+"tit": "VILLALON TAPIA ALFREDO",
+"lon": -71.33167,
+"lat": -31.491704
+},
+{
+"id": "V086",
+"E": 256527,
+"N": 6504048,
+"score": 1.5,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"CHALO 1/10 (0ha)",
+"MINERA SANTA JUANA V 1/20 (0ha)"
+],
+"tit": "SALAMANCA ROJAS GONZALO",
+"lon": -71.565439,
+"lat": -31.572904
+},
+{
+"id": "V087",
+"E": 279927,
+"N": 6462548,
+"score": 1.5,
+"com": "LOS VILOS",
+"libre600": 18.2,
+"minas": [
+"GUAYACAN 1/6 (0ha)",
+"AZUL DEL INCA 1/10 (0ha)"
+],
+"tit": "MILLET MORALES IGNACIO JAVIER",
+"lon": -71.328412,
+"lat": -31.951725
+},
+{
+"id": "V088",
+"E": 278427,
+"N": 6459698,
+"score": 1.5,
+"com": "LOS VILOS",
+"libre600": 30.4,
+"minas": [
+"MARCELA 1/12 (0ha)",
+"MARAY 2 1/10 (0ha)"
+],
+"tit": "JIMENEZ ZAMORA MANUEL",
+"lon": -71.344925,
+"lat": -31.977123
+},
+{
+"id": "V089",
+"E": 282277,
+"N": 6445498,
+"score": 1.5,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"LOS OLIVOS 1/10 (0ha)",
+"FRANCISCA 1/4 (0ha)"
+],
+"tit": "GALLARDO SALINAS HECTOR",
+"lon": -71.307419,
+"lat": -32.105874
+},
+{
+"id": "V090",
+"E": 328977,
+"N": 6435948,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"POTRERO SECO 1/14 (0ha)",
+"VALLE 1/5 (0ha)"
+],
+"tit": "VIAL DONOSO VICENTE",
+"lon": -70.814441,
+"lat": -32.200037
+},
+{
+"id": "V091",
+"E": 290527,
+"N": 6432948,
+"score": 1.5,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"MARUCLAXI II 1/17 (85ha)",
+"LA TUNA 1/6 (0ha)"
+],
+"tit": "SLM MARUCLAXI II 1 DE LONGOTOM",
+"lon": -71.222789,
+"lat": -32.220572
+},
+{
+"id": "V092",
+"E": 340927,
+"N": 6432548,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CATALINA 10 1/15 (150ha)",
+"CELESTE 1 1/10 (0ha)"
+],
+"tit": "MORAGA LATAPIAT MARIA INES",
+"lon": -70.688275,
+"lat": -32.232453
+},
+{
+"id": "V093",
+"E": 341577,
+"N": 6432548,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CATALINA 10 1/15 (150ha)",
+"CELESTE 1 1/10 (0ha)"
+],
+"tit": "MORAGA LATAPIAT MARIA INES",
+"lon": -70.681379,
+"lat": -32.232545
+},
+{
+"id": "V094",
+"E": 342427,
+"N": 6431698,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 25.7,
+"minas": [
+"CATALINA 6 1/5 (50ha)",
+"SANTA ROSA 1/7 (0ha)"
+],
+"tit": "MORAGA LATAPIAT MARIA INES",
+"lon": -70.672502,
+"lat": -32.240329
+},
+{
+"id": "V095",
+"E": 340927,
+"N": 6431048,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CELESTE 2 1/23 (98ha)",
+"RITA III 1/10 (0ha)",
+"RAQUEL 2 1/10 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.688526,
+"lat": -32.245979
+},
+{
+"id": "V096",
+"E": 341577,
+"N": 6430848,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 31.0,
+"minas": [
+"CELESTE 2 1/23 (98ha)",
+"RITA III 1/10 (0ha)",
+"RAQUEL 2 1/10 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.681662,
+"lat": -32.247875
+},
+{
+"id": "V097",
+"E": 340927,
+"N": 6430398,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CELESTE 2 1/23 (98ha)",
+"RITA III 1/10 (0ha)",
+"RAQUEL 2 1/10 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.688634,
+"lat": -32.25184
+},
+{
+"id": "V098",
+"E": 309877,
+"N": 6429148,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 27.3,
+"minas": [
+"GANADOR 1/18 (74ha)",
+"GANADOR 1/6 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -71.018333,
+"lat": -32.258276
+},
+{
+"id": "V099",
+"E": 330477,
+"N": 6424848,
+"score": 1.5,
+"com": "PETORCA",
+"libre600": 35.4,
+"minas": [
+"HEKA 1 1/20 (0ha)",
+"LA CRUZ 1/7 (0ha)"
+],
+"tit": "DELGADO TOBAR RENE",
+"lon": -70.800509,
+"lat": -32.300353
+},
+{
+"id": "V100",
+"E": 337927,
+"N": 6419548,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 28.6,
+"minas": [
+"CHAMPITA 11/15 (0ha)",
+"MAITEN 21/40 (0ha)"
+],
+"tit": "MINERA SAN JAVIER LIMITADA",
+"lon": -70.722318,
+"lat": -32.349249
+},
+{
+"id": "V101",
+"E": 327327,
+"N": 6415498,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"CAROLINA 1/10 (100ha)",
+"PAIHUEN LA CANOA 1/10 (0ha)",
+"LA PIPA 1/14 (0ha)"
+],
+"tit": "JUAN CARLOS FERNANDO Y JAMETT",
+"lon": -70.835652,
+"lat": -32.384178
+},
+{
+"id": "V102",
+"E": 302027,
+"N": 6415148,
+"score": 1.5,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LEMU 5 1/12 (0ha)",
+"HEIDI 1/5 (0ha)"
+],
+"tit": "ROJAS CORTES WILSON BELMAR",
+"lon": -71.104539,
+"lat": -32.383131
+},
+{
+"id": "V103",
+"E": 318477,
+"N": 6412998,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LA GRANDIOSA 1/20 (0ha)",
+"LAURITA TRES 1/20 (0ha)",
+"LAURITA 3 1/20 (0ha)"
+],
+"tit": "ESCOBAR CORREA NELSON",
+"lon": -70.93017,
+"lat": -32.405313
+},
+{
+"id": "V104",
+"E": 324077,
+"N": 6412848,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"FRIEINPERMUNDINER 1/10 (35ha)",
+"LA RECUERDO 1/20 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.870679,
+"lat": -32.407564
+},
+{
+"id": "V105",
+"E": 281827,
+"N": 6404348,
+"score": 1.5,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LEY 1/20 (0ha)",
+"EL CUARZITO 1/20 (0ha)",
+"LA MAQUI 1/20 (0ha)"
+],
+"tit": "VALENCIA SOLAR RAFAEL",
+"lon": -71.321623,
+"lat": -32.476713
+},
+{
+"id": "V106",
+"E": 281827,
+"N": 6403698,
+"score": 1.5,
+"com": "LA LIGUA",
+"libre600": 32.7,
+"minas": [
+"EL LEON 1/18 (0ha)",
+"EL CUARZITO 1/20 (0ha)",
+"LA MAQUI 1/20 (0ha)"
+],
+"tit": "VALENCIA SOLAR RAFAEL",
+"lon": -71.321774,
+"lat": -32.482572
+},
+{
+"id": "V107",
+"E": 283527,
+"N": 6400648,
+"score": 1.5,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"CATAPILCO I 1/10 (0ha)",
+"PARQUE 1, 1/30 (0ha)"
+],
+"tit": "FERNANDEZ VASQUEZ CARLOS RBTO",
+"lon": -71.304396,
+"lat": -32.510397
+},
+{
+"id": "V108",
+"E": 283527,
+"N": 6399998,
+"score": 1.5,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"PARQUE 3, 1/30 (0ha)",
+"CATAPILCO I 1/10 (0ha)"
+],
+"tit": "JARAQUEMADA LEDOUX JULIO",
+"lon": -71.304546,
+"lat": -32.516256
+},
+{
+"id": "V109",
+"E": 341427,
+"N": 6399948,
+"score": 1.5,
+"com": "PUTAENDO",
+"libre600": 34.3,
+"minas": [
+"ORO FINO 70/75 (0ha)",
+"LA SUERTE II 1/20 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -70.68843,
+"lat": -32.526489
+},
+{
+"id": "V110",
+"E": 274627,
+"N": 6399748,
+"score": 1.5,
+"com": "PAPUDO",
+"libre600": 36.0,
+"minas": [
+"SILVIA 1/8 (0ha)",
+"PAPUDO 1/18 (0ha)"
+],
+"tit": "PRADO AUGERAUD MANUEL Y OT",
+"lon": -71.399284,
+"lat": -32.516738
+},
+{
+"id": "V111",
+"E": 319927,
+"N": 6398098,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 31.8,
+"minas": [
+"CLAUDIO 1/10 (0ha)",
+"LA BORRADA 1/10 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.917606,
+"lat": -32.539888
+},
+{
+"id": "V112",
+"E": 327377,
+"N": 6397848,
+"score": 1.5,
+"com": "CABILDO",
+"libre600": 25.3,
+"minas": [
+"LA CHANITA 11/21 (0ha)",
+"COLLAO 5 1/20 (0ha)"
+],
+"tit": "SOC MRA EDMUNDO ELISSETCHE LTD",
+"lon": -70.838352,
+"lat": -32.543327
+},
+{
+"id": "V113",
+"E": 289327,
+"N": 6391948,
+"score": 1.5,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"VISTA 1/19 (0ha)",
+"MARK 1/100 (0ha)"
+],
+"tit": "TUNEL EL MELON SA",
+"lon": -71.244647,
+"lat": -32.589935
+},
+{
+"id": "V114",
+"E": 289327,
+"N": 6391298,
+"score": 1.5,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"VISTA 1/19 (0ha)",
+"MARK 1/100 (0ha)"
+],
+"tit": "TUNEL EL MELON SA",
+"lon": -71.244794,
+"lat": -32.595794
+},
+{
+"id": "V115",
+"E": 282027,
+"N": 6374648,
+"score": 1.5,
+"com": "QUINTERO",
+"libre600": 12.9,
+"minas": [
+"HUALTATAS 1/20 (0ha)",
+"LAS HUALTATAS 1/20 (0ha)",
+"CASCAJO 2 1/20 (0ha)"
+],
+"tit": "LAGAZIO CAMPODONICO HUMBERTO",
+"lon": -71.326411,
+"lat": -32.744454
+},
+{
+"id": "V116",
+"E": 297627,
+"N": 6364048,
+"score": 1.5,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"ORO VERDE 1/10 (50ha)",
+"JUPITER 1/38 (0ha)"
+],
+"tit": "CIA MRA PACHACAMA LTDA",
+"lon": -71.162332,
+"lat": -32.842984
+},
+{
+"id": "V117",
+"E": 298277,
+"N": 6364048,
+"score": 1.5,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"ORO VERDE 1/10 (50ha)",
+"JUPITER 1/38 (0ha)"
+],
+"tit": "CIA MRA PACHACAMA LTDA",
+"lon": -71.155391,
+"lat": -32.843104
+},
+{
+"id": "V118",
+"E": 306677,
+"N": 6362348,
+"score": 1.5,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"LA ESPERANZA 1/20 (0ha)",
+"DON BENJA 1/10 (0ha)"
+],
+"tit": "GOMEZ HERNANDEZ HUGO HERNAN",
+"lon": -71.066045,
+"lat": -32.859942
+},
+{
+"id": "V119",
+"E": 294927,
+"N": 6357998,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"BAJACA 1/10 (0ha)",
+"ALBORADA 1 1/7 (0ha)",
+"ROSA MARIA 21/30 (0ha)"
+],
+"tit": "SOC AGRICOLA LAS VERTIENTES LT",
+"lon": -71.192505,
+"lat": -32.897017
+},
+{
+"id": "V120",
+"E": 297527,
+"N": 6357898,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ESPERANZA III 1/10 (0ha)",
+"YESENIA 1/10 (0ha)",
+"LUCHADOR 3 1/30 (0ha)"
+],
+"tit": "PARRA CARMONA JOSE CELESTINO",
+"lon": -71.164747,
+"lat": -32.898402
+},
+{
+"id": "V121",
+"E": 298177,
+"N": 6357898,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ESPERANZA III 1/10 (0ha)",
+"YESENIA 1/10 (0ha)",
+"LUCHADOR 3 1/30 (0ha)"
+],
+"tit": "PARRA CARMONA JOSE CELESTINO",
+"lon": -71.157802,
+"lat": -32.898522
+},
+{
+"id": "V122",
+"E": 302427,
+"N": 6357548,
+"score": 1.5,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"MARIA PAZ 44/63 (0ha)",
+"LAS CANAS I/X (0ha)"
+],
+"tit": "TAPIA OCARANZA MARIA ANGELICA",
+"lon": -71.112465,
+"lat": -32.902453
+},
+{
+"id": "V123",
+"E": 271927,
+"N": 6356948,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"SAN IGNACIO 1 1/51 (0ha)",
+"SOLEDAD 1/12 (0ha)"
+],
+"tit": "DEL CAMPO ROJAS ALEJANDRO",
+"lon": -71.438483,
+"lat": -32.901927
+},
+{
+"id": "V124",
+"E": 295427,
+"N": 6356298,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL BOLDO 1/20 (100ha)",
+"CAROLINA 11/20 (0ha)",
+"ESPERANZA IV 1/10 (0ha)"
+],
+"tit": "SOCIEDAD LOS ALMENDROS SA",
+"lon": -71.18754,
+"lat": -32.912434
+},
+{
+"id": "V125",
+"E": 273527,
+"N": 6355348,
+"score": 1.5,
+"com": "VINA DEL MAR",
+"libre600": 36.0,
+"minas": [
+"PEPITO 1/5 (50ha)",
+"JACINTO VI 1/20 (0ha)"
+],
+"tit": "CLAMAMI LTDA",
+"lon": -71.421782,
+"lat": -32.91668
+},
+{
+"id": "V126",
+"E": 275927,
+"N": 6355248,
+"score": 1.5,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"BETA 2 1/14 (0ha)",
+"JACINTO 3 1/28 (0ha)"
+],
+"tit": "PAVEZ VALENZUELA RUBEN",
+"lon": -71.396161,
+"lat": -32.918075
+},
+{
+"id": "V127",
+"E": 279927,
+"N": 6354848,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 35.5,
+"minas": [
+"NUEVA SOLEDAD 1/6 (60ha)",
+"SOLEDAD 1/7 (0ha)"
+],
+"tit": "RAMIREZ CIFUENTES EUGENIO",
+"lon": -71.353514,
+"lat": -32.922493
+},
+{
+"id": "V128",
+"E": 297127,
+"N": 6353948,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 6 1/20 (100ha)",
+"LAS PALMAS 1/14 (0ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.16989,
+"lat": -32.933933
+},
+{
+"id": "V129",
+"E": 281927,
+"N": 6353648,
+"score": 1.5,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ALFA 3 1/7 (0ha)",
+"JACINTO IX 1/14 (0ha)"
+],
+"tit": "MELON S.A.",
+"lon": -71.332425,
+"lat": -32.933709
+},
+{
+"id": "V130",
+"E": 257377,
+"N": 6502548,
+"score": 1.45,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"BELLAVISTA 3 1/38 (0ha)",
+"MINERA CHOAPA 1/10 (0ha)"
+],
+"tit": "ALVEAR PARRA GERARDINE",
+"lon": -71.55686,
+"lat": -31.586603
+},
+{
+"id": "V131",
+"E": 337327,
+"N": 6433398,
+"score": 1.45,
+"com": "PETORCA",
+"libre600": 24.6,
+"minas": [
+"NEPTUNO 2B, 1/72 (0ha)",
+"EL CALENDARIO 1/60 (0ha)",
+"DON EDUARDO 1/9 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.726323,
+"lat": -32.224272
+},
+{
+"id": "V132",
+"E": 318377,
+"N": 6391448,
+"score": 1.45,
+"com": "CABILDO",
+"libre600": 27.9,
+"minas": [
+"LA GRILLO 1 1/7 (35ha)",
+"LA PERLA 1/40 (0ha)",
+"CERRO OESTE 1 1/17 (0ha)"
+],
+"tit": "GUERRA LEPE SERGIO",
+"lon": -70.935391,
+"lat": -32.599591
+},
+{
+"id": "V133",
+"E": 322377,
+"N": 6433298,
+"score": 1.44,
+"com": "PETORCA",
+"libre600": 13.2,
+"minas": [
+"BUENA FE (0ha)",
+"PORTEZUELO (0ha)"
+],
+"tit": "SOC MRA CASABLANCA SA",
+"lon": -70.884924,
+"lat": -32.222908
+},
+{
+"id": "V134",
+"E": 342727,
+"N": 6416998,
+"score": 1.44,
+"com": "CABILDO",
+"libre600": 31.5,
+"minas": [
+"VIZCACHA 1/4 (20ha)",
+"SEBA I 1/4 (0ha)"
+],
+"tit": "RODRIGUEZ HUGO SANDRA LEONOR",
+"lon": -70.671752,
+"lat": -32.372929
+},
+{
+"id": "V135",
+"E": 319127,
+"N": 6412998,
+"score": 1.42,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAURITA TRES 1/20 (0ha)",
+"LAURITA 3 1/20 (0ha)"
+],
+"tit": "RAMIREZ OLMOS GABRIEL ANGEL",
+"lon": -70.923261,
+"lat": -32.405419
+},
+{
+"id": "V136",
+"E": 324027,
+"N": 6410498,
+"score": 1.41,
+"com": "CABILDO",
+"libre600": 31.8,
+"minas": [
+"COLLAO 27 1/60 (0ha)",
+"LA MATRIZ 1/20 (0ha)"
+],
+"tit": "SERVICIOS DE GEOLOGIA AB LTDA",
+"lon": -70.871648,
+"lat": -32.428744
+},
+{
+"id": "V137",
+"E": 280427,
+"N": 6453548,
+"score": 1.4,
+"com": "LOS VILOS",
+"libre600": 26.1,
+"minas": [
+"ALBA 4 1/15 (0ha)",
+"LOS MOLLES 1/13 (0ha)"
+],
+"tit": "SOC MRA GODOY SCHWENGER Y CIA",
+"lon": -71.325173,
+"lat": -32.032951
+},
+{
+"id": "V138",
+"E": 319077,
+"N": 6428798,
+"score": 1.4,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA VICENTE 1/10 (100ha)",
+"VICENTE 1/10 (0ha)"
+],
+"tit": "GARRIDO HERNANDEZ ARIEL AUGUSO",
+"lon": -70.920781,
+"lat": -32.262954
+},
+{
+"id": "V139",
+"E": 305827,
+"N": 6413348,
+"score": 1.4,
+"com": "CABILDO",
+"libre600": 27.1,
+"minas": [
+"DON GUILLE 1/7 (14ha)",
+"SAN JOSE I/III (0ha)"
+],
+"tit": "APABLAZA SERRANO GUILLERMO A",
+"lon": -71.064535,
+"lat": -32.400026
+},
+{
+"id": "V140",
+"E": 316577,
+"N": 6391448,
+"score": 1.4,
+"com": "CABILDO",
+"libre600": 27.3,
+"minas": [
+"LA RESGUARDO 1/10 (49ha)",
+"DANIELA 2 1/16 (80ha)"
+],
+"tit": "VALDES FRICH CAMILO ENRIQUE",
+"lon": -70.954563,
+"lat": -32.599294
+},
+{
+"id": "V141",
+"E": 316577,
+"N": 6390798,
+"score": 1.4,
+"com": "CABILDO",
+"libre600": 19.0,
+"minas": [
+"LA RESGUARDO 1/10 (49ha)",
+"DANIELA 2 1/16 (80ha)"
+],
+"tit": "VALDES FRICH CAMILO ENRIQUE",
+"lon": -70.95469,
+"lat": -32.605154
+},
+{
+"id": "V142",
+"E": 307427,
+"N": 6361598,
+"score": 1.4,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"FERNANDO 1/12 (0ha)",
+"LA ESPERANZA 1/20 (0ha)"
+],
+"tit": "RENZ TAMM FERNANDO",
+"lon": -71.05819,
+"lat": -32.866835
+},
+{
+"id": "V143",
+"E": 256927,
+"N": 6500648,
+"score": 1.35,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA CLAUDIA I 1/20 (0ha)",
+"MINERA SANTA JUANA II 1/19 (0ha)",
+"BELLAVISTA 2 1/45 (0ha)"
+],
+"tit": "BLANCO BEROIZ HAROLDO FCO",
+"lon": -71.562067,
+"lat": -31.603634
+},
+{
+"id": "V144",
+"E": 329277,
+"N": 6400548,
+"score": 1.35,
+"com": "CABILDO",
+"libre600": 25.7,
+"minas": [
+"LOS TRES HERMANOS 1/16 (96ha)",
+"RECONQUISTA 7 1/40 (0ha)",
+"SAN RICARDO 1/10 (0ha)"
+],
+"tit": "LAZCANO QUIROZ ANDRES",
+"lon": -70.817636,
+"lat": -32.519276
+},
+{
+"id": "V145",
+"E": 325927,
+"N": 6398148,
+"score": 1.34,
+"com": "CABILDO",
+"libre600": 18.7,
+"minas": [
+"COLLAO 7, 1/24 (0ha)",
+"RAUL 1/41 (0ha)",
+"LA ESCONDIDA 1/19 (0ha)",
+"CATALINA 1/200 (0ha)"
+],
+"tit": "SERVICIOS DE GEOLOGIA AB LTDA",
+"lon": -70.853731,
+"lat": -32.540395
+},
+{
+"id": "V146",
+"E": 327477,
+"N": 6414848,
+"score": 1.34,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"CAROLINA 1/10 (100ha)",
+"LA RETAMILLA 1/31 (0ha)",
+"PAIHUEN LA CANOA 1/10 (0ha)"
+],
+"tit": "JUAN CARLOS FERNANDO Y JAMETT",
+"lon": -70.834177,
+"lat": -32.390062
+},
+{
+"id": "V147",
+"E": 284377,
+"N": 6400698,
+"score": 1.32,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"SANTA FE 1/12 (1-4/12) (0ha)",
+"PARQUE 2, 1/20 (0ha)"
+],
+"tit": "FERNANDEZ VASQUEZ CARLOS RBTO",
+"lon": -71.295343,
+"lat": -32.510111
+},
+{
+"id": "V148",
+"E": 302077,
+"N": 6406448,
+"score": 1.3,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"CABILSOL 1 1/20 (0ha)",
+"ANA 1/5 (0ha)"
+],
+"tit": "GR GUAYACAN SPA",
+"lon": -71.10583,
+"lat": -32.461571
+},
+{
+"id": "V149",
+"E": 320577,
+"N": 6397798,
+"score": 1.3,
+"com": "CABILDO",
+"libre600": 16.6,
+"minas": [
+"LOS PEQUENES 1/20 (0ha)",
+"LA MONI 1/12 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.910744,
+"lat": -32.542698
+},
+{
+"id": "V150",
+"E": 278177,
+"N": 6517998,
+"score": 1.29,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"RAICES 2 1/36 (0ha)",
+"BLANCA 1/20 (0ha)",
+"BETA 1/10 (0ha)"
+],
+"tit": "BUSTAMANTE POZA CRISTIAN ELIAS",
+"lon": -71.334356,
+"lat": -31.45152
+},
+{
+"id": "V151",
+"E": 326577,
+"N": 6397698,
+"score": 1.28,
+"com": "CABILDO",
+"libre600": 33.8,
+"minas": [
+"COLLAO 7, 1/24 (0ha)",
+"RAUL 1/41 (0ha)",
+"LA ESCONDIDA 1/19 (0ha)",
+"CATALINA 1/200 (0ha)"
+],
+"tit": "SERVICIOS DE GEOLOGIA AB LTDA",
+"lon": -70.846896,
+"lat": -32.544554
+},
+{
+"id": "V152",
+"E": 273227,
+"N": 6526998,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 25.5,
+"minas": [
+"OSCURO 20, 1/48 (0ha)",
+"VANGUARDIA 1/8 (0ha)"
+],
+"tit": "SOCIEDAD PUNTA DEL COBRE SA",
+"lon": -71.384356,
+"lat": -31.369427
+},
+{
+"id": "V153",
+"E": 273227,
+"N": 6526348,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 18.0,
+"minas": [
+"OSCURO 20, 1/48 (0ha)",
+"VANGUARDIA 1/8 (0ha)"
+],
+"tit": "SOCIEDAD PUNTA DEL COBRE SA",
+"lon": -71.384504,
+"lat": -31.375286
+},
+{
+"id": "V154",
+"E": 278527,
+"N": 6512898,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"BENDICION 4 1/50 (0ha)",
+"LA MELOCATO 1/10 (0ha)"
+],
+"tit": "BUSTAMANTE POZA CRISTIAN ELIAS",
+"lon": -71.331816,
+"lat": -31.497563
+},
+{
+"id": "V155",
+"E": 255977,
+"N": 6503398,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA CLAUDIA II 1/18 (0ha)",
+"MINERA SANTA JUANA III 1/18 (0ha)",
+"BELLAVISTA 4 1/55 (0ha)"
+],
+"tit": "BLANCO BEROIZ HAROLDO FCO",
+"lon": -71.571391,
+"lat": -31.578646
+},
+{
+"id": "V156",
+"E": 256627,
+"N": 6503398,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"BELLAVISTA 4 1/55 (0ha)",
+"CHALO 1/10 (0ha)"
+],
+"tit": "ALVEAR PARRA GERARDINE",
+"lon": -71.564547,
+"lat": -31.578783
+},
+{
+"id": "V157",
+"E": 255977,
+"N": 6502748,
+"score": 1.25,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA CLAUDIA II 1/18 (0ha)",
+"MINERA SANTA JUANA III 1/18 (0ha)",
+"BELLAVISTA 4 1/55 (0ha)"
+],
+"tit": "BLANCO BEROIZ HAROLDO FCO",
+"lon": -71.571552,
+"lat": -31.584504
+},
+{
+"id": "V158",
+"E": 286527,
+"N": 6454548,
+"score": 1.25,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"VARILLONES 1/176 (0ha)",
+"HOYADA 6, 1/65 (0ha)"
+],
+"tit": "DE AMESTICA OLIVEROS MARCO A.",
+"lon": -71.260399,
+"lat": -32.025104
+},
+{
+"id": "V159",
+"E": 340227,
+"N": 6432698,
+"score": 1.25,
+"com": "PETORCA",
+"libre600": 33.9,
+"minas": [
+"TRENT 1 1/40 (160ha)",
+"SAN PEDRO 1/4 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.695677,
+"lat": -32.231001
+},
+{
+"id": "V160",
+"E": 339927,
+"N": 6431198,
+"score": 1.25,
+"com": "PETORCA",
+"libre600": 35.3,
+"minas": [
+"TRENT 2 1/60 (285ha)",
+"EL CONDOR 1/20 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.699111,
+"lat": -32.244484
+},
+{
+"id": "V161",
+"E": 295677,
+"N": 6431148,
+"score": 1.25,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA FORTUNA 1/5 (0ha)",
+"MARTUKI 85 1/60 (0ha)"
+],
+"tit": "DIAZ TAPIA ELEUTERIO",
+"lon": -71.16856,
+"lat": -32.237748
+},
+{
+"id": "V162",
+"E": 310927,
+"N": 6429548,
+"score": 1.25,
+"com": "PETORCA",
+"libre600": 18.8,
+"minas": [
+"VALENTINA 1/46 (230ha)",
+"HAMBURGO 1/18 (0ha)"
+],
+"tit": "MUNOZ SALAS JUAN GABRIEL",
+"lon": -71.007112,
+"lat": -32.254847
+},
+{
+"id": "V163",
+"E": 308327,
+"N": 6426948,
+"score": 1.25,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"HEKA 4 1/20 (0ha)",
+"HIERRO VIEJO 1/15 (0ha)",
+"MULA MUERTA 1/50 (0ha)"
+],
+"tit": "INVERSIONES MINERAS SA",
+"lon": -71.035221,
+"lat": -32.277847
+},
+{
+"id": "V164",
+"E": 332227,
+"N": 6425048,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAGUNA 5 1/53 (0ha)",
+"LOS QUILOS 1/14 (0ha)",
+"LOS QUILOS 1/12 (0ha)"
+],
+"tit": "MURILLO V GUSTAVO Y OTRA",
+"lon": -70.781894,
+"lat": -32.298814
+},
+{
+"id": "V165",
+"E": 296427,
+"N": 6424448,
+"score": 1.25,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CARLOTA 2 1/58 (0ha)",
+"EL NARANJO 1/20 (0ha)",
+"LORENA 1/14 (0ha)"
+],
+"tit": "INVERSIONES MINERAS SA",
+"lon": -71.162038,
+"lat": -32.298285
+},
+{
+"id": "V166",
+"E": 297077,
+"N": 6424198,
+"score": 1.25,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CARLOTA 2 1/58 (0ha)",
+"EL MANZANO 1/20 (0ha)",
+"LORENA 1/14 (0ha)"
+],
+"tit": "INVERSIONES MINERAS SA",
+"lon": -71.155192,
+"lat": -32.300657
+},
+{
+"id": "V167",
+"E": 333727,
+"N": 6423548,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 24.5,
+"minas": [
+"TINAJAS III 1/10 (0ha)",
+"AGUA DEL TORDO 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.766232,
+"lat": -32.312563
+},
+{
+"id": "V168",
+"E": 333727,
+"N": 6422898,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 24.5,
+"minas": [
+"TINAJAS III 1/10 (0ha)",
+"AGUA DEL TORDO 1/10 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.766346,
+"lat": -32.318424
+},
+{
+"id": "V169",
+"E": 308477,
+"N": 6416348,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"NOVA 5, 1/60 (0ha)",
+"MINERA ALEXANDER 1/20 (0ha)"
+],
+"tit": "MANSOUR SEDAGHAT ZOWGHI",
+"lon": -71.035767,
+"lat": -32.373438
+},
+{
+"id": "V170",
+"E": 325527,
+"N": 6405898,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"AGUA MALA DEL 1-7 (55ha)",
+"COLLAO 13, 1/60 (0ha)"
+],
+"tit": "RIGOBERTO PATRICIO OLMOS MARCHAN",
+"lon": -70.856552,
+"lat": -32.470456
+},
+{
+"id": "V171",
+"E": 315427,
+"N": 6404448,
+"score": 1.25,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ALMENDRA 1/20 (160ha)",
+"LA RESCATADA 1/6 (0ha)"
+],
+"tit": "MADRID VERDEJO SERGIO OSCAR",
+"lon": -70.964257,
+"lat": -32.481898
+},
+{
+"id": "V172",
+"E": 283227,
+"N": 6404148,
+"score": 1.25,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"JAURURO (50ha)",
+"MAILEN II 1/40 (0ha)"
+],
+"tit": "VASSALLI VANNETTI JUAN E",
+"lon": -71.306782,
+"lat": -32.47879
+},
+{
+"id": "V173",
+"E": 350827,
+"N": 6381998,
+"score": 1.25,
+"com": "SAN FELIPE",
+"libre600": 22.7,
+"minas": [
+"LUZ DEL ALBA 1/10 (0ha)",
+"JAHUEL 1/40 (0ha)"
+],
+"tit": "VILLARROEL B. RICARDO Y OTRO",
+"lon": -70.591237,
+"lat": -32.689656
+},
+{
+"id": "V174",
+"E": 282777,
+"N": 6373998,
+"score": 1.25,
+"com": "PUCHUNCAVI",
+"libre600": 25.6,
+"minas": [
+"CHARQUICAN 1/10 (0ha)",
+"PUCALAN 0 1/45 (0ha)"
+],
+"tit": "FERNANDEZ LAGAZIO FERNANDO",
+"lon": -71.318564,
+"lat": -32.75046
+},
+{
+"id": "V175",
+"E": 286027,
+"N": 6363048,
+"score": 1.25,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"RETIRO 1/60 (0ha)",
+"EL PENASCO 1/8 (0ha)"
+],
+"tit": "RIEGEL BADE GERHARD",
+"lon": -71.286425,
+"lat": -32.849795
+},
+{
+"id": "V176",
+"E": 286127,
+"N": 6362398,
+"score": 1.25,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LOS ACACIOS 1/8 (0ha)",
+"RETIRO 1/60 (0ha)"
+],
+"tit": "CORREA ORTIZ FRED NELSON",
+"lon": -71.285507,
+"lat": -32.855673
+},
+{
+"id": "V177",
+"E": 277277,
+"N": 6354848,
+"score": 1.25,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"SANDRA 1/6 (0ha)",
+"DOLORES 1/162 (0ha)"
+],
+"tit": "VRSALOVIC OYARZO LJUBICA",
+"lon": -71.381832,
+"lat": -32.921956
+},
+{
+"id": "V178",
+"E": 297027,
+"N": 6352048,
+"score": 1.25,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LONCOMILLA 1/42 (0ha)",
+"EL SAUCE 1/14 (0ha)",
+"SAN PEDRO 1/60 (0ha)",
+"LONCOMILLA 1/30 (0ha)"
+],
+"tit": "QUIJANO FERNANDEZ JUAN JOSE",
+"lon": -71.171378,
+"lat": -32.951041
+},
+{
+"id": "V179",
+"E": 297677,
+"N": 6352048,
+"score": 1.25,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LONCOMILLA 1/42 (0ha)",
+"EL SAUCE 1/14 (0ha)",
+"SAN PEDRO 1/60 (0ha)",
+"LONCOMILLA 1/30 (0ha)"
+],
+"tit": "QUIJANO FERNANDEZ JUAN JOSE",
+"lon": -71.164428,
+"lat": -32.951162
+},
+{
+"id": "V180",
+"E": 308527,
+"N": 6422048,
+"score": 1.22,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"EL BARRACO 1/3 (0ha)",
+"LUZ 1/100 (0ha)"
+],
+"tit": "OLMOS DIAZ EDITH CAROLINA",
+"lon": -71.034086,
+"lat": -32.322058
+},
+{
+"id": "V181",
+"E": 269577,
+"N": 6438298,
+"score": 1.2,
+"com": "LOS VILOS",
+"libre600": 28.8,
+"minas": [
+"LAS TUPAS II 1/10 (0ha)",
+"ESTRELLA 1/20 (0ha)"
+],
+"tit": "SLM LAS TUPAS II 1 D LOS VILOS",
+"lon": -71.443641,
+"lat": -32.168248
+},
+{
+"id": "V182",
+"E": 302277,
+"N": 6430598,
+"score": 1.2,
+"com": "PETORCA",
+"libre600": 22.7,
+"minas": [
+"CERRO COLORADO I 1/16 (0ha)",
+"CERRO COLORADO I 1/16 (0ha)",
+"LA PALMIRA 1/16 (0ha)"
+],
+"tit": "ALDAY FLORES IBAR",
+"lon": -71.098667,
+"lat": -32.243889
+},
+{
+"id": "V183",
+"E": 320627,
+"N": 6428348,
+"score": 1.2,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"PETORCA 1/7 (56ha)",
+"PETORCA 7 1/7 (0ha)"
+],
+"tit": "GARRIDO HERNANDEZ ARIEL AUGUSO",
+"lon": -70.904418,
+"lat": -32.267261
+},
+{
+"id": "V184",
+"E": 340677,
+"N": 6419798,
+"score": 1.2,
+"com": "CABILDO",
+"libre600": 32.8,
+"minas": [
+"RIO GRANDE 1/10 (0ha)"
+],
+"tit": "SLM RIO GRANDE UNO DE ALICAHUE",
+"lon": -70.693064,
+"lat": -32.34739
+},
+{
+"id": "V185",
+"E": 338577,
+"N": 6419548,
+"score": 1.2,
+"com": "CABILDO",
+"libre600": 25.7,
+"minas": [
+"CHAMPITA 11/15 (0ha)"
+],
+"tit": "MINERA SAN JAVIER LIMITADA",
+"lon": -70.715413,
+"lat": -32.349343
+},
+{
+"id": "V186",
+"E": 283927,
+"N": 6371798,
+"score": 1.2,
+"com": "PUCHUNCAVI",
+"libre600": 27.6,
+"minas": [
+"SUD AMERICA 1/8 (32ha)"
+],
+"tit": "SLM SUDAMERICA DEL 1/8",
+"lon": -71.306809,
+"lat": -32.770516
+},
+{
+"id": "V187",
+"E": 298077,
+"N": 6359198,
+"score": 1.2,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"OLIVIA 2 IV 1/20 (100ha)",
+"EBER-EZER 1/20 (0ha)"
+],
+"tit": "AGRICOLA COVADONGA LTDA",
+"lon": -71.158586,
+"lat": -32.886785
+},
+{
+"id": "V188",
+"E": 271677,
+"N": 6527048,
+"score": 1.15,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"OSCURO 19, 1/60 (0ha)",
+"TRES AMIGOS 1/6 (0ha)"
+],
+"tit": "SOCIEDAD PUNTA DEL COBRE SA",
+"lon": -71.400629,
+"lat": -31.368672
+},
+{
+"id": "V189",
+"E": 321527,
+"N": 6434998,
+"score": 1.15,
+"com": "PETORCA",
+"libre600": 24.5,
+"minas": [
+"AMALIA 1/10 (32ha)",
+"PEDRO II 1/60 (0ha)"
+],
+"tit": "MUNOZ SALAS JUAN GABRIEL",
+"lon": -70.893622,
+"lat": -32.207445
+},
+{
+"id": "V190",
+"E": 321527,
+"N": 6433698,
+"score": 1.15,
+"com": "PETORCA",
+"libre600": 22.9,
+"minas": [
+"LA YERBA LOCA 1/10 (25ha)",
+"PEDRO II 1/60 (0ha)"
+],
+"tit": "MUNOZ SALAS JUAN GABRIEL",
+"lon": -70.893865,
+"lat": -32.219166
+},
+{
+"id": "V191",
+"E": 331827,
+"N": 6418848,
+"score": 1.15,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"CRISTO V 1/60 (0ha)",
+"GUATON 1/5 (0ha)"
+],
+"tit": "FEISTNER CANALES HANS MAX",
+"lon": -70.787239,
+"lat": -32.354659
+},
+{
+"id": "V192",
+"E": 297427,
+"N": 6363398,
+"score": 1.15,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"RESERVA I 1/20 (0ha)",
+"PIERO 1/118 (0ha)",
+"JUPITER 1/38 (0ha)"
+],
+"tit": "TAUCANO QUIROZ JUAN",
+"lon": -71.16461,
+"lat": -32.848806
+},
+{
+"id": "V193",
+"E": 298077,
+"N": 6363398,
+"score": 1.15,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"RESERVA I 1/20 (0ha)",
+"PIERO 1/118 (0ha)",
+"JUPITER 1/38 (0ha)"
+],
+"tit": "TAUCANO QUIROZ JUAN",
+"lon": -71.157668,
+"lat": -32.848926
+},
+{
+"id": "V194",
+"E": 286727,
+"N": 6427898,
+"score": 1.12,
+"com": "LA LIGUA",
+"libre600": 10.3,
+"minas": [
+"BALANTA II 1/6 (0ha)",
+"LAS ROSETAS 1/30 (0ha)"
+],
+"tit": "SALDIAS NARVAEZ ROBERTO JUAN",
+"lon": -71.264215,
+"lat": -32.26538
+},
+{
+"id": "V195",
+"E": 338777,
+"N": 6399698,
+"score": 1.12,
+"com": "PUTAENDO",
+"libre600": 9.2,
+"minas": [
+"BRONCEADA 1/14 (0ha)"
+],
+"tit": "SLM BRONCEADA 1/20 DE PUTAENDO",
+"lon": -70.716679,
+"lat": -32.528362
+},
+{
+"id": "V196",
+"E": 280627,
+"N": 6361148,
+"score": 1.11,
+"com": "QUILLOTA",
+"libre600": 20.0,
+"minas": [
+"JOSEFINA 1/4 (20ha)",
+"ESPERANZA 1/37 (0ha)"
+],
+"tit": "VEGA CORTES PEDRO",
+"lon": -71.344536,
+"lat": -32.865852
+},
+{
+"id": "V197",
+"E": 341577,
+"N": 6430198,
+"score": 1.1,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CELESTE 2 1/23 (98ha)",
+"RITA III 1/10 (0ha)",
+"RAQUEL 2 1/10 (0ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.68177,
+"lat": -32.253736
+},
+{
+"id": "V198",
+"E": 320077,
+"N": 6429398,
+"score": 1.1,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CAMARA 3 1/10 (0ha)",
+"PADRE HURTADO II 1/20 (0ha)"
+],
+"tit": "MARTINEZ RASSE CARLOS SALVADOR",
+"lon": -70.910056,
+"lat": -32.257705
+},
+{
+"id": "V199",
+"E": 341927,
+"N": 6416898,
+"score": 1.1,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"QUEBRADA 1/40 (200ha)",
+"EL DORADO 2 1/20 (0ha)"
+],
+"tit": "RODRIGUEZ HUGO SANDRA LEONOR",
+"lon": -70.680269,
+"lat": -32.373718
+},
+{
+"id": "V200",
+"E": 327977,
+"N": 6415498,
+"score": 1.1,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"EL SUENO 1/20 (0ha)",
+"EL SUENO 1/20 (0ha)"
+],
+"tit": "SILVA LE-FORT ENRIQUE",
+"lon": -70.828745,
+"lat": -32.384278
+},
+{
+"id": "V201",
+"E": 317827,
+"N": 6412748,
+"score": 1.1,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAURITA DOS 1/20 (100ha)",
+"LAURITA 2 1/20 (0ha)",
+"SANTA FE 1/20 (0ha)"
+],
+"tit": "RAMIREZ OLMOS GABRIEL ANGEL",
+"lon": -70.937126,
+"lat": -32.407461
+},
+{
+"id": "V202",
+"E": 294777,
+"N": 6357348,
+"score": 1.1,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"CAROLINA 1/10 (0ha)",
+"BAJACA 1/10 (0ha)"
+],
+"tit": "RIVERA HUMBERTO",
+"lon": -71.194253,
+"lat": -32.902847
+},
+{
+"id": "V203",
+"E": 273627,
+"N": 6354698,
+"score": 1.1,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"BETA 3 1/6 (0ha)",
+"JACINTO VI 1/20 (0ha)"
+],
+"tit": "PAVEZ VALENZUELA RUBEN",
+"lon": -71.420873,
+"lat": -32.922558
+},
+{
+"id": "V204",
+"E": 302427,
+"N": 6356898,
+"score": 1.06,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"MARIA PAZ 44/63 (0ha)",
+"LAS CANAS I/X (0ha)"
+],
+"tit": "TAPIA OCARANZA MARIA ANGELICA",
+"lon": -71.112604,
+"lat": -32.908312
+},
+{
+"id": "V205",
+"E": 327577,
+"N": 6354498,
+"score": 1.06,
+"com": "TIL-TIL",
+"libre600": 36.0,
+"minas": [
+"ANUNCIADA 1 Y 4 (0ha)"
+],
+"tit": "CM CONSTANCIA D MONTENEGRO LTD",
+"lon": -70.844259,
+"lat": -32.934205
+},
+{
+"id": "V206",
+"E": 291627,
+"N": 6410148,
+"score": 1.06,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"SORPRESA 1/5 (19ha)"
+],
+"tit": "SCM VALLE HERMOSO",
+"lon": -71.216127,
+"lat": -32.42631
+},
+{
+"id": "V207",
+"E": 330427,
+"N": 6402948,
+"score": 1.05,
+"com": "CABILDO",
+"libre600": 28.5,
+"minas": [
+"CARMELA Y CLEMENTINA 1/60 (0ha)",
+"PUNTO 4 1/9 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.804965,
+"lat": -32.497813
+},
+{
+"id": "V208",
+"E": 278177,
+"N": 6518748,
+"score": 1.05,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"RAICES 1 1/60 (0ha)",
+"BLANCA 1/20 (0ha)",
+"BETA 1/10 (0ha)"
+],
+"tit": "BUSTAMANTE POZA CRISTIAN ELIAS",
+"lon": -71.334188,
+"lat": -31.444758
+},
+{
+"id": "V209",
+"E": 307377,
+"N": 6426148,
+"score": 1.05,
+"com": "PETORCA",
+"libre600": 28.7,
+"minas": [
+"COBRE NORTE III 1/40 (0ha)",
+"DON PAOLODELACANELILLA 1/10 (0ha)"
+],
+"tit": "GARCIA LAZCANO JAIME",
+"lon": -71.045465,
+"lat": -32.284896
+},
+{
+"id": "V210",
+"E": 302527,
+"N": 6373348,
+"score": 1.05,
+"com": "HIJUELAS",
+"libre600": 17.9,
+"minas": [
+"LA ANDACOLLO 1/10 (50ha)"
+],
+"tit": "ORTEGA ARAVENA JOSE ALAMIRO",
+"lon": -71.108027,
+"lat": -32.760042
+},
+{
+"id": "V211",
+"E": 319177,
+"N": 6399698,
+"score": 1.04,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"TABATHA 1/3 (6ha)",
+"LOS PEQUENES 21/34 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.925281,
+"lat": -32.525341
+},
+{
+"id": "V212",
+"E": 324577,
+"N": 6366598,
+"score": 1.04,
+"com": "PANQUEHUE",
+"libre600": 36.0,
+"minas": [
+"SAN EXPEDITO (0ha)"
+],
+"tit": "SINKEN HIDALGO PEDRO Y OTRO",
+"lon": -70.874035,
+"lat": -32.824638
+},
+{
+"id": "V213",
+"E": 317027,
+"N": 6392498,
+"score": 1.02,
+"com": "CABILDO",
+"libre600": 22.7,
+"minas": [
+"LA RESCATADA 1/10 (50ha)"
+],
+"tit": "KUPRO RESOURCES SPA",
+"lon": -70.949565,
+"lat": -32.589902
+},
+{
+"id": "V214",
+"E": 317627,
+"N": 6418248,
+"score": 1.01,
+"com": "CABILDO",
+"libre600": 34.1,
+"minas": [
+"ALEJANDRO 1/5 (25ha)"
+],
+"tit": "SLM ALEJANDRO 1 DE CABILDO",
+"lon": -70.938192,
+"lat": -32.35784
+},
+{
+"id": "V215",
+"E": 279927,
+"N": 6523448,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"INDIO V 1/11 (0ha)"
+],
+"tit": "MARIN AGUILERA JUAN MANUEL",
+"lon": -71.314745,
+"lat": -31.402721
+},
+{
+"id": "V216",
+"E": 280577,
+"N": 6523448,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 32.5,
+"minas": [
+"INDIO V 1/11 (0ha)"
+],
+"tit": "MARIN AGUILERA JUAN MANUEL",
+"lon": -71.307913,
+"lat": -31.402844
+},
+{
+"id": "V217",
+"E": 279577,
+"N": 6522548,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 29.5,
+"minas": [
+"TERESA 2 1/119 (0ha)",
+"INDIO III DE LOS ARRAY 1/20 (0ha)"
+],
+"tit": "SULFATOS CHILE SA",
+"lon": -71.318623,
+"lat": -31.410768
+},
+{
+"id": "V218",
+"E": 280227,
+"N": 6521948,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 26.8,
+"minas": [
+"INDIO II 1/17 (0ha)",
+"TERESA 2 1/119 (0ha)"
+],
+"tit": "MARIN AGUILERA JUAN MANUEL",
+"lon": -71.311923,
+"lat": -31.416301
+},
+{
+"id": "V219",
+"E": 277027,
+"N": 6520848,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LA SITA LORE 1/16 (0ha)"
+],
+"tit": "TAPIA IBACACHE RUBEN",
+"lon": -71.345809,
+"lat": -31.425606
+},
+{
+"id": "V220",
+"E": 277727,
+"N": 6520498,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 29.1,
+"minas": [
+"LA SITA LORE 1/16 (0ha)"
+],
+"tit": "TAPIA IBACACHE RUBEN",
+"lon": -71.338528,
+"lat": -31.428896
+},
+{
+"id": "V221",
+"E": 261627,
+"N": 6518748,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 31.2,
+"minas": [
+"LA BLANCA 1/8 (0ha)"
+],
+"tit": "SOCIEDAD MRA CASABLANCA SA",
+"lon": -71.508203,
+"lat": -31.441468
+},
+{
+"id": "V222",
+"E": 283327,
+"N": 6516448,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"LAS ARAVENAS 1/10 (50ha)"
+],
+"tit": "CONTRERAS ALVAREZ ROLANDO DELC",
+"lon": -71.280536,
+"lat": -31.46647
+},
+{
+"id": "V223",
+"E": 283327,
+"N": 6515798,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"LAS ARAVENAS 1/10 (50ha)"
+],
+"tit": "CONTRERAS ALVAREZ ROLANDO DELC",
+"lon": -71.280678,
+"lat": -31.47233
+},
+{
+"id": "V224",
+"E": 281527,
+"N": 6513598,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"PASTO REY 1/7 (0ha)"
+],
+"tit": "HURTADO BRICENO HOMERO OSVALDO",
+"lon": -71.300097,
+"lat": -31.491824
+},
+{
+"id": "V225",
+"E": 285277,
+"N": 6509248,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 32.6,
+"minas": [
+"DEFENSA 1/20 (0ha)"
+],
+"tit": "MOYANO MOYANO MARIA GEORGINA",
+"lon": -71.261588,
+"lat": -31.531745
+},
+{
+"id": "V226",
+"E": 256977,
+"N": 6505598,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"SARITA 1/5 (0ha)"
+],
+"tit": "FACUSE HERESI NAZRE",
+"lon": -71.56032,
+"lat": -31.559028
+},
+{
+"id": "V227",
+"E": 283327,
+"N": 6505548,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"ATELCURA 57/70 (0ha)",
+"PLACETAS DEL QUILLAY 1/20 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.282925,
+"lat": -31.564737
+},
+{
+"id": "V228",
+"E": 256427,
+"N": 6504798,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"MINERA SANTA JUANA V 1/20 (0ha)",
+"CONE 1/20 (0ha)"
+],
+"tit": "SLM MRA STA JUANA V UNA CANELA",
+"lon": -71.566307,
+"lat": -31.566122
+},
+{
+"id": "V229",
+"E": 280727,
+"N": 6501848,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 26.0,
+"minas": [
+"LA CHICA 1/10 (0ha)"
+],
+"tit": "GONZALEZ AGUILERA MARIA E.",
+"lon": -71.311124,
+"lat": -31.5976
+},
+{
+"id": "V230",
+"E": 280727,
+"N": 6501198,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LA CHICA 1/10 (0ha)"
+],
+"tit": "GONZALEZ AGUILERA MARIA E.",
+"lon": -71.311268,
+"lat": -31.60346
+},
+{
+"id": "V231",
+"E": 260877,
+"N": 6498798,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LAS TORRES 1/9 (0ha)"
+],
+"tit": "CIA MRA QUILIMARI SCM",
+"lon": -71.520917,
+"lat": -31.621137
+},
+{
+"id": "V232",
+"E": 261527,
+"N": 6498798,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 36.0,
+"minas": [
+"LAS TORRES 1/9 (0ha)"
+],
+"tit": "CIA MRA QUILIMARI SCM",
+"lon": -71.51407,
+"lat": -31.621272
+},
+{
+"id": "V233",
+"E": 259177,
+"N": 6496898,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 31.4,
+"minas": [
+"SAN PEDRO 1/9 (0ha)"
+],
+"tit": "CIA MRA QUILIMARI SCM",
+"lon": -71.53929,
+"lat": -31.637907
+},
+{
+"id": "V234",
+"E": 260377,
+"N": 6496898,
+"score": 1.0,
+"com": "CANELA",
+"libre600": 22.3,
+"minas": [
+"SAN PEDRO 1/9 (0ha)"
+],
+"tit": "CIA MRA QUILIMARI SCM",
+"lon": -71.526647,
+"lat": -31.638158
+},
+{
+"id": "V235",
+"E": 276927,
+"N": 6493848,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"MAGUILLA 3 1/9 (0ha)"
+],
+"tit": "ALFARO ORREGO MANUEL",
+"lon": -71.352963,
+"lat": -31.668987
+},
+{
+"id": "V236",
+"E": 276927,
+"N": 6493198,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"MAGUILLA 3 1/9 (0ha)"
+],
+"tit": "ALFARO ORREGO MANUEL",
+"lon": -71.353111,
+"lat": -31.674847
+},
+{
+"id": "V237",
+"E": 284927,
+"N": 6490548,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 18.1,
+"minas": [
+"PACHO  1 1/10 (50ha)"
+],
+"tit": "CORREA ELIZALDE ERNESTO",
+"lon": -71.269361,
+"lat": -31.700265
+},
+{
+"id": "V238",
+"E": 285577,
+"N": 6490548,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 26.9,
+"minas": [
+"PACHO  1 1/10 (50ha)"
+],
+"tit": "CORREA ELIZALDE ERNESTO",
+"lon": -71.262507,
+"lat": -31.700387
+},
+{
+"id": "V239",
+"E": 285927,
+"N": 6489898,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 26.0,
+"minas": [
+"PACHO 2 1/10 (50ha)"
+],
+"tit": "CORREA ELIZALDE ERNESTO",
+"lon": -71.258958,
+"lat": -31.706312
+},
+{
+"id": "V240",
+"E": 280127,
+"N": 6486598,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 18.7,
+"minas": [
+"LA FORTUNA 1/5 (0ha)"
+],
+"tit": "BUSTAMANTE IBACACHE PEDRO",
+"lon": -71.320861,
+"lat": -31.734962
+},
+{
+"id": "V241",
+"E": 280927,
+"N": 6486048,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 23.2,
+"minas": [
+"CARMENCITA 1/9 (52ha)"
+],
+"tit": "FLORES ARAYA DAVID ENRIQUE",
+"lon": -71.312545,
+"lat": -31.740074
+},
+{
+"id": "V242",
+"E": 284177,
+"N": 6485548,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 25.6,
+"minas": [
+"VINCHUCA 27/31 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.278372,
+"lat": -31.745199
+},
+{
+"id": "V243",
+"E": 280527,
+"N": 6485398,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 24.4,
+"minas": [
+"LA MILAGROSA 1/5 (0ha)"
+],
+"tit": "CUELLO MALEBRAN JULIA",
+"lon": -71.316911,
+"lat": -31.745857
+},
+{
+"id": "V244",
+"E": 284177,
+"N": 6484898,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"VINCHUCA 27/31 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.278516,
+"lat": -31.751059
+},
+{
+"id": "V245",
+"E": 284377,
+"N": 6484248,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"VINCHUCA 24/26 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.276549,
+"lat": -31.756957
+},
+{
+"id": "V246",
+"E": 285877,
+"N": 6483248,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 7.9,
+"minas": [
+"EMILIANA 1 (5ha)",
+"VINCHUCA 18/23 (0ha)"
+],
+"tit": "LEIVA ALFARO RAMON ANTONIO",
+"lon": -71.260942,
+"lat": -31.766254
+},
+{
+"id": "V247",
+"E": 285977,
+"N": 6482098,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 33.2,
+"minas": [
+"DONA RAQUEL 1/5 (20ha)"
+],
+"tit": "WILSON APABLAZA ALEX RODRIGO",
+"lon": -71.260139,
+"lat": -31.77664
+},
+{
+"id": "V248",
+"E": 267927,
+"N": 6481548,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"SAN JOSE 4 1/20 (0ha)",
+"LOS ESTEROS 3 1/20 (0ha)"
+],
+"tit": "SLM SAN JOSE CUATRO",
+"lon": -71.450739,
+"lat": -31.778073
+},
+{
+"id": "V249",
+"E": 267927,
+"N": 6480898,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 31.4,
+"minas": [
+"SAN JOSE 4 1/20 (0ha)",
+"LOS ESTEROS 3 1/20 (0ha)"
+],
+"tit": "SLM SAN JOSE CUATRO",
+"lon": -71.450894,
+"lat": -31.783932
+},
+{
+"id": "V250",
+"E": 286927,
+"N": 6480498,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"CANEL 1/5 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.250463,
+"lat": -31.791242
+},
+{
+"id": "V251",
+"E": 286927,
+"N": 6479848,
+"score": 1.0,
+"com": "ILLAPEL",
+"libre600": 36.0,
+"minas": [
+"CANEL 1/5 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.250605,
+"lat": -31.797101
+},
+{
+"id": "V252",
+"E": 273277,
+"N": 6472848,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"ROSITA 1/4 (0ha)"
+],
+"tit": "ROJAS TORRES EDUARDO",
+"lon": -71.39631,
+"lat": -31.857571
+},
+{
+"id": "V253",
+"E": 282527,
+"N": 6470948,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 16.4,
+"minas": [
+"LA ANDACOLLO 1/5 (0ha)"
+],
+"tit": "GAMBOA CORNU JORGE EDUARDO",
+"lon": -71.299038,
+"lat": -31.876503
+},
+{
+"id": "V254",
+"E": 260627,
+"N": 6470398,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"NEPTUNO 1/9 (0ha)"
+],
+"tit": "PENNA PALMA MARIO",
+"lon": -71.530508,
+"lat": -31.877064
+},
+{
+"id": "V255",
+"E": 269427,
+"N": 6461548,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"EL SOCIO 1/10 (0ha)"
+],
+"tit": "RIQUELME AGUAYO JOSE ADRIANO",
+"lon": -71.439658,
+"lat": -31.958653
+},
+{
+"id": "V256",
+"E": 269427,
+"N": 6460898,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"EL SOCIO 1/10 (0ha)"
+],
+"tit": "RIQUELME AGUAYO JOSE ADRIANO",
+"lon": -71.439813,
+"lat": -31.964512
+},
+{
+"id": "V257",
+"E": 281727,
+"N": 6459748,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 32.1,
+"minas": [
+"MOLLE 10 1/44 (0ha)",
+"ALBORADA IV 1/20 (0ha)"
+],
+"tit": "ALFARO ORREGO MANUEL",
+"lon": -71.310014,
+"lat": -31.977313
+},
+{
+"id": "V258",
+"E": 281727,
+"N": 6459098,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"MOLLE 10 1/44 (0ha)",
+"ALBORADA IV 1/20 (0ha)"
+],
+"tit": "ALFARO ORREGO MANUEL",
+"lon": -71.31016,
+"lat": -31.983172
+},
+{
+"id": "V259",
+"E": 281227,
+"N": 6453548,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 29.1,
+"minas": [
+"MOLLE 8 1/13 (0ha)"
+],
+"tit": "ALFARO ORREGO MANUEL",
+"lon": -71.316707,
+"lat": -32.033106
+},
+{
+"id": "V260",
+"E": 275027,
+"N": 6451248,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"LAS DOS C 1/10 (0ha)"
+],
+"tit": "DOLY CEBALLOS DIAZ",
+"lon": -71.382852,
+"lat": -32.052622
+},
+{
+"id": "V261",
+"E": 275027,
+"N": 6450598,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"LAS DOS C 1/10 (0ha)"
+],
+"tit": "DOLY CEBALLOS DIAZ",
+"lon": -71.383004,
+"lat": -32.058481
+},
+{
+"id": "V262",
+"E": 280977,
+"N": 6447148,
+"score": 1.0,
+"com": "",
+"libre600": 28.5,
+"minas": [],
+"tit": "",
+"lon": -71.32081,
+"lat": -32.090749
+},
+{
+"id": "V263",
+"E": 282677,
+"N": 6446298,
+"score": 1.0,
+"com": "LOS VILOS",
+"libre600": 36.0,
+"minas": [
+"ANGELINA 1/13 (0ha)",
+"CONDOR 1/14 (0ha)"
+],
+"tit": "AHLERS WUILLE MICHAEL",
+"lon": -71.303001,
+"lat": -32.09874
+},
+{
+"id": "V264",
+"E": 328827,
+"N": 6436648,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"VALLE 1/5 (0ha)"
+],
+"tit": "AGRICOLA PETORCA SA",
+"lon": -70.815907,
+"lat": -32.193703
+},
+{
+"id": "V265",
+"E": 325927,
+"N": 6436148,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"OLGA 1/10 (0ha)"
+],
+"tit": "MARTINEZ RASSE CARLOS SALVADOR",
+"lon": -70.846749,
+"lat": -32.197766
+},
+{
+"id": "V266",
+"E": 337377,
+"N": 6436048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CERRO NEGRO 1/18 (90ha)",
+"OROCOTA 2 1/20 (0ha)"
+],
+"tit": "OYANEDEL BARRAZA MANUEL ANTONI",
+"lon": -70.725341,
+"lat": -32.200383
+},
+{
+"id": "V267",
+"E": 338027,
+"N": 6436048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CERRO NEGRO 1/18 (90ha)",
+"OROCOTA 2 1/20 (0ha)"
+],
+"tit": "OYANEDEL BARRAZA MANUEL ANTONI",
+"lon": -70.718448,
+"lat": -32.200477
+},
+{
+"id": "V268",
+"E": 327577,
+"N": 6435648,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"VEGA 1/16 (0ha)"
+],
+"tit": "AGRICOLA PETORCA SA",
+"lon": -70.829342,
+"lat": -32.202529
+},
+{
+"id": "V269",
+"E": 326977,
+"N": 6434998,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"VEGA 1/16 (0ha)"
+],
+"tit": "AGRICOLA PETORCA SA",
+"lon": -70.835823,
+"lat": -32.208297
+},
+{
+"id": "V270",
+"E": 327627,
+"N": 6434998,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"VEGA 1/16 (0ha)"
+],
+"tit": "AGRICOLA PETORCA SA",
+"lon": -70.828929,
+"lat": -32.208397
+},
+{
+"id": "V271",
+"E": 325177,
+"N": 6434748,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 25.7,
+"minas": [
+"AGOSTO 12 1/4 (12ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.854959,
+"lat": -32.210273
+},
+{
+"id": "V272",
+"E": 302627,
+"N": 6434348,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 34.8,
+"minas": [
+"LA SANTIAGO 1/20 (100ha)",
+"MINA LA SANTIAGO 1/20 (0ha)"
+],
+"tit": "SLM LA SANTIAGO FRUTILLAR BAJO",
+"lon": -71.094179,
+"lat": -32.210143
+},
+{
+"id": "V273",
+"E": 303277,
+"N": 6434348,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA SANTIAGO 1/20 (100ha)",
+"MINA LA SANTIAGO 1/20 (0ha)"
+],
+"tit": "SLM LA SANTIAGO FRUTILLAR BAJO",
+"lon": -71.087286,
+"lat": -32.210257
+},
+{
+"id": "V274",
+"E": 297627,
+"N": 6434048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"FRANI 1/5 (0ha)",
+"SANTA TERESITA 1/10 (0ha)"
+],
+"tit": "GARCIA BONILLA FAUSTINO JOSE",
+"lon": -71.147262,
+"lat": -32.211958
+},
+{
+"id": "V275",
+"E": 340927,
+"N": 6434048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"ANGELICA 1 1/10 (50ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.688025,
+"lat": -32.218926
+},
+{
+"id": "V276",
+"E": 341577,
+"N": 6434048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 31.3,
+"minas": [
+"ANGELICA 1 1/10 (50ha)"
+],
+"tit": "MINERA GOLDEYE CHILE LTDA",
+"lon": -70.68113,
+"lat": -32.219018
+},
+{
+"id": "V277",
+"E": 302627,
+"N": 6433698,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 28.7,
+"minas": [
+"LA SANTIAGO 1/20 (100ha)",
+"MINA LA SANTIAGO 1/20 (0ha)"
+],
+"tit": "SLM LA SANTIAGO FRUTILLAR BAJO",
+"lon": -71.094313,
+"lat": -32.216003
+},
+{
+"id": "V278",
+"E": 262127,
+"N": 6433548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"PAULA 1/10 (80ha)",
+"PUQUEN 1/16 (0ha)"
+],
+"tit": "PEREIRA AGUIRRE JORGE EDUARDO",
+"lon": -71.523766,
+"lat": -32.209508
+},
+{
+"id": "V279",
+"E": 295927,
+"N": 6432948,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 17.8,
+"minas": [
+"BLANCO 10 1/14 (58ha)"
+],
+"tit": "ENAMI",
+"lon": -71.165524,
+"lat": -32.221567
+},
+{
+"id": "V280",
+"E": 286927,
+"N": 6432548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"BOSSA NOVA 14 1/5 (0ha)"
+],
+"tit": "ARAYA CARRENO PATRICIO",
+"lon": -71.261054,
+"lat": -32.223501
+},
+{
+"id": "V281",
+"E": 272927,
+"N": 6432148,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"VERO 1 1/4 (0ha)"
+],
+"tit": "CARVAJAL ROBLEDO VERONICA",
+"lon": -71.409603,
+"lat": -32.224362
+},
+{
+"id": "V282",
+"E": 302127,
+"N": 6432148,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CERRO COLORADO II 1/16 (0ha)",
+"CERRO COLORADO II 1/16 (0ha)"
+],
+"tit": "ALDAY FLORES IBAR",
+"lon": -71.099937,
+"lat": -32.229889
+},
+{
+"id": "V283",
+"E": 286927,
+"N": 6431898,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"BOSSA NOVA 14 1/5 (0ha)"
+],
+"tit": "ARAYA CARRENO PATRICIO",
+"lon": -71.261199,
+"lat": -32.22936
+},
+{
+"id": "V284",
+"E": 340927,
+"N": 6431898,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CATALINA 5 1/5 (50ha)"
+],
+"tit": "MORAGA LATAPIAT MARIA INES",
+"lon": -70.688384,
+"lat": -32.238314
+},
+{
+"id": "V285",
+"E": 301427,
+"N": 6431598,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CERRO COLORADO III 1/14 (0ha)"
+],
+"tit": "ALDAY FLORES IBAR",
+"lon": -71.107476,
+"lat": -32.234724
+},
+{
+"id": "V286",
+"E": 322827,
+"N": 6431148,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA POLCURA 1/4 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -70.88055,
+"lat": -32.242364
+},
+{
+"id": "V287",
+"E": 263577,
+"N": 6430698,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"MONTERO DE LOS MOLLES 1/6 (0ha)"
+],
+"tit": "M&M COMERCIAL E INDUSTRIAL LTD",
+"lon": -71.5091,
+"lat": -32.235501
+},
+{
+"id": "V288",
+"E": 264227,
+"N": 6430698,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"MONTERO DE LOS MOLLES 1/6 (0ha)"
+],
+"tit": "M&M COMERCIAL E INDUSTRIAL LTD",
+"lon": -71.502208,
+"lat": -32.235637
+},
+{
+"id": "V289",
+"E": 324377,
+"N": 6430598,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 31.1,
+"minas": [
+"MERTONIA 1/5 (0ha)"
+],
+"tit": "TAUCANO QUIROZ ADELA DE LAS ME",
+"lon": -70.864207,
+"lat": -32.247567
+},
+{
+"id": "V290",
+"E": 291427,
+"N": 6430548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LONGOTOMA 3 1/10 (55ha)"
+],
+"tit": "AGRICOLA LAS LOICAS LIMITADA",
+"lon": -71.21377,
+"lat": -32.242375
+},
+{
+"id": "V291",
+"E": 302427,
+"N": 6429948,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA ESPIGA 4 1/5 (0ha)"
+],
+"tit": "VALENCIA ROJAS MARCELO Y OTRO",
+"lon": -71.097211,
+"lat": -32.249776
+},
+{
+"id": "V292",
+"E": 291327,
+"N": 6429898,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LONGOTOMA 3 1/10 (55ha)"
+],
+"tit": "AGRICOLA LAS LOICAS LIMITADA",
+"lon": -71.214973,
+"lat": -32.248216
+},
+{
+"id": "V293",
+"E": 312977,
+"N": 6429548,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 24.8,
+"minas": [
+"LA MARAVILLA 1/7 (17ha)"
+],
+"tit": "VALLEMAT SPA",
+"lon": -70.985362,
+"lat": -32.255191
+},
+{
+"id": "V294",
+"E": 331277,
+"N": 6429448,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA TORRE 1/10 (0ha)"
+],
+"tit": "HERRERA BARRAZA HECTOR GREGORI",
+"lon": -70.7912,
+"lat": -32.258996
+},
+{
+"id": "V295",
+"E": 270377,
+"N": 6429298,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 30.7,
+"minas": [
+"VERO 2 1/4 (0ha)"
+],
+"tit": "SLM VERO 2 UNO DE LOS MOLLES",
+"lon": -71.437328,
+"lat": -32.249531
+},
+{
+"id": "V296",
+"E": 293627,
+"N": 6429248,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"NERON 1 1/40 (0ha)"
+],
+"tit": "VILCHES ORELLANA FRANCISCO",
+"lon": -71.190716,
+"lat": -32.254501
+},
+{
+"id": "V297",
+"E": 331277,
+"N": 6428798,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA TORRE 1/10 (0ha)"
+],
+"tit": "HERRERA BARRAZA HECTOR GREGORI",
+"lon": -70.791315,
+"lat": -32.264857
+},
+{
+"id": "V298",
+"E": 293927,
+"N": 6428598,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"NERON 1 1/40 (0ha)"
+],
+"tit": "VILCHES ORELLANA FRANCISCO",
+"lon": -71.187674,
+"lat": -32.260416
+},
+{
+"id": "V299",
+"E": 308627,
+"N": 6428548,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 26.4,
+"minas": [
+"TORNO 1/5-9/10-14/15 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.031716,
+"lat": -32.263473
+},
+{
+"id": "V300",
+"E": 321277,
+"N": 6428248,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA ALICIA 1/10 (0ha)"
+],
+"tit": "MUNOZ SALAS MARIO GOLIAT",
+"lon": -70.897539,
+"lat": -32.268266
+},
+{
+"id": "V301",
+"E": 308627,
+"N": 6427898,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 32.0,
+"minas": [
+"TORNO 1/5-9/10-14/15 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.031846,
+"lat": -32.269333
+},
+{
+"id": "V302",
+"E": 322727,
+"N": 6426848,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 21.9,
+"minas": [
+"LA OVEJA 1/20 (0ha)",
+"DANIELA 1/20 (0ha)"
+],
+"tit": "SLM CALETON 1 DE PETORCA",
+"lon": -70.882412,
+"lat": -32.28112
+},
+{
+"id": "V303",
+"E": 312877,
+"N": 6426548,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"CHILE 1/7 (56ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.987012,
+"lat": -32.282222
+},
+{
+"id": "V304",
+"E": 332427,
+"N": 6426548,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 25.7,
+"minas": [
+"DON JUAN 1/8 (0ha)"
+],
+"tit": "BRITO RICHARDS JOSE MIGUEL",
+"lon": -70.779507,
+"lat": -32.285318
+},
+{
+"id": "V305",
+"E": 313677,
+"N": 6426148,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA NIPA I 1/10 (0ha)"
+],
+"tit": "RAMOS ARAYA VALDEMIL",
+"lon": -70.9786,
+"lat": -32.285962
+},
+{
+"id": "V306",
+"E": 329677,
+"N": 6425798,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"COQUIMBITO 1/5 (0ha)"
+],
+"tit": "VARGAS ZEPEDA MONICA ELVIRA",
+"lon": -70.808832,
+"lat": -32.291666
+},
+{
+"id": "V307",
+"E": 313677,
+"N": 6425498,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 27.5,
+"minas": [
+"LA NIPA I 1/10 (0ha)"
+],
+"tit": "RAMOS ARAYA VALDEMIL",
+"lon": -70.978727,
+"lat": -32.291823
+},
+{
+"id": "V308",
+"E": 292227,
+"N": 6425398,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"ESTELA MARIS 1/2 (0ha)"
+],
+"tit": "PEREZ CAMPOS XIMENA ROSA LIA",
+"lon": -71.206408,
+"lat": -32.288949
+},
+{
+"id": "V309",
+"E": 292877,
+"N": 6425398,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"TOLIMA 1/10 (0ha)",
+"XIMENA 1/20 (0ha)"
+],
+"tit": "GEOPERMIN SPA",
+"lon": -71.19951,
+"lat": -32.28907
+},
+{
+"id": "V310",
+"E": 294927,
+"N": 6425048,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 32.0,
+"minas": [
+"LA OLVIDADA 1/3 (15ha)"
+],
+"tit": "OILVARES PIZARRO LUIS",
+"lon": -71.177829,
+"lat": -32.292602
+},
+{
+"id": "V311",
+"E": 291227,
+"N": 6424548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"DONA FRESIA 1-6 (0ha)"
+],
+"tit": "PEREZ CAMPOS XIMENA ROSA LIA",
+"lon": -71.217207,
+"lat": -32.296426
+},
+{
+"id": "V312",
+"E": 291877,
+"N": 6424548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"DONA FRESIA 1-6 (0ha)"
+],
+"tit": "PEREZ CAMPOS XIMENA ROSA LIA",
+"lon": -71.210308,
+"lat": -32.296547
+},
+{
+"id": "V313",
+"E": 307827,
+"N": 6423898,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 32.9,
+"minas": [
+"ANGOSTURA 1/10 (0ha)"
+],
+"tit": "CACERES OLIVARES ROBERTO",
+"lon": -71.041144,
+"lat": -32.305259
+},
+{
+"id": "V314",
+"E": 308477,
+"N": 6423898,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 30.0,
+"minas": [
+"ANGOSTURA 1/10 (0ha)"
+],
+"tit": "CACERES OLIVARES ROBERTO",
+"lon": -71.034244,
+"lat": -32.30537
+},
+{
+"id": "V315",
+"E": 299727,
+"N": 6423698,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 27.3,
+"minas": [
+"PERLITA 1/18 (0ha)"
+],
+"tit": "COUDERC WILLIAMS JEAN MARCEL",
+"lon": -71.127169,
+"lat": -32.305642
+},
+{
+"id": "V316",
+"E": 329277,
+"N": 6423598,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 27.7,
+"minas": [
+"NATALI 1/6 (28ha)"
+],
+"tit": "INMOBILIARIA PETROHUE S.A",
+"lon": -70.813473,
+"lat": -32.311442
+},
+{
+"id": "V317",
+"E": 299427,
+"N": 6423048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 26.9,
+"minas": [
+"PERLITA 1/18 (0ha)"
+],
+"tit": "COUDERC WILLIAMS JEAN MARCEL",
+"lon": -71.130491,
+"lat": -32.311448
+},
+{
+"id": "V318",
+"E": 299727,
+"N": 6422398,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"LA QUEBRADA 1/7 (0ha)"
+],
+"tit": "SLM LA QUEBRADA 1",
+"lon": -71.127443,
+"lat": -32.317361
+},
+{
+"id": "V319",
+"E": 293777,
+"N": 6422248,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"JA 1/20 (0ha)",
+"ISABEL 1/20 (0ha)"
+],
+"tit": "OLGUIN ORTIZ JOSE ARNOLDO",
+"lon": -71.190642,
+"lat": -32.317632
+},
+{
+"id": "V320",
+"E": 305127,
+"N": 6421848,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 36.0,
+"minas": [
+"MONTT 1, 1/40 (40ha)"
+],
+"tit": "CANENCIA ENERGIA SPA",
+"lon": -71.070226,
+"lat": -32.323274
+},
+{
+"id": "V321",
+"E": 306027,
+"N": 6421048,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 28.6,
+"minas": [
+"GUANACA IV 1/5 (0ha)"
+],
+"tit": "COZ GONZALEZ JUAN LUIS",
+"lon": -71.060834,
+"lat": -32.330642
+},
+{
+"id": "V322",
+"E": 331127,
+"N": 6421048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAS ROCAS 1/9 (25ha)"
+],
+"tit": "INMOBILIARIA PETROHUE S.A",
+"lon": -70.794284,
+"lat": -32.334716
+},
+{
+"id": "V323",
+"E": 337677,
+"N": 6420548,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 25.3,
+"minas": [
+"CRISTO III 1/20 (0ha)",
+"MAITEN 1/20 (0ha)"
+],
+"tit": "FEISTNER CANALES HANS MAX",
+"lon": -70.724803,
+"lat": -32.340195
+},
+{
+"id": "V324",
+"E": 340377,
+"N": 6420448,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"RIO GRANDE 1/10 (0ha)"
+],
+"tit": "SLM RIO GRANDE UNO DE ALICAHUE",
+"lon": -70.696141,
+"lat": -32.341486
+},
+{
+"id": "V325",
+"E": 331227,
+"N": 6420398,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAS ROCAS 1/9 (25ha)"
+],
+"tit": "INMOBILIARIA PETROHUE S.A",
+"lon": -70.793337,
+"lat": -32.340592
+},
+{
+"id": "V326",
+"E": 295377,
+"N": 6420248,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"TEJAS COLORADAS 1/7 (0ha)"
+],
+"tit": "SLM TALQUITA 1/10 DE LOS VILOS",
+"lon": -71.174087,
+"lat": -32.335956
+},
+{
+"id": "V327",
+"E": 310927,
+"N": 6420048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANGELICA II 1/10 (0ha)"
+],
+"tit": "SOC AGRICOLA LOS GRANEROS LTDA",
+"lon": -71.009001,
+"lat": -32.340498
+},
+{
+"id": "V328",
+"E": 311577,
+"N": 6420048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANGELICA II 1/10 (0ha)"
+],
+"tit": "SOC AGRICOLA LOS GRANEROS LTDA",
+"lon": -71.002098,
+"lat": -32.340607
+},
+{
+"id": "V329",
+"E": 296577,
+"N": 6418998,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"SOLOVEROFF 1/4 (16ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -71.161613,
+"lat": -32.347444
+},
+{
+"id": "V330",
+"E": 328127,
+"N": 6417098,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"PIEDRA GRANDE 1/3 (0ha)"
+],
+"tit": "SOC AGRICOLA PAIHUEN LIMITADA",
+"lon": -70.826861,
+"lat": -32.369875
+},
+{
+"id": "V331",
+"E": 305827,
+"N": 6416598,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 30.1,
+"minas": [
+"LA FLORA 1/16 (0ha)",
+"LOS MANANTIALES PEDEGU 1/30 (0ha)"
+],
+"tit": "CHACANA PULGAR JUAN ARNALDO",
+"lon": -71.063868,
+"lat": -32.370726
+},
+{
+"id": "V332",
+"E": 297927,
+"N": 6416348,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA NINA 2 1/7 (0ha)"
+],
+"tit": "SALAS OLIVARES TRINIDAD INES",
+"lon": -71.147841,
+"lat": -32.371578
+},
+{
+"id": "V333",
+"E": 300027,
+"N": 6416348,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ROSA 2 1/7 (0ha)"
+],
+"tit": "ROJAS CORTES WILSON BELMAR",
+"lon": -71.125534,
+"lat": -32.371956
+},
+{
+"id": "V334",
+"E": 300677,
+"N": 6416348,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ROSA 1 1/7 (0ha)"
+],
+"tit": "ROJAS CORTES WILSON BELMAR",
+"lon": -71.118629,
+"lat": -32.372073
+},
+{
+"id": "V335",
+"E": 307277,
+"N": 6416348,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 18.3,
+"minas": [
+"NOVA 5, 1/60 (0ha)",
+"LOS PAJARITOS 1/20 (0ha)",
+"LA BATALLA 1/56 (0ha)"
+],
+"tit": "MANSOUR SEDAGHAT ZOWGHI",
+"lon": -71.048516,
+"lat": -32.373232
+},
+{
+"id": "V336",
+"E": 317977,
+"N": 6416048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 27.9,
+"minas": [
+"ANGLO C 3 1/13 (0ha)"
+],
+"tit": "LEON SILVA CLAUDIO ANDRES",
+"lon": -70.934897,
+"lat": -32.377733
+},
+{
+"id": "V337",
+"E": 305827,
+"N": 6415948,
+"score": 1.0,
+"com": "PETORCA",
+"libre600": 29.6,
+"minas": [
+"LA FLORA 1/16 (0ha)",
+"LOS MANANTIALES PEDEGU 1/30 (0ha)"
+],
+"tit": "CHACANA PULGAR JUAN ARNALDO",
+"lon": -71.064002,
+"lat": -32.376586
+},
+{
+"id": "V338",
+"E": 328627,
+"N": 6415848,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"EL RENACER SUR 10/18 (0ha)"
+],
+"tit": "DONOSO OLGUIN Y COMPA.LIMITADA",
+"lon": -70.821775,
+"lat": -32.381222
+},
+{
+"id": "V339",
+"E": 285427,
+"N": 6415548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"AIDA 1/5 (0ha)"
+],
+"tit": "VILLANUEVA RUBILAR LUIS",
+"lon": -71.280798,
+"lat": -32.376457
+},
+{
+"id": "V340",
+"E": 286077,
+"N": 6415548,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 34.6,
+"minas": [
+"MINERA SAN MANUEL 1/7(1/2) (0ha)"
+],
+"tit": "VASQUEZ VILLEGAS RUPERTO EDO",
+"lon": -71.273893,
+"lat": -32.376582
+},
+{
+"id": "V341",
+"E": 317977,
+"N": 6415398,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANGLO C 3 1/13 (0ha)"
+],
+"tit": "LEON SILVA CLAUDIO ANDRES",
+"lon": -70.935022,
+"lat": -32.383593
+},
+{
+"id": "V342",
+"E": 318627,
+"N": 6415348,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANGLO C 3 1/13 (0ha)"
+],
+"tit": "LEON SILVA CLAUDIO ANDRES",
+"lon": -70.928125,
+"lat": -32.38415
+},
+{
+"id": "V343",
+"E": 328627,
+"N": 6415198,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"EL RENACER SUR 10/18 (0ha)"
+],
+"tit": "DONOSO OLGUIN Y COMPA.LIMITADA",
+"lon": -70.821893,
+"lat": -32.387083
+},
+{
+"id": "V344",
+"E": 285427,
+"N": 6414898,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 31.3,
+"minas": [
+"MINERA SAN MANUEL 1/7(3/7) (0ha)"
+],
+"tit": "FERNANDEZ VASQUEZ CARLOS RBTO",
+"lon": -71.280945,
+"lat": -32.382316
+},
+{
+"id": "V345",
+"E": 286077,
+"N": 6414898,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 27.7,
+"minas": [
+"MINERA SAN MANUEL 1/7(3/7) (0ha)"
+],
+"tit": "FERNANDEZ VASQUEZ CARLOS RBTO",
+"lon": -71.27404,
+"lat": -32.382441
+},
+{
+"id": "V346",
+"E": 323977,
+"N": 6414548,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ESTERO II, 1/7 (0ha)"
+],
+"tit": "LAVIN ARREDONDO ANDRES",
+"lon": -70.871426,
+"lat": -32.39222
+},
+{
+"id": "V347",
+"E": 326277,
+"N": 6414498,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LA CHANCHITA 3 1/10 (0ha)"
+],
+"tit": "SLM LA CHANCHITA 3 UNO PAIHUEN",
+"lon": -70.846993,
+"lat": -32.393031
+},
+{
+"id": "V348",
+"E": 283627,
+"N": 6413848,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 18.2,
+"minas": [
+"MORRO 1/20 (0ha)",
+"POTRERO ALTO 1/20 (0ha)"
+],
+"tit": "VALENCIA SOLAR RAFAEL",
+"lon": -71.300306,
+"lat": -32.391433
+},
+{
+"id": "V349",
+"E": 326277,
+"N": 6413848,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LA CHANCHITA 3 1/10 (0ha)"
+],
+"tit": "SLM LA CHANCHITA 3 UNO PAIHUEN",
+"lon": -70.847113,
+"lat": -32.398892
+},
+{
+"id": "V350",
+"E": 318477,
+"N": 6413748,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAURITA TRES 1/20 (0ha)",
+"LAURITA 3 1/20 (0ha)"
+],
+"tit": "RAMIREZ OLMOS GABRIEL ANGEL",
+"lon": -70.930026,
+"lat": -32.398551
+},
+{
+"id": "V351",
+"E": 319127,
+"N": 6413748,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LAURITA TRES 1/20 (0ha)",
+"LAURITA 3 1/20 (0ha)"
+],
+"tit": "RAMIREZ OLMOS GABRIEL ANGEL",
+"lon": -70.923118,
+"lat": -32.398657
+},
+{
+"id": "V352",
+"E": 302127,
+"N": 6413648,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"SAIM RAM 1/16 (0ha)"
+],
+"tit": "EMP.CONSTRUCTORA DL CHOAPA LTD",
+"lon": -71.10379,
+"lat": -32.396671
+},
+{
+"id": "V353",
+"E": 283627,
+"N": 6413198,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 25.6,
+"minas": [
+"MORRO 1/20 (0ha)",
+"POTRERO ALTO 1/20 (0ha)"
+],
+"tit": "VALENCIA SOLAR RAFAEL",
+"lon": -71.300455,
+"lat": -32.397292
+},
+{
+"id": "V354",
+"E": 315727,
+"N": 6412248,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ARCO IRIS 1/10 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.959543,
+"lat": -32.411624
+},
+{
+"id": "V355",
+"E": 315727,
+"N": 6411598,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ARCO IRIS 1/10 (0ha)"
+],
+"tit": "ALVAREZ CASTRO ROBERTO PABLO",
+"lon": -70.959669,
+"lat": -32.417484
+},
+{
+"id": "V356",
+"E": 292277,
+"N": 6410648,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"COMPLETA 1/40 (40ha)"
+],
+"tit": "SCM VALLE HERMOSO",
+"lon": -71.209109,
+"lat": -32.421924
+},
+{
+"id": "V357",
+"E": 301027,
+"N": 6410198,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 31.7,
+"minas": [
+"ANDACOLLO 1/12 (0ha)"
+],
+"tit": "SOMIMETAL",
+"lon": -71.116204,
+"lat": -32.427578
+},
+{
+"id": "V358",
+"E": 293527,
+"N": 6409798,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA CATITA 1/20 (0ha)",
+"GOLDEN VALLEY 1/20 (0ha)"
+],
+"tit": "MINERA LAS CENIZAS S.A.",
+"lon": -71.196009,
+"lat": -32.429819
+},
+{
+"id": "V359",
+"E": 294177,
+"N": 6409798,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA CATITA 1/20 (0ha)",
+"GOLDEN VALLEY 1/20 (0ha)"
+],
+"tit": "MINERA LAS CENIZAS S.A.",
+"lon": -71.1891,
+"lat": -32.429939
+},
+{
+"id": "V360",
+"E": 314427,
+"N": 6409248,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"GATA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -70.973949,
+"lat": -32.438456
+},
+{
+"id": "V361",
+"E": 293427,
+"N": 6409148,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA CATITA 1/20 (0ha)",
+"GOLDEN VALLEY 1/20 (0ha)"
+],
+"tit": "MINERA LAS CENIZAS S.A.",
+"lon": -71.197214,
+"lat": -32.43566
+},
+{
+"id": "V362",
+"E": 294077,
+"N": 6409148,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"LA CATITA 1/20 (0ha)",
+"GOLDEN VALLEY 1/20 (0ha)"
+],
+"tit": "MINERA LAS CENIZAS S.A.",
+"lon": -71.190305,
+"lat": -32.43578
+},
+{
+"id": "V363",
+"E": 314427,
+"N": 6408598,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"GATA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -70.974077,
+"lat": -32.444316
+},
+{
+"id": "V364",
+"E": 329227,
+"N": 6408548,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 16.8,
+"minas": [
+"SAMANTA 1/12 (0ha)"
+],
+"tit": "LOPEZ PULGAR FERNANDO CARMEN",
+"lon": -70.816718,
+"lat": -32.447136
+},
+{
+"id": "V365",
+"E": 307977,
+"N": 6407548,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 22.0,
+"minas": [
+"TORO 1 1/13 (13ha)"
+],
+"tit": "SLM TORO 1 1 DEL CO MAHUIN",
+"lon": -71.042867,
+"lat": -32.452688
+},
+{
+"id": "V366",
+"E": 296427,
+"N": 6407048,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 25.7,
+"minas": [
+"GRANADILLA SUR 1/20 (0ha)",
+"SALVADA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -71.165778,
+"lat": -32.455143
+},
+{
+"id": "V367",
+"E": 297077,
+"N": 6407048,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 30.5,
+"minas": [
+"GRANADILLA SUR 1/20 (0ha)",
+"SALVADA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -71.158867,
+"lat": -32.455262
+},
+{
+"id": "V368",
+"E": 308627,
+"N": 6407048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 24.3,
+"minas": [
+"TORO 2 1/22 (22ha)"
+],
+"tit": "SLM TORO 2 1 DEL CO MAHUIN",
+"lon": -71.036057,
+"lat": -32.457308
+},
+{
+"id": "V369",
+"E": 296427,
+"N": 6406398,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"GRANADILLA SUR 1/20 (0ha)",
+"SALVADA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -71.165918,
+"lat": -32.461002
+},
+{
+"id": "V370",
+"E": 297077,
+"N": 6406398,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"GRANADILLA SUR 1/20 (0ha)",
+"SALVADA 1/10 (0ha)"
+],
+"tit": "SOC LEGAL MRA FRANCISCO JAVIER",
+"lon": -71.159006,
+"lat": -32.461121
+},
+{
+"id": "V371",
+"E": 281927,
+"N": 6405948,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"ALBERTO 1/10 (0ha)",
+"MAILEN I 1/10 (0ha)"
+],
+"tit": "AGRICOLA PULLACON LTDA",
+"lon": -71.32019,
+"lat": -32.462311
+},
+{
+"id": "V372",
+"E": 281927,
+"N": 6405298,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"ALBERTO 1/10 (0ha)",
+"MAILEN I 1/10 (0ha)"
+],
+"tit": "AGRICOLA PULLACON LTDA",
+"lon": -71.32034,
+"lat": -32.46817
+},
+{
+"id": "V373",
+"E": 318477,
+"N": 6404798,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"FATIMA 1/6 (0ha)"
+],
+"tit": "SLM FATIMA UNO DE CABILDO",
+"lon": -70.931747,
+"lat": -32.479245
+},
+{
+"id": "V374",
+"E": 336527,
+"N": 6402748,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 15.9,
+"minas": [
+"MONSERRAT 1/4 (0ha)"
+],
+"tit": "LEON ROBLE PAMELA ARIANA",
+"lon": -70.740097,
+"lat": -32.500531
+},
+{
+"id": "V375",
+"E": 335927,
+"N": 6402098,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 29.7,
+"minas": [
+"CHARITO III 1/8 (0ha)"
+],
+"tit": "LAZCANO ESCOBAR MARCELO ANTONI",
+"lon": -70.746594,
+"lat": -32.506303
+},
+{
+"id": "V376",
+"E": 341427,
+"N": 6402048,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 36.0,
+"minas": [
+"MANTOS DE LUNA 1 1/13 (0ha)",
+"ORO FINO 98/107 (0ha)"
+],
+"tit": "GONZALEZ NUNEZ RODRIGO ANDRES",
+"lon": -70.688076,
+"lat": -32.507553
+},
+{
+"id": "V377",
+"E": 312927,
+"N": 6401948,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"ANGELES 6 1/5 (0ha)"
+],
+"tit": "INVERSIONES EL RETIRO SA",
+"lon": -70.991345,
+"lat": -32.504019
+},
+{
+"id": "V378",
+"E": 342077,
+"N": 6401848,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 27.9,
+"minas": [
+"MANTOS DE LUNA 1 1/13 (0ha)",
+"ORO FINO 88/97 (0ha)"
+],
+"tit": "GONZALEZ NUNEZ RODRIGO ANDRES",
+"lon": -70.681193,
+"lat": -32.509449
+},
+{
+"id": "V379",
+"E": 319427,
+"N": 6401698,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 22.6,
+"minas": [
+"CAROLINA 1/12 (0ha)"
+],
+"tit": "SLM CAROLINA 1 DE EL GUAYACAN",
+"lon": -70.922236,
+"lat": -32.507349
+},
+{
+"id": "V380",
+"E": 339627,
+"N": 6401548,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 33.8,
+"minas": [
+"ORO FINO 32/35 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -70.707316,
+"lat": -32.511803
+},
+{
+"id": "V381",
+"E": 340277,
+"N": 6401548,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 25.7,
+"minas": [
+"ORO FINO 32/35 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -70.700399,
+"lat": -32.511897
+},
+{
+"id": "V382",
+"E": 341927,
+"N": 6401198,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 32.3,
+"minas": [
+"EL DORADO 2 1/20 (0ha)",
+"ORO FINO 88/97 (0ha)"
+],
+"tit": "CRUZ ARGANDONA JESSICA NATALIA",
+"lon": -70.682898,
+"lat": -32.515289
+},
+{
+"id": "V383",
+"E": 336427,
+"N": 6401048,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 30.1,
+"minas": [
+"EL DORADO 1 1/20 (0ha)",
+"JESUS MARIA 1/10 (0ha)"
+],
+"tit": "CRUZ ARGANDONA JESSICA NATALIA",
+"lon": -70.741456,
+"lat": -32.515845
+},
+{
+"id": "V384",
+"E": 342077,
+"N": 6400548,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 36.0,
+"minas": [
+"LA SUERTE II 1/20 (0ha)",
+"ORO FINO 78/87 (0ha)"
+],
+"tit": "CARCAMO CARTES DANNERY ZAYONAR",
+"lon": -70.681411,
+"lat": -32.521172
+},
+{
+"id": "V385",
+"E": 284177,
+"N": 6400048,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"SANTA FE 1/12 (1-4/12) (0ha)"
+],
+"tit": "FERNANDEZ VASQUEZ CARLOS RBTO",
+"lon": -71.297619,
+"lat": -32.515931
+},
+{
+"id": "V386",
+"E": 328627,
+"N": 6399898,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 28.1,
+"minas": [
+"COLLAO 10 1/11 (36ha)"
+],
+"tit": "INMOBILIARIA PETROHUE S.A",
+"lon": -70.824672,
+"lat": -32.525037
+},
+{
+"id": "V387",
+"E": 321427,
+"N": 6398698,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 36.0,
+"minas": [
+"LA TURCA 1/10 (0ha)"
+],
+"tit": "SLM LA TURCA UNO DE CABILDO",
+"lon": -70.901526,
+"lat": -32.534721
+},
+{
+"id": "V388",
+"E": 321227,
+"N": 6398048,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 34.7,
+"minas": [
+"LA TURCA 1/10 (0ha)"
+],
+"tit": "SLM LA TURCA UNO DE CABILDO",
+"lon": -70.903778,
+"lat": -32.540549
+},
+{
+"id": "V389",
+"E": 287327,
+"N": 6397948,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"DON SEBASTIAN II 1/6 (0ha)"
+],
+"tit": "SOL DE MAR SPA",
+"lon": -71.264583,
+"lat": -32.535469
+},
+{
+"id": "V390",
+"E": 287977,
+"N": 6397948,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"DON SEBASTIAN III 1/10 (0ha)"
+],
+"tit": "SOL DE MAR SPA",
+"lon": -71.257666,
+"lat": -32.535593
+},
+{
+"id": "V391",
+"E": 288627,
+"N": 6397948,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"DON SEBASTIAN III 1/10 (0ha)"
+],
+"tit": "SOL DE MAR SPA",
+"lon": -71.250749,
+"lat": -32.535717
+},
+{
+"id": "V392",
+"E": 288927,
+"N": 6397248,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CERRO LAS BAYAS 1/20 (0ha)",
+"CERRO LAS BAYAS 1/20 (0ha)"
+],
+"tit": "UGARTE ELGUETA VICTOR",
+"lon": -71.247714,
+"lat": -32.542084
+},
+{
+"id": "V393",
+"E": 289577,
+"N": 6397248,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CERRO LAS BAYAS 1/20 (0ha)",
+"CERRO LAS BAYAS 1/20 (0ha)"
+],
+"tit": "UGARTE ELGUETA VICTOR",
+"lon": -71.240797,
+"lat": -32.542208
+},
+{
+"id": "V394",
+"E": 320177,
+"N": 6397148,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 25.4,
+"minas": [
+"ORO AZUL 1/20 (1/4-11/13) (0ha)",
+"LOS PEQUENES 1/20 (0ha)"
+],
+"tit": "SLM ORO AZUL 1 DE EL GUAYACAN",
+"lon": -70.915127,
+"lat": -32.548494
+},
+{
+"id": "V395",
+"E": 288927,
+"N": 6396598,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CERRO LAS BAYAS 1/20 (0ha)",
+"CERRO LAS BAYAS 1/20 (0ha)"
+],
+"tit": "UGARTE ELGUETA VICTOR",
+"lon": -71.24786,
+"lat": -32.547943
+},
+{
+"id": "V396",
+"E": 289577,
+"N": 6396598,
+"score": 1.0,
+"com": "LA LIGUA",
+"libre600": 36.0,
+"minas": [
+"CERRO LAS BAYAS 1/20 (0ha)",
+"CERRO LAS BAYAS 1/20 (0ha)"
+],
+"tit": "UGARTE ELGUETA VICTOR",
+"lon": -71.240943,
+"lat": -32.548067
+},
+{
+"id": "V397",
+"E": 342427,
+"N": 6395548,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 25.0,
+"minas": [
+"MANITOBA 25, 1/10 (0ha)"
+],
+"tit": "SCM MANITOBA",
+"lon": -70.678525,
+"lat": -32.566307
+},
+{
+"id": "V398",
+"E": 342427,
+"N": 6394898,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 35.3,
+"minas": [
+"MANITOBA 25, 1/10 (0ha)"
+],
+"tit": "SCM MANITOBA",
+"lon": -70.678634,
+"lat": -32.572168
+},
+{
+"id": "V399",
+"E": 318927,
+"N": 6394248,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 21.7,
+"minas": [
+"CATALUNA 1/40 (0ha)",
+"AGUA V 1/20 (0ha)",
+"QUINTRALA 1/20 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.928992,
+"lat": -32.574436
+},
+{
+"id": "V400",
+"E": 280027,
+"N": 6393998,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"LOS DUENDES 1/20 (0ha)",
+"LA ROSARIO 1/20 (0ha)"
+],
+"tit": "SLM LOS DUENDES 1 D LOMAS CHIV",
+"lon": -71.343185,
+"lat": -32.569648
+},
+{
+"id": "V401",
+"E": 280677,
+"N": 6393998,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"LOS DUENDES 1/20 (0ha)",
+"LA ROSARIO 1/20 (0ha)"
+],
+"tit": "SLM LOS DUENDES 1 D LOMAS CHIV",
+"lon": -71.336266,
+"lat": -32.569777
+},
+{
+"id": "V402",
+"E": 318927,
+"N": 6393598,
+"score": 1.0,
+"com": "CABILDO",
+"libre600": 28.2,
+"minas": [
+"CATALUNA 1/40 (0ha)",
+"AGUA V 1/20 (0ha)",
+"QUINTRALA 1/20 (0ha)"
+],
+"tit": "CIA MRA CERRO NEGRO SA",
+"lon": -70.929118,
+"lat": -32.580297
+},
+{
+"id": "V403",
+"E": 280027,
+"N": 6393348,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 31.6,
+"minas": [
+"LOS DUENDES 1/20 (0ha)",
+"LA ROSARIO 1/20 (0ha)"
+],
+"tit": "SLM LOS DUENDES 1 D LOMAS CHIV",
+"lon": -71.343337,
+"lat": -32.575507
+},
+{
+"id": "V404",
+"E": 280677,
+"N": 6393348,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 35.0,
+"minas": [
+"LOS DUENDES 1/20 (0ha)",
+"LA ROSARIO 1/20 (0ha)"
+],
+"tit": "SLM LOS DUENDES 1 D LOMAS CHIV",
+"lon": -71.336418,
+"lat": -32.575636
+},
+{
+"id": "V405",
+"E": 280527,
+"N": 6392598,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"CATAPILCO III 1/8 (46ha)"
+],
+"tit": "EUROAMERICA SEGUROS DE VIDA SA",
+"lon": -71.33819,
+"lat": -32.582366
+},
+{
+"id": "V406",
+"E": 335527,
+"N": 6391948,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 23.3,
+"minas": [
+"LA ESPERANZA 1/6 (0ha)"
+],
+"tit": "SLM ESPERANZA 1/10 DE CABRERO",
+"lon": -70.752629,
+"lat": -32.597765
+},
+{
+"id": "V407",
+"E": 287627,
+"N": 6390298,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 33.3,
+"minas": [
+"NUEVA ESPERANZA 1/5 (0ha)"
+],
+"tit": "CONTRERAS LUJAN CARLOS EUGENIO",
+"lon": -71.263122,
+"lat": -32.604483
+},
+{
+"id": "V408",
+"E": 288277,
+"N": 6390298,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 31.3,
+"minas": [
+"NUEVA ESPERANZA 1/5 (0ha)"
+],
+"tit": "CONTRERAS LUJAN CARLOS EUGENIO",
+"lon": -71.2562,
+"lat": -32.604607
+},
+{
+"id": "V409",
+"E": 282727,
+"N": 6389448,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 31.1,
+"minas": [
+"MURUME 4 1/12 (48ha)"
+],
+"tit": "BENEDETTI ROSENQVIST HUMBERTO",
+"lon": -71.315499,
+"lat": -32.611193
+},
+{
+"id": "V410",
+"E": 283377,
+"N": 6389448,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 28.4,
+"minas": [
+"MURUME 4 1/12 (48ha)"
+],
+"tit": "BENEDETTI ROSENQVIST HUMBERTO",
+"lon": -71.308577,
+"lat": -32.61132
+},
+{
+"id": "V411",
+"E": 286327,
+"N": 6388848,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"MINA RAHAB 1/5 (0ha)"
+],
+"tit": "DIAZ TAPIA TERESA DEL ROSARIO",
+"lon": -71.277297,
+"lat": -32.617303
+},
+{
+"id": "V412",
+"E": 286977,
+"N": 6388848,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"MINA RAHAB 1/5 (0ha)"
+],
+"tit": "DIAZ TAPIA TERESA DEL ROSARIO",
+"lon": -71.270374,
+"lat": -32.617428
+},
+{
+"id": "V413",
+"E": 339927,
+"N": 6388348,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 36.0,
+"minas": [
+"ANCEL II 1/10 (0ha)"
+],
+"tit": "SAEGER ARAYA OTTO LUDWIG",
+"lon": -70.706376,
+"lat": -32.630871
+},
+{
+"id": "V414",
+"E": 340577,
+"N": 6388348,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 36.0,
+"minas": [
+"ANCEL II 1/10 (0ha)"
+],
+"tit": "SAEGER ARAYA OTTO LUDWIG",
+"lon": -70.69945,
+"lat": -32.630965
+},
+{
+"id": "V415",
+"E": 281627,
+"N": 6388248,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 27.7,
+"minas": [
+"PAJARITOS 1/6 (0ha)"
+],
+"tit": "HERRERA CORONADO LEONIDAS",
+"lon": -71.327494,
+"lat": -32.621793
+},
+{
+"id": "V416",
+"E": 279977,
+"N": 6387548,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"EL BOLDO 1/12 (0ha)",
+"ESPANA 1/30 (0ha)"
+],
+"tit": "LAGAZIO CAMPODONICO HUMBERTO",
+"lon": -71.345232,
+"lat": -32.627775
+},
+{
+"id": "V417",
+"E": 274627,
+"N": 6387198,
+"score": 1.0,
+"com": "ZAPALLAR",
+"libre600": 36.0,
+"minas": [
+"LA CANTERA RICA 1/3 (0ha)"
+],
+"tit": "SILVA REINOSO MARIA CRISTINA",
+"lon": -71.402299,
+"lat": -32.629852
+},
+{
+"id": "V418",
+"E": 289927,
+"N": 6387198,
+"score": 1.0,
+"com": "NOGALES",
+"libre600": 28.7,
+"minas": [
+"CATALINA 1/20 (0ha)",
+"LA FOXY LADY 1/40 (0ha)",
+"CECILIA 1/40 (0ha)"
+],
+"tit": "OLIVARES ORTIZ LUIS",
+"lon": -71.239325,
+"lat": -32.632865
+},
+{
+"id": "V419",
+"E": 353977,
+"N": 6384448,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 28.8,
+"minas": [
+"ROMBO 9 1/12 (0ha)"
+],
+"tit": "CAYUL MANQUEPI LUZ ANGELICA",
+"lon": -70.557263,
+"lat": -32.667985
+},
+{
+"id": "V420",
+"E": 334927,
+"N": 6383548,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 20.8,
+"minas": [
+"SAN NICOLAS 1/4 (0ha)"
+],
+"tit": "ANDREANI MOUNIER YVON",
+"lon": -70.760503,
+"lat": -32.673415
+},
+{
+"id": "V421",
+"E": 288677,
+"N": 6383348,
+"score": 1.0,
+"com": "NOGALES",
+"libre600": 25.6,
+"minas": [
+"PICHICHO 1/8 (56ha)"
+],
+"tit": "SOPROSIL SOC MRA",
+"lon": -71.253511,
+"lat": -32.667331
+},
+{
+"id": "V422",
+"E": 353377,
+"N": 6383348,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 28.1,
+"minas": [
+"LA ESCONDIDA 1 1/12 (0ha)"
+],
+"tit": "LEPE ARANCIBIA CESAR AUGUSTO",
+"lon": -70.563833,
+"lat": -32.677825
+},
+{
+"id": "V423",
+"E": 338427,
+"N": 6382148,
+"score": 1.0,
+"com": "PUTAENDO",
+"libre600": 27.9,
+"minas": [
+"DESPRECIADA 1/10 (0ha)"
+],
+"tit": "MARIN ARTURO Y OT",
+"lon": -70.723433,
+"lat": -32.686557
+},
+{
+"id": "V424",
+"E": 329927,
+"N": 6381948,
+"score": 1.0,
+"com": "SAN FELIPE",
+"libre600": 18.4,
+"minas": [
+"ANDREANI 1/10 (0ha)"
+],
+"tit": "ANDREANI JERUME JEAN FRANCOIS",
+"lon": -70.814097,
+"lat": -32.687082
+},
+{
+"id": "V425",
+"E": 329927,
+"N": 6381298,
+"score": 1.0,
+"com": "SAN FELIPE",
+"libre600": 18.0,
+"minas": [
+"ANDREANI 1/10 (0ha)"
+],
+"tit": "ANDREANI JERUME JEAN FRANCOIS",
+"lon": -70.814216,
+"lat": -32.692942
+},
+{
+"id": "V426",
+"E": 277677,
+"N": 6380498,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"NORMA 1/10 (0ha)",
+"LA SALVADA 1/20 (0ha)"
+],
+"tit": "PIZARRO VALENCIA PATRICIO",
+"lon": -71.371408,
+"lat": -32.690857
+},
+{
+"id": "V427",
+"E": 352927,
+"N": 6380048,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 12.0,
+"minas": [
+"LOS TRES AMIGOS 1/4 (0ha)"
+],
+"tit": "CAMUS MORALES CARLOS",
+"lon": -70.569151,
+"lat": -32.707522
+},
+{
+"id": "V428",
+"E": 280977,
+"N": 6379998,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"JERUSALEM 1/12 (0ha)",
+"SUENO REVELADO 1/12 (0ha)"
+],
+"tit": "ARAYA AGUSTINA VIOLETA",
+"lon": -71.336351,
+"lat": -32.696024
+},
+{
+"id": "V429",
+"E": 280977,
+"N": 6379348,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"JERUSALEM 1/12 (0ha)",
+"SUENO REVELADO 1/12 (0ha)"
+],
+"tit": "ARAYA AGUSTINA VIOLETA",
+"lon": -71.336504,
+"lat": -32.701883
+},
+{
+"id": "V430",
+"E": 284027,
+"N": 6377898,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 31.2,
+"minas": [
+"LA VERDE 1/5 (0ha)"
+],
+"tit": "MARCHANT BAHAMONDES ERNESTO",
+"lon": -71.304326,
+"lat": -32.715554
+},
+{
+"id": "V431",
+"E": 284677,
+"N": 6377898,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 31.2,
+"minas": [
+"LA VERDE 1/5 (0ha)"
+],
+"tit": "MARCHANT BAHAMONDES ERNESTO",
+"lon": -71.297396,
+"lat": -32.715681
+},
+{
+"id": "V432",
+"E": 283177,
+"N": 6375998,
+"score": 1.0,
+"com": "NOGALES",
+"libre600": 30.7,
+"minas": [
+"PUCALAN 6 1/18 (0ha)"
+],
+"tit": "MINERA LOS CASCAJOS SA",
+"lon": -71.313831,
+"lat": -32.732513
+},
+{
+"id": "V433",
+"E": 282027,
+"N": 6373998,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 29.1,
+"minas": [
+"CHARQUICAN 1/10 (0ha)"
+],
+"tit": "FERNANDEZ LAGAZIO FERNANDO",
+"lon": -71.326563,
+"lat": -32.750312
+},
+{
+"id": "V434",
+"E": 354677,
+"N": 6373998,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 36.0,
+"minas": [
+"EL MORRO AZUL 1/5 (0ha)"
+],
+"tit": "LARA VARGAS ELIAS MOISES",
+"lon": -70.551431,
+"lat": -32.76231
+},
+{
+"id": "V435",
+"E": 355327,
+"N": 6373998,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 36.0,
+"minas": [
+"EL MORRO AZUL 1/5 (0ha)"
+],
+"tit": "LARA VARGAS ELIAS MOISES",
+"lon": -70.544494,
+"lat": -32.762396
+},
+{
+"id": "V436",
+"E": 281027,
+"N": 6373898,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 25.8,
+"minas": [
+"LAS HUALTATAS 2 1/14 (0ha)"
+],
+"tit": "MINERA LOS CASCAJOS SA",
+"lon": -71.337253,
+"lat": -32.751015
+},
+{
+"id": "V437",
+"E": 303177,
+"N": 6373598,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 22.5,
+"minas": [
+"LA ANDACOLLO 1/10 (50ha)"
+],
+"tit": "ORTEGA ARAVENA JOSE ALAMIRO",
+"lon": -71.101039,
+"lat": -32.757905
+},
+{
+"id": "V438",
+"E": 298627,
+"N": 6372748,
+"score": 1.0,
+"com": "CALERA",
+"libre600": 36.0,
+"minas": [
+"SANTA ROSA 1/7 (0ha)"
+],
+"tit": "SOC MRA GODOY SCHWENGER Y CIA",
+"lon": -71.149764,
+"lat": -32.764744
+},
+{
+"id": "V439",
+"E": 283127,
+"N": 6371448,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 28.4,
+"minas": [
+"LAURA 1/3 (0ha)"
+],
+"tit": "DEL CAMPO NUNEZ RENATO",
+"lon": -71.315426,
+"lat": -32.773514
+},
+{
+"id": "V440",
+"E": 349277,
+"N": 6370598,
+"score": 1.0,
+"com": "SANTA MARIA",
+"libre600": 36.0,
+"minas": [
+"FORTUNA 1 (0ha)"
+],
+"tit": "SCM VICTOR Y ALEJANDRO AMAR AM",
+"lon": -70.609613,
+"lat": -32.792241
+},
+{
+"id": "V441",
+"E": 280777,
+"N": 6369998,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"HELGA 2 1/2 (0ha)"
+],
+"tit": "BERNAL DIAZ JUAN DE DIOS",
+"lon": -71.34084,
+"lat": -32.786116
+},
+{
+"id": "V442",
+"E": 299577,
+"N": 6369898,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"LA CORRECTA 1/20 (0ha)",
+"SANTA PATRICIA 1/20 (0ha)"
+],
+"tit": "SOCIEDAD MINERA LA FAISANA",
+"lon": -71.140244,
+"lat": -32.790608
+},
+{
+"id": "V443",
+"E": 300227,
+"N": 6369898,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"LA CORRECTA 1/20 (0ha)",
+"SANTA PATRICIA 1/20 (0ha)"
+],
+"tit": "SOCIEDAD MINERA LA FAISANA",
+"lon": -71.133307,
+"lat": -32.790727
+},
+{
+"id": "V444",
+"E": 326927,
+"N": 6369598,
+"score": 1.0,
+"com": "PANQUEHUE",
+"libre600": 31.7,
+"minas": [
+"LA MAGICA 1/7 (0ha)"
+],
+"tit": "RUIZ BOLIVAR BERNARDITA",
+"lon": -70.848381,
+"lat": -32.797963
+},
+{
+"id": "V445",
+"E": 277827,
+"N": 6369348,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"LA PONDEROSA 1/9 (45ha)"
+],
+"tit": "SOC INMOBILIA. PUENTE COLMO SA",
+"lon": -71.372472,
+"lat": -32.791382
+},
+{
+"id": "V446",
+"E": 299577,
+"N": 6369248,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"LA CORRECTA 1/20 (0ha)",
+"SANTA PATRICIA 1/20 (0ha)"
+],
+"tit": "SOCIEDAD MINERA LA FAISANA",
+"lon": -71.140384,
+"lat": -32.796468
+},
+{
+"id": "V447",
+"E": 300227,
+"N": 6369248,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"LA CORRECTA 1/20 (0ha)",
+"SANTA PATRICIA 1/20 (0ha)"
+],
+"tit": "SOCIEDAD MINERA LA FAISANA",
+"lon": -71.133447,
+"lat": -32.796586
+},
+{
+"id": "V448",
+"E": 268927,
+"N": 6369048,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 25.8,
+"minas": [
+"ROCIO 2 1/20 (0ha)",
+"ANDRES 1/20 (0ha)"
+],
+"tit": "MANFREDI AGUIRRE ALFREDO ROVAL",
+"lon": -71.467511,
+"lat": -32.79225
+},
+{
+"id": "V449",
+"E": 277427,
+"N": 6368698,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 28.6,
+"minas": [
+"LA PONDEROSA 1/9 (45ha)"
+],
+"tit": "SOC INMOBILIA. PUENTE COLMO SA",
+"lon": -71.376896,
+"lat": -32.79716
+},
+{
+"id": "V450",
+"E": 285277,
+"N": 6367948,
+"score": 1.0,
+"com": "LA CRUZ",
+"libre600": 36.0,
+"minas": [
+"EL MANZANO 1/6 (24ha)"
+],
+"tit": "GAMBOA LEIVA CESAR ENRIQUE",
+"lon": -71.293297,
+"lat": -32.805483
+},
+{
+"id": "V451",
+"E": 349777,
+"N": 6367798,
+"score": 1.0,
+"com": "LOS ANDES",
+"libre600": 28.7,
+"minas": [
+"LAS CASAS 2 1/10 (0ha)",
+"GONZALO 1/40 (0ha)"
+],
+"tit": "MALUJE BORODAY  GONZALO",
+"lon": -70.604729,
+"lat": -32.817558
+},
+{
+"id": "V452",
+"E": 349627,
+"N": 6367148,
+"score": 1.0,
+"com": "LOS ANDES",
+"libre600": 34.1,
+"minas": [
+"LAS CASAS 2 1/10 (0ha)",
+"GONZALO 1/40 (0ha)"
+],
+"tit": "MALUJE BORODAY  GONZALO",
+"lon": -70.606436,
+"lat": -32.823398
+},
+{
+"id": "V453",
+"E": 322427,
+"N": 6366748,
+"score": 1.0,
+"com": "PANQUEHUE",
+"libre600": 36.0,
+"minas": [
+"LA BOLLEN 1/10 (0ha)"
+],
+"tit": "VALENCIA OLIVARES ELIAS",
+"lon": -70.896963,
+"lat": -32.822939
+},
+{
+"id": "V454",
+"E": 323077,
+"N": 6366748,
+"score": 1.0,
+"com": "PANQUEHUE",
+"libre600": 36.0,
+"minas": [
+"LA BOLLEN 1/10 (0ha)"
+],
+"tit": "VALENCIA OLIVARES ELIAS",
+"lon": -70.890023,
+"lat": -32.823044
+},
+{
+"id": "V455",
+"E": 296577,
+"N": 6366348,
+"score": 1.0,
+"com": "CALERA",
+"libre600": 28.8,
+"minas": [
+"PACHACAMA 5/7 (60ha)"
+],
+"tit": "SLM PACHACAMA DE LA CALERA",
+"lon": -71.173039,
+"lat": -32.822057
+},
+{
+"id": "V456",
+"E": 351727,
+"N": 6366248,
+"score": 1.0,
+"com": "SAN ESTEBAN",
+"libre600": 36.0,
+"minas": [
+"PAIDAHUEN (0ha)"
+],
+"tit": "MENA LOBO PATRICIA EDITH",
+"lon": -70.584153,
+"lat": -32.8318
+},
+{
+"id": "V457",
+"E": 297227,
+"N": 6365998,
+"score": 1.0,
+"com": "CALERA",
+"libre600": 32.0,
+"minas": [
+"PACHACAMA 5/7 (60ha)"
+],
+"tit": "SLM PACHACAMA DE LA CALERA",
+"lon": -71.166176,
+"lat": -32.825332
+},
+{
+"id": "V458",
+"E": 308927,
+"N": 6364948,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"TRANQUE 1/4 (0ha)"
+],
+"tit": "DECOMBE VILLALOBOS JUAN",
+"lon": -71.041475,
+"lat": -32.836898
+},
+{
+"id": "V459",
+"E": 279177,
+"N": 6364198,
+"score": 1.0,
+"com": "PUCHUNCAVI",
+"libre600": 36.0,
+"minas": [
+"LOS QUILLAYES 1/7 (0ha)"
+],
+"tit": "FIGUEROA MANOSALVA BELISARIO",
+"lon": -71.359294,
+"lat": -32.838071
+},
+{
+"id": "V460",
+"E": 307927,
+"N": 6363748,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"BERNARDA 1/12 (0ha)"
+],
+"tit": "RAMIREZ MATTE ANDRES",
+"lon": -71.052403,
+"lat": -32.847541
+},
+{
+"id": "V461",
+"E": 307927,
+"N": 6363098,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"BERNARDA 1/12 (0ha)"
+],
+"tit": "RAMIREZ MATTE ANDRES",
+"lon": -71.052538,
+"lat": -32.853401
+},
+{
+"id": "V462",
+"E": 284427,
+"N": 6363048,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"COLINDANTE 1/9 (0ha)"
+],
+"tit": "ALVAREZ AGUILERA MANUEL Y OT",
+"lon": -71.30351,
+"lat": -32.849481
+},
+{
+"id": "V463",
+"E": 307927,
+"N": 6362448,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"MONICA 1/12 (0ha)"
+],
+"tit": "RENZ TAMM FERNANDO",
+"lon": -71.052673,
+"lat": -32.859261
+},
+{
+"id": "V464",
+"E": 284427,
+"N": 6362398,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 23.5,
+"minas": [
+"COLINDANTE 1/9 (0ha)"
+],
+"tit": "ALVAREZ AGUILERA MANUEL Y OT",
+"lon": -71.303661,
+"lat": -32.85534
+},
+{
+"id": "V465",
+"E": 305927,
+"N": 6362348,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 34.3,
+"minas": [
+"EL RELOJ 1/4 (0ha)"
+],
+"tit": "RAMIREZ VASQUEZ ROBERTO",
+"lon": -71.074055,
+"lat": -32.85981
+},
+{
+"id": "V466",
+"E": 339227,
+"N": 6362298,
+"score": 1.0,
+"com": "RINCONADA",
+"libre600": 32.4,
+"minas": [
+"LA HIGUERA 1/4 (40ha)"
+],
+"tit": "SLM LA HIGUERA 1 RINCONADA DE",
+"lon": -70.71834,
+"lat": -32.865654
+},
+{
+"id": "V467",
+"E": 339877,
+"N": 6362298,
+"score": 1.0,
+"com": "RINCONADA",
+"libre600": 35.2,
+"minas": [
+"LA HIGUERA 1/4 (40ha)"
+],
+"tit": "SLM LA HIGUERA 1 RINCONADA DE",
+"lon": -70.711396,
+"lat": -32.865749
+},
+{
+"id": "V468",
+"E": 282477,
+"N": 6362048,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ADRIANA 1/15 (0ha)",
+"EL PEUMO 1/20 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.324567,
+"lat": -32.858109
+},
+{
+"id": "V469",
+"E": 283127,
+"N": 6362048,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ADRIANA 1/15 (0ha)",
+"EL PEUMO 1/20 (0ha)"
+],
+"tit": "ENAMI",
+"lon": -71.317626,
+"lat": -32.858238
+},
+{
+"id": "V470",
+"E": 308077,
+"N": 6361798,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"MONICA 1/12 (0ha)"
+],
+"tit": "RENZ TAMM FERNANDO",
+"lon": -71.051205,
+"lat": -32.865146
+},
+{
+"id": "V471",
+"E": 308077,
+"N": 6361148,
+"score": 1.0,
+"com": "HIJUELAS",
+"libre600": 36.0,
+"minas": [
+"JORGE 1/12 (0ha)"
+],
+"tit": "RENZ TAMM FERNANDO",
+"lon": -71.05134,
+"lat": -32.871006
+},
+{
+"id": "V472",
+"E": 284427,
+"N": 6360548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LEONOR 1/10 (0ha)",
+"LEONOR 1/10 (0ha)"
+],
+"tit": "RODRIGUEZ LARRAIN MARIA LEONOR",
+"lon": -71.304093,
+"lat": -32.872014
+},
+{
+"id": "V473",
+"E": 285077,
+"N": 6360548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 31.1,
+"minas": [
+"LEONOR 1/10 (0ha)",
+"LEONOR 1/10 (0ha)"
+],
+"tit": "RODRIGUEZ LARRAIN MARIA LEONOR",
+"lon": -71.29715,
+"lat": -32.872142
+},
+{
+"id": "V474",
+"E": 287577,
+"N": 6360448,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LOA 1/8 (51ha)"
+],
+"tit": "VRSALOVIC  OYARZO LJUBICA",
+"lon": -71.270471,
+"lat": -32.873531
+},
+{
+"id": "V475",
+"E": 286327,
+"N": 6360398,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 28.1,
+"minas": [
+"RAFAELA 6/13 (0ha)"
+],
+"tit": "DELGADO OPAZO GUSTAVO",
+"lon": -71.283834,
+"lat": -32.873739
+},
+{
+"id": "V476",
+"E": 284427,
+"N": 6359898,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LEONOR 1/10 (0ha)",
+"LEONOR 1/10 (0ha)"
+],
+"tit": "RODRIGUEZ LARRAIN MARIA LEONOR",
+"lon": -71.304244,
+"lat": -32.877873
+},
+{
+"id": "V477",
+"E": 285577,
+"N": 6359898,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LAS PIRITAS 1/10 (0ha)"
+],
+"tit": "SLM LAS PIRITAS I DE QUILLOTA",
+"lon": -71.29196,
+"lat": -32.878099
+},
+{
+"id": "V478",
+"E": 287527,
+"N": 6359798,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LOA 1/8 (51ha)"
+],
+"tit": "VRSALOVIC  OYARZO LJUBICA",
+"lon": -71.271154,
+"lat": -32.87938
+},
+{
+"id": "V479",
+"E": 286227,
+"N": 6359548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LA JUSTICIA 1/8 (40ha)"
+],
+"tit": "SLM LA JUSTICIA 1A DE QUILLOTA",
+"lon": -71.285098,
+"lat": -32.881381
+},
+{
+"id": "V480",
+"E": 285427,
+"N": 6359248,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LA PATITA 1/10 (50ha)"
+],
+"tit": "CARVAJAL VEGA CAROLINA FELIZA",
+"lon": -71.293714,
+"lat": -32.883928
+},
+{
+"id": "V481",
+"E": 296427,
+"N": 6359048,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"ESPERANZA VIII 1/10 (0ha)",
+"ESPERANZA 1/20 (0ha)"
+],
+"tit": "PARRA CARMONA JOSE CELESTINO",
+"lon": -71.176247,
+"lat": -32.887832
+},
+{
+"id": "V482",
+"E": 326727,
+"N": 6358648,
+"score": 1.0,
+"com": "LLAY LLAY",
+"libre600": 35.0,
+"minas": [
+"LA SUERTE 1 1/5 (0ha)"
+],
+"tit": "MORALES MATURANA FRANCISCO",
+"lon": -70.852567,
+"lat": -32.896655
+},
+{
+"id": "V483",
+"E": 320177,
+"N": 6358298,
+"score": 1.0,
+"com": "LLAY LLAY",
+"libre600": 36.0,
+"minas": [
+"SOLEDAD 1/4 (0ha)"
+],
+"tit": "SLM SOLEDAD 1/10 DE LLAY LLAY",
+"lon": -70.922631,
+"lat": -32.898754
+},
+{
+"id": "V484",
+"E": 326727,
+"N": 6357998,
+"score": 1.0,
+"com": "LLAY LLAY",
+"libre600": 29.7,
+"minas": [
+"LA SUERTE 1 1/5 (0ha)"
+],
+"tit": "MORALES MATURANA FRANCISCO",
+"lon": -70.852689,
+"lat": -32.902516
+},
+{
+"id": "V485",
+"E": 296427,
+"N": 6357548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL QUILLAY 1/20 (200ha)",
+"CAROLINA 26/45 (0ha)",
+"ESPERANZA II 1/10 (0ha)"
+],
+"tit": "SOCIEDAD LOS ALMENDROS SA",
+"lon": -71.176578,
+"lat": -32.901353
+},
+{
+"id": "V486",
+"E": 338427,
+"N": 6357148,
+"score": 1.0,
+"com": "RINCONADA",
+"libre600": 31.2,
+"minas": [
+"LOS OLIVOS 19A, 1/45 (45ha)"
+],
+"tit": "AGRICOLA E INMOBILIARIA LOS OL",
+"lon": -70.727788,
+"lat": -32.911971
+},
+{
+"id": "V487",
+"E": 339077,
+"N": 6357148,
+"score": 1.0,
+"com": "RINCONADA",
+"libre600": 36.0,
+"minas": [
+"LOS OLIVOS 19A, 1/45 (45ha)"
+],
+"tit": "AGRICOLA E INMOBILIARIA LOS OL",
+"lon": -70.72084,
+"lat": -32.912066
+},
+{
+"id": "V488",
+"E": 296077,
+"N": 6356898,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL QUILLAY 1/20 (200ha)",
+"ESPERANZA IV 1/10 (0ha)",
+"CAROLINA 26/45 (0ha)"
+],
+"tit": "SOCIEDAD LOS ALMENDROS SA",
+"lon": -71.180461,
+"lat": -32.907147
+},
+{
+"id": "V489",
+"E": 296077,
+"N": 6356248,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL QUILLAY 1/20 (200ha)",
+"ESPERANZA IV 1/10 (0ha)",
+"CAROLINA 26/45 (0ha)"
+],
+"tit": "SOCIEDAD LOS ALMENDROS SA",
+"lon": -71.180605,
+"lat": -32.913006
+},
+{
+"id": "V490",
+"E": 292627,
+"N": 6355548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"CALIFORNIA 1/5 (0ha)"
+],
+"tit": "AGRICOLA DE PUREHUE LIMITADA",
+"lon": -71.21763,
+"lat": -32.918667
+},
+{
+"id": "V491",
+"E": 274927,
+"N": 6355298,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 27.6,
+"minas": [
+"JACINTO 4 1/100 (0ha)",
+"BETA 1 1/14 (0ha)"
+],
+"tit": "SAN MARTIN Y CIA.",
+"lon": -71.406835,
+"lat": -32.917419
+},
+{
+"id": "V492",
+"E": 293277,
+"N": 6355298,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 11 1/5 (25ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.21074,
+"lat": -32.921043
+},
+{
+"id": "V493",
+"E": 272877,
+"N": 6355048,
+"score": 1.0,
+"com": "VINA DEL MAR",
+"libre600": 26.3,
+"minas": [
+"PEPITO 1/5 (50ha)",
+"JACINTO VI 1/20 (0ha)"
+],
+"tit": "CLAMAMI LTDA",
+"lon": -71.428801,
+"lat": -32.919248
+},
+{
+"id": "V494",
+"E": 292627,
+"N": 6354898,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"CALIFORNIA 1/5 (0ha)"
+],
+"tit": "AGRICOLA DE PUREHUE LIMITADA",
+"lon": -71.217776,
+"lat": -32.924526
+},
+{
+"id": "V495",
+"E": 271377,
+"N": 6354748,
+"score": 1.0,
+"com": "VINA DEL MAR",
+"libre600": 27.1,
+"minas": [
+"ALONSITO 1/6 (0ha)"
+],
+"tit": "CLAMAMI LTDA",
+"lon": -71.444904,
+"lat": -32.92164
+},
+{
+"id": "V496",
+"E": 270127,
+"N": 6354648,
+"score": 1.0,
+"com": "CONCON",
+"libre600": 36.0,
+"minas": [
+"CARLOS A 1/6 (0ha)"
+],
+"tit": "AGUIRRE MARTINEZ CARLOS",
+"lon": -71.458285,
+"lat": -32.922279
+},
+{
+"id": "V497",
+"E": 274927,
+"N": 6354648,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 34.8,
+"minas": [
+"JACINTO 4 1/100 (0ha)",
+"BETA 1 1/14 (0ha)"
+],
+"tit": "SAN MARTIN Y CIA.",
+"lon": -71.406993,
+"lat": -32.923277
+},
+{
+"id": "V498",
+"E": 275577,
+"N": 6354598,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"JACINTO 4 1/100 (0ha)",
+"BETA 2 1/14 (0ha)"
+],
+"tit": "SAN MARTIN Y CIA.",
+"lon": -71.40006,
+"lat": -32.923862
+},
+{
+"id": "V499",
+"E": 280577,
+"N": 6353948,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 35.7,
+"minas": [
+"LAUREL 1 1/14 (42ha)"
+],
+"tit": "MELON S.A.",
+"lon": -71.346782,
+"lat": -32.930735
+},
+{
+"id": "V500",
+"E": 297777,
+"N": 6353948,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 6 1/20 (100ha)",
+"LAS PALMAS 1/14 (0ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.162942,
+"lat": -32.934054
+},
+{
+"id": "V501",
+"E": 293927,
+"N": 6353548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 10 1/5 (50ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.204184,
+"lat": -32.93694
+},
+{
+"id": "V502",
+"E": 294577,
+"N": 6353548,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 10 1/5 (50ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.197236,
+"lat": -32.937062
+},
+{
+"id": "V503",
+"E": 273977,
+"N": 6353498,
+"score": 1.0,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"MARGARITA 1/5 (0ha)"
+],
+"tit": "NAVIA PARDO ZOILA MARTA",
+"lon": -71.417427,
+"lat": -32.933446
+},
+{
+"id": "V504",
+"E": 274627,
+"N": 6353498,
+"score": 1.0,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"MARGARITA 1/5 (0ha)"
+],
+"tit": "NAVIA PARDO ZOILA MARTA",
+"lon": -71.41048,
+"lat": -32.93358
+},
+{
+"id": "V505",
+"E": 295927,
+"N": 6352898,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"EL RODADERO 8 1/5 (40ha)"
+],
+"tit": "SOC AGRICOLA RIOS HNOS Y CIA L",
+"lon": -71.18295,
+"lat": -32.943175
+},
+{
+"id": "V506",
+"E": 275027,
+"N": 6352848,
+"score": 1.0,
+"com": "LIMACHE",
+"libre600": 36.0,
+"minas": [
+"DONA ANTONIA 1/10 (0ha)"
+],
+"tit": "TAIVO VARGAS SERGIO LUIS",
+"lon": -71.406364,
+"lat": -32.939521
+},
+{
+"id": "V507",
+"E": 298327,
+"N": 6352148,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LONCOMILLA 1/42 (0ha)",
+"LA SILLETA 1/25 (0ha)",
+"SAN PEDRO 1/60 (0ha)",
+"LONCOMILLA 1/30 (0ha)"
+],
+"tit": "QUIJANO FERNANDEZ JUAN JOSE",
+"lon": -71.157457,
+"lat": -32.950381
+},
+{
+"id": "V508",
+"E": 298977,
+"N": 6352148,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LONCOMILLA 1/42 (0ha)",
+"SAN PEDRO 1/60 (0ha)",
+"LONCOMILLA 1/30 (0ha)",
+"LA BUITRERA 1/22 (0ha)"
+],
+"tit": "QUIJANO FERNANDEZ JUAN JOSE",
+"lon": -71.150508,
+"lat": -32.950501
+},
+{
+"id": "V509",
+"E": 299627,
+"N": 6352148,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"LONCOMILLA 1/42 (0ha)",
+"SAN PEDRO 1/60 (0ha)",
+"LONCOMILLA 1/30 (0ha)",
+"LA BUITRERA 1/22 (0ha)"
+],
+"tit": "QUIJANO FERNANDEZ JUAN JOSE",
+"lon": -71.143558,
+"lat": -32.95062
+},
+{
+"id": "V510",
+"E": 288327,
+"N": 6351848,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"SANTA ESTER 1/10 (0ha)",
+"VIA LACTEA 1/10 (0ha)"
+],
+"tit": "DEL CAMPO PINTO PABLO ANDRES",
+"lon": -71.264433,
+"lat": -32.951192
+},
+{
+"id": "V511",
+"E": 288327,
+"N": 6351198,
+"score": 1.0,
+"com": "QUILLOTA",
+"libre600": 36.0,
+"minas": [
+"SANTA ESTER 1/10 (0ha)",
+"VIA LACTEA 1/10 (0ha)"
+],
+"tit": "DEL CAMPO PINTO PABLO ANDRES",
+"lon": -71.264583,
+"lat": -32.957051
+}
+]

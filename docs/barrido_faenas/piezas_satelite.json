@@ -1,0 +1,801 @@
+{
+"zonas": {
+"tilama_petorca": [
+-71.3186,
+-32.2439,
+-70.9725,
+-31.9656
+],
+"cerro_alto": [
+-71.0938,
+-31.575,
+-71.0074,
+-31.4753
+],
+"limache": [
+-71.1347,
+-33.1054,
+-71.0478,
+-33.0528
+]
+},
+"piezas": [
+{
+"nombre": "MARTINA 37",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 297800,
+"E1": 298800,
+"N0": 6445025,
+"N1": 6448025
+},
+{
+"nombre": "MARTINA 32",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 296900,
+"E1": 297450,
+"N0": 6453975,
+"N1": 6454175
+},
+{
+"nombre": "MARTINA 33",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 296400,
+"E1": 297400,
+"N0": 6453175,
+"N1": 6454175
+},
+{
+"nombre": "MARTINA 12",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 298800,
+"E1": 301800,
+"N0": 6446675,
+"N1": 6447675
+},
+{
+"nombre": "MARTINA 14",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 297800,
+"N0": 6447025,
+"N1": 6448025
+},
+{
+"nombre": "MARTINA 15",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 301800,
+"E1": 304800,
+"N0": 6447175,
+"N1": 6448175
+},
+{
+"nombre": "ELARA 9",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 303800,
+"E1": 304800,
+"N0": 6450675,
+"N1": 6452675
+},
+{
+"nombre": "ELARA 16",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 303800,
+"E1": 304800,
+"N0": 6448675,
+"N1": 6450675
+},
+{
+"nombre": "ELARA 17",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 302800,
+"E1": 303800,
+"N0": 6448175,
+"N1": 6449175
+},
+{
+"nombre": "MARTINA 16",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 298800,
+"E1": 301800,
+"N0": 6445675,
+"N1": 6446675
+},
+{
+"nombre": "MARTINA 18",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 299800,
+"E1": 301800,
+"N0": 6444675,
+"N1": 6445675
+},
+{
+"nombre": "MARTINA 17",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 301800,
+"E1": 303800,
+"N0": 6446175,
+"N1": 6447175
+},
+{
+"nombre": "MARTINA 19",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 301800,
+"E1": 302800,
+"N0": 6445175,
+"N1": 6446175
+},
+{
+"nombre": "MARTINA 20",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 297800,
+"N0": 6446025,
+"N1": 6447025
+},
+{
+"nombre": "MARTINA 21",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 297800,
+"N0": 6445025,
+"N1": 6446025
+},
+{
+"nombre": "MARTINA 22",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 297800,
+"N0": 6444025,
+"N1": 6445025
+},
+{
+"nombre": "MARTINA 23",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 296800,
+"N0": 6443025,
+"N1": 6444025
+},
+{
+"nombre": "MARTINA 24",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 297800,
+"E1": 298800,
+"N0": 6441025,
+"N1": 6444025
+},
+{
+"nombre": "MARTINA 25",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 296800,
+"N0": 6441025,
+"N1": 6442025
+},
+{
+"nombre": "MARTINA 26",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 297800,
+"N0": 6440025,
+"N1": 6441025
+},
+{
+"nombre": "MARTINA 27",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 296800,
+"N0": 6439025,
+"N1": 6440025
+},
+{
+"nombre": "MARTINA 28",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 305300,
+"E1": 306300,
+"N0": 6448775,
+"N1": 6449775
+},
+{
+"nombre": "MARTINA 29",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 307400,
+"E1": 308400,
+"N0": 6449375,
+"N1": 6450375
+},
+{
+"nombre": "MARTINA 30",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 306400,
+"E1": 307400,
+"N0": 6449775,
+"N1": 6451775
+},
+{
+"nombre": "MARTINA 31",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 305400,
+"E1": 306400,
+"N0": 6450725,
+"N1": 6451725
+},
+{
+"nombre": "MARTINA 34",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 296800,
+"N0": 6454675,
+"N1": 6455675
+},
+{
+"nombre": "MARTINA 35",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 296800,
+"E1": 298800,
+"N0": 6452025,
+"N1": 6453025
+},
+{
+"nombre": "MARTINA 36",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 294800,
+"E1": 295800,
+"N0": 6452675,
+"N1": 6454675
+},
+{
+"nombre": "MARTINA 56",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 287050,
+"E1": 288050,
+"N0": 6451175,
+"N1": 6454175
+},
+{
+"nombre": "MARTINA 57",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 286050,
+"E1": 287050,
+"N0": 6452175,
+"N1": 6455175
+},
+{
+"nombre": "MARTINA 58",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 288050,
+"E1": 291050,
+"N0": 6453175,
+"N1": 6454175
+},
+{
+"nombre": "MARTINA 59",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 285050,
+"E1": 288050,
+"N0": 6455175,
+"N1": 6456175
+},
+{
+"nombre": "MARTINA 60",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 288050,
+"E1": 289050,
+"N0": 6454175,
+"N1": 6457175
+},
+{
+"nombre": "MARTINA 61",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 285050,
+"E1": 286050,
+"N0": 6452175,
+"N1": 6455175
+},
+{
+"nombre": "MARTINA 62",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 284050,
+"E1": 287050,
+"N0": 6451175,
+"N1": 6452175
+},
+{
+"nombre": "MARTINA 63",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 285050,
+"E1": 288050,
+"N0": 6456175,
+"N1": 6457175
+},
+{
+"nombre": "MARTINA 64",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 284050,
+"E1": 285050,
+"N0": 6453175,
+"N1": 6456175
+},
+{
+"nombre": "MARTINA 65",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 285050,
+"E1": 288050,
+"N0": 6457175,
+"N1": 6458175
+},
+{
+"nombre": "MARTINA 66",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 286050,
+"E1": 289050,
+"N0": 6458175,
+"N1": 6459175
+},
+{
+"nombre": "MARTINA 67",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 292050,
+"E1": 293050,
+"N0": 6450175,
+"N1": 6453175
+},
+{
+"nombre": "MARTINA 68",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 285050,
+"E1": 288050,
+"N0": 6450175,
+"N1": 6451175
+},
+{
+"nombre": "MARTINA 38",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 296800,
+"E1": 299800,
+"N0": 6438675,
+"N1": 6439675
+},
+{
+"nombre": "MARTINA 39",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 295900,
+"E1": 298900,
+"N0": 6437675,
+"N1": 6438675
+},
+{
+"nombre": "MARTINA 40",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 299800,
+"E1": 300800,
+"N0": 6438575,
+"N1": 6441575
+},
+{
+"nombre": "MARTINA 41",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 298500,
+"E1": 299500,
+"N0": 6439675,
+"N1": 6440675
+},
+{
+"nombre": "MARTINA 42",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 303800,
+"E1": 305800,
+"N0": 6445675,
+"N1": 6446675
+},
+{
+"nombre": "MARTINA 43",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 305300,
+"E1": 306300,
+"N0": 6446875,
+"N1": 6447875
+},
+{
+"nombre": "MARTINA 44",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 302800,
+"E1": 303800,
+"N0": 6444875,
+"N1": 6445875
+},
+{
+"nombre": "MARTINA 45",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 306300,
+"E1": 307300,
+"N0": 6447775,
+"N1": 6448775
+},
+{
+"nombre": "MARTINA 46",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 296600,
+"E1": 299600,
+"N0": 6436575,
+"N1": 6437575
+},
+{
+"nombre": "MARTINA 47",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 295600,
+"E1": 296600,
+"N0": 6434675,
+"N1": 6437675
+},
+{
+"nombre": "MARTINA 48",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 300300,
+"E1": 303300,
+"N0": 6435775,
+"N1": 6436775
+},
+{
+"nombre": "MARTINA 49",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 299600,
+"E1": 302600,
+"N0": 6436775,
+"N1": 6437775
+},
+{
+"nombre": "MARTINA 50",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 306300,
+"E1": 307300,
+"N0": 6444675,
+"N1": 6447675
+},
+{
+"nombre": "MARTINA 51",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 307400,
+"E1": 308400,
+"N0": 6451575,
+"N1": 6452575
+},
+{
+"nombre": "MARTINA 52",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 309100,
+"E1": 310100,
+"N0": 6446675,
+"N1": 6449675
+},
+{
+"nombre": "MARTINA 53",
+"zona": "tilama_petorca",
+"hoy": false,
+"E0": 310100,
+"E1": 311100,
+"N0": 6447675,
+"N1": 6450675
+},
+{
+"nombre": "MARTINA 54",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 295600,
+"E1": 298600,
+"N0": 6433675,
+"N1": 6434675
+},
+{
+"nombre": "MARTINA 55",
+"zona": "tilama_petorca",
+"hoy": true,
+"E0": 295600,
+"E1": 298600,
+"N0": 6432675,
+"N1": 6433675
+},
+{
+"nombre": "LEONOR CERRO ALTO 1",
+"zona": "cerro_alto",
+"hoy": true,
+"E0": 304799,
+"E1": 305799,
+"N0": 6509373,
+"N1": 6512373
+},
+{
+"nombre": "LEONOR CERRO ALTO 2",
+"zona": "cerro_alto",
+"hoy": true,
+"E0": 305799,
+"E1": 306799,
+"N0": 6507273,
+"N1": 6510273
+},
+{
+"nombre": "LEONOR CERRO ALTO 3",
+"zona": "cerro_alto",
+"hoy": true,
+"E0": 303799,
+"E1": 304799,
+"N0": 6509473,
+"N1": 6512473
+},
+{
+"nombre": "LEONOR CERRO ALTO 4",
+"zona": "cerro_alto",
+"hoy": true,
+"E0": 303799,
+"E1": 305799,
+"N0": 6512473,
+"N1": 6513473
+},
+{
+"nombre": "ELARA CALIFORNIA",
+"zona": "limache",
+"hoy": false,
+"presentada": "V-166-2026",
+"E0": 303300,
+"E1": 306300,
+"N0": 6337500,
+"N1": 6338500
+},
+{
+"nombre": "ELARA 21",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-303-2026",
+"E0": 299800.0,
+"E1": 300800.0,
+"N0": 6449675.0,
+"N1": 6450675.0
+},
+{
+"nombre": "ELARA 19",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-304-2026",
+"E0": 298800.0,
+"E1": 299800.0,
+"N0": 6449675.0,
+"N1": 6452675.0
+},
+{
+"nombre": "LEONOR 8",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-305-2026",
+"E0": 298800.0,
+"E1": 301800.0,
+"N0": 6447675.0,
+"N1": 6448675.0
+},
+{
+"nombre": "LEONOR 7",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-306-2026",
+"E0": 298800.0,
+"E1": 301800.0,
+"N0": 6448675.0,
+"N1": 6449675.0
+},
+{
+"nombre": "LEONOR 6",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-307-2026",
+"E0": 301800.0,
+"E1": 302800.0,
+"N0": 6448175.0,
+"N1": 6450175.0
+},
+{
+"nombre": "LEONOR 4",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-308-2026",
+"E0": 302800.0,
+"E1": 303800.0,
+"N0": 6449175.0,
+"N1": 6451175.0
+},
+{
+"nombre": "MARTINA 11",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-309-2026",
+"E0": 302800.0,
+"E1": 304800.0,
+"N0": 6457025.0,
+"N1": 6458025.0
+},
+{
+"nombre": "MARTINA 10",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-310-2026",
+"E0": 304800.0,
+"E1": 306800.0,
+"N0": 6456025.0,
+"N1": 6457025.0
+},
+{
+"nombre": "MARTINA 8",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-311-2026",
+"E0": 307300.0,
+"E1": 308300.0,
+"N0": 6452625.0,
+"N1": 6455625.0
+},
+{
+"nombre": "MARTINA 7",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-312-2026",
+"E0": 304950.0,
+"E1": 306950.0,
+"N0": 6452025.0,
+"N1": 6453025.0
+},
+{
+"nombre": "MARTINA 6",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-313-2026",
+"E0": 303800.0,
+"E1": 304800.0,
+"N0": 6452675.0,
+"N1": 6454675.0
+},
+{
+"nombre": "MARTINA 5",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-314-2026",
+"E0": 304940.0,
+"E1": 306940.0,
+"N0": 6453025.0,
+"N1": 6454025.0
+},
+{
+"nombre": "MARTINA 4",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-315-2026",
+"E0": 305800.0,
+"E1": 306800.0,
+"N0": 6454025.0,
+"N1": 6456025.0
+},
+{
+"nombre": "MARTINA 3",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-316-2026",
+"E0": 304800.0,
+"E1": 305800.0,
+"N0": 6454025.0,
+"N1": 6456025.0
+},
+{
+"nombre": "MARTINA 2",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-317-2026",
+"E0": 303800.0,
+"E1": 304800.0,
+"N0": 6455025.0,
+"N1": 6457025.0
+},
+{
+"nombre": "LEONOR 5",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-319-2026",
+"E0": 300800.0,
+"E1": 301800.0,
+"N0": 6449675.0,
+"N1": 6450675.0
+},
+{
+"nombre": "LEONOR 3",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-320-2026",
+"E0": 301800.0,
+"E1": 302800.0,
+"N0": 6450175.0,
+"N1": 6452175.0
+},
+{
+"nombre": "LEONOR 2",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-321-2026",
+"E0": 302800.0,
+"E1": 303800.0,
+"N0": 6451175.0,
+"N1": 6453175.0
+},
+{
+"nombre": "MARTINA 1",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-322-2026",
+"E0": 302800.0,
+"E1": 303300.0,
+"N0": 6453275.0,
+"N1": 6453975.0
+},
+{
+"nombre": "LEONOR 1",
+"zona": "tilama_petorca",
+"hoy": false,
+"presentada": "V-323-2026",
+"E0": 301800.0,
+"E1": 303100.0,
+"N0": 6452105.0,
+"N1": 6453705.0
+}
+]
+}

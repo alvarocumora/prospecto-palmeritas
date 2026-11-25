@@ -1,0 +1,427 @@
+[
+ {
+  "n": 1,
+  "nombre": "MARTINA 38",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 297000,
+  "E1": 300000,
+  "N0": 6439000,
+  "N1": 6440000,
+  "ha": 300,
+  "NS": 1000,
+  "EW": 3000,
+  "pm_N": 6439500.0,
+  "pm_E": 298500.0,
+  "libre": 299.9,
+  "minas_ha": 299.5,
+  "minas": [
+   "EL TRANSITO 1/11",
+   "LAS PALMAS 3 1/30",
+   "MI HIJA 1/11",
+   "MI PADRE 1/18",
+   "MI PRIMER AMOR 1/18",
+   "MINA MARILYN MONRIE 1/5",
+   "SI DIOS QUIERE 1/15"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 2,
+  "nombre": "MARTINA 39",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 296100,
+  "E1": 299100,
+  "N0": 6438000,
+  "N1": 6439000,
+  "ha": 300,
+  "NS": 1000,
+  "EW": 3000,
+  "pm_N": 6438500.0,
+  "pm_E": 297600.0,
+  "libre": 299.0,
+  "minas_ha": 211.2,
+  "minas": [
+   "BARBARA 1/55",
+   "EL TRANSITO 1/11",
+   "LAS PALMAS 4 1/57",
+   "LAS PALMERAS 1/8",
+   "MI HIJA 1/11",
+   "MI PRIMER AMOR 1/18",
+   "MINA MARILYN MONRIE 1/5",
+   "ROBERTO PABLO 1/2"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 3,
+  "nombre": "MARTINA 40",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 300000,
+  "E1": 301000,
+  "N0": 6438900,
+  "N1": 6441900,
+  "ha": 300,
+  "NS": 3000,
+  "EW": 1000,
+  "pm_N": 6440400.0,
+  "pm_E": 300500.0,
+  "libre": 262.0,
+  "minas_ha": 207.0,
+  "minas": [
+   "LA BENDECIDA 1/20",
+   "LA GLORIA 1/10",
+   "MI PADRE 1/18",
+   "MI SEGUNDO AMOR 1/20",
+   "MONTECRISTO 1/36",
+   "MONTECRISTO 1/36(8/15-29/33"
+  ],
+  "solapa": [
+   "CARDAS 6"
+  ]
+ },
+ {
+  "n": 4,
+  "nombre": "MARTINA 41",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 298700,
+  "E1": 299700,
+  "N0": 6440000,
+  "N1": 6441000,
+  "ha": 100,
+  "NS": 1000,
+  "EW": 1000,
+  "pm_N": 6440500.0,
+  "pm_E": 299200.0,
+  "libre": 100.0,
+  "minas_ha": 94.0,
+  "minas": [
+   "MI PADRE 1/18",
+   "MONTECRISTO 1/36",
+   "OREX 5 ESTE 1/18",
+   "SI DIOS QUIERE 1/15"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 5,
+  "nombre": "MARTINA 42",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 304000,
+  "E1": 306000,
+  "N0": 6446000,
+  "N1": 6447000,
+  "ha": 200,
+  "NS": 1000,
+  "EW": 2000,
+  "pm_N": 6446500.0,
+  "pm_E": 305000.0,
+  "libre": 200.0,
+  "minas_ha": 150.0,
+  "minas": [
+   "BIOTIERRA F 1/20",
+   "BIOTIERRA G 1/30"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 6,
+  "nombre": "MARTINA 43",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 305500,
+  "E1": 306500,
+  "N0": 6447200,
+  "N1": 6448200,
+  "ha": 100,
+  "NS": 1000,
+  "EW": 1000,
+  "pm_N": 6447700.0,
+  "pm_E": 306000.0,
+  "libre": 100.0,
+  "minas_ha": 80.0,
+  "minas": [
+   "BIOTIERRA 6 1/10",
+   "DANIEL V 1/20",
+   "LA JOSEFA 1/20",
+   "SANTA ANDRES 1/20"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 7,
+  "nombre": "MARTINA 44",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 303000,
+  "E1": 304000,
+  "N0": 6445200,
+  "N1": 6446200,
+  "ha": 100,
+  "NS": 1000,
+  "EW": 1000,
+  "pm_N": 6445700.0,
+  "pm_E": 303500.0,
+  "libre": 71.2,
+  "minas_ha": 70.5,
+  "minas": [
+   "BARBARA 1/20",
+   "BIOTIERRA E 1/130",
+   "BIOTIERRA F 1/20",
+   "GRADO 11 1/150"
+  ],
+  "solapa": [
+   "AURUM 1 1/70",
+   "CARDAS 1",
+   "LAS CARDITAS 1/5"
+  ]
+ },
+ {
+  "n": 8,
+  "nombre": "MARTINA 45",
+  "tier": "A",
+  "grupo": "A",
+  "E0": 306500,
+  "E1": 307500,
+  "N0": 6448100,
+  "N1": 6449100,
+  "ha": 100,
+  "NS": 1000,
+  "EW": 1000,
+  "pm_N": 6448600.0,
+  "pm_E": 307000.0,
+  "libre": 55.0,
+  "minas_ha": 50.0,
+  "minas": [
+   "DANIEL V 1/20",
+   "EL QUILLAY 2 1/60"
+  ],
+  "solapa": [
+   "DANIEL IV 1/20"
+  ]
+ },
+ {
+  "n": 9,
+  "nombre": "MARTINA 46",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 296800,
+  "E1": 299800,
+  "N0": 6436900,
+  "N1": 6437900,
+  "ha": 300,
+  "NS": 1000,
+  "EW": 3000,
+  "pm_N": 6437400.0,
+  "pm_E": 298300.0,
+  "libre": 282.0,
+  "minas_ha": 130.0,
+  "minas": [
+   "ICO ICO 1/19",
+   "MI PRIMER AMOR 1/18",
+   "MINA SOFIA LORENS 1/5"
+  ],
+  "solapa": [
+   "ALIANZA"
+  ]
+ },
+ {
+  "n": 10,
+  "nombre": "MARTINA 47",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 295800,
+  "E1": 296800,
+  "N0": 6435000,
+  "N1": 6438000,
+  "ha": 300,
+  "NS": 3000,
+  "EW": 1000,
+  "pm_N": 6436500.0,
+  "pm_E": 296300.0,
+  "libre": 270.7,
+  "minas_ha": 172.2,
+  "minas": [
+   "BLANCO 6 1/10",
+   "LA SUERTE 1/35",
+   "MAMI BERTA 1/5",
+   "MONSERRAT 1/20",
+   "MONTE BLANCO 1/40",
+   "SAN JOSE 1/15"
+  ],
+  "solapa": [
+   "CHEPITA 1 1/4",
+   "DIOS TE SALVE 1/7",
+   "MARIELA 1/25",
+   "MARTUKI 62 B 1/6",
+   "MARTUKI 62 C 1/4"
+  ]
+ },
+ {
+  "n": 11,
+  "nombre": "MARTINA 48",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 300500,
+  "E1": 303500,
+  "N0": 6436100,
+  "N1": 6437100,
+  "ha": 300,
+  "NS": 1000,
+  "EW": 3000,
+  "pm_N": 6436600.0,
+  "pm_E": 302000.0,
+  "libre": 300.0,
+  "minas_ha": 161.0,
+  "minas": [
+   "AGUSTIN 1/20",
+   "LAS VETILLAS 1/10",
+   "SAN DIEGO 1/5",
+   "SAN LUIS 1/18"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 12,
+  "nombre": "MARTINA 49",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 299800,
+  "E1": 302800,
+  "N0": 6437100,
+  "N1": 6438100,
+  "ha": 300,
+  "NS": 1000,
+  "EW": 3000,
+  "pm_N": 6437600.0,
+  "pm_E": 301300.0,
+  "libre": 259.9,
+  "minas_ha": 79.0,
+  "minas": [
+   "AGUSTIN 1/20",
+   "LA CEPA II 1/10",
+   "MI PRIMER AMOR 1/18",
+   "MI SEGUNDO AMOR 1/20"
+  ],
+  "solapa": [
+   "ALIANZA",
+   "MILENIUM DEL 1-10"
+  ]
+ },
+ {
+  "n": 13,
+  "nombre": "MARTINA 50",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 306500,
+  "E1": 307500,
+  "N0": 6445000,
+  "N1": 6448000,
+  "ha": 300,
+  "NS": 3000,
+  "EW": 1000,
+  "pm_N": 6446500.0,
+  "pm_E": 307000.0,
+  "libre": 296.2,
+  "minas_ha": 193.0,
+  "minas": [
+   "BIOTIERRA 7 1/20",
+   "ESPERANZA 1/40",
+   "LA VIZCACHA 1/20",
+   "LAS PAMELA 1/10",
+   "PANDA IX 1/20",
+   "SANTA ANDRES 1/20"
+  ],
+  "solapa": [
+   "LA ORTIGA 1 1/10"
+  ]
+ },
+ {
+  "n": 14,
+  "nombre": "MARTINA 51",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 307600,
+  "E1": 308600,
+  "N0": 6451900,
+  "N1": 6452900,
+  "ha": 100,
+  "NS": 1000,
+  "EW": 1000,
+  "pm_N": 6452400.0,
+  "pm_E": 308100.0,
+  "libre": 85.0,
+  "minas_ha": 83.5,
+  "minas": [
+   "ALEJANDRA II 1/30",
+   "LOS BURROS 1/32",
+   "VENTANA 1/22"
+  ],
+  "solapa": [
+   "GEMINIS I 1/20",
+   "MADRE MIA II"
+  ]
+ },
+ {
+  "n": 15,
+  "nombre": "MARTINA 52",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 309300,
+  "E1": 310300,
+  "N0": 6447000,
+  "N1": 6450000,
+  "ha": 300,
+  "NS": 3000,
+  "EW": 1000,
+  "pm_N": 6448500.0,
+  "pm_E": 309800.0,
+  "libre": 300.0,
+  "minas_ha": 250.0,
+  "minas": [
+   "DANIEL II 1/40",
+   "DANIEL III 1/20",
+   "GEMINIS VII 1/20",
+   "GEMINIS VIII 1/20",
+   "LA PLATA DEL 1/9",
+   "PANDA XVII 1/30",
+   "PANDA XVIII 1/30",
+   "SANTA MARTA 1/20"
+  ],
+  "solapa": []
+ },
+ {
+  "n": 16,
+  "nombre": "MARTINA 53",
+  "tier": "B",
+  "grupo": "A",
+  "E0": 310300,
+  "E1": 311300,
+  "N0": 6448000,
+  "N1": 6451000,
+  "ha": 300,
+  "NS": 3000,
+  "EW": 1000,
+  "pm_N": 6449500.0,
+  "pm_E": 310800.0,
+  "libre": 205.0,
+  "minas_ha": 195.0,
+  "minas": [
+   "DANIEL III 1/20",
+   "DANIEL VI 1/30",
+   "GEMINIS VII 1/20",
+   "LA PLATA DEL 1/9",
+   "PANDA X 1/30",
+   "PANDA XVIII 1/30",
+   "SILVER MINES 17  1/20"
+  ],
+  "solapa": [
+   "GEMINIS XVI 1/10",
+   "TESORO 4"
+  ]
+ }
+]

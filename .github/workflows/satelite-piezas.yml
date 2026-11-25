@@ -1,0 +1,38 @@
+name: Satélite por pieza
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'scripts/satelite_piezas.py'
+      - 'docs/barrido_faenas/piezas_satelite.json'
+      - '.github/workflows/satelite-piezas.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  piezas:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install -e ./geocapitals-remote scipy matplotlib
+      - run: python scripts/satelite_piezas.py
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: satelite-piezas
+          path: out/satelite_piezas/
+          retention-days: 30
+      - name: Publicar en rama de datos
+        run: |
+          cd out/satelite_piezas
+          git init -q -b data/satelite-piezas
+          git config user.name "tilama-bot"; git config user.email "tilama-bot@users.noreply.github.com"
+          git add -A; git commit -q -m "Satélite por pieza ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" data/satelite-piezas
