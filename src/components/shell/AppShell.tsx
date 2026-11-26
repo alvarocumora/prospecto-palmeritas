@@ -52,6 +52,11 @@ const PILLARS: { label: string; items: NavItem[] }[] = [
         desc: "Concesiones, satélite y anomalías",
       },
       {
+        to: "/servicios/legal-minero",
+        label: "Consultoría y Legal Minero",
+        desc: "Pedimentos, manifestaciones y due diligence",
+      },
+      {
         to: "/terminal",
         label: "Terminal de proyectos",
         desc: "Ficha técnica, 2D y 3D por activo",
@@ -306,6 +311,11 @@ export function MarketingFooter() {
             <li>
               <Link to="/catastro/precios" className="hover:text-white">
                 Planes y precios
+              </Link>
+            </li>
+            <li>
+              <Link to="/servicios/legal-minero" className="hover:text-white">
+                Consultoría y Legal Minero
               </Link>
             </li>
             <li>

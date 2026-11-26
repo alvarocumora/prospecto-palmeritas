@@ -4,47 +4,7 @@ import { ArrowRight, Check, Scale } from "lucide-react";
 import { Eyebrow } from "@/components/brand";
 import { LegalTramiteModal } from "@/features/catastro-workbench/LegalTramiteModal";
 import type { LegalServiceType } from "@/lib/cadastre/legalRequest";
-
-const SERVICES: {
-  id: LegalServiceType;
-  title: string;
-  subtitle: string;
-  items: string[];
-}[] = [
-  {
-    id: "pedimento",
-    title: "Pedimento minero (Exploración)",
-    subtitle: "Hasta 5.000 ha · Código de Minería",
-    items: [
-      "Diseño geométrico y chequeo de solapes SERNAGEOMIN",
-      "Redacción de escrito y patrocinio de abogado minero",
-      "Ingreso en OJV ante el Juzgado de Letras competente",
-      "Control de tasa TGR (30 días) y publicación en Boletín",
-    ],
-  },
-  {
-    id: "manifestacion",
-    title: "Manifestación (Explotación)",
-    subtitle: "Pertenencias y faenas identificadas",
-    items: [
-      "Determinación de punto de interés y pertenencias (1–10 ha)",
-      "Incorporación de antecedentes técnicos o de labores",
-      "Tramitación judicial completa hasta solicitud de mensura",
-      "Coordinación con perito mensurador y Conservador de Minas",
-    ],
-  },
-  {
-    id: "due-diligence",
-    title: "Due Diligence y Blindaje",
-    subtitle: "Vigilancia, patentes y contratos mineros",
-    items: [
-      "Auditoría de vigencia y patentes TGR en zonas objetivo",
-      "Monitoreo de caducidades y terceros en Boletín Oficial",
-      "Diseño perimetral de bloques defensivos alrededor de faenas",
-      "Contratos de opción, arriendo, royalties y Joint Venture",
-    ],
-  },
-];
+import { LEGAL_SERVICES } from "@/lib/cadastre/legalServices";
 
 const GUARANTEES = [
   "Abogados mineros habilitados en Chile",
@@ -77,7 +37,7 @@ export function LegalMiningServices() {
         </div>
 
         <div className="mt-8 grid gap-px border border-hairline bg-hairline md:grid-cols-3">
-          {SERVICES.map((svc, idx) => (
+          {LEGAL_SERVICES.map((svc, idx) => (
             <div key={svc.id} className="flex flex-col justify-between bg-surface p-6">
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-accent-brand">
@@ -94,13 +54,13 @@ export function LegalMiningServices() {
                   ))}
                 </ul>
               </div>
-              <button
-                type="button"
-                onClick={() => openFor(svc.id)}
+              <Link
+                to="/servicios/legal-minero"
+                search={{ servicio: svc.id }}
                 className="mt-6 inline-flex items-center gap-2 self-start font-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-accent-brand hover:underline"
               >
-                Solicitar este trámite <ArrowRight className="h-3.5 w-3.5" />
-              </button>
+                Ver alcance y cotizar <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
             </div>
           ))}
         </div>

@@ -74,3 +74,8 @@
 - [ ] Revisar el aviso de control de calidad que aparece en el memorándum.
 - [ ] Actualización trimestral y cartola: bloqueadas por falta de datos verificados o privacidad.
 - [ ] Catastro nacional usable desde la portada con límites por plan
+
+## Legal Minero · Fase 2
+- [x] Página pública de servicios, proceso, antecedentes y preguntas frecuentes.
+- [x] Cotizador de alcance sin tarifas públicas; honorarios y gastos a confirmar.
+- [x] Verificar enlaces, validaciones y presentación móvil/escritorio sin enviar solicitudes ficticias.

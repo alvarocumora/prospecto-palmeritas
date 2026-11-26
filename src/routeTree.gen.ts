@@ -65,6 +65,7 @@ import { Route as ProveedorTokenRouteImport } from './routes/proveedor.$token'
 import { Route as ProyectoTokenRouteImport } from './routes/proyecto.$token'
 import { Route as ProyectosListingIdRouteImport } from './routes/proyectos.$listingId'
 import { Route as RfqsIndexRouteImport } from './routes/rfqs.index'
+import { Route as ServiciosLegalMineroRouteImport } from './routes/servicios.legal-minero'
 import { Route as TerminalCapitalRaiseRouteImport } from './routes/terminal.capital-raise'
 import { Route as TerminalMarketRouteImport } from './routes/terminal.market'
 import { Route as TerminalTokenizeRouteImport } from './routes/terminal.tokenize'
@@ -473,6 +474,11 @@ const ProyectosListingIdRoute = ProyectosListingIdRouteImport.update({
 const RfqsIndexRoute = RfqsIndexRouteImport.update({
   id: '/rfqs/',
   path: '/rfqs/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServiciosLegalMineroRoute = ServiciosLegalMineroRouteImport.update({
+  id: '/servicios/legal-minero',
+  path: '/servicios/legal-minero',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TerminalCapitalRaiseRoute = TerminalCapitalRaiseRouteImport.update({
@@ -1270,6 +1276,7 @@ export interface FileRoutesByFullPath {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/servicios/legal-minero': typeof ServiciosLegalMineroRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1455,6 +1462,7 @@ export interface FileRoutesByTo {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/servicios/legal-minero': typeof ServiciosLegalMineroRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1642,6 +1650,7 @@ export interface FileRoutesById {
   '/proveedor/$token': typeof ProveedorTokenRoute
   '/proyecto/$token': typeof ProyectoTokenRoute
   '/proyectos/$listingId': typeof ProyectosListingIdRoute
+  '/servicios/legal-minero': typeof ServiciosLegalMineroRoute
   '/terminal/capital-raise': typeof TerminalCapitalRaiseRoute
   '/terminal/market': typeof TerminalMarketRoute
   '/terminal/tokenize': typeof TerminalTokenizeRoute
@@ -1829,6 +1838,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/servicios/legal-minero'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -2014,6 +2024,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/servicios/legal-minero'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -2200,6 +2211,7 @@ export interface FileRouteTypes {
     | '/proveedor/$token'
     | '/proyecto/$token'
     | '/proyectos/$listingId'
+    | '/servicios/legal-minero'
     | '/terminal/capital-raise'
     | '/terminal/market'
     | '/terminal/tokenize'
@@ -2384,6 +2396,7 @@ export interface RootRouteChildren {
   OperacionTokenRoute: typeof OperacionTokenRoute
   ProveedorTokenRoute: typeof ProveedorTokenRoute
   ProyectoTokenRoute: typeof ProyectoTokenRoute
+  ServiciosLegalMineroRoute: typeof ServiciosLegalMineroRoute
   TerminalSlugRoute: typeof TerminalSlugRoute
   VerificarRefRoute: typeof VerificarRefRoute
   AguaIndexRoute: typeof AguaIndexRoute
@@ -2817,6 +2830,13 @@ declare module '@tanstack/react-router' {
       path: '/rfqs'
       fullPath: '/rfqs/'
       preLoaderRoute: typeof RfqsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/servicios/legal-minero': {
+      id: '/servicios/legal-minero'
+      path: '/servicios/legal-minero'
+      fullPath: '/servicios/legal-minero'
+      preLoaderRoute: typeof ServiciosLegalMineroRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terminal/capital-raise': {
@@ -4116,6 +4136,7 @@ const rootRouteChildren: RootRouteChildren = {
   OperacionTokenRoute: OperacionTokenRoute,
   ProveedorTokenRoute: ProveedorTokenRoute,
   ProyectoTokenRoute: ProyectoTokenRoute,
+  ServiciosLegalMineroRoute: ServiciosLegalMineroRoute,
   TerminalSlugRoute: TerminalSlugRoute,
   VerificarRefRoute: VerificarRefRoute,
   AguaIndexRoute: AguaIndexRoute,
