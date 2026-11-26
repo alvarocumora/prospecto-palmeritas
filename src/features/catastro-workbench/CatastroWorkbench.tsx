@@ -5,7 +5,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Link } from "@tanstack/react-router";
-import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X, CalendarClock, Satellite, ShieldAlert, BookmarkPlus } from "lucide-react";
+import { FileText, Copy, Download, Loader2, Ruler, Scale, Newspaper, X, CalendarClock, Satellite, ShieldAlert, BookmarkPlus, Briefcase } from "lucide-react";
 import { toast } from "sonner";
 import type { Map as MLMap, GeoJSONSource } from "maplibre-gl";
 import { proposePedimentoOnAoi } from "@/lib/pedimento.functions";
@@ -19,6 +19,7 @@ import { useMiningBulletins } from "@/hooks/useMiningBulletins";
 import { DesignerPanel, type DesignerHandle } from "./DesignerPanel";
 import { SpectralPanel } from "./SpectralPanel";
 import { OwnCasesPanel } from "./OwnCasesPanel";
+import { LegalTramiteModal } from "./LegalTramiteModal";
 import { downloadEscritoDocx } from "@/lib/cadastre/escritoDocx";
 import { pedimentoInDatum, utmToLngLat, PSAD56_NOTE, type Datum } from "@/lib/cadastre/datum";
 import { loadCases, saveCases, overlapsWithOwn, type OwnCase } from "@/lib/cadastre/ownCases";
@@ -83,6 +84,7 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
   const [meta, setMeta] = useState<DesignerHandle>({ kind: "pedimento", pertenencias: [] });
   const [datum, setDatum] = useState<Datum>("WGS84");
   const [own, setOwn] = useState<OwnCase[]>([]);
+  const [legalOpen, setLegalOpen] = useState(false);
   useEffect(() => setOwn(loadCases()), [tab]);
   const pedOut = useMemo(() => (ped ? pedimentoInDatum(ped, datum) : null), [ped, datum]);
   const ownHits = useMemo(() => (ped ? overlapsWithOwn(ped.rectangleWgs84, own) : []), [ped, own]);
@@ -291,6 +293,14 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
                 {datum === "PSAD56" && <p className="text-[10px] text-muted-foreground">{PSAD56_NOTE}</p>}
                 <div className="text-[10px] text-muted-foreground">{ped.concessionsChecked} concesiones revisadas.</div>
                 <div className="grid grid-cols-1 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setLegalOpen(true)}
+                    className="flex items-center justify-center gap-2 rounded bg-accent-brand px-3 py-2 text-xs font-semibold text-accent-brand-contrast hover:opacity-90 transition-opacity"
+                  >
+                    <Briefcase className="w-3.5 h-3.5" />
+                    Tramitar con Geocapitals Legal
+                  </button>
                   <button type="button" onClick={() => { navigator.clipboard.writeText(ojvVertexText(pedOut!)); toast.success(`Vértices ${datum} copiados para OJV`); }}
                     className="flex items-center gap-2 rounded border border-border px-3 py-1.5 text-xs hover:bg-muted"><Copy className="w-3.5 h-3.5" />Copiar minuta de vértices (OJV)</button>
                   <button type="button" onClick={() => downloadEscritoDocx(pedOut!, "pedimento", datos)}
@@ -338,6 +348,14 @@ export function CatastroWorkbench({ map, onClose }: { map: MLMap | null; onClose
           </div>
         )}
       </div>
+      {pedOut && (
+        <LegalTramiteModal
+          open={legalOpen}
+          onOpenChange={setLegalOpen}
+          source="catastro-legal-tramite"
+          context={{ kind: meta.kind, ped: pedOut, datos, pertenencias: meta.pertenencias }}
+        />
+      )}
     </div>
   );
 }

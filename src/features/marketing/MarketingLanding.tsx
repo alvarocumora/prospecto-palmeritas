@@ -14,6 +14,7 @@ import { MiningInvestShowcase } from "@/features/marketing/MiningInvestShowcase"
 import featureCatastro from "@/assets/feature-catastro.jpg";
 import { CollateralDownloadButtons } from "@/features/investor/CollateralDownloadButtons";
 import { InvestorDeckEntry } from "@/features/marketing/deck/InvestorDeckEntry";
+import { LegalMiningServices } from "@/features/marketing/LegalMiningServices";
 
 /**
  * Portada = embudo de captura con dos puertas:
@@ -210,6 +211,8 @@ export function MarketingLanding() {
           </div>
         </div>
       </section>
+
+      <LegalMiningServices />
 
       {/* 4. CIERRE */}
       <section className="border-b border-hairline">
